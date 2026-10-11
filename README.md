@@ -6,7 +6,7 @@ The ETAF Reference Manual documents every public interface of the core ETAF pack
 
 This repository holds the book source and the `etaf-manual` package, which reads the book as data for Emacs tools and the site build. The book is checked against the code: a build fails when a signature differs from its package's Commentary, when the text names a symbol that is not public, when a stated version is out of date, when a translation diverges, or when a runnable example fails to mount.
 
-The book currently contains the Reactivity chapter; the other chapters are being written. The interactive reader in Emacs and the HTML edition are not implemented yet.
+The book currently contains the Introduction and the Reactivity chapter; the other chapters are being written. The interactive reader in Emacs and the HTML edition are not implemented yet.
 
 ## Requirements
 
@@ -28,7 +28,7 @@ To read a chapter, open its Markdown file below `book/en/` or `book/zh-CN/`. The
 ## Documentation
 
 - [Writing the manual](docs/manual.md): the book format, the gate and the commands.
-- [Reactivity](book/en/reactivity.md): refs, computed values, effects, watchers, scopes and the update cycle.
+- [Introduction](book/en/introduction.md): the scope of the book and its notation.
 
 ## Development
 

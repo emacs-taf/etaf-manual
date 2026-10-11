@@ -162,7 +162,7 @@
 
 (mapcar (lambda (chapter) (plist-get chapter :title))
         (plist-get (etaf-manual-book "zh-CN") :chapters))
-     ⇒ ("响应式系统")
+     ⇒ ("引言" "响应式系统")
 ```
 
 `etaf-manual-book` 会缓存解析结果，直到某个源文件改变；源文件格式有误时发出 `etaf-manual-error`。`etaf-manual-example-view` 对可运行示例求值，返回可交给 `etaf-mount` 的 View。

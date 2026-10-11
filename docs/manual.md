@@ -162,7 +162,7 @@ When a package changes a public interface, update the affected chapters in every
 
 (mapcar (lambda (chapter) (plist-get chapter :title))
         (plist-get (etaf-manual-book "zh-CN") :chapters))
-     ⇒ ("响应式系统")
+     ⇒ ("引言" "响应式系统")
 ```
 
 `etaf-manual-book` caches the parsed book until a source file changes and signals `etaf-manual-error` for malformed sources. `etaf-manual-example-view` evaluates a runnable example and returns its View for `etaf-mount`.

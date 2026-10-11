@@ -23,6 +23,16 @@
   "coverage": [],
   "parts": [
     {
+      "id": "overview",
+      "title": {
+        "en": "Overview",
+        "zh-CN": "总论"
+      },
+      "chapters": [
+        "introduction"
+      ]
+    },
+    {
       "id": "programming-model",
       "title": {
         "en": "The ETAF Programming Model",

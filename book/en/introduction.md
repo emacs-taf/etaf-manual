@@ -31,7 +31,7 @@ The manual has three kinds of readers. Each can start at the beginning of the li
 | --- | --- | --- |
 | Application author: builds an application from Views, components and state | Overview; The ETAF Programming Model | Style; Layout and Rendering; Interaction; Data and Asynchrony; the UI Component Library |
 | Component author: adds reusable components to an application or to the catalog | The same, with the [component styles and themes](component-styles-and-themes.md) chapter of Style | the overview of the UI Component Library; the chapter on incremental updates and publication; the chapter on extending the framework |
-| Framework developer: extends ETAF or diagnoses its behavior and performance | The ETAF Programming Model; Layout and Rendering | Framework Internals and Extension; the chapters on the implementation of styles and of EKP |
+| Framework developer: extends ETAF or diagnoses its behavior and performance | The ETAF Programming Model; Layout and Rendering | Framework Internals and Extension; the chapters on the [implementation of styles](style-implementation.md) and of EKP |
 | Library user: uses Ebox, ECSS or EKP without ETAF | the part on that package: Using Ebox Directly, ECSS as a General Library or EKP Paragraph Layout | Style; Layout and Rendering |
 
 The chapters of each part are ordered so that a chapter needs only the chapters before it. [Reactivity](reactivity.md) is a good example of the depth of the manual: read it before the chapters on [Components](components.md) and [Runtime](runtime.md).

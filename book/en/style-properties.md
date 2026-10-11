@@ -4,7 +4,7 @@
 
 Every Host gets its appearance and its share of space from the style properties in this chapter. Each property has one entry that gives its value syntax, its initial value, the Hosts that accept it, whether it inherits, and whether changing it affects paint or geometry.
 
-The value grammars are shared and are defined in [Values](values.md): lengths with their units and size functions, colors, fonts, shorthand expansion, inheritance and the CSS-wide keywords. This chapter is the property-by-property reference; the layer that computes a winner among declarations is [The Style System](style-system.md), and how a schema property becomes paint and geometry is the Styles Implementation chapter.
+The value grammars are shared and are defined in [Values](values.md): lengths with their units and size functions, colors, fonts, shorthand expansion, inheritance and the CSS-wide keywords. This chapter is the property-by-property reference; the layer that computes a winner among declarations is [The Style System](style-system.md), and how a schema property becomes paint and geometry is [Styles Implementation](style-implementation.md).
 
 **Reading an entry.** The first line is a table: *Value* is the grammar the property's validator accepts; *Initial* is the computed value when no declaration wins; *Applies to* names the Hosts whose author forms accept the property; *Inherited* says whether the computed value flows to descendants; *Impact* says whether a change repaints, re-lays out, or both. A shorthand has no computed value of its own: it expands into the longhands named in its entry, and its *Initial* cell is left empty.
 

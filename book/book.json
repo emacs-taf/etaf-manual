@@ -64,7 +64,8 @@
         "selectors",
         "values",
         "style-properties",
-        "component-styles-and-themes"
+        "component-styles-and-themes",
+        "style-implementation"
       ]
     }
   ],

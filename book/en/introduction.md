@@ -12,12 +12,12 @@ The manual covers six packages:
 | --- | --- | --- |
 | `ecss` | A CSS cascade engine: selectors, specificity, cascade, inheritance, variables and computed styles | — |
 | `ekp` | Knuth–Plass paragraph line breaking, with CJK support | — |
-| `ebox` | A retained box tree rendered into buffer text: measurement, box, flex and grid layout, style projection, scrolling, incremental buffer updates and input primitives | `ecss`; `ekp` for paragraph layout |
+| `ebox` | A retained box tree rendered into buffer text: measurement, box, flex and grid layout, style projection, scrolling, incremental buffer updates and input primitives | `ecss` |
 | `etaf` | The application framework: Views, Hosts, Components, reactive state, Context, Runtimes, events, Behaviors, Actions, Resources and Data | `ebox`, `ecss` |
 | `etaf-ui` | The official component catalog and its theme tokens | `etaf`, `ebox` |
 | `etaf-db` | Database backends for ETAF Data; currently SQLite | `etaf` |
 
-Applications reach Ebox, ECSS and EKP only through ETAF. The manual still describes the public interfaces of those packages completely, because each can be used on its own: Ebox without ETAF, ECSS with another host, and EKP for ordinary Emacs text each have a part of their own.
+Applications reach Ebox and ECSS only through ETAF, and no other package uses EKP. The manual still describes the public interfaces of these three packages completely, because each can be used on its own: Ebox without ETAF, ECSS with another host, and EKP for ordinary Emacs text each have a part of their own.
 
 The manual does not cover applications built with ETAF, games, the etaf-desktop desktop application or the game kit. The two playgrounds, `ebox-playground` and `etaf-playground`, appear only in the chapters on tooling.
 

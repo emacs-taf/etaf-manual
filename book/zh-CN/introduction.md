@@ -12,12 +12,12 @@
 | --- | --- | --- |
 | `ecss` | CSS 层叠引擎：选择器、优先级、层叠、继承、变量与计算样式 | — |
 | `ekp` | Knuth–Plass 段落断行，支持 CJK | — |
-| `ebox` | 渲染成 buffer 文本的保留盒树：测量、盒/flex/grid 布局、样式投影、滚动、增量 buffer 更新与输入原语 | `ecss`；段落排版用 `ekp` |
+| `ebox` | 渲染成 buffer 文本的保留盒树：测量、盒/flex/grid 布局、样式投影、滚动、增量 buffer 更新与输入原语 | `ecss` |
 | `etaf` | 应用框架：View、Host、Component、响应式状态、Context、Runtime、事件、Behavior、Action、Resource 与 Data | `ebox`、`ecss` |
 | `etaf-ui` | 官方组件库及其主题 token | `etaf`、`ebox` |
 | `etaf-db` | ETAF Data 的数据库后端，目前实现 SQLite | `etaf` |
 
-应用只经由 ETAF 使用 Ebox、ECSS 和 EKP。本书仍然完整描述这三个包的公共接口，因为它们都能单独使用。不经 ETAF 使用 Ebox、把 ECSS 接到别的宿主、用 EKP 给普通 Emacs 文本排版，各有一个部分专门讲。
+应用只经由 ETAF 使用 Ebox 和 ECSS，其他包都不使用 EKP。本书仍然完整描述这三个包的公共接口，因为它们都能单独使用。不经 ETAF 使用 Ebox、把 ECSS 接到别的宿主、用 EKP 给普通 Emacs 文本排版，各有一个部分专门讲。
 
 本书不涵盖用 ETAF 构建的应用、游戏、etaf-desktop 桌面应用和游戏套件。两个 playground，`ebox-playground` 和 `etaf-playground`，只出现在工具相关的章节里。
 

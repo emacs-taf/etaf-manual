@@ -160,6 +160,16 @@
         "ui-grids-and-character-surfaces",
         "ui-gallery-and-acceptance"
       ]
+    },
+    {
+      "id": "standalone-ebox",
+      "title": {
+        "en": "Using Ebox Standalone",
+        "zh-CN": "独立使用 Ebox"
+      },
+      "chapters": [
+        "ebox-node-construction"
+      ]
     }
   ],
   "appendices": [],

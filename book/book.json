@@ -67,6 +67,16 @@
         "component-styles-and-themes",
         "style-implementation"
       ]
+    },
+    {
+      "id": "layout-and-rendering",
+      "title": {
+        "en": "Layout and Rendering",
+        "zh-CN": "布局与渲染"
+      },
+      "chapters": [
+        "rendering-model"
+      ]
     }
   ],
   "appendices": [],

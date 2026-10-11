@@ -141,7 +141,8 @@
       },
       "chapters": [
         "ui-overview",
-        "ui-icons"
+        "ui-icons",
+        "ui-containers"
       ]
     }
   ],

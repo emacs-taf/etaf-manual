@@ -32,7 +32,7 @@ View 是描述，Runtime 保存输出。View 的静态部分构建一次，每�
 
 - BUFFER-OR-NAME 是缓冲区或缓冲区名。缓冲区不存在时会被创建；Runtime 不显示它。
 - VIEW 是 [View](views.md) 定义的归一化 View，或返回 View 的零参函数。函数带追踪求值，所以读了响应式源的 View 函数会在该源变化时重新渲染。
-- OPTIONS 是 plist。支持的键有 `:viewport-width`(像素)与 `:viewport-height`(行),首次发布会直接使用它们而不立刻重新布局;还有 `:observer`,一个单参报告 sink,在首次渲染前安装。维度为 nil 时跟随所在窗口。视口细节属于[视口](viewport.md)章;报告格式属于 Observers 章。
+- OPTIONS 是 plist。支持的键有 `:viewport-width`(像素)与 `:viewport-height`(行),首次发布会直接使用它们而不立刻重新布局;还有 `:observer`,一个单参报告 sink,在首次渲染前安装。维度为 nil 时跟随所在窗口。视口细节属于[视口](viewport.md)章;报告格式属于[增量更新与发布](incremental-updates-and-publication.md)。
 
 **语义。** BUFFER-OR-NAME 里已挂载的 Runtime 会被先卸载，所以新 View 取代旧应用。首次发布是一次被观测的操作：View 被降级并渲染、整个缓冲区写一次、已提交修订号变为 1。登记 Runtime 的同时安装它的按键处理与 `kill-buffer-hook`，所以杀掉缓冲区会卸载它。首次发布失败时，新 Runtime 被释放、条件向外传播，缓冲区存活且没有 Runtime。
 

@@ -30,7 +30,7 @@
 | 读者 | 先读 | 然后按需查阅 |
 | --- | --- | --- |
 | 应用作者：用 View、组件和状态构建应用 | 总论；ETAF 编程模型 | 样式；布局与渲染；交互；数据与异步；UI 组件库 |
-| 组件作者：为应用或组件库添加可复用组件 | 同上，加上「样式」部分中[组件样式与主题](component-styles-and-themes.md) | 「UI 组件库」的总论；增量更新与发布一章；扩展框架一章 |
+| 组件作者：为应用或组件库添加可复用组件 | 同上，加上「样式」部分中[组件样式与主题](component-styles-and-themes.md) | 「UI 组件库」的总论；[增量更新与发布](incremental-updates-and-publication.md)一章；扩展框架一章 |
 | 框架开发者：扩展 ETAF，或诊断它的行为与性能 | ETAF 编程模型；布局与渲染 | 框架内部与扩展；[样式的实现](style-implementation.md)、EKP 实现两章 |
 | 库用户：不经 ETAF 使用 Ebox、ECSS 或 EKP | 该包所在的部分：独立使用 Ebox、ECSS 作为通用库或 EKP 段落排版 | 样式；布局与渲染 |
 

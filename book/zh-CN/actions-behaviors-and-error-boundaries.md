@@ -50,7 +50,7 @@ Behavior 是规格，不是节点：一个名字、一组语义属性，以及�
 
 **参数。** ACTION 是已登记的 Action 名；也可以把 Runtime 显式作为第一个参数传入：`(etaf-dispatch RUNTIME ACTION ...)`。ARGUMENTS 在 Runtime 之后传给 Action 的函数，而 Runtime 永远是第一个参数。
 
-**语义。** 调用解析出 Runtime——显式传入的那个，或动态活动的那个（事件回调与生命周期代码里可用）——并在一次 `etaf-call-with-batch` 里以 `(RUNTIME ARGUMENTS...)` 运行 Action 的函数。Action 的写入在调用返回时一起发布；返回值就是函数的返回值。重定义之后，未来的派发用新函数，因为表是在派发时查的。Runtime 装了 observer 时，这次派发会作为一次被观测的操作上报，见 Observers 章。
+**语义。** 调用解析出 Runtime--显式传入的那个,或动态活动的那个(事件回调与生命周期代码里可用)--并在一次 `etaf-call-with-batch` 里以 `(RUNTIME ARGUMENTS...)` 运行 Action 的函数。Action 的写入在调用返回时一起发布;返回值就是函数的返回值。重定义之后,未来的派发用新函数,因为表是在派发时查的。Runtime 装了 observer 时,这次派发会作为一次被观测的操作上报,见[增量更新与发布](incremental-updates-and-publication.md)章。
 
 **返回。** Action 函数的返回值。
 

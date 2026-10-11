@@ -83,7 +83,8 @@
         "text",
         "images",
         "viewport",
-        "scrolling"
+        "scrolling",
+        "incremental-updates-and-publication"
       ]
     }
   ],

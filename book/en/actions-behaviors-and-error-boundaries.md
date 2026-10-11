@@ -50,7 +50,7 @@ Dispatch named ACTION through the active Runtime with ARGUMENTS.
 
 **Arguments.** ACTION is the registered Action name, or a Runtime when the Runtime is passed explicitly as the first argument: `(etaf-dispatch RUNTIME ACTION ...)`. ARGUMENTS are passed to the Action's function after the Runtime, which is always the first argument.
 
-**Semantics.** The call resolves the Runtime — the explicit one or the dynamically active one, which is available inside event callbacks and lifecycle code — and runs the Action's function with `(RUNTIME ARGUMENTS...)` inside one `etaf-call-with-batch`. Writes the Action makes are published together when the call returns; the return value is the function's return value. After a redefinition, future dispatches use the new function, because the table is consulted at dispatch time. When the Runtime has an observer, the dispatch is reported as an observed operation, as the Observers chapter describes.
+**Semantics.** The call resolves the Runtime — the explicit one or the dynamically active one, which is available inside event callbacks and lifecycle code — and runs the Action's function with `(RUNTIME ARGUMENTS...)` inside one `etaf-call-with-batch`. Writes the Action makes are published together when the call returns; the return value is the function's return value. After a redefinition, future dispatches use the new function, because the table is consulted at dispatch time. When the Runtime has an observer, the dispatch is reported as an observed operation, as [Incremental Updates and Publication](incremental-updates-and-publication.md) describes.
 
 **Returns.** The Action function's return value.
 

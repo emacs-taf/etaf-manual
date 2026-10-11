@@ -62,7 +62,7 @@ Composition splices each overlay into the host's lines. The overlay's margin box
 
 Border decorations are applied after the overlays are spliced, so a top or bottom border's overline or underline continues across an overlay and an overlay never breaks a border line. An overlay changes pixels, hit testing and visibility, never layout: the host is not resized, siblings do not shift, and the flow below the overlay is untouched.
 
-The cost of an overlay is proportional to the lines it covers. A host composes and caches its lines, and an overlay's lines take part in that cache; when the overlay moves, only the lines it leaves and the lines it reaches are repainted, so a tooltip that moves one line does not rewrite the host. The damage bookkeeping behind this belongs to Incremental Updates and Publication.
+The cost of an overlay is proportional to the lines it covers. A host composes and caches its lines, and an overlay's lines take part in that cache; when the overlay moves, only the lines it leaves and the lines it reaches are repainted, so a tooltip that moves one line does not rewrite the host. The damage bookkeeping behind this belongs to [Incremental Updates and Publication](incremental-updates-and-publication.md).
 
 `ebox-node-geometry` reports an overlay's border box in root coordinates — host margin origin plus the overlay's host-relative position plus its own margin — so an overlay's position is directly comparable with any other node's, including through nested hosts.
 

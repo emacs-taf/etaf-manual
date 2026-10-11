@@ -148,7 +148,8 @@
         "ui-text-input-controls",
         "ui-embedded-editors",
         "ui-pickers-and-menus",
-        "ui-overlays"
+        "ui-overlays",
+        "ui-navigation-and-collections"
       ]
     }
   ],

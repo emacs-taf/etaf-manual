@@ -22,6 +22,7 @@
   ],
   "coverage": [
     "hosts",
+    "properties",
     "styles",
     "etaf-db"
   ],
@@ -128,7 +129,8 @@
         "zh-CN": "动画与媒体"
       },
       "chapters": [
-        "animation"
+        "animation",
+        "native-video"
       ]
     }
   ],

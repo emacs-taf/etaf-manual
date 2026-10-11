@@ -149,7 +149,8 @@
         "ui-embedded-editors",
         "ui-pickers-and-menus",
         "ui-overlays",
-        "ui-navigation-and-collections"
+        "ui-navigation-and-collections",
+        "ui-data-display"
       ]
     }
   ],

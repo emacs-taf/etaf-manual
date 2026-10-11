@@ -1,6 +1,6 @@
 # 选择器与菜单
 
-目录用两种形态回答「从这些值里选一个」：一种是在布局里就地显示当前选择的*选择器*，另一种是打开临时动作表面的*菜单*。`etaf-select` 是选择器：短列表用 chips，较长列表用锚定下拉。`etaf-menu`、`etaf-dropdown-menu` 与 `etaf-context-menu` 是菜单：一个用原生补全，另两个打开 buffer 内的浮动表面。四者都是受控的——值、选项与反应都归调用方所有——也都经回调报告选中的键。[UI 组件库总论](ui-overview.md)定义受控契约，[按钮与选择控件](ui-buttons-and-choice-controls.md)定义它们组合的按钮与选中色调，浮层章定义它们打开的浮动表面，[文本输入](text-input.md)定义补全菜单所穿过的原生输入边界。
+目录用两种形态回答「从这些值里选一个」：一种是在布局里就地显示当前选择的*选择器*，另一种是打开临时动作表面的*菜单*。`etaf-select` 是选择器：短列表用 chips，较长列表用锚定下拉。`etaf-menu`、`etaf-dropdown-menu` 与 `etaf-context-menu` 是菜单：一个用原生补全，另两个打开 buffer 内的浮动表面。四者都是受控的——值、选项与反应都归调用方所有——也都经回调报告选中的键。[UI 组件库总论](ui-overview.md)定义受控契约，[按钮与选择控件](ui-buttons-and-choice-controls.md)定义它们组合的按钮与选中色调，[浮层](ui-overlays.md)定义它们打开的浮动表面，[文本输入](text-input.md)定义补全菜单所穿过的原生输入边界。
 
 ## 选项契约
 
@@ -70,7 +70,7 @@
 
 渲染一个按钮与锚定的菜单项 Popover。
 
-**参数。** LABEL 默认 `"Actions"`。WIDTH 默认 `(ch 28)`。ITEMS 遵循 `etaf-menu`，每项可带显示在标签之前的 `:icon`。ICON 非 nil 时触发件就是该图标，LABEL 作为它的帮助文本与可访问名。PLACEMENT 默认 `bottom-start`，遵循浮层章。
+**参数。** LABEL 默认 `"Actions"`。WIDTH 默认 `(ch 28)`。ITEMS 遵循 `etaf-menu`，每项可带显示在标签之前的 `:icon`。ICON 非 nil 时触发件就是该图标，LABEL 作为它的帮助文本与可访问名。PLACEMENT 默认 `bottom-start`，遵循[浮层](ui-overlays.md)。
 
 **语义。** 按压触发件打开浮层；选择可用项会关闭它并以该键调用 ON-SELECT 一次。带图标的项是全宽行，其指针与键盘行为来自与按钮相同的 Host 属性，并带 hover 色调；不带图标的项是 ghost 按钮。打开状态与唯一锚点属于保留的 Component，多个下拉因此可以并存而不共享标志，应用数据仍归调用方所有。键盘导航、焦点返回与关闭遵循 Popover 契约。
 
@@ -122,7 +122,7 @@
 - 取消不是错误：不选择就关闭菜单、空补全输入或 C-c C-k 都只是不报告任何东西，禁用触发件根本无法激活。
 - 选择器与菜单只拥有呈现状态；被拒绝或被取消的交互不触碰调用方的值。
 
-**参见。** [UI 组件库总论](ui-overview.md#错误与恢复)、浮层章。
+**参见。** [UI 组件库总论](ui-overview.md#错误与恢复)、[浮层](ui-overlays.md)。
 
 ```elisp :run
 (etaf-view

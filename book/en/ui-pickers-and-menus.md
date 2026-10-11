@@ -1,6 +1,6 @@
 # Pickers and Menus
 
-The catalog answers "choose one of these values" in two shapes: a *picker* that lives inside the layout and shows the current choice in place, and a *menu* that opens a temporary surface of actions. `etaf-select` is the picker: chips for short lists, an anchored dropdown for longer ones. `etaf-menu`, `etaf-dropdown-menu` and `etaf-context-menu` are the menus: one uses native completion, the other two open an in-buffer floating surface. All four are controlled — the caller owns the value, the items and the reaction — and all four report a chosen key through a callback. [UI Overview](ui-overview.md) defines the controlled contract, [Buttons and Choice Controls](ui-buttons-and-choice-controls.md) the buttons and selection tints they compose, the Overlays chapter the floating surface they open, and [Text Input](text-input.md) the native input boundary that the completion menu crosses.
+The catalog answers "choose one of these values" in two shapes: a *picker* that lives inside the layout and shows the current choice in place, and a *menu* that opens a temporary surface of actions. `etaf-select` is the picker: chips for short lists, an anchored dropdown for longer ones. `etaf-menu`, `etaf-dropdown-menu` and `etaf-context-menu` are the menus: one uses native completion, the other two open an in-buffer floating surface. All four are controlled — the caller owns the value, the items and the reaction — and all four report a chosen key through a callback. [UI Overview](ui-overview.md) defines the controlled contract, [Buttons and Choice Controls](ui-buttons-and-choice-controls.md) the buttons and selection tints they compose, [Overlays](ui-overlays.md) the floating surface they open, and [Text Input](text-input.md) the native input boundary that the completion menu crosses.
 
 ## The option contract
 
@@ -70,7 +70,7 @@ Render a Button opening native completion for an action.
 
 Render a Button and an anchored Popover of menu items.
 
-**Arguments.** LABEL defaults to `"Actions"`. WIDTH defaults to `(ch 28)`. ITEMS follows `etaf-menu` and may carry an `:icon` shown before the label. ICON non-nil makes the trigger that icon, with LABEL as its help text and accessible name. PLACEMENT defaults to `bottom-start` and follows the Overlays chapter.
+**Arguments.** LABEL defaults to `"Actions"`. WIDTH defaults to `(ch 28)`. ITEMS follows `etaf-menu` and may carry an `:icon` shown before the label. ICON non-nil makes the trigger that icon, with LABEL as its help text and accessible name. PLACEMENT defaults to `bottom-start` and follows [Overlays](ui-overlays.md).
 
 **Semantics.** Pressing the trigger opens the popover; choosing an enabled item closes it and invokes ON-SELECT once with its key. An item with an icon is a full-width row whose pointer and keyboard behavior come from the same Host properties as a button, with a hover tint; an item without an icon is a ghost button. Open state and the unique anchor belong to the retained Component, so several dropdowns coexist without sharing a flag, and application data remains caller-owned. Keyboard navigation, focus return and dismissal follow the Popover contract.
 
@@ -122,7 +122,7 @@ Compose a keyboard and mouse accessible context action trigger from the Dropdown
 - Cancelling is not an error: closing a menu without a choice, an empty completion entry or C-c C-k simply reports nothing, and a disabled trigger cannot be activated at all.
 - The picker and the menus own only presentation state; a rejected or cancelled interaction leaves the caller's value untouched.
 
-**See also.** [UI Overview](ui-overview.md#errors-and-recovery), the Overlays chapter.
+**See also.** [UI Overview](ui-overview.md#errors-and-recovery), [Overlays](ui-overlays.md).
 
 ```elisp :run
 (etaf-view

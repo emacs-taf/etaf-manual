@@ -104,7 +104,7 @@ Sets the line style of text decorations.
 
 <!-- index: width; height; box sizing -->
 
-`:width`, `:height` and their minimum and maximum partners accept keywords and axis lengths, and `:box-sizing` decides what the size measures. Inline lengths resolve in pixels and block lengths in lines; percentages use the containing block. Boxes and Normal Flow, Flex Layout and Grid Layout define how the constraints are resolved.
+`:width`, `:height` and their minimum and maximum partners accept keywords and axis lengths, and `:box-sizing` decides what the size measures. Inline lengths resolve in pixels and block lengths in lines; percentages use the containing block. [Boxes and Normal Flow](boxes-and-normal-flow.md), Flex Layout and Grid Layout define how the constraints are resolved.
 
 #### Style: :box-sizing
 

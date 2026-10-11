@@ -75,7 +75,8 @@
         "zh-CN": "布局与渲染"
       },
       "chapters": [
-        "rendering-model"
+        "rendering-model",
+        "boxes-and-normal-flow"
       ]
     }
   ],

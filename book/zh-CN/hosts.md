@@ -81,7 +81,7 @@ Host 也是 View 里的身份单位：和解按名字和 `:key` 匹配 Host 子�
 
 **示例。** `(box :background-color "gray15" (text "Ready"))` 已经是一个可用的面板；`(box :padding '(px 4) :border-radius '(px 1) ...)` 再加上留白和圆角。
 
-**参见。** 常见堆叠场景用 `column` 和 `row`；布局规则见《盒与常规流》章。
+**参见。** 常见堆叠场景用 `column` 和 `row`；布局规则见[盒与常规流](boxes-and-normal-flow.md)。
 
 ### fragment
 

@@ -81,7 +81,7 @@ A block-level flow container; the general-purpose layout Host.
 
 **Example.** `(box :background-color "gray15" (text "Ready"))` is already a usable panel; `(box :padding '(px 4) :border-radius '(px 1) ...)` adds breathing room and a rounded corner.
 
-**See also.** the `column` and `row` Hosts for the common stacking cases, and the Boxes and Normal Flow chapter for the layout rules.
+**See also.** the `column` and `row` Hosts for the common stacking cases, and [Boxes and Normal Flow](boxes-and-normal-flow.md) for the layout rules.
 
 ### fragment
 

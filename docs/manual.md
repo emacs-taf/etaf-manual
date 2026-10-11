@@ -104,9 +104,11 @@ Put `<!-- index: TERM; TERM -->` on its own line after a heading to mark index t
 
 A fenced block opened with ```` ```elisp :run ```` is a runnable example. The package reads each top-level form and evaluates it with lexical binding, with etaf and etaf-ui loaded; the value of the last form must be an ETAF View. Separate top-level forms do not share local bindings. Name components defined in an example `demo-…`. A View child computed by Lisp must be wrapped as `(expr FORM)`. The acceptance tests mount every runnable example in every language, so an example that fails to evaluate, fails to mount or emits a warning fails `make check`.
 
+An example must serve the entry or section it illustrates: give it a real task whose result is visible, keep it focused on that one feature, and do not assemble a multi-feature demo for it. An inline `**Example.**` block follows the same rule.
+
 ### Links and names
 
-Link to another chapter by its file name, optionally followed by a heading anchor, such as `reactivity.md` or `reactivity.md#scopes`, and only to chapters that exist. Refer to an unwritten chapter in plain text by its title.
+Link to another chapter by its file name, optionally followed by a heading anchor, such as `reactivity.md` or `reactivity.md#scopes`, and only to chapters that exist. Refer to an unwritten chapter in plain text by its title. When that chapter is written, update those mentions to links in the same delivery.
 
 A code span that names a symbol with a package prefix, such as `etaf-ref`, must name a Commentary record of a documented package or reference, or the name of a package or reference. Write other names, such as applications outside the book, as plain text. A code span that gives a package and a version, such as `etaf 0.2.1`, must match the `Version:` header of that package's entry file.
 

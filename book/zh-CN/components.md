@@ -337,7 +337,7 @@ setup 是每实例初始化。它运行一次，在脱离渲染的 Scope 里，�
 
 ### 实例记录
 
-实例保存：身份（定义和调用的 `:key`）、每个已声明 prop 一个响应式单元加 prop 名表、当前调用及其解析后的 slots、为 setup 创建的 Scope、state 或绑定值、保留的渲染 View、props 动态时的输入副作用、已注册的生命周期钩子，以及 Runtime 用来发布和退役它的记账标志。Runtime 还把每个活实例放在一张表里供内省，见《Runtime》章。
+实例保存：身份（定义和调用的 `:key`）、每个已声明 prop 一个响应式单元加 prop 名表、当前调用及其解析后的 slots、为 setup 创建的 Scope、state 或绑定值、保留的渲染 View、props 动态时的输入副作用、已注册的生命周期钩子，以及 Runtime 用来发布和退役它的记账标志。Runtime 还把每个活实例放在一张表里供内省，见 [Runtime](runtime.md)。
 
 ### 初始化与更新
 

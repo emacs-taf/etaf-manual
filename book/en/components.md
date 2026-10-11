@@ -337,7 +337,7 @@ The merge rules are the Host rules: non-nil style values from the caller win; `:
 
 ### The instance record
 
-An instance holds: its identity (the definition and the call's `:key`), one reactive cell per declared prop plus the table of prop names, the current call and its resolved slots, the Scope created for setup, the state or binding values, the retained rendered View, the input effect when props are dynamic, the registered lifecycle hooks, and the bookkeeping flags the Runtime uses to publish and retire it. The Runtime also keeps every live instance in a table for introspection, as the Runtime chapter describes.
+An instance holds: its identity (the definition and the call's `:key`), one reactive cell per declared prop plus the table of prop names, the current call and its resolved slots, the Scope created for setup, the state or binding values, the retained rendered View, the input effect when props are dynamic, the registered lifecycle hooks, and the bookkeeping flags the Runtime uses to publish and retire it. The Runtime also keeps every live instance in a table for introspection, as [Runtime](runtime.md) describes.
 
 ### Initialization and updates
 

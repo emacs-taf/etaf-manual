@@ -69,7 +69,7 @@ Construct a normalized ETAF View from the structural FORM.
 ;; ⇒ a text View
 ```
 
-**See also.** `etaf-node`, `etaf-render`, and the chapters on [Hosts](hosts.md), [Components](components.md) and Runtimes.
+**See also.** `etaf-node`, `etaf-render`, and the chapters on [Hosts](hosts.md), [Components](components.md) and [Runtime](runtime.md).
 
 ### Property values
 
@@ -241,7 +241,7 @@ Lower a normalized VIEW to one canonical detached Ebox root without a Runtime.
 ;; ⇒ an Ebox text node
 ```
 
-**See also.** `etaf-mount` and the Runtime chapter for mounting and lifecycle.
+**See also.** `etaf-mount` and [Runtime](runtime.md) for mounting and lifecycle.
 
 ## Semantic details
 

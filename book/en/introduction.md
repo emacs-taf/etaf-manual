@@ -34,7 +34,7 @@ The manual has three kinds of readers. Each can start at the beginning of the li
 | Framework developer: extends ETAF or diagnoses its behavior and performance | The ETAF Programming Model; Layout and Rendering | Framework Internals and Extension; the chapters on the implementation of styles and of EKP |
 | Library user: uses Ebox, ECSS or EKP without ETAF | the part on that package: Using Ebox Directly, ECSS as a General Library or EKP Paragraph Layout | Style; Layout and Rendering |
 
-The chapters of each part are ordered so that a chapter needs only the chapters before it. [Reactivity](reactivity.md) is a good example of the depth of the manual: read it before the chapters on components and Runtimes.
+The chapters of each part are ordered so that a chapter needs only the chapters before it. [Reactivity](reactivity.md) is a good example of the depth of the manual: read it before the chapters on [Components](components.md) and [Runtime](runtime.md).
 
 ## Notation
 

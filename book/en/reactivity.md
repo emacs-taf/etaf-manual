@@ -2,7 +2,7 @@
 
 The reactive system holds application state and keeps everything derived from it current: computed values, watchers, effects and the output of mounted Runtimes. It belongs to the ETAF layer and is loaded by `(require 'etaf)`. The core does not depend on Views or Runtimes, so the same graph serves application code, Components and every mounted Runtime.
 
-Read this chapter before the chapters on Components and Runtimes, which build on the ownership and timing rules defined here.
+Read this chapter before the chapters on [Components](components.md) and [Runtime](runtime.md), which build on the ownership and timing rules defined here.
 
 <!-- index: reactive graph; state; dependency tracking -->
 

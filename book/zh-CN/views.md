@@ -69,7 +69,7 @@ NAME 是 Host 符号（如 `text`、`column`），或用 `etaf-define-component`
 ;; ⇒ 一个 text View
 ```
 
-**参见。** `etaf-node`、`etaf-render`，以及 [Host](hosts.md)、[组件](components.md)和 Runtime 三章。
+**参见。** `etaf-node`、`etaf-render`，以及 [Host](hosts.md)、[组件](components.md)和 [Runtime](runtime.md) 三章。
 
 ### 属性值
 
@@ -241,7 +241,7 @@ fragment 的身份由 `:key` 决定；没有 `:key` 时由编译它的调用点�
 ;; ⇒ 一个 Ebox text 节点
 ```
 
-**参见。** `etaf-mount` 以及 Runtime 章，其中讲挂载和生命周期。
+**参见。** `etaf-mount` 以及 [Runtime](runtime.md)，其中讲挂载和生命周期。
 
 ## 语义细节
 

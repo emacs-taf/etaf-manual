@@ -46,7 +46,8 @@
         "views",
         "hosts",
         "components",
-        "reactivity"
+        "reactivity",
+        "runtime"
       ]
     }
   ],

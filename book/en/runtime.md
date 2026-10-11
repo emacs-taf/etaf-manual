@@ -235,7 +235,7 @@ Set HOST-REF's position, size or layer properties in mounted RUNTIME.
 (etaf-runtime-update-host-geometry runtime 'panel :left '(px 40) :top '(px 0))
 ```
 
-**See also.** `etaf-runtime-update-host-geometries` and the style property reference for the accepted values.
+**See also.** `etaf-runtime-update-host-geometries` and [Style Properties](style-properties.md) for the accepted values.
 
 #### Function: etaf-runtime-update-host-geometries (runtime updates)
 

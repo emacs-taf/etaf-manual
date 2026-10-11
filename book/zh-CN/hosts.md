@@ -44,7 +44,7 @@ Host 也是 View 里的身份单位：和解按名字和 `:key` 匹配 Host 子�
 | `image` | 无；它的来源和大小来自 `:src`、`:columns`、`:rows`、`:adapter` 和 `:inset` |
 | `fragment` | 无；它没有节点 |
 
-`flex` 或 `grid` Host 的子节点还可以声明子项属性（`:order`、`:flex-grow`、`:flex-shrink`、`:flex-basis`、`:flex`、`:align-self`、`:justify-self`、`:grid-column`、`:grid-row`、`:grid-column-span`、`:grid-row-span`），它们影响父节点如何摆放该子项。样式属性从 schema 初值开始——没有 padding、margin 和 border，颜色继承，字重和字形为 normal，加上各 Host 条目里点名的布局初值——所以不带任何样式属性的 Host 也已经排好版。《样式属性参考》列出每个属性的值语法、初值和继承。
+`flex` 或 `grid` Host 的子节点还可以声明子项属性（`:order`、`:flex-grow`、`:flex-shrink`、`:flex-basis`、`:flex`、`:align-self`、`:justify-self`、`:grid-column`、`:grid-row`、`:grid-column-span`、`:grid-row-span`），它们影响父节点如何摆放该子项。样式属性从 schema 初值开始——没有 padding、margin 和 border，颜色继承，字重和字形为 normal，加上各 Host 条目里点名的布局初值——所以不带任何样式属性的 Host 也已经排好版。[样式属性参考](style-properties.md)列出每个属性的值语法、初值和继承。
 
 ## Host 种类
 

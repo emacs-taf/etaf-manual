@@ -235,7 +235,7 @@ pre 或 render 副作用失败时，Runtime 丢弃整份未提交的工作：缓
 (etaf-runtime-update-host-geometry runtime 'panel :left '(px 40) :top '(px 0))
 ```
 
-**参见。** `etaf-runtime-update-host-geometries` 与样式属性参考中可接受的值。
+**参见。** `etaf-runtime-update-host-geometries` 与[样式属性参考](style-properties.md)中可接受的值。
 
 #### Function: etaf-runtime-update-host-geometries (runtime updates)
 

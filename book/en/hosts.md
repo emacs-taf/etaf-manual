@@ -44,7 +44,7 @@ Every Host accepts semantic properties, event properties and pointer affordances
 | `image` | none; its source and size come from `:src`, `:columns`, `:rows`, `:adapter` and `:inset` |
 | `fragment` | none; it has no node |
 
-A child of a `flex` or `grid` Host may also declare the item properties (`:order`, `:flex-grow`, `:flex-shrink`, `:flex-basis`, `:flex`, `:align-self`, `:justify-self`, `:grid-column`, `:grid-row`, `:grid-column-span`, `:grid-row-span`), which affect how its parent places it. Style properties start at the schema defaults — no padding, margin or border, inherited color, normal font weight and style, and the layout defaults named with each kind — so a Host with no style properties is already laid out. The Style Properties reference lists every property with its value grammar, initial value and inheritance.
+A child of a `flex` or `grid` Host may also declare the item properties (`:order`, `:flex-grow`, `:flex-shrink`, `:flex-basis`, `:flex`, `:align-self`, `:justify-self`, `:grid-column`, `:grid-row`, `:grid-column-span`, `:grid-row-span`), which affect how its parent places it. Style properties start at the schema defaults — no padding, margin or border, inherited color, normal font weight and style, and the layout defaults named with each kind — so a Host with no style properties is already laid out. [Style Properties](style-properties.md) lists every property with its value grammar, initial value and inheritance.
 
 ## Host kinds
 

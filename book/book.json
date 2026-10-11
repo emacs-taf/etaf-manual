@@ -21,7 +21,8 @@
     "etaf-manual"
   ],
   "coverage": [
-    "hosts"
+    "hosts",
+    "styles"
   ],
   "parts": [
     {
@@ -61,7 +62,8 @@
       "chapters": [
         "style-system",
         "selectors",
-        "values"
+        "values",
+        "style-properties"
       ]
     }
   ],

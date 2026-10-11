@@ -1,6 +1,6 @@
 # Values
 
-A style declaration gives a property a value, and the value decides how the property behaves: a length occupies space, a color paints, a keyword selects a mode. This chapter defines the value grammars Ebox accepts — lengths with their units and size functions, colors, fonts — and the machinery around them: shorthand expansion and aliases, inheritance and the CSS-wide keywords, custom properties and variable references, `!important`, and the path from a declared value to a computed value with its provenance. The properties themselves are the subject of the Style Properties chapter, and the cascade that chooses between declarations belongs to [The Style System](style-system.md).
+A style declaration gives a property a value, and the value decides how the property behaves: a length occupies space, a color paints, a keyword selects a mode. This chapter defines the value grammars Ebox accepts — lengths with their units and size functions, colors, fonts — and the machinery around them: shorthand expansion and aliases, inheritance and the CSS-wide keywords, custom properties and variable references, `!important`, and the path from a declared value to a computed value with its provenance. The properties themselves are the subject of [Style Properties](style-properties.md), and the cascade that chooses between declarations belongs to [The Style System](style-system.md).
 
 ## Lengths
 

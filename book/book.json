@@ -59,7 +59,8 @@
         "zh-CN": "样式"
       },
       "chapters": [
-        "style-system"
+        "style-system",
+        "selectors"
       ]
     }
   ],

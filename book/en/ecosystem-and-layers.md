@@ -12,7 +12,7 @@ The buffer is a canvas with two kinds of units. Horizontal geometry is measured 
 
 The application does not edit the buffer. It describes its interface as a View, keeps its state in reactive sources and changes that state; the framework then rewrites the lines whose content changed and leaves the other lines untouched.
 
-The same buffer works in graphical and in terminal frames. A terminal frame draws a simpler picture, for example square corners and text in place of images; the chapter Installation, Loading and Building lists what changes.
+The same buffer works in graphical and in terminal frames. A terminal frame draws a simpler picture, for example square corners and text in place of images; [Graphical and terminal frames](installation-and-loading.md#graphical-and-terminal-frames) lists what changes.
 
 ## The packages
 

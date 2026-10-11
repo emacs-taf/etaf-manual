@@ -30,7 +30,8 @@
       },
       "chapters": [
         "introduction",
-        "ecosystem-and-layers"
+        "ecosystem-and-layers",
+        "installation-and-loading"
       ]
     },
     {

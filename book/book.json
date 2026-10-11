@@ -168,7 +168,8 @@
         "zh-CN": "独立使用 Ebox"
       },
       "chapters": [
-        "ebox-node-construction"
+        "ebox-node-construction",
+        "ebox-mount-lifecycle"
       ]
     }
   ],

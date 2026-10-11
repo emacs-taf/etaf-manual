@@ -1,6 +1,6 @@
 # 节点构造
 
-Ebox 可以单独使用：程序建立一棵保留节点树，把它挂载进缓冲区，然后就地修改节点，全程不需要 ETAF、View 或 Component。本部分手册记录这种独立用法。树在这里诞生——`ebox-build` 把紧凑的作者表单变成节点，`ebox-node-create` 用 Lisp 逐个构造节点，`ebox-node-copy` 从节点当前输入复制一棵子树。挂载与生命周期一章把这里建好的树挂进缓冲区，树查询一章把它读回来；`.ebox` 文件与预览一章从文件读取树，错误条件一章汇总 API 会报出的条件。[渲染模型](rendering-model.md)描述把建好的树变成文本的布局与绘制，[样式属性](style-properties.md)定义节点可以携带的样式属性。
+Ebox 可以单独使用：程序建立一棵保留节点树，把它挂载进缓冲区，然后就地修改节点，全程不需要 ETAF、View 或 Component。本部分手册记录这种独立用法。树在这里诞生——`ebox-build` 把紧凑的作者表单变成节点，`ebox-node-create` 用 Lisp 逐个构造节点，`ebox-node-copy` 从节点当前输入复制一棵子树。[挂载与生命周期](ebox-mount-lifecycle.md)一章把这里建好的树挂进缓冲区，树查询一章把它读回来；`.ebox` 文件与预览一章从文件读取树，错误条件一章汇总 API 会报出的条件。[渲染模型](rendering-model.md)描述把建好的树变成文本的布局与绘制，[样式属性](style-properties.md)定义节点可以携带的样式属性。
 
 ## 模型
 

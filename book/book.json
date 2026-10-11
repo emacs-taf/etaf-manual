@@ -114,7 +114,8 @@
         "resources",
         "data-sources",
         "data-controllers",
-        "reconciliation"
+        "reconciliation",
+        "list-cache"
       ]
     }
   ],

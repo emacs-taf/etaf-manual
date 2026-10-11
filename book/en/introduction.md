@@ -60,7 +60,7 @@ These terms are used throughout the manual. Each is defined fully in the chapter
 
 **Drain and commit.** After state changes, ETAF *drains*: it runs the queued effects until the state settles. During a drain, each Runtime whose output changed *commits* once, writing the change into its buffer.
 
-**Context.** A value that an ancestor provides with `etaf-provide` and that its descendants read with `etaf-inject`.
+**Context.** A value that an ancestor provides with `etaf-provide` and that its descendants read with `etaf-inject`. See [Context](context.md).
 
 **Action.** A named command defined with `etaf-action-define` and invoked with `etaf-dispatch`. An Action receives the Runtime as its first argument.
 

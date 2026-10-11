@@ -60,7 +60,7 @@
 
 **排空与提交。** 状态变化后，ETAF 进行*排空*：运行排队的副作用，直到状态稳定。排空期间，输出有变化的每个 Runtime *提交*一次，把变化写进自己的 buffer。
 
-**Context。** 祖先用 `etaf-provide` 提供、后代用 `etaf-inject` 读取的值。
+**Context。** 祖先用 `etaf-provide` 提供、后代用 `etaf-inject` 读取的值。见 [Context](context.md)。
 
 **Action。** 用 `etaf-action-define` 定义、用 `etaf-dispatch` 调用的具名命令。Action 的第一个参数是 Runtime。
 

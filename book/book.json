@@ -47,7 +47,8 @@
         "hosts",
         "components",
         "reactivity",
-        "runtime"
+        "runtime",
+        "context"
       ]
     }
   ],

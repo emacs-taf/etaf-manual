@@ -1,0 +1,38 @@
+{
+  "title": {
+    "en": "ETAF Reference Manual",
+    "zh-CN": "ETAF 参考手册"
+  },
+  "languages": [
+    "en",
+    "zh-CN"
+  ],
+  "packages": [
+    "ecss",
+    "ekp",
+    "ebox",
+    "etaf",
+    "etaf-ui",
+    "etaf-db"
+  ],
+  "references": [
+    "ebox-playground",
+    "etaf-playground",
+    "etaf-manual"
+  ],
+  "coverage": [],
+  "parts": [
+    {
+      "id": "programming-model",
+      "title": {
+        "en": "The ETAF Programming Model",
+        "zh-CN": "ETAF 编程模型"
+      },
+      "chapters": [
+        "reactivity"
+      ]
+    }
+  ],
+  "appendices": [],
+  "indices": []
+}

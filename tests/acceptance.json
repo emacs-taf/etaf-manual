@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "load_path": [
+    ".",
+    "tests",
+    "../ebox",
+    "../ecss",
+    "../ekp",
+    "../etaf",
+    "../etaf-ui"
+  ],
+  "support": [],
+  "cases": [
+    {
+      "name": "etaf-manual-book-numbers-parts-and-chapters",
+      "file": "tests/etaf-manual-tests.el",
+      "purpose": "Both languages read every chapter in book.json order with part and chapter numbers."
+    },
+    {
+      "name": "etaf-manual-book-translations-share-entries",
+      "file": "tests/etaf-manual-tests.el",
+      "purpose": "Translations list the same chapters and definition entries as English."
+    },
+    {
+      "name": "etaf-manual-definition-finds-entries-by-name-and-kind",
+      "file": "tests/etaf-manual-tests.el",
+      "purpose": "Definition lookup locates an entry by symbol and optional kind in either language."
+    },
+    {
+      "name": "etaf-manual-book-rejects-unknown-language",
+      "file": "tests/etaf-manual-tests.el",
+      "purpose": "A language the book does not provide signals etaf-manual-error."
+    },
+    {
+      "name": "etaf-manual-runnable-examples-mount",
+      "file": "tests/etaf-manual-tests.el",
+      "purpose": "Every runnable example evaluates to a View that mounts without warnings."
+    },
+    {
+      "name": "etaf-manual-example-view-reports-failures",
+      "file": "tests/etaf-manual-tests.el",
+      "purpose": "A failing example signals etaf-manual-error naming the example."
+    }
+  ]
+}

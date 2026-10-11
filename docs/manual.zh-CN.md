@@ -1,0 +1,168 @@
+# 编写 ETAF 参考手册
+
+[English](manual.md)
+
+本文写给编写或检查《ETAF 参考手册》章节的人，也写给通过 `etaf-manual` 包读取本书的工具。内容包括源文件布局、章节格式、门禁检查哪些问题，以及运行检查的命令。受支持的 Lisp API 以 [`etaf-manual.el`](../etaf-manual.el) 的 Commentary 为准。
+
+## 手册写什么
+
+本书记录核心包 ecss、ekp、ebox、etaf、etaf-ui 和 etaf-db 的公共接口，并通过概念和公共接口讲清各个子系统怎样工作，包括数据流、时序、不变式、错误和代价。书中不点名私有函数、内部数据结构，也不点名包的 Commentary 没有列出的符号，即使名字里没有双连字符。书中只写已经实现的行为；计划中的能力至多注明尚未实现。本书是参考手册，按子系统和对象组织，不是教程。
+
+## 源文件布局
+
+| 路径 | 内容 |
+| --- | --- |
+| `book/book.json` | 全书描述：书名、语言、包、部分、章、附录和索引 |
+| `book/en/ID.md` | 标识为 ID 的章的英文版 |
+| `book/zh-CN/ID.md` | 同一章的简体中文译本 |
+| `etaf-manual.el`、`lisp/` | 把全书作为数据读取的包 |
+| `scripts/check-book.el` | 门禁 |
+| `tests/` | 可运行示例与读书接口的场景，以及门禁的工具测试 |
+
+英文是主语言。每一章在每种语言下都有同名文件。
+
+## 全书描述
+
+`book/book.json` 是一个 JSON 对象，字段如下：
+
+| 字段 | 值 |
+| --- | --- |
+| `title` | 语言到书名的映射 |
+| `languages` | 语言代码；第一个是翻译检查的基准 |
+| `packages` | 本书记录的包，它们的入口文件提供 Commentary 记录和版本号 |
+| `references` | 正文可以点名的其他仓库，例如两个 playground；它们的 Commentary 记录同样算公共接口 |
+| `coverage` | 每个接口都必须有定义条目的包和词表 |
+| `parts` | 对象列表，每项有 `id`、按语言给出的 `title`，以及按阅读顺序排列的 `chapters` |
+| `appendices` | 对象列表，每项有 `id`、按语言给出的 `title`，并且要么对应一个章节文件，要么用 `generate` 指定生成的内容 |
+| `indices` | 对象列表，每项有 `id`、`generate` 和按语言给出的 `title` |
+
+部分用罗马数字编号，章在全书范围内用整数编号，附录用字母编号，顺序都取自这个文件。因此编号并不固定：正文里用标题称呼一章，链接时用文件名。
+
+## 章节格式
+
+每章是一个 Markdown 文件。每个段落、列表项和表格行都写成一行，由渲染器按窗口宽度折行：中文段落里的换行会被渲染成一个空格。
+
+### 章节结构
+
+一章按下面的顺序组织，用不到的部分可以省略：章首导语，不带标题，说明本章讲什么；「模型」一节，讲概念以及概念之间的关系；若干「接口」小节，每个对象一节，先讲概念，再列定义条目，最后讲条目之间怎样配合；「语义细节」一节，讲时序、边界情况、机制和代价；最后是「错误与恢复」一节。机制只通过概念和公共接口来讲，不点名内部函数或数据结构。
+
+### 标题
+
+- `#` 是章标题，每章恰好一个。
+- `##` 和 `###` 是节。
+- `####` 一律是定义条目，不允许出现第四级以下的标题。
+
+每个标题都有锚点，算法与 GitHub 相同：文字转为小写，链接只保留链接文字，保留字母、数字、组合符号、连字符和下划线，空格变成连字符，其余字符丢弃。重复的锚点依次加 `-1`、`-2`。所以 `## Errors and recovery` 的锚点是 `errors-and-recovery`，`## 错误与恢复` 的锚点是 `错误与恢复`。
+
+### 定义条目
+
+定义条目的标题是 `#### KIND: NAME SIGNATURE`。各语言都用英文的种类标签。
+
+| 种类 | 指什么 | 对照检查的依据 |
+| --- | --- | --- |
+| `Function` | 函数 | 它的 Commentary 记录 |
+| `Macro` | 宏 | 它的 Commentary 记录 |
+| `Variable` | 变量或用户选项 | 它的 Commentary 记录 |
+| `Hook` | 钩子变量 | 它的 Commentary 记录 |
+| `Error` | 错误条件 | 它的 Commentary 记录 |
+| `Component` | 组件及其 props | 它的 Commentary 记录 |
+| `Host` | Host 种类，例如 `text` | ETAF 定义的 Host |
+| `Property` | Host 的语义属性或事件属性，例如 `:role` | ETAF 读取的属性 |
+| `Style` | 样式属性，例如 `:padding` | Ebox 定义的样式属性 |
+| `Token` | 主题 token，例如 `:ui-fg` | 组件库的 token |
+| `Syntax` | View 语法的一种形式，例如 `expr` | 不检查 |
+
+签名照抄 Commentary 记录，空白差异忽略不计。连续的几个条目标题组成一组，共用一段说明。条目正文以一句话概述开头，随后按下面的顺序写带标签的段落，没有内容的标签省略：
+
+| 英文 | 中文 | 内容 |
+| --- | --- | --- |
+| `**Arguments.**` | `**参数。**` | 每个参数、可接受的值和默认值 |
+| `**Semantics.**` | `**语义。**` | 按顺序说明发生什么，包括边界情况和时机 |
+| `**Returns.**` | `**返回。**` | 返回值 |
+| `**Errors.**` | `**错误。**` | 每个错误条件，写成 ``error→ `CONDITION` ``，并说明附带数据和触发时机 |
+| `**Example.**` | `**示例。**` | 简短示例 |
+| `**See also.**` | `**参见。**` | 相关条目 |
+
+样式条目开头是一张表，列出值语法、初始值、适用对象、是否继承，以及影响绘制还是几何。键位不设条目种类：在拥有该 keymap 的条目或小节里用一张「键、命令、上下文」表列出。
+
+### 记法
+
+| 记号 | 含义 |
+| --- | --- |
+| `⇒` | 前面那个表达式的值 |
+| `▷` | 缓冲区显示的内容 |
+| `error→` | 该表达式发出后面写的错误条件 |
+| `-\|` | 写到 `*Messages*` 的文字 |
+
+签名里的参数名用小写。正文里提到参数时用大写，例如「SOURCE 是一个 ref」。
+
+### 索引词
+
+在标题后单独一行写 `<!-- index: 词; 词 -->`，为这一节标记索引词。概念索引将由这些词生成，生成功能尚未实现。
+
+### 可运行示例
+
+以 ```` ```elisp :run ```` 开头的代码块是可运行示例。包逐个读取顶层表达式，在加载了 etaf 和 etaf-ui 的环境里以词法绑定求值；最后一个表达式的值必须是 ETAF View。不同的顶层表达式之间不共享局部绑定。示例里定义的组件以 `demo-` 命名。由 Lisp 计算出来的 View 子节点要包成 `(expr FORM)`。验收测试会在每种语言下挂载每个可运行示例，所以示例求值失败、挂载失败或产生警告，`make check` 都会失败。
+
+### 链接和名字
+
+链接到其他章时，以文件名作为链接目标，可以再加标题锚点，例如 `reactivity.md` 或 `reactivity.md#scope`，并且只链接已经存在的章。尚未写成的章，用纯文本写它的标题。
+
+带包前缀的代码片段，例如 `etaf-ref`，必须是本书所记录的包或参考仓库的 Commentary 记录，或者是包名、参考仓库名。其他名字，例如本书范围以外的应用，写成纯文本。写出包名和版本号的代码片段，例如 `etaf 0.2.1`，必须与该包入口文件的 `Version:` 头一致。
+
+### 翻译
+
+各语言的章节相同，节的层级序列相同，定义条目及其签名相同，可运行示例的数量也相同。可运行示例的代码保持一致；其他代码块里的注释可以翻译。中文里以下术语不翻译：Runtime、Host、Context、View、Action、Theme 和 Scope。
+
+## 门禁检查什么
+
+门禁读取本书和相邻的各个提供者仓库，每个问题报告为 `FILE:LINE: MESSAGE`。
+
+| 消息 | 原因 |
+| --- | --- |
+| `Missing chapter`、`Chapter needs a level-1 title`、`Chapter has several titles` | 章节文件缺失，或章标题不对 |
+| `Level-4 headings are definition entries`、`Headings deeper than level 4` | 标题既不是合法的节，也不是合法的条目 |
+| `Unclosed code fence` | 代码块没有结束 |
+| `chapter is not listed in book.json` | 语言目录里有一个不属于本书的 Markdown 文件 |
+| `KIND NAME is not a Commentary record` | 需要对照 Commentary 的条目找不到该种类的记录 |
+| `signature of NAME differs from PACKAGE Commentary: SIGNATURE` | 条目签名与记录不一致 |
+| `unknown KIND NAME` | Host、Property、Style 或 Token 条目指向不存在的项 |
+| `duplicate KIND entry for NAME` | 同一种类的两个条目指向同一项 |
+| `` `NAME' is not a public interface `` | 代码片段点名了非公共符号 |
+| `` `NAME' has no definition entry `` | 代码片段点名了已列入覆盖范围、却没有条目的公共接口 |
+| `NAME has no definition entry (coverage: SUBJECT)` | 已列入覆盖范围的包或词表有接口缺少条目 |
+| `PACKAGE is version X, not Y` | 版本号片段与包不一致 |
+| `link to unknown chapter: TARGET`、`link to unknown heading: TARGET` | 链接目标不存在 |
+| `hard-wrapped line: write each paragraph on one line` | 段落或列表项在下一行继续 |
+| `definition entries differ from LANGUAGE`、`section structure differs from LANGUAGE`、`runnable examples differ from LANGUAGE` | 译本与基准语言不一致 |
+| `provider checkout missing: DIRECTORY`、`cannot read provider source` | 读不到提供者仓库 |
+
+## 命令
+
+在仓库根目录运行，各提供者仓库要作为相邻目录检出：
+
+| 命令 | 作用 |
+| --- | --- |
+| `make book-check` | 运行门禁 |
+| `make coverage` | 运行门禁，并列出每个包和词表已有条目的接口数 |
+| `make test` | 运行 `tests/acceptance.json` 中的公共场景，包括挂载每个可运行示例 |
+| `make check` | 结构、编译、门禁、场景、API 边界和工具测试 |
+
+也可以直接运行门禁：`emacs -Q --batch -L . -L lisp -l scripts/check-book.el [--book DIRECTORY] [--providers DIRECTORY] [--coverage]`。`--book` 默认是 `book/`，`--providers` 默认是上级目录。
+
+包改动公共接口时，在同一次交付里更新所有语言中受影响的章节。一个包的全部接口都有条目后，把它加入 `coverage`，门禁会保证它始终完整。
+
+## 在 Lisp 中读取本书
+
+```elisp
+(require 'etaf-manual)
+
+(plist-get (etaf-manual-definition 'etaf-ref) :chapter)
+     ⇒ reactivity
+
+(mapcar (lambda (chapter) (plist-get chapter :title))
+        (plist-get (etaf-manual-book "zh-CN") :chapters))
+     ⇒ ("响应式系统")
+```
+
+`etaf-manual-book` 会缓存解析结果，直到某个源文件改变；源文件格式有误时发出 `etaf-manual-error`。`etaf-manual-example-view` 对可运行示例求值，返回可交给 `etaf-mount` 的 View。

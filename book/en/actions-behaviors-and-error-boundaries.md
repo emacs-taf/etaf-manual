@@ -235,7 +235,7 @@ Return a Behavior that moves caller-owned numeric coordinate refs from Ebox drag
 (etaf-draggable :x position :axis 'x :on-end (lambda (_gesture) (commit position)))
 ```
 
-**See also.** `etaf-draggable-controlled`, the Dragging and Gestures chapter, and [Keyboard](keyboard.md) for the contributed keys.
+**See also.** `etaf-draggable-controlled`, [Dragging and Gestures](dragging-and-gestures.md), and [Keyboard](keyboard.md) for the contributed keys.
 
 #### Function: etaf-resizable (&key x y width height edges min-width max-width min-height max-height delta on-start on-resize on-end on-cancel)
 
@@ -258,7 +258,7 @@ Return a Behavior that resizes caller-owned numeric geometry refs from Ebox drag
                 :on-end (lambda (_gesture) (store-size width height)))
 ```
 
-**See also.** `etaf-resizable-controlled` and the Dragging and Gestures chapter.
+**See also.** `etaf-resizable-controlled` and [Dragging and Gestures](dragging-and-gestures.md).
 
 #### Function: etaf-draggable-controlled (read on-change &key axis delta on-start on-move on-end on-cancel)
 

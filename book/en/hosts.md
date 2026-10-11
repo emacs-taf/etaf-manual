@@ -447,7 +447,7 @@ Keep a drag gesture alive across a button release.
 
 **Errors.** `error→ error` when the modifier is unsupported, or when `:drag-lock-modifier` is given without a drag callback on the same Host.
 
-**See also.** the Dragging and Gestures chapter.
+**See also.** [Dragging and Gestures](dragging-and-gestures.md).
 
 #### Property: :hover-group
 

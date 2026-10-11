@@ -235,7 +235,7 @@ Behavior 是规格，不是节点：一个名字、一组语义属性，以及�
 (etaf-draggable :x position :axis 'x :on-end (lambda (_gesture) (commit position)))
 ```
 
-**参见。** `etaf-draggable-controlled`、拖拽与手势章，以及[键盘](keyboard.md)关于所贡献按键的说明。
+**参见。** `etaf-draggable-controlled`、[拖拽与手势](dragging-and-gestures.md)，以及[键盘](keyboard.md)关于所贡献按键的说明。
 
 #### Function: etaf-resizable (&key x y width height edges min-width max-width min-height max-height delta on-start on-resize on-end on-cancel)
 
@@ -258,7 +258,7 @@ Behavior 是规格，不是节点：一个名字、一组语义属性，以及�
                 :on-end (lambda (_gesture) (store-size width height)))
 ```
 
-**参见。** `etaf-resizable-controlled` 与拖拽与手势章。
+**参见。** `etaf-resizable-controlled` 与[拖拽与手势](dragging-and-gestures.md)。
 
 #### Function: etaf-draggable-controlled (read on-change &key axis delta on-start on-move on-end on-cancel)
 

@@ -56,7 +56,7 @@ The callback that receives a pointer drag gesture phase by phase.
 
 **Example.** `(box :on-drag (lambda (gesture) (pcase (plist-get gesture :phase) ('start ...) ((or 'move 'end) ...)))) "Drag me")`
 
-**See also.** `etaf-drag-step`, the Dragging and Gestures chapter, `etaf-draggable`, `etaf-resizable`.
+**See also.** `etaf-drag-step`, [Dragging and Gestures](dragging-and-gestures.md), `etaf-draggable`, `etaf-resizable`.
 
 #### Property: :on-scroll
 

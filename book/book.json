@@ -98,7 +98,8 @@
         "events",
         "focus",
         "keyboard",
-        "region-navigation"
+        "region-navigation",
+        "dragging-and-gestures"
       ]
     }
   ],

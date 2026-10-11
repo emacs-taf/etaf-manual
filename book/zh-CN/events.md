@@ -56,7 +56,7 @@ Host 为每种事件种类声明一个回调，属性名为 `:on-KIND`，其中 
 
 **示例。** `(box :on-drag (lambda (gesture) (pcase (plist-get gesture :phase) ('start ...) ((or 'move 'end) ...)))) "Drag me")`
 
-**参见。** `etaf-drag-step`、《拖拽与手势》章、`etaf-draggable`、`etaf-resizable`。
+**参见。** `etaf-drag-step`、[拖拽与手势](dragging-and-gestures.md)、`etaf-draggable`、`etaf-resizable`。
 
 #### Property: :on-scroll
 

@@ -447,7 +447,7 @@ Host 的鼠标指针形状。
 
 **错误。** 修饰键不支持，或同一 Host 给出 `:drag-lock-modifier` 却没有拖拽回调时 `error→ error`。
 
-**参见。** 《拖拽与手势》章。
+**参见。** [拖拽与手势](dragging-and-gestures.md)。
 
 #### Property: :hover-group
 

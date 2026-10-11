@@ -159,7 +159,7 @@ A grid container with explicit or automatic tracks.
 
 **Example.** `(grid :grid-template-columns '((fr 1) (fr 2)) ...cells...)` gives a two-column form whose second column is twice as wide.
 
-**See also.** the Grid Layout chapter.
+**See also.** [Grid Layout](grid-layout.md).
 
 ### image
 

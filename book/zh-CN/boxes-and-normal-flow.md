@@ -18,7 +18,7 @@
 
 盒子解出宽度之前，会拿到一个可用像素宽和三种约束之一。*stretch* 意味着盒子可以填满可用宽。*shrink* 意味着盒子应跟随内容，并以可用宽为界：它的固有最小宽（不破坏必须保持完整的单位所能有的最窄宽度）与固有最大宽（内容排成一行时的宽度），再夹到可用宽。*exact* 意味着盒子取另一个算法已经为它决定好的宽度，忽略它自己的声明。
 
-约束由父节点选择。`box` 的块子节点被 stretch 到内容宽，`column` 子节点在交叉轴对齐为 `stretch` 时也是；非文本树的根被 stretch 到视口宽。`row` 子节点与交叉轴不 stretch 的 `column` 子节点 shrink 到自己的内容。exact 是 flex 与 grid 算法把目标宽交给一个项的方式，因此只出现在这两种容器内部，[Flex 布局](flex-layout.md)与 Grid 布局两章讲它们。
+约束由父节点选择。`box` 的块子节点被 stretch 到内容宽，`column` 子节点在交叉轴对齐为 `stretch` 时也是；非文本树的根被 stretch 到视口宽。`row` 子节点与交叉轴不 stretch 的 `column` 子节点 shrink 到自己的内容。exact 是 flex 与 grid 算法把目标宽交给一个项的方式，因此只出现在这两种容器内部，[Flex 布局](flex-layout.md)与 [Grid 布局](grid-layout.md)两章讲它们。
 
 宽度声明优先于模式：固定的 `:width` 在 stretch 与 shrink 下都解析为该值；`min-content`、`max-content` 与 `fit-content` 显式选择固有宽度，其中 `fit-content` 是固有最小与最大宽夹到可用宽。初值 `auto` 表现得与该模式一致——stretch 下填满、shrink 下等价 fit-content——而 `stretch` 关键字在有包含块可填时显式填满。高度同理、按行计：固定的 `:height` 优先，`stretch` 高度在已知包含高时填满它，否则高度取内容高。`overflow` 为 `visible` 的盒子在内容所需行数超过自身高度时改取内容高而不是裁剪，于是一行行长大的文本会把容器顶高。
 

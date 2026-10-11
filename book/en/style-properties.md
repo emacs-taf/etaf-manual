@@ -104,7 +104,7 @@ Sets the line style of text decorations.
 
 <!-- index: width; height; box sizing -->
 
-`:width`, `:height` and their minimum and maximum partners accept keywords and axis lengths, and `:box-sizing` decides what the size measures. Inline lengths resolve in pixels and block lengths in lines; percentages use the containing block. [Boxes and Normal Flow](boxes-and-normal-flow.md), [Flex Layout](flex-layout.md) and Grid Layout define how the constraints are resolved.
+`:width`, `:height` and their minimum and maximum partners accept keywords and axis lengths, and `:box-sizing` decides what the size measures. Inline lengths resolve in pixels and block lengths in lines; percentages use the containing block. [Boxes and Normal Flow](boxes-and-normal-flow.md), [Flex Layout](flex-layout.md) and [Grid Layout](grid-layout.md) define how the constraints are resolved.
 
 #### Style: :box-sizing
 
@@ -798,7 +798,7 @@ Sets the item's growth, shrink and basis in one declaration.
 
 <!-- index: grid template; grid placement; track -->
 
-A `grid` container places its children on explicit and implicit tracks. Track lists are built from fixed and intrinsic sizes, fractional units, `(minmax MIN MAX)` and `(repeat N TRACK)`; placement is one-based. Grid Layout defines the sizing and placement algorithms; this section gives each property's grammar and its effect.
+A `grid` container places its children on explicit and implicit tracks. Track lists are built from fixed and intrinsic sizes, fractional units, `(minmax MIN MAX)` and `(repeat N TRACK)`; placement is one-based. [Grid Layout](grid-layout.md) defines the sizing and placement algorithms; this section gives each property's grammar and its effect.
 
 #### Style: :grid-template-columns
 

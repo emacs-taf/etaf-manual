@@ -159,7 +159,7 @@ Host 也是 View 里的身份单位：和解按名字和 `:key` 匹配 Host 子�
 
 **示例。** `(grid :grid-template-columns '((fr 1) (fr 2)) ...cells...)` 得到一个两列表单，第二列宽度是第一列的两倍。
 
-**参见。** 《Grid 布局》章。
+**参见。** [Grid 布局](grid-layout.md)。
 
 ### image
 

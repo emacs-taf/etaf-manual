@@ -104,7 +104,7 @@
 
 <!-- index: 宽度; 高度; 盒尺寸 -->
 
-`:width`、`:height` 及其最小、最大搭档接受关键字和轴内长度，`:box-sizing` 决定尺寸量到哪里。行内长度解析成像素、块轴长度解析成行，百分比相对包含块。约束的解析算法见[盒与常规流](boxes-and-normal-flow.md)、[Flex 布局](flex-layout.md)、Grid 布局几章。
+`:width`、`:height` 及其最小、最大搭档接受关键字和轴内长度，`:box-sizing` 决定尺寸量到哪里。行内长度解析成像素、块轴长度解析成行，百分比相对包含块。约束的解析算法见[盒与常规流](boxes-and-normal-flow.md)、[Flex 布局](flex-layout.md)、[Grid 布局](grid-layout.md)几章。
 
 #### Style: :box-sizing
 
@@ -798,7 +798,7 @@ padding 在边框盒内侧加空间，margin 在外侧加空间。每条物理�
 
 <!-- index: grid 模板; grid 放置; 轨道 -->
 
-`grid` 容器把子节点放在显式与隐式轨道上。轨道列表由固定尺寸、内容尺寸、分数单位、`(minmax MIN MAX)` 和 `(repeat N TRACK)` 组成；放置位置从 1 起算。尺寸与放置算法见「Grid 布局」一章；本节给出每个属性的语法与作用。
+`grid` 容器把子节点放在显式与隐式轨道上。轨道列表由固定尺寸、内容尺寸、分数单位、`(minmax MIN MAX)` 和 `(repeat N TRACK)` 组成；放置位置从 1 起算。尺寸与放置算法见 [Grid 布局](grid-layout.md)；本节给出每个属性的语法与作用。
 
 #### Style: :grid-template-columns
 

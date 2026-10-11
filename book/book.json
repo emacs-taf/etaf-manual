@@ -77,7 +77,8 @@
       "chapters": [
         "rendering-model",
         "boxes-and-normal-flow",
-        "flex-layout"
+        "flex-layout",
+        "grid-layout"
       ]
     }
   ],

@@ -153,7 +153,8 @@
         "ui-data-display",
         "ui-composite-components",
         "ui-panels-and-windows",
-        "ui-desktop-navigation-and-tiling"
+        "ui-desktop-navigation-and-tiling",
+        "ui-media-and-reactions"
       ]
     }
   ],

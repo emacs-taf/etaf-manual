@@ -184,7 +184,7 @@ A fixed-size local picture.
 
 Semantic properties are ETAF's own Host metadata: identity, accessibility, references, behaviors, pointer feedback, keyboard operation and layout persistence. They do not change a node's visual style; they reach the runtime, the Ebox node, or both, and this chapter defines them all.
 
-A semantic property is validated when its Host commits. A successful commit keeps the previous state; a failing one publishes nothing for that Host, so a Host never carries a half-applied property set. Event properties (`:on-*`) are the third domain; the Events chapter defines them, and [Actions, Behaviors and Error Boundaries](actions-behaviors-and-error-boundaries.md) defines how they compose. `:on-direction` is a keyboard property and is defined in the Keyboard chapter.
+A semantic property is validated when its Host commits. A successful commit keeps the previous state; a failing one publishes nothing for that Host, so a Host never carries a half-applied property set. Event properties (`:on-*`) are the third domain; [Events](events.md) defines them, and [Actions, Behaviors and Error Boundaries](actions-behaviors-and-error-boundaries.md) defines how they compose. `:on-direction` is a keyboard property and is defined in the Keyboard chapter.
 
 ### Values and conflicts
 
@@ -307,7 +307,7 @@ Mark a Host as unavailable without removing it.
 
 **Errors.** `error→ etaf-renderer-error` when the value is not nil or t.
 
-**See also.** the Events chapter for activation and the Focus chapter for focus.
+**See also.** [Events](events.md) for activation and the Focus chapter for focus.
 
 #### Property: :focus-group
 
@@ -652,7 +652,7 @@ Property resolution is per Host: when a Host's segment initializes or its proper
 - A Host whose properties and Theme are unchanged costs one identity comparison at update time.
 - A Host whose plain style values changed follows a lighter path: the changed values are applied to the retained node without recomputing its metadata, Behaviors or children.
 - Changing keys, semantics or the Theme takes the full path: the Host re-resolves its properties, re-registers its reference, and reconciles its Behaviors.
-- The resolved property values reach the node for style properties; identity, accessibility and interaction facts are split off according to the table in [Selector subjects](#selector-subjects) and the interaction boundary described with the event properties. ETAF keeps its own copy of the semantic properties for its queries and for event dispatch.
+- The resolved property values reach the node for style properties; identity, accessibility and interaction facts are split off according to the table in [Selector subjects](#selector-subjects) and the interaction boundary [Events](events.md) describes. ETAF keeps its own copy of the semantic properties for its queries and for event dispatch.
 
 The cost of a Host update is therefore proportional to that Host's own properties, not to the size of the View or the number of siblings; a Host that only reads static values costs nothing after it is first bound.
 

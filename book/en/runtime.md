@@ -289,7 +289,7 @@ Return committed handler contribution entries for RUNTIME.
   (alist-get 'drag (cdr entry)))
 ```
 
-**See also.** the Events chapter and the Behavior chapter.
+**See also.** [Events](events.md) and the Behavior chapter.
 
 #### Function: etaf-runtime-host-props-entries (runtime)
 

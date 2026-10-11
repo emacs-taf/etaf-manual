@@ -215,7 +215,7 @@ Return a Behavior converting ATTRIBUTES into a toggleable press action.
 (etaf-view (demo-setting-row :label "Notifications"))
 ```
 
-**See also.** [Hosts](hosts.md#property-use), the Events chapter and [Components](components.md#setup-bindings-and-state).
+**See also.** [Hosts](hosts.md#property-use), [Events](events.md) and [Components](components.md#setup-bindings-and-state).
 
 #### Function: etaf-draggable (&key x y axis delta on-start on-move on-end on-cancel)
 
@@ -463,7 +463,7 @@ Invalid ETAF Behavior. It is signaled when a Behavior spec, source, installer or
 | `"Controlled geometry READ must be a function"`, `"Controlled geometry READ must return a plist"`, `"Controlled draggable READ must expose :x or :y"`, `"%s must contain a number, got %S"` | Controlled READ input that cannot supply the geometry a gesture needs |
 | `"Controlled draggable ON-CHANGE must be a function"`, `"Controlled resizable ON-CHANGE must be a function"`, `"Invalid controlled resize edges: %S"` | Invalid controlled Behavior arguments |
 
-**See also.** [Hosts](hosts.md#property-use) for `:use` resolution, `etaf-component-call-error` in [Components](components.md#errors-and-recovery) for an owned-property conflict between a Host and a Behavior, and the Events chapter for gesture dispatch.
+**See also.** [Hosts](hosts.md#property-use) for `:use` resolution, `etaf-component-call-error` in [Components](components.md#errors-and-recovery) for an owned-property conflict between a Host and a Behavior, and [Events](events.md) for gesture dispatch.
 
 ### Recovery
 

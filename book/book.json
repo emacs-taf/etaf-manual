@@ -94,7 +94,8 @@
         "zh-CN": "交互"
       },
       "chapters": [
-        "interaction-overview"
+        "interaction-overview",
+        "events"
       ]
     }
   ],

@@ -289,7 +289,7 @@ Host 查询看到的是至少带一个非空语义属性（例如 `:ref`、`:rol
   (alist-get 'drag (cdr entry)))
 ```
 
-**参见。** 事件章与 Behavior 章。
+**参见。** [事件](events.md)与 Behavior 章。
 
 #### Function: etaf-runtime-host-props-entries (runtime)
 

@@ -215,7 +215,7 @@ Behavior 是规格，不是节点：一个名字、一组语义属性，以及�
 (etaf-view (demo-setting-row :label "Notifications"))
 ```
 
-**参见。** [Host](hosts.md#property-use)、事件章与[组件](components.md#setup绑定与-state)。
+**参见。** [Host](hosts.md#property-use)、[事件](events.md)与[组件](components.md#setup绑定与-state)。
 
 #### Function: etaf-draggable (&key x y axis delta on-start on-move on-end on-cancel)
 
@@ -463,7 +463,7 @@ Invalid ETAF Behavior。Behavior 规格、来源、安装函数或受控几何�
 | `"Controlled geometry READ must be a function"`、`"Controlled geometry READ must return a plist"`、`"Controlled draggable READ must expose :x or :y"`、`"%s must contain a number, got %S"` | 受控 READ 无法提供手势需要的几何 |
 | `"Controlled draggable ON-CHANGE must be a function"`、`"Controlled resizable ON-CHANGE must be a function"`、`"Invalid controlled resize edges: %S"` | 受控 Behavior 的参数非法 |
 
-**参见。** [Host](hosts.md#property-use) 关于 `:use` 解析；Host 与 Behavior 的归属属性冲突见[组件](components.md#错误与恢复)的 `etaf-component-call-error`；手势派发见事件章。
+**参见。** [Host](hosts.md#property-use) 关于 `:use` 解析；Host 与 Behavior 的归属属性冲突见[组件](components.md#错误与恢复)的 `etaf-component-call-error`；手势派发见[事件](events.md)。
 
 ### 恢复
 

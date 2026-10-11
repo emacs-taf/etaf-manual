@@ -177,7 +177,7 @@ Behavior 是规格，不是节点：一个名字、一组语义属性，以及�
 
 **参数。** ATTRIBUTES 原样交给 `etaf-behavior-create`，只有 tab stop 例外。
 
-**语义。** ATTRIBUTES 不含 `:tab-index` 时，Behavior 补上标准的第一站 `0`，让 Host 参与 Tab 导航；显式 `:tab-index nil` 把它排除在外。其余属性照常属于 Host。由此产生的停靠点如何导航，见键盘章与焦点章。
+**语义。** ATTRIBUTES 不含 `:tab-index` 时，Behavior 补上标准的第一站 `0`，让 Host 参与 Tab 导航；显式 `:tab-index nil` 把它排除在外。其余属性照常属于 Host。由此产生的停靠点如何导航，见《键盘》章与[焦点](focus.md)。
 
 **返回。** 名为 `focusable` 的 Behavior 规格。
 
@@ -185,7 +185,7 @@ Behavior 是规格，不是节点：一个名字、一组语义属性，以及�
 
 **示例。** `(text :use (list (etaf-focusable)) "Open")`
 
-**参见。** 焦点章与 [Host](hosts.md#无障碍与焦点)。
+**参见。** [焦点](focus.md)与 [Host](hosts.md#无障碍与焦点)。
 
 #### Function: etaf-toggleable (&rest attributes)
 

@@ -177,7 +177,7 @@ Return a focusable Behavior from ATTRIBUTES.
 
 **Arguments.** ATTRIBUTES are passed to `etaf-behavior-create` unchanged, except for the tab stop.
 
-**Semantics.** When ATTRIBUTES does not contain `:tab-index`, the Behavior supplies the standard first tab stop, `0`, so the Host takes part in tab navigation; an explicit `:tab-index nil` excludes it. The rest of the attributes belong to the Host as usual. The Keyboard and Focus chapters define navigation over the resulting stops.
+**Semantics.** When ATTRIBUTES does not contain `:tab-index`, the Behavior supplies the standard first tab stop, `0`, so the Host takes part in tab navigation; an explicit `:tab-index nil` excludes it. The rest of the attributes belong to the Host as usual. The Keyboard and [Focus](focus.md) chapters define navigation over the resulting stops.
 
 **Returns.** A Behavior spec named `focusable`.
 
@@ -185,7 +185,7 @@ Return a focusable Behavior from ATTRIBUTES.
 
 **Example.** `(text :use (list (etaf-focusable)) "Open")`
 
-**See also.** the Focus chapter and [Hosts](hosts.md#accessibility-and-focus).
+**See also.** [Focus](focus.md) and [Hosts](hosts.md#accessibility-and-focus).
 
 #### Function: etaf-toggleable (&rest attributes)
 

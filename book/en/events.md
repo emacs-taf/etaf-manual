@@ -120,7 +120,7 @@ The callback that runs when keyboard focus enters the Host from outside it.
 
 **Example.** `(column :on-focus-enter (lambda () (raise-window 'notes)) ...)`
 
-**See also.** `etaf-focus`, `ebox-focus-change-functions`, the Focus chapter.
+**See also.** `etaf-focus`, `ebox-focus-change-functions`, [Focus](focus.md).
 
 ### How several sources compose
 

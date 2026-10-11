@@ -214,14 +214,14 @@ A conflict between owned semantics is an error rather than a silent override, be
 
 A Host's accessible metadata is its `role` attribute and its `aria-*` attributes on the Ebox node. They are ordinary selector subjects, so stylesheets and tests can select a Host by role or accessible state, and they are the facts the keyboard and focus layers read.
 
-- `:role` writes the node's `role` attribute. Roles such as `button`, `option`, `checkbox` and `slider` carry conventional behavior in the Focus and Keyboard chapters.
+- `:role` writes the node's `role` attribute. Roles such as `button`, `option`, `checkbox` and `slider` carry conventional behavior in the [Focus](focus.md) and Keyboard chapters.
 - Every `:aria-*` property writes one attribute with the name after the colon. Explicitly passing nil still writes the attribute with a nil value, which is different from omitting it: a nil attribute is present, so a selector that tests the attribute matches, and Ebox's inherited-value blocking sees the difference.
 - The values are strings, numbers or symbols; numbers and symbols are converted to their printed form. A list or other value is rejected with `error→ etaf-renderer-error`.
 - `:role` and the identifying `aria-*` attributes are owned semantic properties as described above; `:aria-label` and `:aria-description` are descriptive and may be replaced by a caller.
 
 **Example.** `(box :role "progressbar" :aria-valuenow 62 :aria-valuemin 0 :aria-valuemax 100 ...)`
 
-**See also.** the Focus and Keyboard chapters for role-specific behavior.
+**See also.** the [Focus](focus.md) and Keyboard chapters for role-specific behavior.
 
 ### Identity and metadata
 
@@ -259,7 +259,7 @@ The accessible role of a Host.
 
 **Arguments.** A symbol or a string, or nil. Values are not restricted to the ARIA vocabulary; ETAF only refuses values that are neither a symbol nor a string.
 
-**Semantics.** A non-nil role is written to the node as its `role` attribute and becomes a selector subject. The Focus and Keyboard chapters define how roles such as `button`, `slider`, `separator` and `option` participate in focus order, arrows and activation. `:role` is owned semantics: once the Host declares it, a caller or Behavior cannot replace it with a different value.
+**Semantics.** A non-nil role is written to the node as its `role` attribute and becomes a selector subject. The [Focus](focus.md) and Keyboard chapters define how roles such as `button`, `slider`, `separator` and `option` participate in focus order, arrows and activation. `:role` is owned semantics: once the Host declares it, a caller or Behavior cannot replace it with a different value.
 
 **Example.** `(text :role 'button :tab-index 0 :on-press #'retry "Retry")`
 
@@ -287,13 +287,13 @@ The position of a Host in the Tab order.
 
 **Arguments.** nil or an integer. The default is nil, which makes the Host no focus stop.
 
-**Semantics.** A non-negative integer makes the Host a focus stop: focus navigation can enter it with Tab and leave it with Tab. Stops are ordered by the integer, lower first, and stops with equal indices keep tree order, so a region's controls are visited together. A Host without a tab index can still be activated by pointer and can still contain focus stops of its own. The Focus chapter defines the rest of the navigation model.
+**Semantics.** A non-negative integer makes the Host a focus stop: focus navigation can enter it with Tab and leave it with Tab. Stops are ordered by the integer, lower first, and stops with equal indices keep tree order, so a region's controls are visited together. A Host without a tab index can still be activated by pointer and can still contain focus stops of its own. The [Focus](focus.md) chapter defines the rest of the navigation model.
 
 **Example.** `(row :tab-index 0 :on-press (lambda () (open item)) (text (expr item)))`
 
 **Errors.** `error→ etaf-renderer-error` when the value is not an integer or nil.
 
-**See also.** the Focus chapter.
+**See also.** the [Focus](focus.md) chapter.
 
 #### Property: :disabled
 
@@ -307,7 +307,7 @@ Mark a Host as unavailable without removing it.
 
 **Errors.** `error→ etaf-renderer-error` when the value is not nil or t.
 
-**See also.** [Events](events.md) for activation and the Focus chapter for focus.
+**See also.** [Events](events.md) for activation and [Focus](focus.md) for focus.
 
 #### Property: :focus-group
 
@@ -321,7 +321,7 @@ Make a container's focus stops one stop of the enclosing navigation.
 
 **Errors.** `error→ etaf-renderer-error` when the value is not nil, `vertical`, `horizontal` or `grid`.
 
-**See also.** the Focus chapter.
+**See also.** the [Focus](focus.md) chapter.
 
 #### Property: :focus-scope
 
@@ -335,7 +335,7 @@ Confine keyboard operation to a subtree.
 
 **Errors.** `error→ etaf-renderer-error` when the value is not nil or `modal`.
 
-**See also.** the Focus and Keyboard chapters.
+**See also.** the [Focus](focus.md) and Keyboard chapters.
 
 #### Property: :region
 

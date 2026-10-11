@@ -214,14 +214,14 @@ Host 也是 View 里的身份单位：和解按名字和 `:key` 匹配 Host 子�
 
 Host 的无障碍元数据是 Ebox 节点上的 `role` 属性和 `aria-*` 属性。它们是普通的选择器主体，样式表和测试都可以按角色或无障碍状态选择 Host，也是键盘层和焦点层读取的事实。
 
-- `:role` 写入节点的 `role` 属性。`button`、`option`、`checkbox`、`slider` 这类角色在《焦点》和《键盘》两章有约定行为。
+- `:role` 写入节点的 `role` 属性。`button`、`option`、`checkbox`、`slider` 这类角色在[焦点](focus.md)与《键盘》章有约定行为。
 - 每个 `:aria-*` 属性写入一个属性，名字是冒号后的部分。显式传 nil 仍会写入值为 nil 的属性，这与省略不同：nil 属性是存在的，测试该属性的选择器会匹配，Ebox 的继承阻塞也能分辨差别。
 - 值是字符串、数字或符号；数字和符号转换成打印形式。列表或其他值以 `error→ etaf-renderer-error` 拒绝。
 - `:role` 和标识类 `aria-*` 属性是上面说的归属语义属性；`:aria-label` 和 `:aria-description` 是描述性的，调用者可以替换。
 
 **示例。** `(box :role "progressbar" :aria-valuenow 62 :aria-valuemin 0 :aria-valuemax 100 ...)`
 
-**参见。** 角色特有行为见《焦点》和《键盘》两章。
+**参见。** 角色特有行为见[焦点](focus.md)与《键盘》章。
 
 ### 身份与元数据
 
@@ -259,7 +259,7 @@ Host 的无障碍角色。
 
 **参数。** 符号或字符串，或 nil。取值不限于 ARIA 词表；只要不是符号或字符串，ETAF 就拒绝。
 
-**语义。** 非 nil 角色作为节点的 `role` 属性写入，并成为选择器主体。《焦点》和《键盘》两章定义 `button`、`slider`、`separator`、`option` 这类角色如何参与焦点顺序、方向键和激活。`:role` 是归属语义：Host 一旦声明，调用者或 Behavior 就不能用不同的值替换它。
+**语义。** 非 nil 角色作为节点的 `role` 属性写入，并成为选择器主体。[焦点](focus.md)与《键盘》章定义 `button`、`slider`、`separator`、`option` 这类角色如何参与焦点顺序、方向键和激活。`:role` 是归属语义：Host 一旦声明，调用者或 Behavior 就不能用不同的值替换它。
 
 **示例。** `(text :role 'button :tab-index 0 :on-press #'retry "Retry")`
 
@@ -287,13 +287,13 @@ Host 在 Tab 顺序里的位置。
 
 **参数。** nil 或整数。默认是 nil，表示该 Host 不是焦点停靠点。
 
-**语义。** 非负整数让 Host 成为焦点停靠点：焦点导航可以按 Tab 进入和离开。停靠点按整数值排序，小的在前；整数相同的按树序，因此同一区域的控件会连续访问。没有 tab index 的 Host 仍可由指针激活，也仍可包含自己的焦点停靠点。导航模型其余部分见《焦点》章。
+**语义。** 非负整数让 Host 成为焦点停靠点：焦点导航可以按 Tab 进入和离开。停靠点按整数值排序，小的在前；整数相同的按树序，因此同一区域的控件会连续访问。没有 tab index 的 Host 仍可由指针激活，也仍可包含自己的焦点停靠点。导航模型其余部分见[焦点](focus.md)。
 
 **示例。** `(row :tab-index 0 :on-press (lambda () (open item)) (text (expr item)))`
 
 **错误。** 值不是整数或 nil 时 `error→ etaf-renderer-error`。
 
-**参见。** 《焦点》章。
+**参见。** [焦点](focus.md)章。
 
 #### Property: :disabled
 
@@ -307,7 +307,7 @@ Host 在 Tab 顺序里的位置。
 
 **错误。** 值不是 nil 或 t 时 `error→ etaf-renderer-error`。
 
-**参见。** 激活见[事件](events.md)，焦点见《焦点》章。
+**参见。** 激活见[事件](events.md)，焦点见[焦点](focus.md)。
 
 #### Property: :focus-group
 
@@ -321,7 +321,7 @@ Host 在 Tab 顺序里的位置。
 
 **错误。** 值不是 nil、`vertical`、`horizontal` 或 `grid` 时 `error→ etaf-renderer-error`。
 
-**参见。** 《焦点》章。
+**参见。** [焦点](focus.md)章。
 
 #### Property: :focus-scope
 
@@ -335,7 +335,7 @@ Host 在 Tab 顺序里的位置。
 
 **错误。** 值不是 nil 或 `modal` 时 `error→ etaf-renderer-error`。
 
-**参见。** 《焦点》和《键盘》两章。
+**参见。** [焦点](focus.md)与《键盘》章。
 
 #### Property: :region
 

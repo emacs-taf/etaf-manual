@@ -120,7 +120,7 @@ Host 为每种事件种类声明一个回调，属性名为 `:on-KIND`，其中 
 
 **示例。** `(column :on-focus-enter (lambda () (raise-window 'notes)) ...)`
 
-**参见。** `etaf-focus`、`ebox-focus-change-functions`、《焦点》章。
+**参见。** `etaf-focus`、`ebox-focus-change-functions`、[焦点](focus.md)。
 
 ### 多个来源如何组合
 

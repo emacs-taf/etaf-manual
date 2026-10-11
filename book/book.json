@@ -95,7 +95,8 @@
       },
       "chapters": [
         "interaction-overview",
-        "events"
+        "events",
+        "focus"
       ]
     }
   ],

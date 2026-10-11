@@ -19,7 +19,7 @@ Data source 是携带回调的普通值。在拥有它的 Controller 调用某�
 
 只有 `:load` 必需；其余能力都可选，Controller 有什么用什么。`:provider` 是 source 在观察报告里的名字，默认 `data`。
 
-加载与变更回调可以返回 `etaf-async` 适配器而不返回值：Controller 启动它，并以普通结果解决（[异步模型](async.md)）。v1 变更的普通返回表示已提交；v2 结果自带确定度；拒绝、取消或超时始终让外部写入的确定度未知，由和解——而不是回滚——处理（Reconciliation 章）。
+加载与变更回调可以返回 `etaf-async` 适配器而不返回值：Controller 启动它，并以普通结果解决（[异步模型](async.md)）。v1 变更的普通返回表示已提交；v2 结果自带确定度；拒绝、取消或超时始终让外部写入的确定度未知，由和解——而不是回滚——处理（[和解](reconciliation.md)一章）。
 
 source 自己不持有状态，且恰好有一个拥有它的 Controller。释放由 Controller 负责：停止它会让 `:dispose` 运行一次。
 

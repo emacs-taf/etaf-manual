@@ -1,6 +1,6 @@
 # Data Controller
 
-Data Controller 是一个 Data Source 的响应式所有者。它把查询、页码、已接受的条目、总数、选择、状态与错误放进 ref；它调用 source 取页和写入；并把每次结果发布为一次响应式更新，因此读取这些 ref 的 View 会跟随数据。本章定义构造与选项、加载、查询与分页、选择、修改、取消与停止，以及各读取接口。[Data Source](data-sources.md)定义它驱动的 source 协议，[异步模型](async.md)定义 source 回调可以返回的适配器，[响应式系统](reactivity.md)定义 ref 与 `etaf-value`。已提交写入之后的五态和解状态机属于 Reconciliation 章。
+Data Controller 是一个 Data Source 的响应式所有者。它把查询、页码、已接受的条目、总数、选择、状态与错误放进 ref；它调用 source 取页和写入；并把每次结果发布为一次响应式更新，因此读取这些 ref 的 View 会跟随数据。本章定义构造与选项、加载、查询与分页、选择、修改、取消与停止，以及各读取接口。[Data Source](data-sources.md)定义它驱动的 source 协议，[异步模型](async.md)定义 source 回调可以返回的适配器，[响应式系统](reactivity.md)定义 ref 与 `etaf-value`。已提交写入之后的五态和解状态机属于[和解](reconciliation.md)章。
 
 ## 控制器模型
 
@@ -244,7 +244,7 @@ Controller 一次只做一个请求。开始一次加载或写入会把上一个
 
 **参数。** CONTROLLER 是存活的 Controller。OPERATION 命名修改，例如内存 source 的 `insert`、`replace`、`update`、`delete`、`reset`。PAYLOAD 是操作的输入。
 
-**语义。** 同步 source 返回结果，调用返回该结果；异步 source 在写入待决时返回 nil，应用通过状态与结果 ref 观察。写入待决期间第二次写会抛出 `etaf-data-error`，数据为 `("A mutation is already pending")`；加载仍可以取代待决的写。v1 结果视为已提交；带 `:mutate-v2` 的 source 返回标记结果，其确定度为 `committed`、`rolled-back` 或 `external-unknown`。已提交的写会触发一次当前页的 reconciliation 加载，结果 ref 之后携带最终信封。回滚或未分类的结果改为发布失败，调用重新抛出提供者的条件。取消、超时或未分类失败从不表示写入被回滚；结果记录 `external-unknown`，可重试的范围由 Reconciliation 章定义。
+**语义。** 同步 source 返回结果，调用返回该结果；异步 source 在写入待决时返回 nil，应用通过状态与结果 ref 观察。写入待决期间第二次写会抛出 `etaf-data-error`，数据为 `("A mutation is already pending")`；加载仍可以取代待决的写。v1 结果视为已提交；带 `:mutate-v2` 的 source 返回标记结果，其确定度为 `committed`、`rolled-back` 或 `external-unknown`。已提交的写会触发一次当前页的 reconciliation 加载，结果 ref 之后携带最终信封。回滚或未分类的结果改为发布失败，调用重新抛出提供者的条件。取消、超时或未分类失败从不表示写入被回滚；结果记录 `external-unknown`，可重试的范围由[和解](reconciliation.md)章定义。
 
 **返回。** 同步修改结果；异步写入待决时为 nil。
 

@@ -1,6 +1,6 @@
 # Asynchronous Model
 
-Not every loader finishes in the call that starts it: a file read, a SQLite query or a subprocess may complete later, from a timer or a process filter. Resources and Data Controllers run such work through one shared lifecycle. The loader returns an *asynchronous adapter* describing how to start the work; the owner that received it starts the work, applies an optional timeout, records exactly one outcome, and discards obsolete completions. This chapter describes the adapter and the rules every owner applies. The [Resource](resources.md), [Data Sources](data-sources.md) and [Data Controllers](data-controllers.md) chapters, together with the Reconciliation and List Cache chapters, define the owners themselves; [Reactivity](reactivity.md#scopes) defines the Scope that owns the work and [Reactivity](reactivity.md#errors-and-recovery) the parent condition of the errors below.
+Not every loader finishes in the call that starts it: a file read, a SQLite query or a subprocess may complete later, from a timer or a process filter. Resources and Data Controllers run such work through one shared lifecycle. The loader returns an *asynchronous adapter* describing how to start the work; the owner that received it starts the work, applies an optional timeout, records exactly one outcome, and discards obsolete completions. This chapter describes the adapter and the rules every owner applies. The [Resource](resources.md), [Data Sources](data-sources.md) and [Data Controllers](data-controllers.md) chapters, together with the [Reconciliation](reconciliation.md) and List Cache chapters, define the owners themselves; [Reactivity](reactivity.md#scopes) defines the Scope that owns the work and [Reactivity](reactivity.md#errors-and-recovery) the parent condition of the errors below.
 
 ## The load lifecycle
 
@@ -61,7 +61,7 @@ A repeated call to either function, or a call that arrives after the request bec
 
 START may return a zero-argument cancel function, and the owner calls it at most once when the request is cancelled, replaced, disposed or timed out. The request is made obsolete first, so a completion that the cancel function itself triggers is discarded rather than published. Returning nil instead means the external work cannot be stopped; the request is still invalidated and its completion is still ignored, so an adapter without a cancel function remains safe to replace.
 
-Cancellation never retries automatically and never rolls back external work. The owner is free to start a new request — a cancelled read can be loaded again — and a superseded write is handled by reconciliation rather than replayed silently (the Reconciliation chapter).
+Cancellation never retries automatically and never rolls back external work. The owner is free to start a new request — a cancelled read can be loaded again — and a superseded write is handled by reconciliation rather than replayed silently (the [Reconciliation](reconciliation.md) chapter).
 
 ## Timeout
 
@@ -99,7 +99,7 @@ Asynchronous wait exceeded its timeout. Its parent condition is `etaf-async-erro
 
 **Semantics.** The owner's timeout elapsed while the request was still pending. The owner has already run the adapter's cancel function, and this condition is recorded as the request's outcome; no later completion can publish. The data is `(TIMEOUT)`, the number of seconds allowed.
 
-**Recovery.** A timeout never proves that the external work did not happen. A read can be started again; for a write, the outcome is uncertain, and the owner's reconciliation state describes that uncertainty (the Reconciliation chapter). A timeout never certifies a rollback.
+**Recovery.** A timeout never proves that the external work did not happen. A read can be started again; for a write, the outcome is uncertain, and the owner's reconciliation state describes that uncertainty (the [Reconciliation](reconciliation.md) chapter). A timeout never certifies a rollback.
 
 **See also.** `etaf-async`, `etaf-async-error`.
 

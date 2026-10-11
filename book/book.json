@@ -113,7 +113,8 @@
         "async",
         "resources",
         "data-sources",
-        "data-controllers"
+        "data-controllers",
+        "reconciliation"
       ]
     }
   ],

@@ -19,7 +19,7 @@ A Data source is an ordinary value carrying callbacks. Nothing runs until its ow
 
 Only `:load` is required; every other capability is optional, and a Controller uses what the source has. `:provider` names the source in observation reports and defaults to `data`.
 
-Load and mutation callbacks may return an `etaf-async` adapter instead of a value: the Controller starts it and resolves with the ordinary result ([Asynchronous Model](async.md)). A v1 mutation return means committed; a v2 outcome states its own certainty; a rejection, cancellation or timeout always leaves the certainty of an external write unknown, and reconciliation — not rollback — handles it (the Reconciliation chapter).
+Load and mutation callbacks may return an `etaf-async` adapter instead of a value: the Controller starts it and resolves with the ordinary result ([Asynchronous Model](async.md)). A v1 mutation return means committed; a v2 outcome states its own certainty; a rejection, cancellation or timeout always leaves the certainty of an external write unknown, and reconciliation — not rollback — handles it (the [Reconciliation](reconciliation.md) chapter).
 
 A source holds no state of its own and has exactly one owning Controller. The Controller owns disposal: stopping it runs `:dispose` once.
 

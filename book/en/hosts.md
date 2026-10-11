@@ -208,7 +208,7 @@ A conflict between owned semantics is an error rather than a silent override, be
 
 **Errors.** `error→ etaf-component-call-error` when a fallthrough or Behavior value conflicts with an owned semantic property of the root Host; the message names the Component or Behavior, the Host kind and the property.
 
-**See also.** the Component chapter for fallthrough attributes, and the Behavior chapter for `:use`.
+**See also.** the [Component chapter](components.md) for fallthrough attributes, and the Behavior chapter for `:use`.
 
 ### Roles and ARIA
 
@@ -547,7 +547,7 @@ Obtain a stable Host reference scoped to one Component instance.
   :view (box :ref body ...))
 ```
 
-**See also.** `:ref`, [Host references](#host-references) and the Component chapter.
+**See also.** `:ref`, [Host references](#host-references) and the [Component chapter](components.md).
 
 ### Uniqueness and lifetime
 

@@ -208,7 +208,7 @@ Host 也是 View 里的身份单位：和解按名字和 `:key` 匹配 Host 子�
 
 **错误。** 透传或 Behavior 值与根 Host 的归属语义属性冲突时 `error→ etaf-component-call-error`；消息里给出组件或 Behavior 的名字、Host 种类和属性。
 
-**参见。** 透传属性见《组件》章，`:use` 见《Behavior》章。
+**参见。** 透传属性见[《组件》章](components.md)，`:use` 见《Behavior》章。
 
 ### 角色与 ARIA
 
@@ -547,7 +547,7 @@ Host 的身份与无障碍元数据就是 Ebox 选择器查询匹配的事实：
   :view (box :ref body ...))
 ```
 
-**参见。** `:ref`、[Host 引用](#host-引用)与《组件》章。
+**参见。** `:ref`、[Host 引用](#host-引用)与[《组件》章](components.md)。
 
 ### 唯一性与生命周期
 

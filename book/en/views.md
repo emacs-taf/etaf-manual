@@ -2,7 +2,7 @@
 
 A *View* is the description of what an ETAF application shows. It is written in one small structural language, normalized by `etaf-view` and lowered by the renderer into Ebox nodes: Components return Views, `etaf-mount` publishes one, and `etaf-render` lowers one without a Runtime. This chapter defines the language, the normalized values, when the expressions inside a View are evaluated, and the functions that build Views from Lisp.
 
-A View is a description, not a live object: it owns no state and no buffer text by itself. Its dynamic parts read reactive sources, and [Reactivity](reactivity.md) defines when such a read causes another evaluation. Which Host kinds exist and which properties they accept belongs to [the Host chapter](hosts.md); Components, props and slots belong to the Component chapter.
+A View is a description, not a live object: it owns no state and no buffer text by itself. Its dynamic parts read reactive sources, and [Reactivity](reactivity.md) defines when such a read causes another evaluation. Which Host kinds exist and which properties they accept belongs to [the Host chapter](hosts.md); Components, props and slots belong to [the Component chapter](components.md).
 
 <!-- index: View; structural form; View value; expr; keyed list; fragment -->
 
@@ -69,7 +69,7 @@ Construct a normalized ETAF View from the structural FORM.
 ;; ⇒ a text View
 ```
 
-**See also.** `etaf-node`, `etaf-render`, and the chapters on [Hosts](hosts.md), Components and Runtimes.
+**See also.** `etaf-node`, `etaf-render`, and the chapters on [Hosts](hosts.md), [Components](components.md) and Runtimes.
 
 ### Property values
 
@@ -250,7 +250,7 @@ Lower a normalized VIEW to one canonical detached Ebox root without a Runtime.
 A structural form is compiled once per call site into a *blueprint*: a tree of literal nodes and property values, with a table of deferred programs for everything that must run at rendering — property thunks, `expr` bodies, branch conditions, list sources and key expressions, and slot requests. Evaluating the call site instantiates the blueprint.
 
 - A subtree is static when every property and child in it is a literal. Static subtrees are materialized once and cached for the process, keyed by the compiled form, the position inside it and the Component registry generation. Re-evaluating the same call site, or another call site with an equal form, reuses those values instead of building them again.
-- Defining or redefining a Component starts a new registry generation and discards the static caches, so a redefined Component is not served from a stale blueprint. An authoring tool that reloads a Component should dispose its Runtime first, as the Component chapter describes.
+- Defining or redefining a Component starts a new registry generation and discards the static caches, so a redefined Component is not served from a stale blueprint. An authoring tool that reloads a Component should dispose its Runtime first, as [the Component chapter](components.md) describes.
 - A non-literal value makes its subtree dynamic: it is built on every evaluation, and a Host with a deferred property gets a retained binding that re-runs when the sources it read change.
 - If the compiler is not loaded, `etaf-view` falls back to an equivalent direct expansion. Both paths accept the same forms and produce the same View values; the fallback exists for loading `etaf-view` alone.
 

@@ -45,6 +45,7 @@
       "chapters": [
         "views",
         "hosts",
+        "components",
         "reactivity"
       ]
     }

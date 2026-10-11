@@ -1,6 +1,6 @@
 # 异步模型
 
-不是每个 loader 都能在启动它的那一次调用里结束：一次文件读取、一次 SQLite 查询或一个子进程可能稍后完成，来自定时器或进程过滤器。Resource 与 Data Controller 用同一套加载生命周期承载这类工作。loader 返回一个*异步适配器*，描述如何启动工作；收到它的所有者启动工作、施加可选的超时、记录恰好一个结果，并丢弃已作废的完成。本章描述这个适配器，以及每个所有者都遵守的规则。Resource 章，以及 Data Source、Data Controller、Reconciliation 与 List Cache 各章定义各个所有者本身；工作由哪个 Scope 承载见[响应式系统](reactivity.md#scope)，下文错误的父条件见[响应式系统](reactivity.md#错误与恢复)。
+不是每个 loader 都能在启动它的那一次调用里结束：一次文件读取、一次 SQLite 查询或一个子进程可能稍后完成，来自定时器或进程过滤器。Resource 与 Data Controller 用同一套加载生命周期承载这类工作。loader 返回一个*异步适配器*，描述如何启动工作；收到它的所有者启动工作、施加可选的超时、记录恰好一个结果，并丢弃已作废的完成。本章描述这个适配器，以及每个所有者都遵守的规则。[Resource](resources.md) 章，以及 Data Source、Data Controller、Reconciliation 与 List Cache 各章定义各个所有者本身；工作由哪个 Scope 承载见[响应式系统](reactivity.md#scope)，下文错误的父条件见[响应式系统](reactivity.md#错误与恢复)。
 
 ## 加载生命周期
 

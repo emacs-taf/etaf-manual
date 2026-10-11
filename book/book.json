@@ -111,7 +111,8 @@
       },
       "chapters": [
         "async",
-        "resources"
+        "resources",
+        "data-sources"
       ]
     }
   ],

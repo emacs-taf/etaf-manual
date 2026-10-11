@@ -117,7 +117,8 @@
         "data-controllers",
         "reconciliation",
         "list-cache",
-        "sqlite-backend"
+        "sqlite-backend",
+        "storage-strategy"
       ]
     }
   ],

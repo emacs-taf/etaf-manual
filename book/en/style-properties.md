@@ -1015,7 +1015,7 @@ Chooses how lines break when the text is wider than the available space.
 
 <!-- index: overflow; scroll anchor -->
 
-`:overflow` decides what happens when content is larger than its box and which boxes provide a scrolling viewport; `:scroll-anchor` decides whether a scrolled box follows the end of its content. The Scrolling chapter defines the scrolling interfaces.
+`:overflow` decides what happens when content is larger than its box and which boxes provide a scrolling viewport; `:scroll-anchor` decides whether a scrolled box follows the end of its content. [Scrolling](scrolling.md) defines the scrolling interfaces.
 
 #### Style: :overflow
 

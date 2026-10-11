@@ -54,4 +54,4 @@ grid 项的区域由轨道偏移算出：跨多个轨道的项得到这些轨道
 
 畸形的轨道、因子非正的分数、分数形式的最小值，或单位不对的长度，都在编译声明时、任何布局运行之前被拒绝，条件见[样式属性参考](style-properties.md)。把项放到显式轨道之外不是错误：网格扩展隐式轨道来容纳它，尺寸取自网格的自动轨道属性。
 
-零尺寸的 `auto` 轨道是这个模型里唯一不声张的意外：项溢出自己的区域而不是把它撑开。恢复办法是给轨道或项作者本来设想的尺寸——轨道上用 `min-content` 或 `max-content`、项上用 `:min-width` 或 `:overflow visible`、一个显式长度，或用 `:justify-content stretch` 共享容器的剩余空间。此后裁剪溢出就是普通的 `:overflow` 行为，滚动一章讲它。
+零尺寸的 `auto` 轨道是这个模型里唯一不声张的意外：项溢出自己的区域而不是把它撑开。恢复办法是给轨道或项作者本来设想的尺寸——轨道上用 `min-content` 或 `max-content`、项上用 `:min-width` 或 `:overflow visible`、一个显式长度，或用 `:justify-content stretch` 共享容器的剩余空间。此后裁剪溢出就是普通的 `:overflow` 行为，[滚动](scrolling.md)一章讲它。

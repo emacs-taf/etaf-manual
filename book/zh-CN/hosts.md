@@ -77,7 +77,7 @@ Host 也是 View 里的身份单位：和解按名字和 `:key` 匹配 Host 子�
 
 - 子节点按常规流排布。连续的行内子节点（通常是 `text` Host）组成一个匿名段落，因此写成多个文本节点的一句话会作为一个整体折行；块级子节点另起一行。
 - 它接受完整的盒模型与几何集：padding、margin、border、width/height 及其 min/max 形式、`:box-sizing`、`:position`、`:left`/`:top`、`:z-index`、`:layer`、`:anchor`、`:placement`、`:visibility`、`:outer`、`:overflow`、`:scroll-anchor`、`:border-radius`、`:wrap-mode`、`:text-align`，以及 Box 作为 flex 或 grid 子项时的子项属性。
-- `:overflow scroll` 或 `:auto` 配合有界高度会把 Box 变成滚动容器，细节见《滚动》章。
+- `:overflow scroll` 或 `:auto` 配合有界高度会把 Box 变成滚动容器，细节见[滚动](scrolling.md)章。
 
 **示例。** `(box :background-color "gray15" (text "Ready"))` 已经是一个可用的面板；`(box :padding '(px 4) :border-radius '(px 1) ...)` 再加上留白和圆角。
 
@@ -492,7 +492,7 @@ sticky 是行级 affordance：让 Host 保持单行，如工具栏或小节标�
 
 **错误。** 值不是 nil 或 `top` 时 `error→ etaf-renderer-error`。
 
-**参见。** 《视口》和《滚动》两章。
+**参见。** [视口](viewport.md)和[滚动](scrolling.md)两章。
 
 ### 键盘操作
 
@@ -571,7 +571,7 @@ Host 的身份与无障碍元数据就是 Ebox 选择器查询匹配的事实：
 
 **示例。** 布局之后，按行的边界把它滚入视野，或让截图区域对齐面板。
 
-**参见。** `etaf-host-ref-position`、`etaf-host-ref-size` 与《滚动》章。
+**参见。** `etaf-host-ref-position`、`etaf-host-ref-size` 与[滚动](scrolling.md)章。
 
 #### Function: etaf-host-ref-at (runtime &optional position predicate)
 

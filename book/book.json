@@ -82,7 +82,8 @@
         "positioning-layers-and-overlays",
         "text",
         "images",
-        "viewport"
+        "viewport",
+        "scrolling"
       ]
     }
   ],

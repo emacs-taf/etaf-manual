@@ -77,7 +77,7 @@ A block-level flow container; the general-purpose layout Host.
 
 - Children are laid out in normal flow. Consecutive inline children (typically `text` Hosts) become one anonymous paragraph, so a sentence written as several text nodes wraps as a whole; block children start a new line.
 - It accepts the full box model and geometry set: padding, margin, border, width and height with their min/max forms, `:box-sizing`, `:position`, `:left`/`:top`, `:z-index`, `:layer`, `:anchor`, `:placement`, `:visibility`, `:outer`, `:overflow`, `:scroll-anchor`, `:border-radius`, `:wrap-mode`, `:text-align`, and the item properties when the box is a flex or grid item.
-- `:overflow scroll` or `:auto` with a bounded height makes the box a scroller that the Scrolling chapter describes.
+- `:overflow scroll` or `:auto` with a bounded height makes the box a scroller that [Scrolling](scrolling.md) describes.
 
 **Example.** `(box :background-color "gray15" (text "Ready"))` is already a usable panel; `(box :padding '(px 4) :border-radius '(px 1) ...)` adds breathing room and a rounded corner.
 
@@ -492,7 +492,7 @@ Sticky is a row-level affordance: keep the Host to a single row, as in a toolbar
 
 **Errors.** `error→ etaf-renderer-error` when the value is not nil or `top`.
 
-**See also.** the Viewport and Scrolling chapters.
+**See also.** [Viewport](viewport.md) and [Scrolling](scrolling.md).
 
 ### Keyboard operation
 
@@ -571,7 +571,7 @@ Return the live buffer span of a Host.
 
 **Example.** After layout, scroll a row into view from its bounds, or align a capture region to a panel.
 
-**See also.** `etaf-host-ref-position`, `etaf-host-ref-size` and the Scrolling chapter.
+**See also.** `etaf-host-ref-position`, `etaf-host-ref-size` and [Scrolling](scrolling.md).
 
 #### Function: etaf-host-ref-at (runtime &optional position predicate)
 

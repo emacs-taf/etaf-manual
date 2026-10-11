@@ -1015,7 +1015,7 @@ padding 在边框盒内侧加空间，margin 在外侧加空间。每条物理�
 
 <!-- index: 溢出; 滚动锚点 -->
 
-`:overflow` 决定内容大于盒子时发生什么、哪些盒子提供滚动视口；`:scroll-anchor` 决定滚动的盒子是否跟随内容末端。「滚动」一章定义滚动接口。
+`:overflow` 决定内容大于盒子时发生什么、哪些盒子提供滚动视口；`:scroll-anchor` 决定滚动的盒子是否跟随内容末端。[滚动](scrolling.md)一章定义滚动接口。
 
 #### Style: :overflow
 

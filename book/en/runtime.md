@@ -390,7 +390,7 @@ Return non-nil when transient UI borrows lines from WINDOW.
                 (fit-layout-to-window window)))))
 ```
 
-**See also.** [Viewport](viewport.md) and the Scrolling chapters, whose canvas keeps its committed viewport for the same borrow.
+**See also.** [Viewport](viewport.md) and [Scrolling](scrolling.md) chapters, whose canvas keeps its committed viewport for the same borrow.
 
 ## Semantic details
 

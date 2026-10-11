@@ -390,7 +390,7 @@ Host 查询看到的是至少带一个非空语义属性（例如 `:ref`、`:rol
                 (fit-layout-to-window window)))))
 ```
 
-**参见。** [视口](viewport.md)章与滚动章:框架自己的 canvas 对同样的借用保持其已提交视口。
+**参见。** [视口](viewport.md)章与[滚动](scrolling.md)章：框架自己的 canvas 对同样的借用保持其已提交视口。
 
 ## 语义细节
 

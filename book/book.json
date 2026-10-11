@@ -140,7 +140,8 @@
         "zh-CN": "UI 组件库"
       },
       "chapters": [
-        "ui-overview"
+        "ui-overview",
+        "ui-icons"
       ]
     }
   ],

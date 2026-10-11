@@ -144,7 +144,8 @@
         "ui-icons",
         "ui-containers",
         "ui-feedback-and-status",
-        "ui-buttons-and-choice-controls"
+        "ui-buttons-and-choice-controls",
+        "ui-text-input-controls"
       ]
     }
   ],

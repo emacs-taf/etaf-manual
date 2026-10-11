@@ -104,7 +104,7 @@
 
 <!-- index: 宽度; 高度; 盒尺寸 -->
 
-`:width`、`:height` 及其最小、最大搭档接受关键字和轴内长度，`:box-sizing` 决定尺寸量到哪里。行内长度解析成像素、块轴长度解析成行，百分比相对包含块。约束的解析算法见[盒与常规流](boxes-and-normal-flow.md)、Flex 布局、Grid 布局几章。
+`:width`、`:height` 及其最小、最大搭档接受关键字和轴内长度，`:box-sizing` 决定尺寸量到哪里。行内长度解析成像素、块轴长度解析成行，百分比相对包含块。约束的解析算法见[盒与常规流](boxes-and-normal-flow.md)、[Flex 布局](flex-layout.md)、Grid 布局几章。
 
 #### Style: :box-sizing
 
@@ -607,7 +607,7 @@ padding 在边框盒内侧加空间，margin 在外侧加空间。每条物理�
 
 <!-- index: 主轴间隔; 交叉轴对齐 -->
 
-`row` 与 `column` 沿一条轴摆放直接子节点。`:item-gap` 设置主轴间隔，`:cross-align` 设置交叉轴对齐；完整算法见「Flex 布局」一章。
+`row` 与 `column` 沿一条轴摆放直接子节点。`:item-gap` 设置主轴间隔，`:cross-align` 设置交叉轴对齐；完整算法见 [Flex 布局](flex-layout.md)。
 
 #### Style: :item-gap
 
@@ -633,7 +633,7 @@ padding 在边框盒内侧加空间，margin 在外侧加空间。每条物理�
 
 <!-- index: flex 容器; flex 项; 间隔 -->
 
-`flex` 容器用本节中的容器属性分配与对齐直接子节点，子节点则使用项属性。`:gap`、`:row-gap` 和 `:column-gap` 与 `grid` 共用，`:justify-content`、`:align-items` 和 `:align-content` 也适用于 `grid` 容器。算法见「Flex 布局」一章；本节给出每个属性的语法与作用。
+`flex` 容器用本节中的容器属性分配与对齐直接子节点，子节点则使用项属性。`:gap`、`:row-gap` 和 `:column-gap` 与 `grid` 共用，`:justify-content`、`:align-items` 和 `:align-content` 也适用于 `grid` 容器。算法见 [Flex 布局](flex-layout.md)；本节给出每个属性的语法与作用。
 
 #### Style: :flex-direction
 
@@ -752,7 +752,7 @@ padding 在边框盒内侧加空间，margin 在外侧加空间。每条物理�
 
 设置该项能拿走多少主轴剩余空间。
 
-**语义。** 剩余空间按因子成比例分配。初值让项保持自己的基准尺寸。「Flex 布局」一章说明增长如何与最小、最大尺寸相互作用。
+**语义。** 剩余空间按因子成比例分配。初值让项保持自己的基准尺寸。[Flex 布局](flex-layout.md)说明增长如何与最小、最大尺寸相互作用。
 
 #### Style: :flex-shrink
 

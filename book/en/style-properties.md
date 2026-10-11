@@ -104,7 +104,7 @@ Sets the line style of text decorations.
 
 <!-- index: width; height; box sizing -->
 
-`:width`, `:height` and their minimum and maximum partners accept keywords and axis lengths, and `:box-sizing` decides what the size measures. Inline lengths resolve in pixels and block lengths in lines; percentages use the containing block. [Boxes and Normal Flow](boxes-and-normal-flow.md), Flex Layout and Grid Layout define how the constraints are resolved.
+`:width`, `:height` and their minimum and maximum partners accept keywords and axis lengths, and `:box-sizing` decides what the size measures. Inline lengths resolve in pixels and block lengths in lines; percentages use the containing block. [Boxes and Normal Flow](boxes-and-normal-flow.md), [Flex Layout](flex-layout.md) and Grid Layout define how the constraints are resolved.
 
 #### Style: :box-sizing
 
@@ -607,7 +607,7 @@ Hides or shows the node and its subtree without changing layout.
 
 <!-- index: item gap; cross alignment -->
 
-A `row` or `column` lays its direct children along one axis. `:item-gap` sets the main-axis gap between them and `:cross-align` the cross-axis alignment; Flex Layout defines the fuller algorithm.
+A `row` or `column` lays its direct children along one axis. `:item-gap` sets the main-axis gap between them and `:cross-align` the cross-axis alignment; [Flex Layout](flex-layout.md) defines the fuller algorithm.
 
 #### Style: :item-gap
 
@@ -633,7 +633,7 @@ Aligns the direct children of a row or column on the cross axis.
 
 <!-- index: flex container; flex item; gap -->
 
-A `flex` container distributes and aligns its direct children with the container properties in this section, and its children take the item properties. `:gap`, `:row-gap` and `:column-gap` are shared with `grid`, and `:justify-content`, `:align-items` and `:align-content` also apply to `grid` containers. Flex Layout defines the algorithm; this section gives each property's grammar and its effect.
+A `flex` container distributes and aligns its direct children with the container properties in this section, and its children take the item properties. `:gap`, `:row-gap` and `:column-gap` are shared with `grid`, and `:justify-content`, `:align-items` and `:align-content` also apply to `grid` containers. [Flex Layout](flex-layout.md) defines the algorithm; this section gives each property's grammar and its effect.
 
 #### Style: :flex-direction
 
@@ -752,7 +752,7 @@ Changes the order in which a flex container places its children.
 
 Sets how much of the free main-axis space the item takes.
 
-**Semantics.** Free space is distributed in proportion to the factors. The initial value leaves the item at its basis. Flex Layout defines how growth interacts with minimum and maximum sizes.
+**Semantics.** Free space is distributed in proportion to the factors. The initial value leaves the item at its basis. [Flex Layout](flex-layout.md) defines how growth interacts with minimum and maximum sizes.
 
 #### Style: :flex-shrink
 

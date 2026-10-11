@@ -143,7 +143,7 @@ Host 也是 View 里的身份单位：和解按名字和 `:key` 匹配 Host 子�
 
 **示例。** `(flex :flex-wrap 'wrap :gap '((lh 0) (px 2)) ...cards...)` 把卡片排成会折行的条带。
 
-**参见。** 《Flex 布局》章。
+**参见。** [Flex 布局](flex-layout.md)。
 
 ### grid
 

@@ -143,7 +143,7 @@ A full flex container.
 
 **Example.** `(flex :flex-wrap 'wrap :gap '((lh 0) (px 2)) ...cards...)` lays cards out in a wrapping strip.
 
-**See also.** the Flex Layout chapter.
+**See also.** [Flex Layout](flex-layout.md).
 
 ### grid
 

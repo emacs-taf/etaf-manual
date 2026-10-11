@@ -79,7 +79,8 @@
         "boxes-and-normal-flow",
         "flex-layout",
         "grid-layout",
-        "positioning-layers-and-overlays"
+        "positioning-layers-and-overlays",
+        "text"
       ]
     }
   ],

@@ -989,7 +989,7 @@ padding 在边框盒内侧加空间，margin 在外侧加空间。每条物理�
 
 <!-- index: 文字对齐; 换行模式 -->
 
-`:text-align` 摆放 box 段落中的各行，`:wrap-mode` 选择这些行怎样断。「文本」一章定义换行模式与断行规则。两者都继承。
+`:text-align` 摆放 box 段落中的各行，`:wrap-mode` 选择这些行怎样断。[文本](text.md)定义换行模式与断行规则。两者都继承。
 
 #### Style: :text-align
 

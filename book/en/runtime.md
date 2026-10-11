@@ -193,7 +193,7 @@ Replace HOST-REF's published content with CONTENT in mounted RUNTIME.
 (etaf-runtime-update-host-content runtime 'video-frame frame-image)
 ```
 
-**See also.** `etaf-runtime-update-host-contents`, `etaf-runtime-update-host-geometry`, and the Text chapter for display properties.
+**See also.** `etaf-runtime-update-host-contents`, `etaf-runtime-update-host-geometry`, and [Text](text.md) for display properties.
 
 #### Function: etaf-runtime-update-host-contents (runtime updates)
 

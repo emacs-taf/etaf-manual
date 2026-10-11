@@ -193,7 +193,7 @@ pre 或 render 副作用失败时，Runtime 丢弃整份未提交的工作：缓
 (etaf-runtime-update-host-content runtime 'video-frame frame-image)
 ```
 
-**参见。** `etaf-runtime-update-host-contents`、`etaf-runtime-update-host-geometry` 与文本章关于显示属性的说明。
+**参见。** `etaf-runtime-update-host-contents`、`etaf-runtime-update-host-geometry` 与[文本](text.md)关于显示属性的说明。
 
 #### Function: etaf-runtime-update-host-contents (runtime updates)
 

@@ -989,7 +989,7 @@ Chooses which corner of the anchor target an overlay is placed against.
 
 <!-- index: text align; wrap mode -->
 
-`:text-align` positions the lines of a box's paragraph and `:wrap-mode` chooses how those lines break. Both inherit. The Text chapter defines the wrap modes and the line-breaking rules.
+`:text-align` positions the lines of a box's paragraph and `:wrap-mode` chooses how those lines break. Both inherit. [Text](text.md) defines the wrap modes and the line-breaking rules.
 
 #### Style: :text-align
 

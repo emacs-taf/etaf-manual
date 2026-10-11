@@ -149,7 +149,7 @@ Return non-nil when VALUE is a deferred ETAF Theme token.
 
 <!-- index: ui-fg; ui-bg; ui-border; ui-muted-fg; status color -->
 
-The tokens in this section are the semantic color surface the official Component catalog reads. A component that uses a token supplies a built-in fallback, so a catalog that runs without a provided Theme still paints; providing that key in a Theme overrides the fallback for the whole subtree. The remaining, component-family tokens are the subject of the UI catalog chapter; the Theme token table appendix lists the full vocabulary.
+The tokens in this section are the semantic color surface the official Component catalog reads. A component that uses a token supplies a built-in fallback, so a catalog that runs without a provided Theme still paints; providing that key in a Theme overrides the fallback for the whole subtree. The remaining, component-family tokens are the subject of [the UI overview](ui-overview.md); the Theme token table appendix lists the full vocabulary.
 
 Each entry names one role. A Theme may give the key any value the consuming declaration accepts; the base vocabulary uses colors.
 

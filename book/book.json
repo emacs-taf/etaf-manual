@@ -132,6 +132,16 @@
         "animation",
         "native-video"
       ]
+    },
+    {
+      "id": "ui-components",
+      "title": {
+        "en": "The UI Component Library",
+        "zh-CN": "UI 组件库"
+      },
+      "chapters": [
+        "ui-overview"
+      ]
     }
   ],
   "appendices": [],

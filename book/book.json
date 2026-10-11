@@ -99,7 +99,8 @@
         "focus",
         "keyboard",
         "region-navigation",
-        "dragging-and-gestures"
+        "dragging-and-gestures",
+        "text-input"
       ]
     }
   ],

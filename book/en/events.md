@@ -8,7 +8,7 @@ An interaction reaches an application as an event. Ebox decides which Host owns 
 
 A Host declares one callback per event kind as a property named `:on-KIND`, where KIND uses lowercase words joined by hyphens, for example `press` in `:on-press`. The value must be a function or nil; any other value is rejected when the Host commits with `error→ etaf-renderer-error`. A nil callback declares the property without handling the event, which still counts as a declaration for the merge rules below.
 
-One kind has no Host property: drag gestures reach drag and resize Behaviors as the `:on-start`, `:on-move`, `:on-end`, `:on-cancel`, `:on-resize` and `:on-change` attributes described in [Actions, Behaviors and Error Boundaries](actions-behaviors-and-error-boundaries.md). `:on-direction` is a keyboard property and belongs to [Keyboard](keyboard.md); `:on-leave` is an input-session option of the Text Input chapter. The seven properties below are the ETAF Runtime's event callbacks.
+One kind has no Host property: drag gestures reach drag and resize Behaviors as the `:on-start`, `:on-move`, `:on-end`, `:on-cancel`, `:on-resize` and `:on-change` attributes described in [Actions, Behaviors and Error Boundaries](actions-behaviors-and-error-boundaries.md). `:on-direction` is a keyboard property and belongs to [Keyboard](keyboard.md); `:on-leave` is an input-session option of the [Text Input](text-input.md) chapter. The seven properties below are the ETAF Runtime's event callbacks.
 
 #### Property: :on-press
 

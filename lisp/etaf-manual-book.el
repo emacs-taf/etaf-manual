@@ -66,8 +66,12 @@ underscores are kept, spaces become hyphens and everything else is dropped."
   "Return the contents of single-line inline code spans in LINE."
   (let ((start 0) spans)
     (while (string-match "\\(`+\\)\\(.+?\\)\\1" line start)
-      (push (string-trim (match-string 2 line)) spans)
-      (setq start (match-end 0)))
+      ;; `string-trim' runs its own regexp matches, so capture the outer
+      ;; match before trimming or `match-end' would describe the wrong match.
+      (let ((span (match-string 2 line))
+            (end (match-end 0)))
+        (push (string-trim span) spans)
+        (setq start end)))
     (nreverse spans)))
 
 (defun etaf-manual--links (line)

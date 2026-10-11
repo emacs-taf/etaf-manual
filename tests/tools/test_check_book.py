@@ -40,6 +40,10 @@ ENGLISH = """\
 
     A ref holds a value; see [refs](#refs) and [hosts](hosts.md#box-hosts). Create one with `etaf-ref`.
 
+    | Message | Raised by |
+    | --- | --- |
+    | `"Stateful Component requires `etaf-mount'"` | `etaf-render` met a Component with `:setup` |
+
     ## Refs
 
     <!-- index: ref -->
@@ -56,6 +60,10 @@ CHINESE = """\
     # 响应式
 
     ref 保存一个值；见[引用](#引用)与[Host](hosts.md#box-hosts)。用 `etaf-ref` 创建。
+
+    | 消息 | 触发者 |
+    | --- | --- |
+    | `"Stateful Component requires `etaf-mount'"` | `etaf-render` 遇到带 `:setup` 的 Component |
 
     ## 引用
 
@@ -136,7 +144,7 @@ class CheckBookTests(unittest.TestCase):
             path = self.root / 'book' / language / 'reactivity.md'
             path.write_text(path.read_text().replace(
                 'etaf-ref (initial-value &key test name)', 'etaf-ref (value)'))
-        self.assert_reported('book/en/reactivity.md:8: signature of etaf-ref '
+        self.assert_reported('book/en/reactivity.md:12: signature of etaf-ref '
                              'differs from etaf Commentary: (initial-value &key test name)')
 
     def test_declared_coverage_requires_every_record(self):

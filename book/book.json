@@ -142,7 +142,8 @@
       "chapters": [
         "ui-overview",
         "ui-icons",
-        "ui-containers"
+        "ui-containers",
+        "ui-feedback-and-status"
       ]
     }
   ],

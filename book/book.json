@@ -154,7 +154,8 @@
         "ui-composite-components",
         "ui-panels-and-windows",
         "ui-desktop-navigation-and-tiling",
-        "ui-media-and-reactions"
+        "ui-media-and-reactions",
+        "ui-grids-and-character-surfaces"
       ]
     }
   ],

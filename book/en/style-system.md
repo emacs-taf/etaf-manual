@@ -82,7 +82,7 @@ A cascade layer orders rules within one origin. ECSS declares the order with `ec
 
 Within one origin and importance level, the layer step orders candidates as follows. Normal declarations in unlayered rules beat all layered normal declarations, and among layered normal declarations the layer declared later wins. Important declarations reverse both rules: layered important declarations beat unlayered important declarations, and among layers the one declared earlier wins.
 
-The Ebox scopes that back inline declarations, Component styles and local `.ebox` rules add their rules unlayered, and ETAF exposes no layer declaration of its own. Cascade layers therefore matter to a host that builds an ECSS stylesheet directly, such as an application that mixes several stylesheets or a library that embeds Ebox; the ECSS chapters describe that interface. The `:layer` style property of Ebox, which positions an element in the paint order, is a different feature and belongs to the Positioning, Layers and Overlays chapter.
+The Ebox scopes that back inline declarations, Component styles and local `.ebox` rules add their rules unlayered, and ETAF exposes no layer declaration of its own. Cascade layers therefore matter to a host that builds an ECSS stylesheet directly, such as an application that mixes several stylesheets or a library that embeds Ebox; the ECSS chapters describe that interface. The `:layer` style property of Ebox, which positions an element in the paint order, is a different feature and belongs to [Positioning, Layers and Overlays](positioning-layers-and-overlays.md).
 
 ## The cascade order
 

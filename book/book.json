@@ -78,7 +78,8 @@
         "rendering-model",
         "boxes-and-normal-flow",
         "flex-layout",
-        "grid-layout"
+        "grid-layout",
+        "positioning-layers-and-overlays"
       ]
     }
   ],

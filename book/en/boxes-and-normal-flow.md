@@ -10,7 +10,7 @@ A node participates in inline formatting when it is a text node, or a `box` whos
 
 A `box` arranges its in-flow children in document order and groups them. Consecutive inline children form one run, and the run is laid out as an *anonymous paragraph* at the box's content width: the inline pieces share the paragraph's lines, wrap together, and are positioned as one block of lines. Every block child is its own group. The groups are then stacked by line, each block child laid out stretched to the content width, each paragraph's height added in lines. A box whose children are a single inline run lays that run out as one paragraph directly; that is the common case of a box that only holds text.
 
-Abspos children do not take part: an absolutely positioned child is out of flow and is placed from its containing host instead, which the Positioning, Layers and Overlays chapter describes. A paragraph is a layout construct, not a public node — it exists while the box is laid out to hold the wrapped lines of its inline run — so the public way to observe it is the box's geometry and the rendered lines.
+Abspos children do not take part: an absolutely positioned child is out of flow and is placed from its containing host instead, which [Positioning, Layers and Overlays](positioning-layers-and-overlays.md) describes. A paragraph is a layout construct, not a public node — it exists while the box is laid out to hold the wrapped lines of its inline run — so the public way to observe it is the box's geometry and the rendered lines.
 
 ## The three width constraints
 

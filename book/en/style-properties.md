@@ -913,7 +913,7 @@ Overrides `:justify-items` for one grid item.
 
 <!-- index: absolute positioning; z-index; anchor; overlay layer -->
 
-A box is in normal flow unless `:position` takes it out of it. An absolutely positioned box is placed by `:left` and `:top` from its positioning host — the nearest non-inline ancestor, or the root for `:layer root` — and `:z-index` orders overlapping paint. `:anchor` and `:placement` place an absolute box against a unique target instead of the host origin. The Positioning, Layers and Overlays chapter defines the full model.
+A box is in normal flow unless `:position` takes it out of it. An absolutely positioned box is placed by `:left` and `:top` from its positioning host — the nearest non-inline ancestor, or the root for `:layer root` — and `:z-index` orders overlapping paint. `:anchor` and `:placement` place an absolute box against a unique target instead of the host origin. [Positioning, Layers and Overlays](positioning-layers-and-overlays.md) defines the full model.
 
 #### Style: :position
 
@@ -933,7 +933,7 @@ Sets how the node participates in its parent's layout.
 
 Sets the horizontal offset of an absolutely positioned box from its positioning host.
 
-**Semantics.** The offset is measured from the host's content origin, or from the root's border-box origin for a root-layer box without an anchor. A percentage uses the host's border-box width. The property has no effect on a box that is not absolutely positioned.
+**Semantics.** The offset is measured from the host's content origin, or from the root's border-box origin for a root-layer box without an anchor. A percentage uses the host's padding-box width, or the root's border-box width for a root-layer box without an anchor. The property has no effect on a box that is not absolutely positioned.
 
 #### Style: :top
 

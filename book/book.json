@@ -86,6 +86,16 @@
         "scrolling",
         "incremental-updates-and-publication"
       ]
+    },
+    {
+      "id": "interaction",
+      "title": {
+        "en": "Interaction",
+        "zh-CN": "交互"
+      },
+      "chapters": [
+        "interaction-overview"
+      ]
     }
   ],
   "appendices": [],

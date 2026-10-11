@@ -235,7 +235,7 @@ Return a Behavior that moves caller-owned numeric coordinate refs from Ebox drag
 (etaf-draggable :x position :axis 'x :on-end (lambda (_gesture) (commit position)))
 ```
 
-**See also.** `etaf-draggable-controlled`, the Dragging and Gestures chapter, and the Keyboard chapter for the contributed keys.
+**See also.** `etaf-draggable-controlled`, the Dragging and Gestures chapter, and [Keyboard](keyboard.md) for the contributed keys.
 
 #### Function: etaf-resizable (&key x y width height edges min-width max-width min-height max-height delta on-start on-resize on-end on-cancel)
 

@@ -96,7 +96,8 @@
       "chapters": [
         "interaction-overview",
         "events",
-        "focus"
+        "focus",
+        "keyboard"
       ]
     }
   ],

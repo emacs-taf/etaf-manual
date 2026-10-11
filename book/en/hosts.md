@@ -184,7 +184,7 @@ A fixed-size local picture.
 
 Semantic properties are ETAF's own Host metadata: identity, accessibility, references, behaviors, pointer feedback, keyboard operation and layout persistence. They do not change a node's visual style; they reach the runtime, the Ebox node, or both, and this chapter defines them all.
 
-A semantic property is validated when its Host commits. A successful commit keeps the previous state; a failing one publishes nothing for that Host, so a Host never carries a half-applied property set. Event properties (`:on-*`) are the third domain; [Events](events.md) defines them, and [Actions, Behaviors and Error Boundaries](actions-behaviors-and-error-boundaries.md) defines how they compose. `:on-direction` is a keyboard property and is defined in the Keyboard chapter.
+A semantic property is validated when its Host commits. A successful commit keeps the previous state; a failing one publishes nothing for that Host, so a Host never carries a half-applied property set. Event properties (`:on-*`) are the third domain; [Events](events.md) defines them, and [Actions, Behaviors and Error Boundaries](actions-behaviors-and-error-boundaries.md) defines how they compose. `:on-direction` is a keyboard property and is defined in the [Keyboard](keyboard.md) chapter.
 
 ### Values and conflicts
 
@@ -214,14 +214,14 @@ A conflict between owned semantics is an error rather than a silent override, be
 
 A Host's accessible metadata is its `role` attribute and its `aria-*` attributes on the Ebox node. They are ordinary selector subjects, so stylesheets and tests can select a Host by role or accessible state, and they are the facts the keyboard and focus layers read.
 
-- `:role` writes the node's `role` attribute. Roles such as `button`, `option`, `checkbox` and `slider` carry conventional behavior in the [Focus](focus.md) and Keyboard chapters.
+- `:role` writes the node's `role` attribute. Roles such as `button`, `option`, `checkbox` and `slider` carry conventional behavior in the [Focus](focus.md) and [Keyboard](keyboard.md) chapters.
 - Every `:aria-*` property writes one attribute with the name after the colon. Explicitly passing nil still writes the attribute with a nil value, which is different from omitting it: a nil attribute is present, so a selector that tests the attribute matches, and Ebox's inherited-value blocking sees the difference.
 - The values are strings, numbers or symbols; numbers and symbols are converted to their printed form. A list or other value is rejected with `error→ etaf-renderer-error`.
 - `:role` and the identifying `aria-*` attributes are owned semantic properties as described above; `:aria-label` and `:aria-description` are descriptive and may be replaced by a caller.
 
 **Example.** `(box :role "progressbar" :aria-valuenow 62 :aria-valuemin 0 :aria-valuemax 100 ...)`
 
-**See also.** the [Focus](focus.md) and Keyboard chapters for role-specific behavior.
+**See also.** the [Focus](focus.md) and [Keyboard](keyboard.md) chapters for role-specific behavior.
 
 ### Identity and metadata
 
@@ -259,7 +259,7 @@ The accessible role of a Host.
 
 **Arguments.** A symbol or a string, or nil. Values are not restricted to the ARIA vocabulary; ETAF only refuses values that are neither a symbol nor a string.
 
-**Semantics.** A non-nil role is written to the node as its `role` attribute and becomes a selector subject. The [Focus](focus.md) and Keyboard chapters define how roles such as `button`, `slider`, `separator` and `option` participate in focus order, arrows and activation. `:role` is owned semantics: once the Host declares it, a caller or Behavior cannot replace it with a different value.
+**Semantics.** A non-nil role is written to the node as its `role` attribute and becomes a selector subject. The [Focus](focus.md) and [Keyboard](keyboard.md) chapters define how roles such as `button`, `slider`, `separator` and `option` participate in focus order, arrows and activation. `:role` is owned semantics: once the Host declares it, a caller or Behavior cannot replace it with a different value.
 
 **Example.** `(text :role 'button :tab-index 0 :on-press #'retry "Retry")`
 
@@ -335,7 +335,7 @@ Confine keyboard operation to a subtree.
 
 **Errors.** `error→ etaf-renderer-error` when the value is not nil or `modal`.
 
-**See also.** the [Focus](focus.md) and Keyboard chapters.
+**See also.** the [Focus](focus.md) and [Keyboard](keyboard.md) chapters.
 
 #### Property: :region
 
@@ -502,13 +502,13 @@ Declare Host key bindings that run while the Host has focus or contains point.
 
 **Arguments.** A list of `(KEY COMMAND [LABEL])` entries: KEY is a key or key sequence as a `kbd` string or a vector, COMMAND is a zero-argument function, and the optional LABEL is a string that names the command in the ETAF help palette. nil declares no bindings.
 
-**Semantics.** A binding works while focus, or point when nothing is focused, is inside the Host. The nearest Host that binds a key wins; a disabled Host contributes nothing; Host bindings take precedence over the buffer's own keymaps, including application emulation maps. A command runs like a keymap binding, so it may move focus or begin input on a Host it just revealed; wrap several writes in `etaf-batch` to publish them once. Keys and regions coexist: the framework reserves arrows, Tab, `?`, Escape, `M-g` and `C-g` for focus, help and region navigation, and a binding may not collide with a reserved key or with another sequence elsewhere in the same Runtime. The Keyboard chapter defines the full model, including prefixes, reserved keys and diagnostics.
+**Semantics.** A binding works while focus, or point when nothing is focused, is inside the Host. The nearest Host that binds a key wins; a disabled Host contributes nothing; Host bindings take precedence over the buffer's own keymaps, including application emulation maps. A command runs like a keymap binding, so it may move focus or begin input on a Host it just revealed; wrap several writes in `etaf-batch` to publish them once. Keys and regions coexist: the framework reserves arrows, Tab, `?`, Escape, `M-g` and `C-g` for focus, help and region navigation, and a binding may not collide with a reserved key or with another sequence elsewhere in the same Runtime. [Keyboard](keyboard.md) defines the full model, including prefixes, reserved keys and diagnostics.
 
 **Example.** `(row :tab-index 0 :keys (list (list "RET" (lambda () (open item)) "Open")) ...)`
 
 **Errors.** `error→ etaf-renderer-error` from the keyboard layer at Host commit: a malformed entry, an empty key, a sequence that starts with a printing key, a framework-reserved key, or a collision with another binding in the same Runtime.
 
-**See also.** the Keyboard chapter, and `:region` for region-level navigation.
+**See also.** [Keyboard](keyboard.md), and `:region` for region-level navigation.
 
 ## Selector subjects
 
@@ -587,7 +587,7 @@ Find the explicit reference of the Host painted at a buffer position.
 
 **Example.** `(etaf-host-ref-at runtime (point) (lambda (ref) (string-prefix-p "row-" (symbol-name ref))))` stops at the innermost ancestor whose reference names a row.
 
-**See also.** `etaf-host-ref-position` and the Keyboard chapter.
+**See also.** `etaf-host-ref-position` and [Keyboard](keyboard.md).
 
 #### Function: etaf-host-ref-size (runtime host-ref)
 

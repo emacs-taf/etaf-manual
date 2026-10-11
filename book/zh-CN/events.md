@@ -8,7 +8,7 @@
 
 Host 为每种事件种类声明一个回调，属性名为 `:on-KIND`，其中 KIND 是小写词以连字符连接，例如 `:on-press` 里的 `press`。值必须是函数或 nil；其他值在 Host 提交时报 `error→ etaf-renderer-error`。值为 nil 表示声明了该属性却不处理事件，在下面的合并规则里这仍算一次声明。
 
-有一种回调没有 Host 属性：拖拽手势以 `:on-start`、`:on-move`、`:on-end`、`:on-cancel`、`:on-resize`、`:on-change` 六种属性到达拖拽与缩放 Behavior，见 [Action、Behavior 与错误边界](actions-behaviors-and-error-boundaries.md)。`:on-direction` 是键盘属性，属于《键盘》章；`:on-leave` 是《文本输入》章的输入会话选项。下面七个属性是 ETAF Runtime 的事件回调。
+有一种回调没有 Host 属性：拖拽手势以 `:on-start`、`:on-move`、`:on-end`、`:on-cancel`、`:on-resize`、`:on-change` 六种属性到达拖拽与缩放 Behavior，见 [Action、Behavior 与错误边界](actions-behaviors-and-error-boundaries.md)。`:on-direction` 是键盘属性，属于[键盘](keyboard.md)；`:on-leave` 是《文本输入》章的输入会话选项。下面七个属性是 ETAF Runtime 的事件回调。
 
 #### Property: :on-press
 
@@ -104,7 +104,7 @@ Host 为每种事件种类声明一个回调，属性名为 `:on-KIND`，其中 
 
 **示例。** `(column :focus-scope 'modal :on-dismiss close-dialog ...)`
 
-**参见。** 模态作用域见 [Host](hosts.md#property-focus-scope)、键层见《键盘》章。
+**参见。** 模态作用域见 [Host](hosts.md#property-focus-scope)、键层见[键盘](keyboard.md)。
 
 #### Property: :on-focus-enter
 

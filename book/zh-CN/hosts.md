@@ -184,7 +184,7 @@ Host 也是 View 里的身份单位：和解按名字和 `:key` 匹配 Host 子�
 
 语义属性是 ETAF 自己的 Host 元数据：身份、无障碍、引用、Behavior、指针反馈、键盘操作和布局持续。它们不改变节点的视觉样式；它们到达 Runtime、Ebox 节点，或两者，本章把它们全部定义完。
 
-语义属性在它的 Host 提交时校验。成功提交保留之前的状态；失败提交不为该 Host 发布任何东西，因此 Host 不会带着只应用了一半的属性集存在。事件属性（`:on-*`）是第三个领域，由[事件](events.md)定义，它们如何组合由 [Action、Behavior 与错误边界](actions-behaviors-and-error-boundaries.md)定义。`:on-direction` 是键盘属性，在《键盘》章定义。
+语义属性在它的 Host 提交时校验。成功提交保留之前的状态；失败提交不为该 Host 发布任何东西，因此 Host 不会带着只应用了一半的属性集存在。事件属性（`:on-*`）是第三个领域，由[事件](events.md)定义，它们如何组合由 [Action、Behavior 与错误边界](actions-behaviors-and-error-boundaries.md)定义。`:on-direction` 是键盘属性，在[键盘](keyboard.md)章定义。
 
 ### 值与冲突
 
@@ -214,14 +214,14 @@ Host 也是 View 里的身份单位：和解按名字和 `:key` 匹配 Host 子�
 
 Host 的无障碍元数据是 Ebox 节点上的 `role` 属性和 `aria-*` 属性。它们是普通的选择器主体，样式表和测试都可以按角色或无障碍状态选择 Host，也是键盘层和焦点层读取的事实。
 
-- `:role` 写入节点的 `role` 属性。`button`、`option`、`checkbox`、`slider` 这类角色在[焦点](focus.md)与《键盘》章有约定行为。
+- `:role` 写入节点的 `role` 属性。`button`、`option`、`checkbox`、`slider` 这类角色在[焦点](focus.md)与[键盘](keyboard.md)章有约定行为。
 - 每个 `:aria-*` 属性写入一个属性，名字是冒号后的部分。显式传 nil 仍会写入值为 nil 的属性，这与省略不同：nil 属性是存在的，测试该属性的选择器会匹配，Ebox 的继承阻塞也能分辨差别。
 - 值是字符串、数字或符号；数字和符号转换成打印形式。列表或其他值以 `error→ etaf-renderer-error` 拒绝。
 - `:role` 和标识类 `aria-*` 属性是上面说的归属语义属性；`:aria-label` 和 `:aria-description` 是描述性的，调用者可以替换。
 
 **示例。** `(box :role "progressbar" :aria-valuenow 62 :aria-valuemin 0 :aria-valuemax 100 ...)`
 
-**参见。** 角色特有行为见[焦点](focus.md)与《键盘》章。
+**参见。** 角色特有行为见[焦点](focus.md)与[键盘](keyboard.md)章。
 
 ### 身份与元数据
 
@@ -259,7 +259,7 @@ Host 的无障碍角色。
 
 **参数。** 符号或字符串，或 nil。取值不限于 ARIA 词表；只要不是符号或字符串，ETAF 就拒绝。
 
-**语义。** 非 nil 角色作为节点的 `role` 属性写入，并成为选择器主体。[焦点](focus.md)与《键盘》章定义 `button`、`slider`、`separator`、`option` 这类角色如何参与焦点顺序、方向键和激活。`:role` 是归属语义：Host 一旦声明，调用者或 Behavior 就不能用不同的值替换它。
+**语义。** 非 nil 角色作为节点的 `role` 属性写入，并成为选择器主体。[焦点](focus.md)与[键盘](keyboard.md)章定义 `button`、`slider`、`separator`、`option` 这类角色如何参与焦点顺序、方向键和激活。`:role` 是归属语义：Host 一旦声明，调用者或 Behavior 就不能用不同的值替换它。
 
 **示例。** `(text :role 'button :tab-index 0 :on-press #'retry "Retry")`
 
@@ -335,7 +335,7 @@ Host 在 Tab 顺序里的位置。
 
 **错误。** 值不是 nil 或 `modal` 时 `error→ etaf-renderer-error`。
 
-**参见。** [焦点](focus.md)与《键盘》章。
+**参见。** [焦点](focus.md)与[键盘](keyboard.md)章。
 
 #### Property: :region
 
@@ -502,13 +502,13 @@ sticky 是行级 affordance：让 Host 保持单行，如工具栏或小节标�
 
 **参数。** `(KEY COMMAND [LABEL])` 条目的列表：KEY 是 `kbd` 字符串或向量形式的键或键序列，COMMAND 是零参函数，可选的 LABEL 是字符串，在 ETAF 帮助面板里命名该命令。nil 表示不声明绑定。
 
-**语义。** 焦点或（没有焦点时）point 在 Host 内时，绑定可用。绑定该键的最近 Host 获胜；禁用的 Host 不贡献任何东西；Host 绑定优先于缓冲区自己的 keymap，包括应用的模拟按键表。命令像 keymap 绑定一样运行，因此可以移动到或开始输入一个它刚刚显示出来的 Host；把多次写入包进 `etaf-batch` 可以只发布一次。键与区域共存：框架保留方向键、Tab、`?`、Escape、`M-g` 和 `C-g` 给焦点、帮助和区域导航，绑定不得与保留键或同一 Runtime 内别处的序列冲突。《键盘》章定义完整模型，包括前缀、保留键和诊断。
+**语义。** 焦点或（没有焦点时）point 在 Host 内时，绑定可用。绑定该键的最近 Host 获胜；禁用的 Host 不贡献任何东西；Host 绑定优先于缓冲区自己的 keymap，包括应用的模拟按键表。命令像 keymap 绑定一样运行，因此可以移动到或开始输入一个它刚刚显示出来的 Host；把多次写入包进 `etaf-batch` 可以只发布一次。键与区域共存：框架保留方向键、Tab、`?`、Escape、`M-g` 和 `C-g` 给焦点、帮助和区域导航，绑定不得与保留键或同一 Runtime 内别处的序列冲突。[键盘](keyboard.md)定义完整模型，包括前缀、保留键和诊断。
 
 **示例。** `(row :tab-index 0 :keys (list (list "RET" (lambda () (open item)) "Open")) ...)`
 
 **错误。** Host 提交时由键盘层给出 `error→ etaf-renderer-error`：条目结构不对、键为空、序列以打印键开头、绑定框架保留键，或与同一 Runtime 里另一个绑定冲突。
 
-**参见。** 《键盘》章，以及区域级导航的 `:region`。
+**参见。** [键盘](keyboard.md)，以及区域级导航的 `:region`。
 
 ## 选择器主体
 
@@ -587,7 +587,7 @@ Host 的身份与无障碍元数据就是 Ebox 选择器查询匹配的事实：
 
 **示例。** `(etaf-host-ref-at runtime (point) (lambda (ref) (string-prefix-p "row-" (symbol-name ref))))` 停在最内层名字像行的祖先上。
 
-**参见。** `etaf-host-ref-position` 与《键盘》章。
+**参见。** `etaf-host-ref-position` 与[键盘](keyboard.md)。
 
 #### Function: etaf-host-ref-size (runtime host-ref)
 

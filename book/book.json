@@ -102,6 +102,16 @@
         "dragging-and-gestures",
         "text-input"
       ]
+    },
+    {
+      "id": "data-and-async",
+      "title": {
+        "en": "Data and Asynchrony",
+        "zh-CN": "数据与异步"
+      },
+      "chapters": [
+        "async"
+      ]
     }
   ],
   "appendices": [],

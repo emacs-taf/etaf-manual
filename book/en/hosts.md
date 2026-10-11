@@ -2,7 +2,7 @@
 
 A *Host* is the View node that owns an Ebox node: the unit that Ebox lays out, styles, paints and hit-tests. Every visual part of a user interface is a Host, and everything else in a View exists to compose, repeat or replace Hosts. This chapter defines the eight Host kinds, the properties they accept, how properties from several sources are combined, how Host metadata becomes selector subjects, and the functions that resolve Host references and read committed geometry.
 
-The View grammar, the evaluation of property expressions and the identity of Host nodes are defined in [Views](views.md). Components, `:use` Behaviors and caller attributes belong to the Component and Behavior chapters; how style properties are declared and cascaded belongs to the style chapters. This chapter is the reference for the Host layer itself.
+The View grammar, the evaluation of property expressions and the identity of Host nodes are defined in [Views](views.md). Components, `:use` Behaviors and caller attributes belong to the [Component](components.md) and [Behavior](actions-behaviors-and-error-boundaries.md) chapters; how style properties are declared and cascaded belongs to the style chapters. This chapter is the reference for the Host layer itself.
 
 <!-- index: Host; Host kind; semantic property; Host reference; selector subject; geometry query -->
 
@@ -184,7 +184,7 @@ A fixed-size local picture.
 
 Semantic properties are ETAF's own Host metadata: identity, accessibility, references, behaviors, pointer feedback, keyboard operation and layout persistence. They do not change a node's visual style; they reach the runtime, the Ebox node, or both, and this chapter defines them all.
 
-A semantic property is validated when its Host commits. A successful commit keeps the previous state; a failing one publishes nothing for that Host, so a Host never carries a half-applied property set. Event properties (`:on-*`) are the third domain; the Events chapter defines them, and the Behavior chapter defines how they compose. `:on-direction` is a keyboard property and is defined in the Keyboard chapter.
+A semantic property is validated when its Host commits. A successful commit keeps the previous state; a failing one publishes nothing for that Host, so a Host never carries a half-applied property set. Event properties (`:on-*`) are the third domain; the Events chapter defines them, and [Actions, Behaviors and Error Boundaries](actions-behaviors-and-error-boundaries.md) defines how they compose. `:on-direction` is a keyboard property and is defined in the Keyboard chapter.
 
 ### Values and conflicts
 
@@ -208,7 +208,7 @@ A conflict between owned semantics is an error rather than a silent override, be
 
 **Errors.** `error→ etaf-component-call-error` when a fallthrough or Behavior value conflicts with an owned semantic property of the root Host; the message names the Component or Behavior, the Host kind and the property.
 
-**See also.** the [Component chapter](components.md) for fallthrough attributes, and the Behavior chapter for `:use`.
+**See also.** the [Component chapter](components.md) for fallthrough attributes, and [Actions, Behaviors and Error Boundaries](actions-behaviors-and-error-boundaries.md) for `:use`.
 
 ### Roles and ARIA
 
@@ -375,13 +375,13 @@ Attach one or more Behaviors to a Host.
 
 **Arguments.** A Behavior source: a symbol naming a zero-argument constructor, a Behavior spec created with `etaf-behavior-create`, or a proper list of such sources. nil is accepted and attaches nothing.
 
-**Semantics.** Each source resolves to a Behavior whose attributes are merged into the Host as [Values and conflicts](#values-and-conflicts) describes: event callbacks and `:disabled` compose, style values fill only where the Host is silent, and owned semantic properties conflict rather than override. A disabled Host installs no Behaviors. The Behavior chapter defines constructors, the optional installer and cleanup.
+**Semantics.** Each source resolves to a Behavior whose attributes are merged into the Host as [Values and conflicts](#values-and-conflicts) describes: event callbacks and `:disabled` compose, style values fill only where the Host is silent, and owned semantic properties conflict rather than override. A disabled Host installs no Behaviors. [Actions, Behaviors and Error Boundaries](actions-behaviors-and-error-boundaries.md) defines constructors, the optional installer and cleanup.
 
 **Example.** `(text :use 'etaf-focusable "Open")`
 
 **Errors.** `error→ etaf-renderer-error` when the value is not a Behavior source or a proper list of them; `error→ etaf-behavior-error` for an unknown constructor, a constructor that returns something else, or two Behaviors with the same name on one Host.
 
-**See also.** the Behavior chapter.
+**See also.** [Actions, Behaviors and Error Boundaries](actions-behaviors-and-error-boundaries.md).
 
 ### Presentation and pointer feedback
 

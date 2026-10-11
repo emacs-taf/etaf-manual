@@ -62,9 +62,9 @@
 
 **Context。** 祖先用 `etaf-provide` 提供、后代用 `etaf-inject` 读取的值。见 [Context](context.md)。
 
-**Action。** 用 `etaf-action-define` 定义、用 `etaf-dispatch` 调用的具名命令。Action 的第一个参数是 Runtime。
+**Action。** 用 `etaf-action-define` 定义、用 `etaf-dispatch` 调用的具名命令。Action 的第一个参数是 Runtime。见 [Action、Behavior 与错误边界](actions-behaviors-and-error-boundaries.md)。
 
-**Behavior。** 一组可复用的非视觉 Host 属性，外加一个可选的、返回清理函数的安装函数。用 `etaf-define-behavior` 定义，经 Host 的 `:use` 属性挂上。
+**Behavior。** 一组可复用的非视觉 Host 属性，外加一个可选的、返回清理函数的安装函数。用 `etaf-define-behavior` 定义，经 Host 的 `:use` 属性挂上。见 [Action、Behavior 与错误边界](actions-behaviors-and-error-boundaries.md)。
 
 **Theme 与 token。** Theme 把具名的值（称为 *token*）映射到颜色和其他样式值。组件库的 token 名字形如 `:ui-fg`、`:ui-panel-bg`。
 

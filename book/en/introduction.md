@@ -62,9 +62,9 @@ These terms are used throughout the manual. Each is defined fully in the chapter
 
 **Context.** A value that an ancestor provides with `etaf-provide` and that its descendants read with `etaf-inject`. See [Context](context.md).
 
-**Action.** A named command defined with `etaf-action-define` and invoked with `etaf-dispatch`. An Action receives the Runtime as its first argument.
+**Action.** A named command defined with `etaf-action-define` and invoked with `etaf-dispatch`. An Action receives the Runtime as its first argument. See [Actions, Behaviors and Error Boundaries](actions-behaviors-and-error-boundaries.md).
 
-**Behavior.** A reusable set of non-visual Host properties and an optional installer that returns a cleanup function, defined with `etaf-define-behavior` and attached through a Host's `:use` property.
+**Behavior.** A reusable set of non-visual Host properties and an optional installer that returns a cleanup function, defined with `etaf-define-behavior` and attached through a Host's `:use` property. See [Actions, Behaviors and Error Boundaries](actions-behaviors-and-error-boundaries.md).
 
 **Theme and token.** A Theme maps named values, called *tokens*, to colors and other style values. The component catalog's tokens have names such as `:ui-fg` and `:ui-panel-bg`.
 

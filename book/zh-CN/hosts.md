@@ -2,7 +2,7 @@
 
 *Host* 是拥有 Ebox 节点的 View 节点：Ebox 布局、设样式、绘制和命中测试都以它为单位。用户界面的每个可见部分都是 Host，View 里其他东西的存在都是为了组合、重复或替换 Host。本章定义八种 Host、它们接受的属性、多个来源的属性如何合并、Host 元数据如何变成选择器主体，以及解析 Host 引用、读取已提交几何的函数。
 
-View 语法、属性表达式的求值时机和 Host 节点的身份，见 [View](views.md)。组件、`:use` Behavior 和调用者属性属于 Component 与 Behavior 两章；样式属性如何声明与层叠，属于样式各章。本章是 Host 层本身的参考。
+View 语法、属性表达式的求值时机和 Host 节点的身份，见 [View](views.md)。组件、`:use` Behavior 和调用者属性属于 [组件](components.md)与 [Action、Behavior 与错误边界](actions-behaviors-and-error-boundaries.md)两章；样式属性如何声明与层叠，属于样式各章。本章是 Host 层本身的参考。
 
 <!-- index: Host; Host 种类; 语义属性; Host 引用; 选择器主体; 几何查询 -->
 
@@ -184,7 +184,7 @@ Host 也是 View 里的身份单位：和解按名字和 `:key` 匹配 Host 子�
 
 语义属性是 ETAF 自己的 Host 元数据：身份、无障碍、引用、Behavior、指针反馈、键盘操作和布局持续。它们不改变节点的视觉样式；它们到达 Runtime、Ebox 节点，或两者，本章把它们全部定义完。
 
-语义属性在它的 Host 提交时校验。成功提交保留之前的状态；失败提交不为该 Host 发布任何东西，因此 Host 不会带着只应用了一半的属性集存在。事件属性（`:on-*`）是第三个领域，由《事件》章定义，它们如何组合由《Behavior》章定义。`:on-direction` 是键盘属性，在《键盘》章定义。
+语义属性在它的 Host 提交时校验。成功提交保留之前的状态；失败提交不为该 Host 发布任何东西，因此 Host 不会带着只应用了一半的属性集存在。事件属性（`:on-*`）是第三个领域，由《事件》章定义，它们如何组合由 [Action、Behavior 与错误边界](actions-behaviors-and-error-boundaries.md)定义。`:on-direction` 是键盘属性，在《键盘》章定义。
 
 ### 值与冲突
 
@@ -208,7 +208,7 @@ Host 也是 View 里的身份单位：和解按名字和 `:key` 匹配 Host 子�
 
 **错误。** 透传或 Behavior 值与根 Host 的归属语义属性冲突时 `error→ etaf-component-call-error`；消息里给出组件或 Behavior 的名字、Host 种类和属性。
 
-**参见。** 透传属性见[《组件》章](components.md)，`:use` 见《Behavior》章。
+**参见。** 透传属性见[《组件》章](components.md)，`:use` 见 [Action、Behavior 与错误边界](actions-behaviors-and-error-boundaries.md)。
 
 ### 角色与 ARIA
 
@@ -375,13 +375,13 @@ Host 在 Tab 顺序里的位置。
 
 **参数。** 一个 Behavior 来源：命名零参构造器的符号、用 `etaf-behavior-create` 创建的 Behavior spec，或由这些来源组成的真列表。nil 合法，表示不挂任何东西。
 
-**语义。** 每个来源解析成一个 Behavior，其属性按[值与冲突](#值与冲突)所述合并进 Host：事件回调和 `:disabled` 组合，样式值只在 Host 没说的地方补入，归属语义属性冲突而不是覆盖。禁用的 Host 不安装任何 Behavior。构造函数、可选安装函数和清理见《Behavior》章。
+**语义。** 每个来源解析成一个 Behavior，其属性按[值与冲突](#值与冲突)所述合并进 Host：事件回调和 `:disabled` 组合，样式值只在 Host 没说的地方补入，归属语义属性冲突而不是覆盖。禁用的 Host 不安装任何 Behavior。构造函数、可选安装函数和清理见 [Action、Behavior 与错误边界](actions-behaviors-and-error-boundaries.md)。
 
 **示例。** `(text :use 'etaf-focusable "Open")`
 
 **错误。** 值不是 Behavior 来源或由其组成的真列表时 `error→ etaf-renderer-error`；未知构造器、构造器返回别的东西、或同一 Host 上两个 Behavior 同名时 `error→ etaf-behavior-error`。
 
-**参见。** 《Behavior》章。
+**参见。** [Action、Behavior 与错误边界](actions-behaviors-and-error-boundaries.md)。
 
 ### 呈现与指针反馈
 

@@ -48,7 +48,8 @@
         "components",
         "reactivity",
         "runtime",
-        "context"
+        "context",
+        "actions-behaviors-and-error-boundaries"
       ]
     }
   ],

@@ -120,6 +120,16 @@
         "sqlite-backend",
         "storage-strategy"
       ]
+    },
+    {
+      "id": "animation-and-media",
+      "title": {
+        "en": "Animation and Media",
+        "zh-CN": "动画与媒体"
+      },
+      "chapters": [
+        "animation"
+      ]
     }
   ],
   "appendices": [],

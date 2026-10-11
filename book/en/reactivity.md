@@ -529,7 +529,7 @@ Several framework functions return reactive sources, so a render, computed or ef
 | `etaf-prop` | A Component input as a read-only source; read it with `etaf-value` in computed getters and watchers |
 | `etaf-runtime-viewport` | The canvas viewport of a mounted Runtime as `(WIDTH . HEIGHT)`; a reader reruns after the viewport changes, including the automatic refit after a window size change |
 | `etaf-viewport-region` | A Component that publishes its committed box as the viewport of every Component below it |
-| `etaf-transition`, `etaf-animation-frames` | Refs written by the animation clock; each tick is one batch, so it causes at most one commit per Runtime |
+| `etaf-transition`, `etaf-animation-frames` | Refs written by the [animation clock](animation.md); each tick is one batch, so it causes at most one commit per Runtime |
 | `etaf-data-status`, `etaf-data-mutation-outcome` | The status ref and the mutation outcome of a Data Controller |
 
 Two related functions are not reactive. `etaf-runtime-revision` returns an integer that increases once for every commit that changed the buffer; compare two revisions to observe that a change was published. `etaf-host-ref-size` queries committed geometry; it does not publish and is not meant for per-frame polling.

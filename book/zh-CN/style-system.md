@@ -72,7 +72,7 @@ ECSS 有五种来源：`ua`、`user`、`author`、`animation` 和 `transition`�
 
 档位更高的无论选择器、层叠层还是顺序如何都获胜。important 不改变值的语法，只把声明抬到它所属来源的 important 档。animation 声明压过所有普通声明，但输给 important 声明；transition 声明压过一切。
 
-ETAF 与 Ebox 的书写界面产生其中两种来源。Theme 被降级为 *UA* 声明：`etaf-theme-provide` 向一个 Component 子树提供属性 plist，ETAF 解析出该 Host 接受的条目，Ebox 把它们作为该 Host 的默认值放进 UA 来源。因此 Component 自己的规则或内联属性会压过 Theme 默认值，而 important 的 Theme 默认值仍能压过 important 的 author 声明。内联 Host 属性、Component 的 `:styles` 规则和 `.ebox` 文件的本地规则都是 *author* 声明。*user* 来源留给直接构建 ECSS stylesheet 的宿主，Ebox 的共享 scope 也可以通过 `ebox-style-scope-create` 带显式来源创建，但 ETAF 自己的书写界面不产生 user 声明。*animation* 与 *transition* 是 ECSS 层叠的一部分；Ebox 与 ETAF 今天都不产生它们，因为 ETAF 的动画是响应式值更新，不是层叠声明；动画一章讲那些。
+ETAF 与 Ebox 的书写界面产生其中两种来源。Theme 被降级为 *UA* 声明：`etaf-theme-provide` 向一个 Component 子树提供属性 plist，ETAF 解析出该 Host 接受的条目，Ebox 把它们作为该 Host 的默认值放进 UA 来源。因此 Component 自己的规则或内联属性会压过 Theme 默认值，而 important 的 Theme 默认值仍能压过 important 的 author 声明。内联 Host 属性、Component 的 `:styles` 规则和 `.ebox` 文件的本地规则都是 *author* 声明。*user* 来源留给直接构建 ECSS stylesheet 的宿主，Ebox 的共享 scope 也可以通过 `ebox-style-scope-create` 带显式来源创建，但 ETAF 自己的书写界面不产生 user 声明。*animation* 与 *transition* 是 ECSS 层叠的一部分；Ebox 与 ETAF 今天都不产生它们，因为 ETAF 的动画是响应式值更新，不是层叠声明；[动画](animation.md)一章讲那些。
 
 ## 层叠层
 

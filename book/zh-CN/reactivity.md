@@ -529,7 +529,7 @@ Scope 是响应式归属的单位。*活动 Scope* 拥有它活动期间创建�
 | `etaf-prop` | 组件的一个输入，作为只读源；在计算值的 getter 和侦听器中用 `etaf-value` 读取 |
 | `etaf-runtime-viewport` | 已挂载 Runtime 的画布视口，形如 `(WIDTH . HEIGHT)`；视口变化后读取者重新运行，包括窗口尺寸变化后的自动重排 |
 | `etaf-viewport-region` | 一个组件，把自己提交后的盒发布为其下所有组件的视口 |
-| `etaf-transition`、`etaf-animation-frames` | 由动画时钟写入的 ref；每一拍是一个批处理，所以每个 Runtime 最多提交一次 |
+| `etaf-transition`、`etaf-animation-frames` | 由[动画时钟](animation.md)写入的 ref；每一拍是一个批处理，所以每个 Runtime 最多提交一次 |
 | `etaf-data-status`、`etaf-data-mutation-outcome` | Data Controller 的状态 ref 和变更结果 |
 
 有两个相关函数不是响应式的。`etaf-runtime-revision` 返回一个整数，每次改变了缓冲区的提交使它加一；比较两次读到的修订号，就能确认某个变化已经发布。`etaf-host-ref-size` 查询提交后的几何尺寸；它不发布任何东西，也不适合逐帧轮询。

@@ -1,6 +1,6 @@
 # 挂载与生命周期
 
-建好的树有两种消费方式。`ebox-render` 把它布局成字符串返回，不涉及缓冲区；`ebox-mount` 把它绑到一个缓冲区，并让缓冲区跟随之后每一次修改。本章沿第二条路径走完它的一生：挂载如何创建、拥有一个缓冲区意味着什么、如何检视活着的挂载、以及如何把它释放。树由[节点构造](ebox-node-construction.md)建成；树查询一章从挂载把它读回来；[视口](viewport.md)定义挂载据以布局的尺寸，[增量更新与发布](incremental-updates-and-publication.md)定义让文本保持最新的 flush。
+建好的树有两种消费方式。`ebox-render` 把它布局成字符串返回，不涉及缓冲区；`ebox-mount` 把它绑到一个缓冲区，并让缓冲区跟随之后每一次修改。本章沿第二条路径走完它的一生：挂载如何创建、拥有一个缓冲区意味着什么、如何检视活着的挂载、以及如何把它释放。树由[节点构造](ebox-node-construction.md)建成；[树查询](ebox-tree-queries.md)一章从挂载把它读回来；[视口](viewport.md)定义挂载据以布局的尺寸，[增量更新与发布](incremental-updates-and-publication.md)定义让文本保持最新的 flush。
 
 ## 挂载对象
 

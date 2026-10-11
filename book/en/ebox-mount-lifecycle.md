@@ -1,6 +1,6 @@
 # Mount and Lifecycle
 
-A constructed tree can be consumed in two ways. `ebox-render` lays it out and returns its lines as a string, with no buffer involved; `ebox-mount` binds it to a buffer and keeps the buffer in step with every later mutation. This chapter follows the second path through its whole life: how a mount is created, what owning a buffer means, how to inspect a live mount, and how it is released again. [Node Construction](ebox-node-construction.md) built the tree; the Tree Queries chapter reads it back from a mount; [Viewport](viewport.md) defines the size a mount lays out for, and [Incremental Updates and Publication](incremental-updates-and-publication.md) the flush that keeps the text current.
+A constructed tree can be consumed in two ways. `ebox-render` lays it out and returns its lines as a string, with no buffer involved; `ebox-mount` binds it to a buffer and keeps the buffer in step with every later mutation. This chapter follows the second path through its whole life: how a mount is created, what owning a buffer means, how to inspect a live mount, and how it is released again. [Node Construction](ebox-node-construction.md) built the tree; the [Tree Queries](ebox-tree-queries.md) chapter reads it back from a mount; [Viewport](viewport.md) defines the size a mount lays out for, and [Incremental Updates and Publication](incremental-updates-and-publication.md) the flush that keeps the text current.
 
 ## The mount
 

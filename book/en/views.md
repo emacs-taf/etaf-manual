@@ -2,7 +2,7 @@
 
 A *View* is the description of what an ETAF application shows. It is written in one small structural language, normalized by `etaf-view` and lowered by the renderer into Ebox nodes: Components return Views, `etaf-mount` publishes one, and `etaf-render` lowers one without a Runtime. This chapter defines the language, the normalized values, when the expressions inside a View are evaluated, and the functions that build Views from Lisp.
 
-A View is a description, not a live object: it owns no state and no buffer text by itself. Its dynamic parts read reactive sources, and [Reactivity](reactivity.md) defines when such a read causes another evaluation. Which Host kinds exist and which properties they accept belongs to the Host chapter; Components, props and slots belong to the Component chapter.
+A View is a description, not a live object: it owns no state and no buffer text by itself. Its dynamic parts read reactive sources, and [Reactivity](reactivity.md) defines when such a read causes another evaluation. Which Host kinds exist and which properties they accept belongs to [the Host chapter](hosts.md); Components, props and slots belong to the Component chapter.
 
 <!-- index: View; structural form; View value; expr; keyed list; fragment -->
 
@@ -69,7 +69,7 @@ Construct a normalized ETAF View from the structural FORM.
 ;; ⇒ a text View
 ```
 
-**See also.** `etaf-node`, `etaf-render`, and the chapters on Hosts, Components and Runtimes.
+**See also.** `etaf-node`, `etaf-render`, and the chapters on [Hosts](hosts.md), Components and Runtimes.
 
 ### Property values
 

@@ -2,7 +2,7 @@
 
 *View* 描述一个 ETAF 应用要显示的内容。它用一种小型结构语言书写，由 `etaf-view` 规范化，再由渲染器降为 Ebox 节点：组件返回 View，`etaf-mount` 发布一个 View，`etaf-render` 则在没有 Runtime 的情况下降下一个 View。本章定义这门语言、规范化后的值、View 内表达式在什么时候求值，以及从 Lisp 构造 View 的函数。
 
-View 是描述，不是活对象：它本身不拥有状态，也不拥有缓冲区文本。它的动态部分读取响应式源，这些读取何时引起再次求值由[响应式系统](reactivity.md)定义。有哪些 Host 种类、各接受哪些属性，属于 Host 章；组件、props 和 slot 属于 Component 章。
+View 是描述，不是活对象：它本身不拥有状态，也不拥有缓冲区文本。它的动态部分读取响应式源，这些读取何时引起再次求值由[响应式系统](reactivity.md)定义。有哪些 Host 种类、各接受哪些属性，属于 [Host 章](hosts.md)；组件、props 和 slot 属于 Component 章。
 
 <!-- index: View; 结构形式; View 值; expr; 键控列表; fragment -->
 
@@ -69,7 +69,7 @@ NAME 是 Host 符号（如 `text`、`column`），或用 `etaf-define-component`
 ;; ⇒ 一个 text View
 ```
 
-**参见。** `etaf-node`、`etaf-render`，以及 Host、组件和 Runtime 三章。
+**参见。** `etaf-node`、`etaf-render`，以及 [Host](hosts.md)、组件和 Runtime 三章。
 
 ### 属性值
 

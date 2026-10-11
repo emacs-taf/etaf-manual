@@ -1,6 +1,6 @@
 # Resource
 
-A Resource is a Scope-owned value with a loader: it runs the loader, stores the outcome in a reactive state, and exposes a status, the last successful value and the failure. It is the single-value companion of the Data Controller, and it uses the asynchronous lifecycle of the [Asynchronous Model](async.md) whenever the loader cannot finish in the call that starts it. This chapter defines the constructor and readers, the status machine, loading, cancellation and disposal, value retention and cleanup, and the shipped example. [Reactivity](reactivity.md#scopes) defines the Scope that owns a Resource.
+A Resource is a Scope-owned value with a loader: it runs the loader, stores the outcome in a reactive state, and exposes a status, the last successful value and the failure. It is the single-value companion of the [Data Controller](data-controllers.md), and it uses the asynchronous lifecycle of the [Asynchronous Model](async.md) whenever the loader cannot finish in the call that starts it. This chapter defines the constructor and readers, the status machine, loading, cancellation and disposal, value retention and cleanup, and the shipped example. [Reactivity](reactivity.md#scopes) defines the Scope that owns a Resource.
 
 ## The Resource model
 

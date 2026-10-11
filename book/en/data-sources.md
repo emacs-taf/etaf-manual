@@ -1,6 +1,6 @@
 # Data Sources
 
-A Data Source is the storage-facing half of the data layer: one value that describes how to read and write records. It is deliberately passive — a plist of callbacks, not a reactive object and not a running request. The Data Controller chapter defines the reactive owner that calls a source, keeps its items, status and selection, and publishes changes. This chapter defines the protocol and its capabilities, how to build and adapt a source, the standalone page loader and the in-memory source. [Asynchronous Model](async.md) defines the adapter a callback may return instead of a value.
+A Data Source is the storage-facing half of the data layer: one value that describes how to read and write records. It is deliberately passive — a plist of callbacks, not a reactive object and not a running request. The [Data Controllers](data-controllers.md) chapter defines the reactive owner that calls a source, keeps its items, status and selection, and publishes changes. This chapter defines the protocol and its capabilities, how to build and adapt a source, the standalone page loader and the in-memory source. [Asynchronous Model](async.md) defines the adapter a callback may return instead of a value.
 
 ## The source protocol
 

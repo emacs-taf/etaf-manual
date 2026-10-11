@@ -1,6 +1,6 @@
 # Resource
 
-Resource 是一个由 Scope 所有、带 loader 的值：它运行 loader，把结果存进响应式状态，并暴露状态、最近成功值和失败。它是 Data Controller 的单值对应物；loader 无法在启动它的那次调用里结束时，它使用[异步模型](async.md)的加载生命周期。本章定义构造与读取接口、状态机、加载、取消与释放、值的保留与清理，以及随附示例。拥有 Resource 的 Scope 由[响应式系统](reactivity.md#scope)定义。
+Resource 是一个由 Scope 所有、带 loader 的值：它运行 loader，把结果存进响应式状态，并暴露状态、最近成功值和失败。它是 [Data Controller](data-controllers.md) 的单值对应物；loader 无法在启动它的那次调用里结束时，它使用[异步模型](async.md)的加载生命周期。本章定义构造与读取接口、状态机、加载、取消与释放、值的保留与清理，以及随附示例。拥有 Resource 的 Scope 由[响应式系统](reactivity.md#scope)定义。
 
 ## Resource 模型
 

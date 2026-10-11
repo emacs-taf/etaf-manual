@@ -112,7 +112,8 @@
       "chapters": [
         "async",
         "resources",
-        "data-sources"
+        "data-sources",
+        "data-controllers"
       ]
     }
   ],

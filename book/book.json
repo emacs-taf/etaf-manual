@@ -170,7 +170,8 @@
       "chapters": [
         "ebox-node-construction",
         "ebox-mount-lifecycle",
-        "ebox-tree-queries"
+        "ebox-tree-queries",
+        "ebox-files-and-preview"
       ]
     }
   ],

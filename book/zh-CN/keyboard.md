@@ -20,7 +20,7 @@ Host 用 `:keys` 声明键盘命令，它是 `(KEY COMMAND [LABEL])` 条目的�
 
 1. 作用域链在 point 位于聚焦 Host 或其子树内时从聚焦 Host 开始；否则从 point 处的 Host 开始。最内层可见模态作用域不包含该 Host 时，链改从模态 Host 开始。
 2. 从最近到最远搜索该 Host 及其祖先的 `:keys` 条目，遇到第一个 `:focus-scope modal` Host 后停止，因此打开的对话框外面的键不可达。禁用的 Host 不贡献任何东西。第一个匹配的条目获胜。
-3. 没有 Host 条目时框架键生效：`M-g` 进入区域选择，Escape 关闭最近的 `:on-dismiss` Host，方向键运行 `etaf-direction`，Tab 与 S-Tab 移动一个焦点停靠点，`?` 打开 `etaf-help`，Home/End 到达组或作用域的首末。
+3. 没有 Host 条目时框架键生效：`M-g` 进入[区域选择](region-navigation.md#选择区域)，Escape 关闭最近的 `:on-dismiss` Host，方向键运行 `etaf-direction`，Tab 与 S-Tab 移动一个焦点停靠点，`?` 打开 `etaf-help`，Home/End 到达组或作用域的首末。
 4. 仍未绑定的键落回 buffer 的其他 keymap，包括应用的模拟按键表。原生输入会话编辑期间所有键都落回，让会话自己的编辑命令获胜。
 
 因此 Host 键会遮蔽 buffer 对同一个键的绑定——包括应用的模拟按键表——打开的模态作用域还会吞掉未绑定的打印键，不让它们到达它背后的应用。序列前缀是共享的：Host 可以绑定 `C-c C-u`，同时 buffer 的模式表保留 `C-c C-k`；而同一个 Runtime 里一个键不能既运行命令又开启序列。
@@ -75,7 +75,7 @@ Host 用 `:keys` 声明键盘命令，它是 `(KEY COMMAND [LABEL])` 条目的�
 
 **参数。** DIRECTION 是 `up`、`down`、`left` 或 `right`。RUNTIME 默认为活动 Runtime。
 
-**语义。** 顺序固定。先运行作用域内最近的 `:on-direction` 处理器；`handled` 与 `hold` 原样返回当前焦点，`release` 继续。然后，聚焦且 role 为 `separator` 或 `slider`、带 `:on-drag` 的 Host 沿它的 `:aria-orientation` 走一格，以键盘拖拽手势上报：`vertical` 元素（竖线）左右走，`horizontal` 元素上下走。接着焦点在周围区域内移动，有区域时在边缘进入相邻区域。没有周围区域时应用 Ebox 空间移动，它找不到停靠点时，下与上各滚动视口一步。没有焦点时由 point 处的 Host 作答，读者因此保留自己行的按键语义。方向键以及 `vim` 方案下的 `h`/`j`/`k`/`l` 运行的就是这个函数。
+**语义。** 顺序固定。先运行作用域内最近的 `:on-direction` 处理器；`handled` 与 `hold` 原样返回当前焦点，`release` 继续。然后，聚焦且 role 为 `separator` 或 `slider`、带 `:on-drag` 的 Host 沿它的 `:aria-orientation` 走一格，以键盘拖拽手势上报：`vertical` 元素（竖线）左右走，`horizontal` 元素上下走。接着焦点在周围区域内移动，有区域时在边缘进入相邻区域，见[区域导航](region-navigation.md#邻接)。没有周围区域时应用 Ebox 空间移动，它找不到停靠点时，下与上各滚动视口一步。没有焦点时由 point 处的 Host 作答，读者因此保留自己行的按键语义。方向键以及 `vim` 方案下的 `h`/`j`/`k`/`l` 运行的就是这个函数。
 
 **返回。** 聚焦的 Host 引用；什么都没动时为 nil。
 

@@ -97,7 +97,8 @@
         "interaction-overview",
         "events",
         "focus",
-        "keyboard"
+        "keyboard",
+        "region-navigation"
       ]
     }
   ],

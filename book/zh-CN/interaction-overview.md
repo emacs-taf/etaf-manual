@@ -1,6 +1,6 @@
 # 交互总论
 
-文本应用通过两个协作的层接收输入。Ebox 拥有原生原语：保留在节点上的交互能力、把这些能力画成 Emacs 文本属性、命中测试、焦点、指针状态与原生输入会话。ETAF 拥有回调：Host 的 `:on-*` 属性是按 Host 引用寻址的应用代码，在响应式批处理里运行。本章把这条路径从头到尾画出来——输入如何到达回调、命中测试如何选择目标、交互属性如何继承——随后各章分别展开每一部分：[事件](events.md)、[焦点](focus.md)、[键盘](keyboard.md)、《区域导航》《拖拽与手势》与《文本输入》。[Host](hosts.md)定义语义属性与事件属性本身，[Action、Behavior 与错误边界](actions-behaviors-and-error-boundaries.md)定义回调如何变成具名业务变更或可复用的 Behavior。
+文本应用通过两个协作的层接收输入。Ebox 拥有原生原语：保留在节点上的交互能力、把这些能力画成 Emacs 文本属性、命中测试、焦点、指针状态与原生输入会话。ETAF 拥有回调：Host 的 `:on-*` 属性是按 Host 引用寻址的应用代码，在响应式批处理里运行。本章把这条路径从头到尾画出来——输入如何到达回调、命中测试如何选择目标、交互属性如何继承——随后各章分别展开每一部分：[事件](events.md)、[焦点](focus.md)、[键盘](keyboard.md)、[区域导航](region-navigation.md)、《拖拽与手势》与《文本输入》。[Host](hosts.md)定义语义属性与事件属性本身，[Action、Behavior 与错误边界](actions-behaviors-and-error-boundaries.md)定义回调如何变成具名业务变更或可复用的 Behavior。
 
 ## 交互路径
 

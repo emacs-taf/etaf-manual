@@ -343,13 +343,13 @@ Declare a user-addressable functional region on a Host.
 
 **Arguments.** A property plist whose keys are `:id` (required, a non-nil symbol that identifies the region), `:label` (a display name), `:key` (one hint character other than `?`), `:enter` (the default entry Host reference) and `:neighbors` (a plist mapping `:left`, `:right`, `:up` and `:down` to region ids). Unknown keys are rejected.
 
-**Semantics.** Regions nest by Host ancestry, so a pane inside a window is found inside its parent region. The Region Navigation chapter defines the selector that jumps between regions and how `:neighbors` orders the movement.
+**Semantics.** Regions nest by Host ancestry, so a pane inside a window is found inside its parent region. The [Region Navigation](region-navigation.md) chapter defines the selector that jumps between regions, the entry memory and how adjacency orders the movement.
 
 **Example.** `(box :region (list :id 'editor :label "Editor" :key ?e :neighbors (list :right 'files)) ...)`
 
 **Errors.** `error→ etaf-renderer-error` for a malformed plist, an unknown key, a missing or non-symbol `:id`, an invalid `:key`, or a neighbour direction outside the four directions.
 
-**See also.** the Region Navigation chapter.
+**See also.** [Region Navigation](region-navigation.md).
 
 ### References and Behaviors
 

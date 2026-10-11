@@ -343,13 +343,13 @@ Host 在 Tab 顺序里的位置。
 
 **参数。** 属性 plist，键为 `:id`（必需，一个非 nil 符号，标识该区域）、`:label`（显示名）、`:key`（一个提示字符，不能是 `?`）、`:enter`（默认入口 Host 引用）和 `:neighbors`（把 `:left`、`:right`、`:up`、`:down` 映射到区域 id 的 plist）。未知键被拒绝。
 
-**语义。** 区域按 Host 祖先关系嵌套，因此窗口里的窗格在父区域里也能找到。《区域导航》章定义在区域间跳转的选择器，以及 `:neighbors` 如何决定移动方向。
+**语义。** 区域按 Host 祖先关系嵌套，因此窗口里的窗格在父区域里也能找到。[区域导航](region-navigation.md)章定义在区域间跳转的选择器、入口记忆，以及邻接如何决定移动方向。
 
 **示例。** `(box :region (list :id 'editor :label "Editor" :key ?e :neighbors (list :right 'files)) ...)`
 
 **错误。** plist 结构不对、键未知、`:id` 缺失或不是符号、`:key` 非法、或邻居方向不在四个方向内时，`error→ etaf-renderer-error`。
 
-**参见。** 《区域导航》章。
+**参见。** [区域导航](region-navigation.md)。
 
 ### 引用与 Behavior
 

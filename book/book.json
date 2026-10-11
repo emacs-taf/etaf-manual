@@ -151,7 +151,8 @@
         "ui-overlays",
         "ui-navigation-and-collections",
         "ui-data-display",
-        "ui-composite-components"
+        "ui-composite-components",
+        "ui-panels-and-windows"
       ]
     }
   ],

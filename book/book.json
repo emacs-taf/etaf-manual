@@ -150,7 +150,8 @@
         "ui-pickers-and-menus",
         "ui-overlays",
         "ui-navigation-and-collections",
-        "ui-data-display"
+        "ui-data-display",
+        "ui-composite-components"
       ]
     }
   ],

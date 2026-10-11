@@ -26,7 +26,8 @@
     "styles",
     "etaf-db",
     "etaf-ui",
-    "tokens"
+    "tokens",
+    "ebox"
   ],
   "parts": [
     {
@@ -171,7 +172,8 @@
         "ebox-node-construction",
         "ebox-mount-lifecycle",
         "ebox-tree-queries",
-        "ebox-files-and-preview"
+        "ebox-files-and-preview",
+        "ebox-errors"
       ]
     }
   ],

@@ -102,6 +102,16 @@ Compile the packages before using them for real work: interpreted code is much s
 - `make native`, in the Ebox and ETAF repositories, byte-compiles the package and then compiles it to native code in the `eln-cache`. Emacs loads that code in place of the bytecode without further configuration, even when just-in-time native compilation is disabled. A source file edited later runs as bytecode until the next `make native`.
 - `make clean` removes the compiled files.
 
+#### Function: ebox-byte-compile ()
+
+Recompile every Ebox Lisp source into a neighboring `.elc` file.
+
+**Semantics.** The function byte-compiles the Ebox entry and its `lisp/ebox-*.el` modules beside their sources, in the checkout it was loaded from, and writes the compiler's output to `*Ebox Byte Compile*`. It is what `make compile` in the Ebox repository runs. Every source is attempted even when one fails; the failures are collected and reported together with the failing file names. Restart Emacs after a successful build so the running session loads the new bytecode; a source edited later runs as bytecode only after the next compile.
+
+**Returns.** Unspecified; the compilation is the effect.
+
+**Errors.** `error→ error` "Ebox byte compilation failed: FILE, …" naming every file that failed to compile.
+
 ## Native components
 
 ### The EKP C module

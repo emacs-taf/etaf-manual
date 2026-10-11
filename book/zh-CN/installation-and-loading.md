@@ -102,6 +102,16 @@ package.el 安装一个包时，会把这些标记收集进这个包的 autoload
 - 在 Ebox 和 ETAF 仓库里，`make native` 先做字节编译，再把包编译成原生代码，放进 `eln-cache`。Emacs 无需额外配置就会用这份代码代替字节码，即使关闭了即时原生编译也一样。之后再改过的源文件以字节码运行，直到下一次 `make native`。
 - `make clean` 删除编译产物。
 
+#### Function: ebox-byte-compile ()
+
+把每个 Ebox Lisp 源文件重编译到相邻的 `.elc` 文件。
+
+**语义。** 该函数在它被加载的那个检出里，把 Ebox 入口与 `lisp/ebox-*.el` 模块就地字节编译，编译器输出写到 `*Ebox Byte Compile*`。Ebox 仓库的 `make compile` 运行的就是它。某个文件失败也会继续尝试其余文件；失败被收集起来，连同失败文件名一起报出。成功构建后重启 Emacs，让当前会话加载新的字节码；之后再改过的源文件要到下一次编译才以字节码运行。
+
+**返回。** 未指定；效果就是这次编译。
+
+**错误。** `error→ error` "Ebox byte compilation failed: FILE, …"，点名每个编译失败的文件。
+
 ## 原生组件
 
 ### EKP 的 C 模块

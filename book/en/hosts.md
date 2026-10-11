@@ -178,7 +178,7 @@ A fixed-size local picture.
 
 **Example.** `(image :src "/tmp/chart.png" :columns 40 :rows 10 :adapter 'placeholder)`
 
-**See also.** the Images chapter.
+**See also.** [Images](images.md).
 
 ## Semantic properties
 

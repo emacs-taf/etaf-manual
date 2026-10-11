@@ -80,7 +80,8 @@
         "flex-layout",
         "grid-layout",
         "positioning-layers-and-overlays",
-        "text"
+        "text",
+        "images"
       ]
     }
   ],

@@ -29,7 +29,8 @@
         "zh-CN": "总论"
       },
       "chapters": [
-        "introduction"
+        "introduction",
+        "ecosystem-and-layers"
       ]
     },
     {

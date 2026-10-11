@@ -2,7 +2,7 @@
 
 *Context* is the one deliberately inherited dependency environment of ETAF. It is attached to Component instances, not to View nodes or global variables: one Component provides a value, and the Components below it read that value without it being passed through every prop. This chapter defines the two functions, the ancestor rule that decides what a Component sees, reactive context values, and the error condition.
 
-Context is the mechanism behind subtree-wide configuration: a panel gives its descendants a locale, a tone, a controller or a data source; the Theme defaults that [Components](components.md) read are a Context value under the key `theme`, which the Component Styles and Themes chapter documents. Unlike a prop, a Context value is not part of a Component call; unlike a global variable, it is scoped to the subtree that provided it.
+Context is the mechanism behind subtree-wide configuration: a panel gives its descendants a locale, a tone, a controller or a data source; the Theme defaults that [Components](components.md) read are a Context value under the key `theme`, which [Component Styles and Themes](component-styles-and-themes.md) documents. Unlike a prop, a Context value is not part of a Component call; unlike a global variable, it is scoped to the subtree that provided it.
 
 <!-- index: Context; provide; inject; inherited dependency; ancestor scope -->
 
@@ -44,7 +44,7 @@ Provide VALUE under stable Context KEY to the current subtree.
 (etaf-provide 'tone "danger")
 ```
 
-**See also.** `etaf-inject`, [Visibility](#visibility) and the Component Styles and Themes chapter for the `theme` key.
+**See also.** `etaf-inject`, [Visibility](#visibility) and [Component Styles and Themes](component-styles-and-themes.md) for the `theme` key.
 
 #### Function: etaf-inject (key &optional default (required-p nil required-p-supplied-p))
 
@@ -135,7 +135,7 @@ Invalid EAF Context operation. It is signaled when a Context operation is malfor
 | `"Context keys must be stable symbols: %S"` | A KEY that is a keyword, nil, t, a string or another non-symbol object, in `etaf-provide` or `etaf-inject` |
 | `"Missing EAF Context dependency: %S"` | `etaf-inject` with a non-nil REQUIRED-P for a key absent from the whole chain |
 
-The Theme functions in the Component Styles and Themes chapter use the same condition for their input validation; that chapter lists their messages.
+The Theme functions in [Component Styles and Themes](component-styles-and-themes.md) use the same condition for their input validation; that chapter lists their messages.
 
 **See also.** [Reactivity](reactivity.md#errors-and-recovery) for `etaf-render-side-effect-error`, and [Components](components.md) for setup, bindings and lifecycle.
 

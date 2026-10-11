@@ -99,7 +99,7 @@ Four combinators join compound selectors. Whitespace is the descendant combinato
 
 A selector may name the root of the scope it is evaluated in: both `&` and `:scope` match that root. Inside a Component's `:styles` rules or an `.ebox` file's local rules the scope root is the node the scope is attached to, so `&` styles that node itself while `&.active` styles it only while it matches, and `:scope > .row` styles its direct children.
 
-A rule selector that does not name the scope root is anchored to the scope: it is matched as a descendant of the root, so `.title` picks a node inside the scope and never the root itself. The scope and the rules written for it are the subject of the Component Styles and Themes chapter.
+A rule selector that does not name the scope root is anchored to the scope: it is matched as a descendant of the root, so `.title` picks a node inside the scope and never the root itself. The scope and the rules written for it are the subject of [Component Styles and Themes](component-styles-and-themes.md).
 
 Outside a scope there is no root to name, so `&` and `:scope` match nothing in a plain `ecss-selector-match-p` call or an `ebox-selector-query`; they become meaningful only while a scoped stylesheet is being matched.
 

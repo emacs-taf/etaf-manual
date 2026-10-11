@@ -1,6 +1,6 @@
 # 样式系统总论
 
-每个 Host 的外观与占位都由同一套样式模型决定。*声明*给一个样式属性一个值，*规则*给声明配一个选择器，层叠为每个属性选出一个赢家。这套模型只有一套语义、三种写法——直接写在 Host 上的属性、Component 的 `:styles` 里的静态规则、以及规则文件——由三层分工：ECSS 计算赢家和最终值，Ebox 拥有属性词表并把计算值投影成绘制与几何，ETAF 提供书写界面和 Theme。本章说明这个分工、五种层叠来源、层叠层，以及完整的比较顺序。[选择器](selectors.md)详述规则选择器；[值](values.md)详述值的语义、继承、自定义属性和来源追溯；[样式属性参考](style-properties.md)是每个属性的参考；组件样式与主题一章讲组件规则与 Theme；样式的实现一章讲 schema 与样式 pass。
+每个 Host 的外观与占位都由同一套样式模型决定。*声明*给一个样式属性一个值，*规则*给声明配一个选择器，层叠为每个属性选出一个赢家。这套模型只有一套语义、三种写法——直接写在 Host 上的属性、Component 的 `:styles` 里的静态规则、以及规则文件——由三层分工：ECSS 计算赢家和最终值，Ebox 拥有属性词表并把计算值投影成绘制与几何，ETAF 提供书写界面和 Theme。本章说明这个分工、五种层叠来源、层叠层，以及完整的比较顺序。[选择器](selectors.md)详述规则选择器；[值](values.md)详述值的语义、继承、自定义属性和来源追溯；[样式属性参考](style-properties.md)是每个属性的参考；[组件样式与主题](component-styles-and-themes.md)讲组件规则与 Theme；样式的实现一章讲 schema 与样式 pass。
 
 ## 一套语义，三种写法
 
@@ -24,7 +24,7 @@ ETAF 先问 Ebox 的 schema，一个关键字是不是样式属性，从而把�
   :styles (("&" :color "#B45309")))
 ```
 
-规则列表在定义 Component 时就校验，选择器相对 Component 自己的根书写。组件样式与主题一章定义规则格式、`&` 选择器和样式替换接口。
+规则列表在定义 Component 时就校验，选择器相对 Component 自己的根书写。[组件样式与主题](component-styles-and-themes.md)定义规则格式、`&` 选择器和样式替换接口。
 
 *规则文件*用惰性数据保存一整份有序规则列表，不加 quote 或包装：
 
@@ -33,7 +33,7 @@ ETAF 先问 Ebox 的 schema，一个关键字是不是样式属性，从而把�
  (".badge.active" :color "#334155"))
 ```
 
-读规则文件从不求值里面的值。`ecss-file-read` 读文件，`ecss-read-rules` 和 `ecss-validate-rules` 接受内存里的同一份列表。`.ebox` 文件可以加载同名的 `.ecss` 同伴，或在表达式里指定一个；工具也可以用 `etaf-component-set-styles` 把文件里的规则装成某个 Component 的样式。规则文件一章定义文件契约，组件样式与主题一章定义替换接口。
+读规则文件从不求值里面的值。`ecss-file-read` 读文件，`ecss-read-rules` 和 `ecss-validate-rules` 接受内存里的同一份列表。`.ebox` 文件可以加载同名的 `.ecss` 同伴，或在表达式里指定一个；工具也可以用 `etaf-component-set-styles` 把文件里的规则装成某个 Component 的样式。规则文件一章定义文件契约，[组件样式与主题](component-styles-and-themes.md)定义替换接口。
 
 ## 所有权
 

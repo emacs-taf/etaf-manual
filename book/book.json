@@ -63,7 +63,8 @@
         "style-system",
         "selectors",
         "values",
-        "style-properties"
+        "style-properties",
+        "component-styles-and-themes"
       ]
     }
   ],

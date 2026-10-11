@@ -231,13 +231,13 @@ One or more class names that selectors and component styles match.
 
 **Arguments.** A string, a symbol, or a proper list of strings and symbols. A string is split on whitespace and a list is flattened, so `"task done"` and `'(task done)` both give the classes `task` and `done`. The default is nil, no classes. Any other value is rejected.
 
-**Semantics.** Classes are written to the Ebox node and become selector subjects: a rule such as `.task` matches the Host, and the Component Styles and Themes chapter explains how a Component's own rules use them. When a caller attribute or a Behavior contributes `:class`, the two token sets merge into a stable union with the inner Host's tokens first and duplicates removed, so a caller can add a class without dropping the Host's own.
+**Semantics.** Classes are written to the Ebox node and become selector subjects: a rule such as `.task` matches the Host, and [Component Styles and Themes](component-styles-and-themes.md) explains how a Component's own rules use them. When a caller attribute or a Behavior contributes `:class`, the two token sets merge into a stable union with the inner Host's tokens first and duplicates removed, so a caller can add a class without dropping the Host's own.
 
 **Example.** `(text :class "status error" "Deployment failed")`
 
 **Errors.** `error→ ebox-error` when the value is not a string, symbol or list of them and the node is built; `error→ etaf-component-call-error` when a merged value is invalid.
 
-**See also.** [Selector subjects](#selector-subjects) and the Component Styles and Themes chapter.
+**See also.** [Selector subjects](#selector-subjects) and [Component Styles and Themes](component-styles-and-themes.md).
 
 #### Property: :id
 
@@ -519,7 +519,7 @@ A Host's identity and accessible metadata are the facts Ebox selector queries ma
 - Every `:aria-*` property, including one explicitly set to nil, becomes an attribute with the name after the colon.
 - The `disabled` state comes from the same `:disabled` input that protects activation, so a Host disabled at commit is matched by `:disabled`.
 
-Selector matching follows the rendered Host tree, not the View tree, and comparison uses ECSS value formatting. The adapter facts `:selector-attributes` and `:selector-state` are how Ebox's library users attach extra subjects; they cannot be authored as View properties, and ETAF rejects them with `error→ etaf-renderer-error`. This is the boundary that lets component styles and application stylesheets select Hosts by meaning rather than by position; the Component Styles and Themes chapter builds on it.
+Selector matching follows the rendered Host tree, not the View tree, and comparison uses ECSS value formatting. The adapter facts `:selector-attributes` and `:selector-state` are how Ebox's library users attach extra subjects; they cannot be authored as View properties, and ETAF rejects them with `error→ etaf-renderer-error`. This is the boundary that lets component styles and application stylesheets select Hosts by meaning rather than by position; [Component Styles and Themes](component-styles-and-themes.md) builds on it.
 
 ## Host references
 

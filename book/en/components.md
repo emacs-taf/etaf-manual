@@ -44,7 +44,7 @@ Define a Component named NAME from an argument declaration and clauses, and regi
 - `:validate ORDINARY-ELISP` runs after defaults are resolved, on mount and on every input update, before any binding, setup or rendering sees the new inputs. Its return value is ignored; use `etaf-check-prop` or signal an error to reject input. It must be pure and may run again, and it cannot use instance bindings, state, slots or lifecycle.
 - `:setup SETUP` is an ordinary Elisp body, not a lambda. Its return value is the instance's state when the Component has no `:bindings`; with `:bindings` the return value is ignored. It must not return a function, and it must not construct View structure: the frontends own rendering.
 - `:view VIEW` is unquoted View syntax and is compiled with the definition; `:render ORDINARY-ELISP` is ordinary Elisp returning a View, usually through `etaf-view`. Both frontends receive the declared props and the current slots. `:view` reads a prop by its name; `:render` reads the live value through `etaf-current-prop` or a source from `etaf-prop`.
-- `:styles ((SELECTOR ATTRIBUTE ...) ...)` declares the Component's static style rules. The clause itself belongs to the Component Styles and Themes chapter; the syntax is validated at definition time.
+- `:styles ((SELECTOR ATTRIBUTE ...) ...)` declares the Component's static style rules. The clause itself belongs to [Component Styles and Themes](component-styles-and-themes.md); the syntax is validated at definition time.
 
 **Returns.** The Component name, as a quoted symbol, so a definition form evaluates to NAME.
 
@@ -69,7 +69,7 @@ Define a Component named NAME from an argument declaration and clauses, and regi
 (etaf-view (demo-notice :severity "warning" :title "Disk almost full"))
 ```
 
-**See also.** `etaf-view`, `etaf-node`, the Component Styles and Themes chapter, and the other entries in this chapter.
+**See also.** `etaf-view`, `etaf-node`, [Component Styles and Themes](component-styles-and-themes.md), and the other entries in this chapter.
 
 ### The clauses
 
@@ -80,7 +80,7 @@ One paragraph per clause; each links to the section that defines its behavior.
 - **`:setup`** performs per-instance initialization in the instance's own Scope; it may register lifecycle hooks and create reactive state. [Setup, bindings and state](#setup-bindings-and-state) and [Lifecycle hooks](#lifecycle-hooks).
 - **`:validate`** checks input values before they are published. [Validation](#validation).
 - **`:view`** and **`:render`** are the two frontends. [The `:view` and `:render` frontends](#the-view-and-render-frontends).
-- **`:styles`** declares static style rules. The Component Styles and Themes chapter.
+- **`:styles`** declares static style rules. [Component Styles and Themes](component-styles-and-themes.md).
 
 ### Registration and redefinition
 

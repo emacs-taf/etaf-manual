@@ -2,7 +2,7 @@
 
 *Context* 是 ETAF 唯一一种有意做成「可继承」的依赖环境。它依附于组件实例，不依附 View 节点，也不是全局变量：一个组件提供值，它下面的组件直接读取，不必让每个组件用 prop 层层传递。本章定义两个函数、决定「组件能看到什么」的祖先规则、响应式的上下文值，以及错误条件。
 
-Context 是「整棵子树共享配置」的机制：面板给它的后代提供 locale、tone、controller 或数据源；[组件](components.md)读的 Theme 默认值就是以 `theme` 为键的 Context 值，组件样式与主题章会讲到。与 prop 不同，Context 值不是组件调用的一部分；与全局变量不同，它的作用范围就是提供它的那棵子树。
+Context 是「整棵子树共享配置」的机制：面板给它的后代提供 locale、tone、controller 或数据源；[组件](components.md)读的 Theme 默认值就是以 `theme` 为键的 Context 值，[组件样式与主题](component-styles-and-themes.md)会讲到。与 prop 不同，Context 值不是组件调用的一部分；与全局变量不同，它的作用范围就是提供它的那棵子树。
 
 <!-- index: Context; 提供; 读取; 继承的依赖; 祖先作用域 -->
 
@@ -44,7 +44,7 @@ Context 是「整棵子树共享配置」的机制：面板给它的后代提供
 (etaf-provide 'tone "danger")
 ```
 
-**参见。** `etaf-inject`、[可见范围](#可见范围)，以及组件样式与主题章关于 `theme` 键的说明。
+**参见。** `etaf-inject`、[可见范围](#可见范围)，以及[组件样式与主题](component-styles-and-themes.md)关于 `theme` 键的说明。
 
 #### Function: etaf-inject (key &optional default (required-p nil required-p-supplied-p))
 
@@ -135,7 +135,7 @@ Invalid EAF Context operation。Context 操作格式错误，或必需依赖缺�
 | `"Context keys must be stable symbols: %S"` | `etaf-provide` 或 `etaf-inject` 的 KEY 是 keyword、nil、t、字符串或其它非符号对象 |
 | `"Missing EAF Context dependency: %S"` | `etaf-inject` 的 REQUIRED-P 非 nil，而该键整条链上都不存在 |
 
-组件样式与主题章里的 Theme 函数用同一个条件做输入校验；它们的消息由那一章列出。
+[组件样式与主题](component-styles-and-themes.md)里的 Theme 函数用同一个条件做输入校验；它们的消息由那一章列出。
 
 **参见。** `etaf-render-side-effect-error` 见[响应式系统](reactivity.md#错误与恢复)；setup、bindings 与生命周期见[组件](components.md)。
 

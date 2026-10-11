@@ -44,7 +44,7 @@ Component 定义是静态数据，在定义时校验并以名字存进注册表�
 - `:validate ORDINARY-ELISP` 在默认值解析之后运行，挂载时和每次输入更新各跑一次，早于任何绑定、setup 或渲染看到新输入。返回值被忽略；用 `etaf-check-prop` 或抛错来拒绝输入。它必须纯粹且可能重跑，不能使用实例绑定、state、slot 或生命周期。
 - `:setup SETUP` 是普通 Elisp 函数体，不是 lambda。组件没有 `:bindings` 时，它的返回值就是实例的 state；有 `:bindings` 时返回值被忽略。它不得返回函数，也不得构造 View 结构：渲染由前端负责。
 - `:view VIEW` 是未引用的 View 语法，随定义一起编译；`:render ORDINARY-ELISP` 是普通 Elisp，返回一个 View，通常经 `etaf-view`。两个前端都收到声明的 props 和当前 slots。`:view` 用 prop 名直接读；`:render` 用 `etaf-current-prop` 或 `etaf-prop` 得到的 source 读实时值。
-- `:styles ((SELECTOR ATTRIBUTE ...) ...)` 声明组件的静态样式规则。子句本身属于《组件样式与主题》章；语法在定义时校验。
+- `:styles ((SELECTOR ATTRIBUTE ...) ...)` 声明组件的静态样式规则。子句本身属于[组件样式与主题](component-styles-and-themes.md)；语法在定义时校验。
 
 **返回。** 组件名，即引用的符号，因此一个定义形式求值为 NAME。
 
@@ -69,7 +69,7 @@ Component 定义是静态数据，在定义时校验并以名字存进注册表�
 (etaf-view (demo-notice :severity "warning" :title "Disk almost full"))
 ```
 
-**参见。** `etaf-view`、`etaf-node`、《组件样式与主题》章，以及本章其他条目。
+**参见。** `etaf-view`、`etaf-node`、[组件样式与主题](component-styles-and-themes.md)，以及本章其他条目。
 
 ### 子句一览
 
@@ -80,7 +80,7 @@ Component 定义是静态数据，在定义时校验并以名字存进注册表�
 - **`:setup`** 在实例自己的 Scope 里做每实例初始化；它可以注册生命周期钩子、创建响应式状态。[Setup、绑定与 state](#setup绑定与-state)与[生命周期钩子](#生命周期钩子)。
 - **`:validate`** 在输入发布前检查值。[校验](#校验)。
 - **`:view`** 与 **`:render`** 是两个前端。[`:view` 与 `:render` 两个前端](#view-与-render-两个前端)。
-- **`:styles`** 声明静态样式规则。《组件样式与主题》章。
+- **`:styles`** 声明静态样式规则。[组件样式与主题](component-styles-and-themes.md)。
 
 ### 注册与重定义
 

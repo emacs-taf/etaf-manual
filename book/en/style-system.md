@@ -1,6 +1,6 @@
 # The Style System
 
-Every Host gets its appearance and its share of space from one style model. A *declaration* gives a style property a value, a *rule* pairs a selector with declarations, and the cascade chooses one winner per property. The model has one semantics and three authoring spellings — attributes written directly on a Host, static rules in a Component's `:styles`, and rule files — and three layers divide the work: ECSS computes the winner and the final value, Ebox owns the property vocabulary and projects computed values into paint and geometry, and ETAF provides the authoring surfaces and the Theme. This chapter describes that division, the five cascade origins, cascade layers and the complete comparison order. [Selectors](selectors.md) details rule selectors; [Values](values.md) details value semantics, inheritance, custom properties and provenance; [Style Properties](style-properties.md) is the reference for every property; the Component Styles and Themes chapter covers component rules and Theme; and the Styles Implementation chapter covers the schema and the style pass.
+Every Host gets its appearance and its share of space from one style model. A *declaration* gives a style property a value, a *rule* pairs a selector with declarations, and the cascade chooses one winner per property. The model has one semantics and three authoring spellings — attributes written directly on a Host, static rules in a Component's `:styles`, and rule files — and three layers divide the work: ECSS computes the winner and the final value, Ebox owns the property vocabulary and projects computed values into paint and geometry, and ETAF provides the authoring surfaces and the Theme. This chapter describes that division, the five cascade origins, cascade layers and the complete comparison order. [Selectors](selectors.md) details rule selectors; [Values](values.md) details value semantics, inheritance, custom properties and provenance; [Style Properties](style-properties.md) is the reference for every property; [Component Styles and Themes](component-styles-and-themes.md) covers component rules and Theme; and the Styles Implementation chapter covers the schema and the style pass.
 
 ## One semantics, three spellings
 
@@ -24,7 +24,7 @@ ETAF separates style keys from semantic and event properties by asking the Ebox 
   :styles (("&" :color "#B45309")))
 ```
 
-The rule list is validated when the Component is defined, and its selectors are written relative to the Component's own roots. The Component Styles and Themes chapter defines the rule format, the `&` selector and the styles replacement interface.
+The rule list is validated when the Component is defined, and its selectors are written relative to the Component's own roots. [Component Styles and Themes](component-styles-and-themes.md) defines the rule format, the `&` selector and the styles replacement interface.
 
 A *rule file* holds one ordered rule list as inert data, with no quote or wrapper:
 
@@ -33,7 +33,7 @@ A *rule file* holds one ordered rule list as inert data, with no quote or wrappe
  (".badge.active" :color "#334155"))
 ```
 
-Reading a rule file never evaluates the values. `ecss-file-read` reads a file, and `ecss-read-rules` and `ecss-validate-rules` accept the same list from memory. An `.ebox` file can load a same-basename `.ecss` companion or name one in its expression, and a tool can install a file's rules as a Component's styles with `etaf-component-set-styles`; the Rule Files chapter defines the file contract, and the Component Styles and Themes chapter defines the replacement interface.
+Reading a rule file never evaluates the values. `ecss-file-read` reads a file, and `ecss-read-rules` and `ecss-validate-rules` accept the same list from memory. An `.ebox` file can load a same-basename `.ecss` companion or name one in its expression, and a tool can install a file's rules as a Component's styles with `etaf-component-set-styles`; the Rule Files chapter defines the file contract, and [Component Styles and Themes](component-styles-and-themes.md) defines the replacement interface.
 
 ## Ownership
 

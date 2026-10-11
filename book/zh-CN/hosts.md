@@ -231,13 +231,13 @@ Host 的无障碍元数据是 Ebox 节点上的 `role` 属性和 `aria-*` 属性
 
 **参数。** 字符串、符号，或由字符串和符号组成的真列表。字符串按空白切分，列表被摊平，所以 `"task done"` 和 `'(task done)` 都得到类 `task` 和 `done`。默认是 nil，没有类。其他值被拒绝。
 
-**语义。** 类写入 Ebox 节点并成为选择器主体：`.task` 这样的规则匹配该 Host，《组件样式与主题》章解释组件自己的规则怎样使用它们。调用者属性或 Behavior 提供 `:class` 时，两组 token 合并成一个稳定并集，内层 Host 的 token 在前、重复去掉，因此调用者可以加类而不丢掉 Host 自己的类。
+**语义。** 类写入 Ebox 节点并成为选择器主体：`.task` 这样的规则匹配该 Host，[组件样式与主题](component-styles-and-themes.md)解释组件自己的规则怎样使用它们。调用者属性或 Behavior 提供 `:class` 时，两组 token 合并成一个稳定并集，内层 Host 的 token 在前、重复去掉，因此调用者可以加类而不丢掉 Host 自己的类。
 
 **示例。** `(text :class "status error" "Deployment failed")`
 
 **错误。** 值不是字符串、符号或它们的列表、且节点被建立时 `error→ ebox-error`；合并后的值非法时 `error→ etaf-component-call-error`。
 
-**参见。** [选择器主体](#选择器主体)与《组件样式与主题》章。
+**参见。** [选择器主体](#选择器主体)与[组件样式与主题](component-styles-and-themes.md)。
 
 #### Property: :id
 
@@ -519,7 +519,7 @@ Host 的身份与无障碍元数据就是 Ebox 选择器查询匹配的事实：
 - 每个 `:aria-*` 属性，包括显式设为 nil 的，都成为名字为冒号后部分的属性。
 - `disabled` 状态来自保护激活的同一个 `:disabled` 输入，因此提交时禁用的 Host 能被 `:disabled` 匹配。
 
-选择器匹配沿着渲染后的 Host 树，而不是 View 树，比较使用 ECSS 的值格式化。适配器事实 `:selector-attributes` 和 `:selector-state` 是 Ebox 库用户附加额外主体的方式；它们不能作为 View 属性给出，ETAF 以 `error→ etaf-renderer-error` 拒绝。这个边界让组件样式和应用样式表按语义而不是按位置选择 Host；《组件样式与主题》章在此基础上构建。
+选择器匹配沿着渲染后的 Host 树，而不是 View 树，比较使用 ECSS 的值格式化。适配器事实 `:selector-attributes` 和 `:selector-state` 是 Ebox 库用户附加额外主体的方式；它们不能作为 View 属性给出，ETAF 以 `error→ etaf-renderer-error` 拒绝。这个边界让组件样式和应用样式表按语义而不是按位置选择 Host；[组件样式与主题](component-styles-and-themes.md)在此基础上构建。
 
 ## Host 引用
 

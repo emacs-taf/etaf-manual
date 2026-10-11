@@ -12,7 +12,7 @@ A length may be computed. The supported expressions are `(calc EXPR)`, `(min ...
 
 Some size properties accept keywords instead of a length: `auto`, `min-content`, `max-content`, `fit-content` and `stretch`, plus `none` where a maximum size is allowed. Those keywords are size values, not lengths.
 
-Lengths stay typed in computed styles: a declaration of `(% 50)` computes to `(% 50)`, and the resolution to pixels happens later against measured context — the containing box for `%`, the viewport for `vw` and `vh`, and the effective font for `ch` and `lh`. The Viewport chapter defines how those measurements are supplied and when a change reflows. An invalid length signals `ebox-size-error` with the property name and the reason.
+Lengths stay typed in computed styles: a declaration of `(% 50)` computes to `(% 50)`, and the resolution to pixels happens later against measured context — the containing box for `%`, the viewport for `vw` and `vh`, and the effective font for `ch` and `lh`. [Viewport](viewport.md) defines how those measurements are supplied and when a change reflows. An invalid length signals `ebox-size-error` with the property name and the reason.
 
 ## Colors
 

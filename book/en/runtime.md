@@ -32,7 +32,7 @@ Mount normalized VIEW into BUFFER-OR-NAME and return its buffer.
 
 - BUFFER-OR-NAME is a buffer or a buffer name. The buffer is created if it does not exist; the Runtime does not display it.
 - VIEW is a normalized View, as [Views](views.md) defines, or a zero-argument function returning one. A function is evaluated with tracking, so a View function that reads a reactive source is re-rendered when the source changes.
-- OPTIONS is a plist. The supported keys are `:viewport-width` (in pixels) and `:viewport-height` (in lines), which the first publication uses directly instead of an immediate re-layout, and `:observer`, a one-argument report sink installed before the first render. A nil dimension follows the displaying window. The viewport details belong to the Viewport chapter; the report format belongs to the Observers chapter.
+- OPTIONS is a plist. The supported keys are `:viewport-width` (in pixels) and `:viewport-height` (in lines), which the first publication uses directly instead of an immediate re-layout, and `:observer`, a one-argument report sink installed before the first render. A nil dimension follows the displaying window. The viewport details belong to [Viewport](viewport.md); the report format belongs to the Observers chapter.
 
 **Semantics.** An existing Runtime mounted in BUFFER-OR-NAME is unmounted first, so the new View replaces the old application. The first publication is one observed operation: the View is lowered and rendered, the whole buffer is written, and the committed revision becomes 1. Registering the Runtime also installs its key handling and its `kill-buffer-hook`, so killing the buffer unmounts it. If the first publication fails, the new Runtime is disposed and the condition propagates; the buffer survives with no Runtime.
 
@@ -48,7 +48,7 @@ Mount normalized VIEW into BUFFER-OR-NAME and return its buffer.
             '(:viewport-width 1200 :viewport-height 48))
 ```
 
-**See also.** `etaf-unmount`, [Finding a Runtime](#finding-a-runtime), and the Viewport chapter.
+**See also.** `etaf-unmount`, [Finding a Runtime](#finding-a-runtime), and [Viewport](viewport.md).
 
 ### Native application windows
 
@@ -390,7 +390,7 @@ Return non-nil when transient UI borrows lines from WINDOW.
                 (fit-layout-to-window window)))))
 ```
 
-**See also.** the Viewport and Scrolling chapters, whose canvas keeps its committed viewport for the same borrow.
+**See also.** [Viewport](viewport.md) and the Scrolling chapters, whose canvas keeps its committed viewport for the same borrow.
 
 ## Semantic details
 

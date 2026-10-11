@@ -81,7 +81,8 @@
         "grid-layout",
         "positioning-layers-and-overlays",
         "text",
-        "images"
+        "images",
+        "viewport"
       ]
     }
   ],

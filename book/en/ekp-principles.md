@@ -2,7 +2,7 @@
 
 EKP lays out a paragraph by choosing all of its line breaks at once. It follows the Knuth–Plass model: the paragraph is a sequence of boxes joined by glue, every legal break point carries a penalty, and an arrangement of lines is judged by the sum of its line costs. Because the choice is made for the whole paragraph, a break that fills one line well but forces an ugly next line loses to an arrangement that is even overall; filling lines greedily cannot take an earlier decision back, and the paragraph-wide search can.
 
-This chapter explains that model as EKP implements it. It defines how text becomes boxes and glue, how a single line is scored with badness, fitness and demerits, what looseness changes, and how the two-pass emergency strategy keeps every input layout-able. Its own interfaces are the explicit spacing parameters below; the individual numbers and policies it names are all user options, collected in the Parameter Reference chapter. The string form of the result and the structural plan behind it are the Programming Interface chapter.
+This chapter explains that model as EKP implements it. It defines how text becomes boxes and glue, how a single line is scored with badness, fitness and demerits, what looseness changes, and how the two-pass emergency strategy keeps every input layout-able. Its own interfaces are the explicit spacing parameters below; the individual numbers and policies it names are all user options, collected in the Parameter Reference chapter. The string form of the result and the structural plan behind it are the [Programming Interface](ekp-programming-interface.md) chapter.
 
 ## Model
 
@@ -121,6 +121,6 @@ The strict pass accepts only valid break points. If the paragraph end cannot be 
 
 ## Errors and recovery
 
-Nothing in this chapter's model refuses a paragraph. Layout has no failure path: the strict pass, the emergency pass and the reachability rule together guarantee a plan for any sequence of boxes, and the recorded outcome of unbreakable content is an overfull line, not an error. A bad width argument is rejected by the entry point that takes it, as the Programming Interface chapter documents.
+Nothing in this chapter's model refuses a paragraph. Layout has no failure path: the strict pass, the emergency pass and the reachability rule together guarantee a plan for any sequence of boxes, and the recorded outcome of unbreakable content is an overfull line, not an error. A bad width argument is rejected by the entry point that takes it, as [Programming Interface](ekp-programming-interface.md) documents.
 
 The spacing-parameter interface is the one place here that signals. `ekp-param-set` rejects a nil argument with a plain error and a non-number with `wrong-type-argument`; in both cases the rejected call leaves no explicit parameters behind, so the next layout simply derives the automatic defaults. To recover, call `ekp-param-set` again with nine numbers, or call `ekp-param-reset` to make the automatic defaults the intended state.

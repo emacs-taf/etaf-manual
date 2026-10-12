@@ -203,7 +203,8 @@
         "ekp-principles",
         "ekp-cjk",
         "ekp-hyphenation",
-        "ekp-interactive-use"
+        "ekp-interactive-use",
+        "ekp-programming-interface"
       ]
     }
   ],

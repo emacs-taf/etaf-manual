@@ -369,7 +369,9 @@ chapter."
                                      (plist-get figure :id))))
         (result (etaf-value outcome)))
     (etaf-node 'column
-               (list :width 'stretch
+               (list :ref (intern (format "etaf-manual-figure-%s"
+                                          (plist-get figure :id)))
+                     :width 'stretch
                      :box-sizing 'border-box
                      :background-color (etaf-manual-reader--color env :panel)
                      :border (etaf-manual-reader--border env)

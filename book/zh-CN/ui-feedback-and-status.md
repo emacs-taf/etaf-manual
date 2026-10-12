@@ -144,6 +144,16 @@ variant 命名的是语义角色而不是颜色。状态 variant `success`、`wa
             :action-label "Clear" :on-action #'clear-query)
 ```
 
+```elisp :figure 徽标、告警与进度条
+(etaf-view
+ (column :width '(ch 44) :item-gap '(lh 1)
+   (row :item-gap '(ch 1)
+     (etaf-badge :text "已完成" :variant 'success)
+     (etaf-badge :text "注意" :variant 'warning))
+   (etaf-alert :title "提示" :message "这是一条信息告警" :variant 'info)
+   (etaf-progress :value 60 :max 100 :label "进度")))
+```
+
 ## 度量
 
 <!-- index: etaf-statistic; metric card -->

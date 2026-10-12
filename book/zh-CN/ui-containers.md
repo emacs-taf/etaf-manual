@@ -65,6 +65,14 @@
 
 **参见。** `etaf-panel`、`:ui-panel-bg`。
 
+```elisp :figure 面板与卡片两种表面
+(etaf-view
+ (column :width '(ch 44) :item-gap '(lh 1)
+   (etaf-panel :title "面板"
+     (text "面板正文"))
+   (etaf-card :title "卡片" :description "卡片描述")))
+```
+
 ## 分隔线组件
 
 <!-- index: etaf-divider; horizontal rule; vertical rule; separator label -->

@@ -68,6 +68,16 @@ Render ordered step buttons. ITEMS contain `:key` and `:label`; CURRENT and the 
             :items '((:key account :label "Account") (:key billing :label "Billing")))
 ```
 
+```elisp :figure A breadcrumb trail and a tabs strip
+(etaf-view
+ (column :width '(ch 44) :item-gap '(lh 1)
+   (etaf-breadcrumb :items '("手册" "样式" "选择器"))
+   (etaf-tabs :items '((:key overview :label "概览")
+                       (:key details :label "细节"))
+              :active 'overview
+              :on-change #'ignore)))
+```
+
 ## Disclosure and collections
 
 <!-- index: etaf-accordion; etaf-tree; etaf-list -->

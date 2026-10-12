@@ -47,6 +47,20 @@ Describe a lazy asynchronous loader using START.
 
 **See also.** `etaf-resource`, `etaf-resource-result`, `etaf-data-source`.
 
+```elisp :figure Load settles once; cancel and timeout share the same path
+(etaf-view
+ (column :width '(ch 44) :item-gap '(lh 0)
+   (row :item-gap '(ch 1)
+     (box :padding '((lh 0) (ch 2)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa") (text "load"))
+     (box :padding '((lh 0) (ch 2)) :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+          (text :color (etaf-theme-token :ui-accent "#0969da") "完成一次"))
+     (box :padding '((lh 0) (ch 2)) :background-color (etaf-theme-token :ui-disabled-bg "#e5e7eb")
+          (text :color (etaf-theme-token :ui-disabled-fg "#687386") "取消"))
+     (box :padding '((lh 0) (ch 2)) :background-color (etaf-theme-token :ui-disabled-bg "#e5e7eb")
+          (text :color (etaf-theme-token :ui-disabled-fg "#687386") "超时")))
+   (text :color (etaf-theme-token :ui-muted-fg "#526174") "晚到的结果被丢弃；取消与超时沿同一路径结算。")))
+```
+
 ## Completing once
 
 <!-- index: resolve; reject; condition data; first completion -->

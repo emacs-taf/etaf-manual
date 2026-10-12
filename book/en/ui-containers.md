@@ -65,6 +65,14 @@ Render a reusable titled surface with default content slots.
 
 **See also.** `etaf-panel`, `:ui-panel-bg`.
 
+```elisp :figure A panel and a card surface
+(etaf-view
+ (column :width '(ch 44) :item-gap '(lh 1)
+   (etaf-panel :title "面板"
+     (text "面板正文"))
+   (etaf-card :title "卡片" :description "卡片描述")))
+```
+
 ## The divider component
 
 <!-- index: etaf-divider; horizontal rule; vertical rule; separator label -->

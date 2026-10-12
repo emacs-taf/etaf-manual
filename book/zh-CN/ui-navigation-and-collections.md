@@ -68,6 +68,16 @@
             :items '((:key account :label "Account") (:key billing :label "Billing")))
 ```
 
+```elisp :figure 面包屑与 tabs
+(etaf-view
+ (column :width '(ch 44) :item-gap '(lh 1)
+   (etaf-breadcrumb :items '("手册" "样式" "选择器"))
+   (etaf-tabs :items '((:key overview :label "概览")
+                       (:key details :label "细节"))
+              :active 'overview
+              :on-change #'ignore)))
+```
+
 ## 披露与集合
 
 <!-- index: etaf-accordion; etaf-tree; etaf-list -->

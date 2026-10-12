@@ -79,6 +79,17 @@ A drain repeats these steps while any of them finds work:
 
 After each step the drain starts again from step 1, so a post watcher that writes a ref causes a further pre, render and commit pass. When the graph is settled, the functions queued by `etaf-next-tick` run.
 
+```elisp :figure A ref feeds a computed, which feeds an effect
+(etaf-view
+ (row :item-gap '(ch 2)
+   (box :padding '((lh 1) (ch 2)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa") (text "ref"))
+   (text :color (etaf-theme-token :ui-muted-fg "#526174") "→")
+   (box :padding '((lh 1) (ch 2)) :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+        (text :color (etaf-theme-token :ui-accent "#0969da") "computed"))
+   (text :color (etaf-theme-token :ui-muted-fg "#526174") "→")
+   (box :padding '((lh 1) (ch 2)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa") (text "effect"))))
+```
+
 ## Refs
 
 A ref is a writable, *shallow* reactive cell. Reading it with `etaf-value` tracks the read; writing it with `etaf-set-value`, `setf` or `etaf-update-value` notifies its observers when the new value differs from the old one.

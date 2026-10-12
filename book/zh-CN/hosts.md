@@ -46,6 +46,24 @@ Host 也是 View 里的身份单位：和解按名字和 `:key` 匹配 Host 子�
 
 `flex` 或 `grid` Host 的子节点还可以声明子项属性（`:order`、`:flex-grow`、`:flex-shrink`、`:flex-basis`、`:flex`、`:align-self`、`:justify-self`、`:grid-column`、`:grid-row`、`:grid-column-span`、`:grid-row-span`），它们影响父节点如何摆放该子项。样式属性从 schema 初值开始——没有 padding、margin 和 border，颜色继承，字重和字形为 normal，加上各 Host 条目里点名的布局初值——所以不带任何样式属性的 Host 也已经排好版。[样式属性参考](style-properties.md)列出每个属性的值语法、初值和继承。
 
+```elisp :figure 八种 Host；fragment 是唯一不产生 Ebox 节点的
+(etaf-view
+ (column :width '(ch 44) :item-gap '(lh 0)
+   (grid :width '(ch 44)
+         :grid-template-columns '((fr 1) (fr 1) (fr 1) (fr 1))
+         :gap '((lh 0) (ch 1))
+     (box :padding '((lh 0) (ch 1)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa") (text "text"))
+     (box :padding '((lh 0) (ch 1)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa") (text "box"))
+     (box :padding '((lh 0) (ch 1)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa") (text "row"))
+     (box :padding '((lh 0) (ch 1)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa") (text "column"))
+     (box :padding '((lh 0) (ch 1)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa") (text "flex"))
+     (box :padding '((lh 0) (ch 1)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa") (text "grid"))
+     (box :padding '((lh 0) (ch 1)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa") (text "image"))
+     (box :padding '((lh 0) (ch 1)) :background-color (etaf-theme-token :ui-disabled-bg "#e5e7eb")
+          (text :color (etaf-theme-token :ui-disabled-fg "#687386") "fragment")))
+   (text :color (etaf-theme-token :ui-muted-fg "#526174") "fragment 不产生节点；其余七种各绑定一个 Ebox 节点。")))
+```
+
 ## Host 种类
 
 ### text

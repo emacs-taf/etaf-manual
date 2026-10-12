@@ -46,6 +46,24 @@ Every Host accepts semantic properties, event properties and pointer affordances
 
 A child of a `flex` or `grid` Host may also declare the item properties (`:order`, `:flex-grow`, `:flex-shrink`, `:flex-basis`, `:flex`, `:align-self`, `:justify-self`, `:grid-column`, `:grid-row`, `:grid-column-span`, `:grid-row-span`), which affect how its parent places it. Style properties start at the schema defaults — no padding, margin or border, inherited color, normal font weight and style, and the layout defaults named with each kind — so a Host with no style properties is already laid out. [Style Properties](style-properties.md) lists every property with its value grammar, initial value and inheritance.
 
+```elisp :figure The eight Host kinds; fragment is the one without an Ebox node
+(etaf-view
+ (column :width '(ch 44) :item-gap '(lh 0)
+   (grid :width '(ch 44)
+         :grid-template-columns '((fr 1) (fr 1) (fr 1) (fr 1))
+         :gap '((lh 0) (ch 1))
+     (box :padding '((lh 0) (ch 1)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa") (text "text"))
+     (box :padding '((lh 0) (ch 1)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa") (text "box"))
+     (box :padding '((lh 0) (ch 1)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa") (text "row"))
+     (box :padding '((lh 0) (ch 1)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa") (text "column"))
+     (box :padding '((lh 0) (ch 1)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa") (text "flex"))
+     (box :padding '((lh 0) (ch 1)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa") (text "grid"))
+     (box :padding '((lh 0) (ch 1)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa") (text "image"))
+     (box :padding '((lh 0) (ch 1)) :background-color (etaf-theme-token :ui-disabled-bg "#e5e7eb")
+          (text :color (etaf-theme-token :ui-disabled-fg "#687386") "fragment")))
+   (text :color (etaf-theme-token :ui-muted-fg "#526174") "fragment 不产生节点；其余七种各绑定一个 Ebox 节点。")))
+```
+
 ## Host kinds
 
 ### text

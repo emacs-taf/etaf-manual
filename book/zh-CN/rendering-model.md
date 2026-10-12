@@ -12,6 +12,17 @@ Ebox 把一棵保留节点树渲染进 Emacs 缓冲区。经 ETAF 发布的 View
 
 渲染不要求挂载。`ebox-render` 对树做布局并把它的行作为字符串返回，预览与测试就是这样在没有缓冲区的情况下显示树的；`ebox-mount` 把根绑定到缓冲区，并开始在那里写入更新。两条路径跑同一套布局与绘制，所以一棵树无论是否挂载，渲染结果相同。
 
+```elisp :figure 从 View 到 Ebox 树再到 buffer 行
+(etaf-view
+ (column :width '(ch 44) :item-gap '(lh 0)
+   (box :padding '((lh 1) (ch 2)) :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+        (text :color (etaf-theme-token :ui-accent "#0969da") "View：描述"))
+   (box :padding '((lh 1) (ch 2)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+        (text :color (etaf-theme-token :ui-panel-fg "#1f2328") "→ Ebox：保留节点树、几何与计算样式"))
+   (box :padding '((lh 1) (ch 2)) :background-color (etaf-theme-token :ui-disabled-bg "#e5e7eb")
+        (text :color (etaf-theme-token :ui-disabled-fg "#687386") "→ buffer：行、文本属性与 display 对象"))))
+```
+
 ## 坐标：纵向行、横向像素
 
 <!-- index: 坐标系; 边框盒; 行高; 像素宽度; 长度单位 -->

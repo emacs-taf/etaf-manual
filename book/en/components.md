@@ -26,6 +26,21 @@ A Component definition is static data, validated when it is defined and stored i
 
 A Component without `:setup` is stateless and can be rendered by `etaf-render`; a Component with `:setup` needs a mounted Runtime, because its Scope must have a lifecycle owner, as [Views](views.md) explains for `etaf-render`.
 
+```elisp :figure One component definition, three instances
+(etaf-define-component demo-chip (&key label)
+  :render
+  (etaf-view
+   (box :padding '((lh 0) (ch 2))
+        :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+     (text :color (etaf-theme-token :ui-accent "#0969da") (expr label)))))
+
+(etaf-view
+ (row :item-gap '(ch 1)
+   (demo-chip :label "调用 A")
+   (demo-chip :label "调用 B")
+   (demo-chip :label "调用 C")))
+```
+
 ## Defining a Component
 
 #### Macro: etaf-define-component (name arguments &rest clauses)

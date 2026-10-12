@@ -26,6 +26,21 @@ Component 定义是静态数据，在定义时校验并以名字存进注册表�
 
 没有 `:setup` 的组件是无状态的，可以用 `etaf-render` 渲染；带 `:setup` 的组件需要已挂载的 Runtime，因为它的 Scope 必须有生命周期所有者，[View](views.md) 在讲 `etaf-render` 时说明了这一点。
 
+```elisp :figure 一份组件定义，三个实例
+(etaf-define-component demo-chip (&key label)
+  :render
+  (etaf-view
+   (box :padding '((lh 0) (ch 2))
+        :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+     (text :color (etaf-theme-token :ui-accent "#0969da") (expr label)))))
+
+(etaf-view
+ (row :item-gap '(ch 1)
+   (demo-chip :label "调用 A")
+   (demo-chip :label "调用 B")
+   (demo-chip :label "调用 C")))
+```
+
 ## 定义组件
 
 #### Macro: etaf-define-component (name arguments &rest clauses)

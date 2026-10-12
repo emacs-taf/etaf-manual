@@ -54,6 +54,17 @@ Hit testing reverses paint order: the highest z wins, and among equal values the
 
 **Example.** Two overlapping four-pixel overlays with z 0 and 1 resolve to `BBBB`, and with the values swapped to `AAAA`; with both at 0 the later one still wins. A flow child of z 5 against an overlay of z 0 paints `RRRR` on top, but a relative z 5 child under a z 10 overlay does not.
 
+```elisp :figure An overlay joins the host's lines without changing the layout
+(etaf-view
+ (column :width '(ch 40) :item-gap '(lh 0)
+   (box :padding '((lh 1) (ch 2)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+        (text :color (etaf-theme-token :ui-panel-fg "#1f2328") "宿主行"))
+   (box :padding '((lh 1) (ch 2)) :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+        (text :color (etaf-theme-token :ui-accent "#0969da") "浮层拼进这一行，布局不动"))
+   (box :padding '((lh 1) (ch 2)) :background-color (etaf-theme-token :ui-disabled-bg "#e5e7eb")
+        (text :color (etaf-theme-token :ui-disabled-fg "#687386") "宿主的其余行不受影响"))))
+```
+
 ## How overlays compose into the lines below
 
 <!-- index: overlay composition; line splicing; border decoration; root coordinates -->

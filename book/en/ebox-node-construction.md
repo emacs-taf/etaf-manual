@@ -83,6 +83,18 @@ Create a detached node of TAG with author PROPS and CHILDREN.
 
 **See also.** `ebox-build`, `ebox-text-create`, `ebox-node-copy`.
 
+```elisp :figure A box with one text child
+(etaf-view
+ (column :width '(ch 40) :item-gap '(lh 0)
+   (box :padding '((lh 0) (ch 1))
+        :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+     (text :color (etaf-theme-token :ui-accent "#0969da") "box  :padding 1"))
+   (box :padding '((lh 0) (ch 4))
+     (box :padding '((lh 0) (ch 1))
+          :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+       (text :color (etaf-theme-token :ui-panel-fg "#1f2328") "text  子节点")))))
+```
+
 ## Copying nodes
 
 #### Function: ebox-node-copy (node)

@@ -12,6 +12,17 @@ Because the tree is the model, the buffer text is not data. A foreign edit to th
 
 Rendering does not require a mount. `ebox-render` lays a tree out and returns its lines as a string, which is how previews and tests show a tree without a buffer; `ebox-mount` binds a root to a buffer and starts writing updates there. Both paths run the same layout and paint, so a tree renders the same way whether or not it is mounted.
 
+```elisp :figure From View to Ebox tree to buffer lines
+(etaf-view
+ (column :width '(ch 44) :item-gap '(lh 0)
+   (box :padding '((lh 1) (ch 2)) :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+        (text :color (etaf-theme-token :ui-accent "#0969da") "View：描述"))
+   (box :padding '((lh 1) (ch 2)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+        (text :color (etaf-theme-token :ui-panel-fg "#1f2328") "→ Ebox：保留节点树、几何与计算样式"))
+   (box :padding '((lh 1) (ch 2)) :background-color (etaf-theme-token :ui-disabled-bg "#e5e7eb")
+        (text :color (etaf-theme-token :ui-disabled-fg "#687386") "→ buffer：行、文本属性与 display 对象"))))
+```
+
 ## Coordinates: lines and pixels
 
 <!-- index: coordinate system; border box; line height; pixel width; length unit -->

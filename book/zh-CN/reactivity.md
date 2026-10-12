@@ -79,6 +79,17 @@
 
 每做完一步都从第 1 步重新开始，所以 post 侦听器写了 ref，会引出新一轮 pre、render 和提交。图稳定后，运行 `etaf-next-tick` 排队的函数。
 
+```elisp :figure ref 喂给 computed，再喂给 effect
+(etaf-view
+ (row :item-gap '(ch 2)
+   (box :padding '((lh 1) (ch 2)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa") (text "ref"))
+   (text :color (etaf-theme-token :ui-muted-fg "#526174") "→")
+   (box :padding '((lh 1) (ch 2)) :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+        (text :color (etaf-theme-token :ui-accent "#0969da") "computed"))
+   (text :color (etaf-theme-token :ui-muted-fg "#526174") "→")
+   (box :padding '((lh 1) (ch 2)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa") (text "effect"))))
+```
+
 ## Ref
 
 ref 是可写的*浅*响应式单元。用 `etaf-value` 读取会被追踪；用 `etaf-set-value`、`setf` 或 `etaf-update-value` 写入时，新值与旧值不同才通知观察者。

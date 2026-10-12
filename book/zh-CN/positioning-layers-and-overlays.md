@@ -54,6 +54,17 @@ z-index 只在单个宿主的列表内比较。不同宿主的浮层由合成与
 
 **示例。** 两个重叠的 4 像素浮层，z 分别 0 和 1 时结果为 `BBBB`，交换取值为 `AAAA`；两者都为 0 时仍是后出现的获胜。z 5 的流子节点对上 z 0 的浮层会画出 `RRRR`，但 z 5 的相对子节点遇到 z 10 的浮层就盖不住它。
 
+```elisp :figure 浮层拼进宿主的行，布局不变
+(etaf-view
+ (column :width '(ch 40) :item-gap '(lh 0)
+   (box :padding '((lh 1) (ch 2)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+        (text :color (etaf-theme-token :ui-panel-fg "#1f2328") "宿主行"))
+   (box :padding '((lh 1) (ch 2)) :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+        (text :color (etaf-theme-token :ui-accent "#0969da") "浮层拼进这一行，布局不动"))
+   (box :padding '((lh 1) (ch 2)) :background-color (etaf-theme-token :ui-disabled-bg "#e5e7eb")
+        (text :color (etaf-theme-token :ui-disabled-fg "#687386") "宿主的其余行不受影响"))))
+```
+
 ## 浮层如何拼进下面的行
 
 <!-- index: 浮层合成; 行拼接; 边框装饰; 根坐标 -->

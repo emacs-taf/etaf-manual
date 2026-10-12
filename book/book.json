@@ -218,7 +218,8 @@
         "zh-CN": "框架内部与扩展"
       },
       "chapters": [
-        "module-map"
+        "module-map",
+        "update-trace"
       ]
     }
   ],

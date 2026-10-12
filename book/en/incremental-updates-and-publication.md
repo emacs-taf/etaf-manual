@@ -250,7 +250,7 @@ Call OBSERVER with the buffer and a report plist after each flush.
 
 Return a copy of the report of BUFFER-OR-NAME's latest flush, or nil.
 
-**Semantics.** This is the same report the observer receives, kept on the mount so an application can ask after the fact instead of observing every flush. The value is a fresh copy each call.
+**Semantics.** The mount keeps its latest report, so an application can ask after the fact instead of observing every flush. The report describes the same flush an observer would have received; `:duration-ms` is present when that flush was timed through an observer, while a flush run without one stores only its raw line ranges and the reader materializes the report without timing. The value is a fresh copy each call.
 
 **Returns.** The report plist, or nil before the first flush.
 

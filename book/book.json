@@ -204,7 +204,8 @@
         "ekp-cjk",
         "ekp-hyphenation",
         "ekp-interactive-use",
-        "ekp-programming-interface"
+        "ekp-programming-interface",
+        "ekp-parameters"
       ]
     }
   ],

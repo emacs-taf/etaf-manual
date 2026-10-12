@@ -2,7 +2,7 @@
 
 EKP lays out a paragraph by choosing all of its line breaks at once. It follows the Knuth–Plass model: the paragraph is a sequence of boxes joined by glue, every legal break point carries a penalty, and an arrangement of lines is judged by the sum of its line costs. Because the choice is made for the whole paragraph, a break that fills one line well but forces an ugly next line loses to an arrangement that is even overall; filling lines greedily cannot take an earlier decision back, and the paragraph-wide search can.
 
-This chapter explains that model as EKP implements it. It defines how text becomes boxes and glue, how a single line is scored with badness, fitness and demerits, what looseness changes, and how the two-pass emergency strategy keeps every input layout-able. Its own interfaces are the explicit spacing parameters below; the individual numbers and policies it names are all user options, collected in the Parameter Reference chapter. The string form of the result and the structural plan behind it are the [Programming Interface](ekp-programming-interface.md) chapter.
+This chapter explains that model as EKP implements it. It defines how text becomes boxes and glue, how a single line is scored with badness, fitness and demerits, what looseness changes, and how the two-pass emergency strategy keeps every input layout-able. Its own interfaces are the explicit spacing parameters below; the individual numbers and policies it names are all user options, collected in the [Parameter Reference](ekp-parameters.md) chapter. The string form of the result and the structural plan behind it are the [Programming Interface](ekp-programming-interface.md) chapter.
 
 ## Model
 

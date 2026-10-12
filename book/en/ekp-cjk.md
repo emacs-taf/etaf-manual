@@ -2,7 +2,7 @@
 
 CJK text differs from Latin text for a line breaker in one basic way: there are no spaces to break at. Any two CJK characters are potential break points, so the interesting work is not finding where a line may break but removing the places where it must not. That is the kinsoku side of the model, and it comes with two companions: what a fullwidth punctuation mark may do at a line edge, where Emacs cannot shrink a glyph, and how a compact number-and-unit token such as `512MB` is kept together.
 
-This chapter describes those three mechanisms as EKP implements them. The break-permission model behind the first one is [Line-Breaking Principles](ekp-principles.md); every option these mechanisms use is a user option collected in the Parameter Reference chapter.
+This chapter describes those three mechanisms as EKP implements them. The break-permission model behind the first one is [Line-Breaking Principles](ekp-principles.md); every option these mechanisms use is a user option collected in the [Parameter Reference](ekp-parameters.md) chapter.
 
 ## Kinsoku
 

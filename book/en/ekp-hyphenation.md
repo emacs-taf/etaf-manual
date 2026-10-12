@@ -2,7 +2,7 @@
 
 A long word can be broken at more places than its spaces allow, and a language can name those places. EKP performs discretionary hyphenation: it finds the legal break positions inside a Latin word with Liang's pattern algorithm and lets the line breaker choose one, showing a hyphen at the break. The result is a softer paragraph — more candidate layouts, fewer stretched lines — at the cost of a hyphen and the linguistic risk of a bad break, which is why the feature is a policy with an off switch rather than an always-on rule.
 
-This chapter defines the hyphenation interface: the function that resolves a language or a dictionary file into a hyphenator, the conditions it can signal, and the language and dictionary handling behind both. The demerits that a hyphenated break pays are part of [Line-Breaking Principles](ekp-principles.md), the hanging hyphen is part of [CJK Typesetting](ekp-cjk.md), and the options that enable hyphenation and pick the language are user options collected in the Parameter Reference chapter.
+This chapter defines the hyphenation interface: the function that resolves a language or a dictionary file into a hyphenator, the conditions it can signal, and the language and dictionary handling behind both. The demerits that a hyphenated break pays are part of [Line-Breaking Principles](ekp-principles.md), the hanging hyphen is part of [CJK Typesetting](ekp-cjk.md), and the options that enable hyphenation and pick the language are user options collected in the [Parameter Reference](ekp-parameters.md) chapter.
 
 ## Model
 
@@ -81,7 +81,7 @@ Dictionary uses unsupported replacement patterns.
 
 ## Language and dictionaries
 
-The language used by the formatter is `ekp-latin-lang`, a code such as `"en_US"` or `"de"`; `ekp-hyphenation` selects the policy, with `auto` (the default) and `on` enabling hyphenation when a dictionary is available, and `off` disabling it without consulting any dictionary. A region that carries the `hyphenate` break policy turns hyphenation on for that region alone. These options are documented in the Parameter Reference chapter; what belongs here is how a code becomes a dictionary and what happens when it cannot.
+The language used by the formatter is `ekp-latin-lang`, a code such as `"en_US"` or `"de"`; `ekp-hyphenation` selects the policy, with `auto` (the default) and `on` enabling hyphenation when a dictionary is available, and `off` disabling it without consulting any dictionary. A region that carries the `hyphenate` break policy turns hyphenation on for that region alone. These options are documented in [Parameter Reference](ekp-parameters.md); what belongs here is how a code becomes a dictionary and what happens when it cannot.
 
 The package ships 49 dictionaries under `dictionaries/`, compiled from a pinned revision of the LibreOffice dictionary collection. Each file's upstream path, SHA-256, license evidence and count of replacement patterns are recorded in `dictionaries/MANIFEST.tsv`, and an offline gate verifies the inventory. The directory is scanned when the package loads; if it is absent, loading only warns once and hyphenation stays disabled.
 

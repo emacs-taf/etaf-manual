@@ -2,7 +2,7 @@
 
 EKP can be used without a buffer. The string interface takes text as a value, returns justified text as a value, and never touches the current buffer or a window: applications embed it to typeset a paragraph they are about to display, and other packages call it to prepare text for their own renderer. This chapter defines that boundary: the two justifying calls, the semantic plan behind them, and the cache control that goes with them.
 
-The layout model is [Line-Breaking Principles](ekp-principles.md), and the buffer commands that project the same plans onto editing buffers are [Interactive Use](ekp-interactive-use.md). The options that steer width selection, hyphenation, kinsoku and the overlong-token policy are user options collected in the Parameter Reference chapter; this chapter names them where a function's result depends on them.
+The layout model is [Line-Breaking Principles](ekp-principles.md), and the buffer commands that project the same plans onto editing buffers are [Interactive Use](ekp-interactive-use.md). The options that steer width selection, hyphenation, kinsoku and the overlong-token policy are user options collected in the [Parameter Reference](ekp-parameters.md) chapter; this chapter names them where a function's result depends on them.
 
 ## The string boundary
 

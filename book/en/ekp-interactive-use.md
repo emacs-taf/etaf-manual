@@ -2,7 +2,7 @@
 
 The string interface lays out text it owns; the buffer commands in this chapter lay out text the user owns. Justification is a projection: EKP computes a plan for a hard paragraph and installs it as display properties on the existing characters. The character sequence never changes, so saving, searching, syntax highlighting and ordinary Lisp see the logical text, while the window shows justified lines. Removing the projection restores the buffer's plain appearance, and nothing that was only a layout decision can reach the file.
 
-This chapter defines the interactive layer: the justify and unjustify commands, the automatic mode with its editing transaction, the session-local protection regions, the Org and Markdown setups, and the layout diagnostic. The line-breaking model is [Line-Breaking Principles](ekp-principles.md), the prohibition and edge rules are [CJK Typesetting](ekp-cjk.md), and hyphenation is [Hyphenation](ekp-hyphenation.md). Every width, tolerance and policy named here is a user option collected in the Parameter Reference chapter.
+This chapter defines the interactive layer: the justify and unjustify commands, the automatic mode with its editing transaction, the session-local protection regions, the Org and Markdown setups, and the layout diagnostic. The line-breaking model is [Line-Breaking Principles](ekp-principles.md), the prohibition and edge rules are [CJK Typesetting](ekp-cjk.md), and hyphenation is [Hyphenation](ekp-hyphenation.md). Every width, tolerance and policy named here is a user option collected in the [Parameter Reference](ekp-parameters.md) chapter.
 
 ## The projection model
 

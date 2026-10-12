@@ -1,6 +1,6 @@
 # Subjects and Adapters
 
-A selector matches a *subject*: a node with a type, an ID, classes, attributes, states and a position in a tree. [Selectors](selectors.md) defines the language that reads those facts; this chapter defines the objects that carry them. There are two ways to supply a subject. A simple caller builds subjects with `ecss-subject-create` and links them with `ecss-subject-set-children`; a host that already has its own node type adapts it with `ecss-subject-adapter-create`, so the tree stays the host's and ECSS reads it through seven callbacks. Every selector query and the stylesheet interface accept either form: a built-in subject on its own, or a host node together with its adapter.
+A selector matches a *subject*: a node with a type, an ID, classes, attributes, states and a position in a tree. [Selectors](selectors.md) defines the language that reads those facts; this chapter defines the objects that carry them. There are two ways to supply a subject. A simple caller builds subjects with `ecss-subject-create` and links them with `ecss-subject-set-children`; a host that already has its own node type adapts it with `ecss-subject-adapter-create`, so the tree stays the host's and ECSS reads it through seven callbacks. Every selector query and the [stylesheet interface](ecss-stylesheets-and-scopes.md) accept either form: a built-in subject on its own, or a host node together with its adapter.
 
 ## Model
 

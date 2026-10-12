@@ -1,6 +1,6 @@
 # 主体与适配器
 
-选择器匹配的是*主体*（subject）：一个带类型、ID、类、属性、状态与树中位置的节点。[选择器](selectors.md)定义读取这些事实的语言；本章定义承载它们的对象。提供主体有两种方式。简单调用方用 `ecss-subject-create` 建立主体、用 `ecss-subject-set-children` 连接它们；已经拥有自己节点类型的宿主用 `ecss-subject-adapter-create` 做适配，树仍归宿主所有，ECSS 通过七个回调读取它。每个选择器查询与样式表接口都接受这两种形式：要么一个内建主体，要么一个宿主节点加它的适配器。
+选择器匹配的是*主体*（subject）：一个带类型、ID、类、属性、状态与树中位置的节点。[选择器](selectors.md)定义读取这些事实的语言；本章定义承载它们的对象。提供主体有两种方式。简单调用方用 `ecss-subject-create` 建立主体、用 `ecss-subject-set-children` 连接它们；已经拥有自己节点类型的宿主用 `ecss-subject-adapter-create` 做适配，树仍归宿主所有，ECSS 通过七个回调读取它。每个选择器查询与[样式表接口](ecss-stylesheets-and-scopes.md)都接受这两种形式：要么一个内建主体，要么一个宿主节点加它的适配器。
 
 ## 模型
 

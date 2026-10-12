@@ -184,7 +184,8 @@
       },
       "chapters": [
         "ecss-schema-packages",
-        "ecss-subjects-and-adapters"
+        "ecss-subjects-and-adapters",
+        "ecss-stylesheets-and-scopes"
       ]
     }
   ],

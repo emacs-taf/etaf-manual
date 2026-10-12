@@ -188,7 +188,7 @@ Return whether VALUE carries ECSS importance, CSS-wide or variable semantics and
 
 <!-- index: custom property; variable reference; var -->
 
-A *custom property* is a named value that other declarations can reference. Custom properties have no schema: their names are symbols whose name begins with `--`, and their values are ordinary data that the cascade carries at the computed level. A property declares one as it would any property, and another declaration reads it with a *variable reference* created by `ecss-var`. A reference resolves against the computed custom properties of the same subject, so a custom property can be set on an ancestor and read by a descendant; when the name is missing and no fallback is given, the referencing property falls back to its inherited or initial value. A fallback may itself be a variable reference, and a reference cycle is recorded as a diagnostic while the property falls back to its initial value. Custom properties are visible on a computed style through the custom-property list and the custom-property accessors of the computed style interface.
+A *custom property* is a named value that other declarations can reference. Custom properties have no schema: their names are symbols whose name begins with `--`, and their values are ordinary data that the cascade carries at the computed level. A property declares one as it would any property, and another declaration reads it with a *variable reference* created by `ecss-var`. A reference resolves against the computed custom properties of the same subject, so a custom property can be set on an ancestor and read by a descendant; when the name is missing and no fallback is given, the referencing property falls back to its inherited or initial value. A fallback may itself be a variable reference, and a reference cycle is recorded as a diagnostic while the property falls back to its initial value. Custom properties are visible on a computed style through the custom-property list and accessors defined in [Computed Style](ecss-computed-style.md).
 
 #### Function: ecss-var (name &rest fallback)
 
@@ -213,7 +213,7 @@ Return a custom property reference to NAME with optional FALLBACK.
      ⇒ "teal"
 ```
 
-**See also.** The computed style interface chapter of the ECSS part.
+**See also.** [Computed Style](ecss-computed-style.md).
 
 ## Importance
 
@@ -246,4 +246,4 @@ Return VALUE tagged as an important declaration.
 
 A declared value becomes a computed value in one deterministic path. The cascade first selects one winning declaration per longhand from the inline declarations, the stylesheet rules and the inherited defaults; the winner's value is then resolved — CSS-wide keywords choose between the inherited and initial value, variable references read the custom property set, importance has already decided the winner's rank — and the schema's normalizer and validator produce the canonical computed value that Ebox projects into paint and geometry.
 
-When the winning value is invalid, the cascade does not hand the property to the next candidate. The schema's inherited or initial value is used instead, and the invalid winner is recorded so that the outcome stays deterministic and diagnosable: the property has no computed declaration, yet re-running the cascade can never select a different winner. A style's provenance tells which declaration won and why — its origin, importance, layer, specificity, scope distance, source and declaration order, and whether it validated — and the per-property fact gives the winner with its computed value. The computed style interface chapter of the ECSS part defines those queries; [The cascade order](style-system.md#the-cascade-order) defines the comparison that produces the winner.
+When the winning value is invalid, the cascade does not hand the property to the next candidate. The schema's inherited or initial value is used instead, and the invalid winner is recorded so that the outcome stays deterministic and diagnosable: the property has no computed declaration, yet re-running the cascade can never select a different winner. A style's provenance tells which declaration won and why — its origin, importance, layer, specificity, scope distance, source and declaration order, and whether it validated — and the per-property fact gives the winner with its computed value. [Computed Style](ecss-computed-style.md) defines those queries; [The cascade order](style-system.md#the-cascade-order) defines the comparison that produces the winner.

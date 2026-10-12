@@ -258,6 +258,18 @@
 
 **参见。** `ebox-buffer-set-observer`。
 
+#### Function: etaf-runtime-update-report (&optional runtime)
+
+返回已挂载 RUNTIME 最近一次缓冲区更新报告，或 nil。
+
+**语义。** plist 就是引擎为最近一次提交生成的 flush 报告，与 `ebox-buffer-update-report` 为 Runtime 缓冲区返回的报告相同：策略、改动范围数、行数、范围与 flush 计数。应用读它来观察一次保留更新重写了变化的行、而不是整个缓冲区。
+
+**返回。** 报告 plist；首次 flush 之前为 nil。
+
+**错误。** 未挂载的 Runtime 报 `etaf-runtime-error`。
+
+**参见。** `ebox-buffer-update-report`、`etaf-runtime-revision`。
+
 #### Error: etaf-observer-error
 
 Invalid ETAF observer operation。当观察者上下文状态以非法值构造或使用时抛出，例如不是函数的 sink、不是整数的身份。用 `condition-case` 捕获这个条件；失败的调用不返回值。它的父条件是 `error`，数据是描述违规的符号列表。

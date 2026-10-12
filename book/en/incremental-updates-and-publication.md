@@ -258,6 +258,18 @@ Return a copy of the report of BUFFER-OR-NAME's latest flush, or nil.
 
 **See also.** `ebox-buffer-set-observer`.
 
+#### Function: etaf-runtime-update-report (&optional runtime)
+
+Return the last buffer update report of mounted RUNTIME, or nil.
+
+**Semantics.** The plist is the engine's flush report for the last commit, the same report `ebox-buffer-update-report` returns for the Runtime's buffer: its strategy, edited range count, line count, ranges and flush counter. Applications read it to observe that a retained update rewrote changed rows instead of the whole buffer.
+
+**Returns.** The report plist, or nil before the first flush.
+
+**Errors.** A non-mounted Runtime signals `etaf-runtime-error`.
+
+**See also.** `ebox-buffer-update-report`, `etaf-runtime-revision`.
+
 #### Error: etaf-observer-error
 
 Invalid ETAF observer operation. It is signaled when observer context state is constructed or used with an invalid value, such as a sink that is not a function or an identity that is not an integer. Catch this condition with `condition-case`; failed calls do not return a value. Its parent condition is `error`, and its data is a list of symbols describing the violation.

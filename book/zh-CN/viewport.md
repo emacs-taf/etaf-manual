@@ -150,6 +150,17 @@ refit 是一次操作、一个结果：测量视口，与已提交值不同时�
 
 **参见。** `ebox-viewport-width`、`ebox-mount-set-viewport`。
 
+```elisp :figure 视口单位跟着挂载走：两个盒子分别占 25 vw 与 50 vw
+(etaf-view
+ (column :width '(ch 40) :item-gap '(lh 0)
+   (box :width '(vw 25) :padding '((lh 0) (ch 1))
+        :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+     (text :color (etaf-theme-token :ui-accent "#0969da") "25 vw"))
+   (box :width '(vw 50) :padding '((lh 0) (ch 1))
+        :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+     (text :color (etaf-theme-token :ui-panel-fg "#1f2328") "50 vw"))))
+```
+
 ## 视口区域
 
 <!-- index: 视口区域; 嵌套视口; 窗格 -->

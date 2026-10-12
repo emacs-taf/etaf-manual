@@ -12,6 +12,13 @@
 
 一个位置可以被多个滚动容器包住。可滚动祖先按由内到外组成的链，就是滚轮或滚动命令在剩余距离交给窗口之前要走过的路径。
 
+```elisp :figure 滚动容器保持声明的高度：显示三行，第四行留在下面
+(etaf-view
+ (box :width '(ch 26) :height '(lh 3) :overflow 'scroll
+      :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+   (column (text "1 first") (text "2 second") (text "3 third") (text "4 fourth"))))
+```
+
 ## 读写偏移
 
 <!-- index: 滚动偏移; 夹取; 滚动回调 -->

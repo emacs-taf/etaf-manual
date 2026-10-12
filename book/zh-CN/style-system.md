@@ -35,6 +35,19 @@ ETAF 先问 Ebox 的 schema，一个关键字是不是样式属性，从而把�
 
 读规则文件从不求值里面的值。`ecss-file-read` 读文件，`ecss-read-rules` 和 `ecss-validate-rules` 接受内存里的同一份列表。`.ebox` 文件可以加载同名的 `.ecss` 同伴，或在表达式里指定一个；工具也可以用 `etaf-component-set-styles` 把文件里的规则装成某个 Component 的样式。[规则文件](ecss-rule-files.md)一章定义文件契约，[组件样式与主题](component-styles-and-themes.md)定义替换接口。
 
+```elisp :figure 同一条声明，写成组件样式规则或行内属性
+(etaf-define-component demo-badge ()
+  :view (box (text "Draft"))
+  :styles (("&" :color "#B45309"
+            :background-color "#fef3c7"
+            :padding ((lh 0) (ch 1)))))
+
+(etaf-view
+ (row :item-gap '(ch 1) :cross-align 'center
+   (demo-badge)
+   (box :color "#334155" (text "Plain text"))))
+```
+
 ## 所有权
 
 <!-- index: 样式所有权; 属性 schema -->

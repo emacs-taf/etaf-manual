@@ -150,6 +150,17 @@ Viewport height in lines for rendering outside a mount, or nil.
 
 **See also.** `ebox-viewport-width`, `ebox-mount-set-viewport`.
 
+```elisp :figure Viewport units follow the mount: boxes at 25 vw and 50 vw
+(etaf-view
+ (column :width '(ch 40) :item-gap '(lh 0)
+   (box :width '(vw 25) :padding '((lh 0) (ch 1))
+        :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+     (text :color (etaf-theme-token :ui-accent "#0969da") "25 vw"))
+   (box :width '(vw 50) :padding '((lh 0) (ch 1))
+        :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+     (text :color (etaf-theme-token :ui-panel-fg "#1f2328") "50 vw"))))
+```
+
 ## Viewport regions
 
 <!-- index: viewport region; nested viewport; pane -->

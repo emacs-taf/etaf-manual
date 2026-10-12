@@ -12,6 +12,13 @@ Scrolling never relayouts. Setting an offset updates the node's scroll value, re
 
 Several scrollers can enclose one point. The chain of scrollable ancestors, innermost first, is what a wheel or a scroll command walks before any remaining distance reaches the window.
 
+```elisp :figure A scroll container keeps its declared height: three lines show and the fourth waits below
+(etaf-view
+ (box :width '(ch 26) :height '(lh 3) :overflow 'scroll
+      :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+   (column (text "1 first") (text "2 second") (text "3 third") (text "4 fourth"))))
+```
+
 ## Reading and writing the offset
 
 <!-- index: scroll offset; clamping; scroll callback -->

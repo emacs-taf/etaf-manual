@@ -29,7 +29,8 @@
     "tokens",
     "ebox",
     "ecss",
-    "ekp"
+    "ekp",
+    "etaf"
   ],
   "parts": [
     {
@@ -222,7 +223,8 @@
         "update-trace",
         "core-records",
         "invariants",
-        "extending-the-framework"
+        "extending-the-framework",
+        "performance-engineering"
       ]
     }
   ],

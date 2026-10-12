@@ -67,6 +67,87 @@
 ;; previous Runtime was unmounted.  Read and evaluation failures signal
 ;; `etaf-manual-error' with the example identifier and the original error.
 ;;
+;; Function: etaf-manual-open (&optional chapter)
+;;;###autoload (autoload 'etaf-manual-open "etaf-manual" nil t)
+;; Open the manual reader in its own buffer and return that buffer.
+;; CHAPTER names a chapter identifier to start from, defaulting to the first
+;; chapter.  The buffer gets `etaf-manual-reader-mode': `n' and `p' move
+;; between sections, `u' goes up one level, `l' and `r' walk the reading
+;; history, `[' and `]' change chapter, `g' switches between Chinese and
+;; English, `i' opens the index, `t' switches the palette and `q' closes the
+;; reader.  Tabs, arrows, RET, M-g and ? keep the framework behaviours, so
+;; controls inside runnable examples stay focusable and operable; activating
+;; the run control of an example renders the real ETAF View in place.
+;;
+;; Function: etaf-manual-close ()
+;;;###autoload (autoload 'etaf-manual-close "etaf-manual" nil t)
+;; Unmount and kill the manual reader buffer shown in the current buffer.
+;;
+;; Function: etaf-manual-lookup (symbol &optional kind)
+;;;###autoload (autoload 'etaf-manual-lookup "etaf-manual" nil t)
+;; Open the manual at the definition entry of SYMBOL.
+;; KIND restricts the entry to one definition kind; without it the first
+;; entry in reading order is used.  An open reader buffer is reused instead
+;; of opening a second one.  A symbol without an entry signals a
+;; `user-error'.
+;;
+;; Function: etaf-manual-reader-create (&key language theme chapter)
+;; Create a headless manual reader session and return it.
+;; LANGUAGE defaults to `etaf-manual-language', THEME to the frame's own
+;; background mode, and CHAPTER to the manual's first chapter.  The session
+;; owns no buffer, so scripts and tests drive the same model the mounted
+;; application uses.  The navigation and display functions below take such a
+;; session as their first argument.
+;;
+;; Function: etaf-manual-reader-state (session)
+;; Return a detached snapshot of SESSION's reading state.
+;; Keys are `:language', `:theme', `:chapter', `:chapter-title', `:part',
+;; `:node' (the zero-based section index, or nil at the chapter top),
+;; `:node-title', `:nodes' (section titles in order), `:position' (zero-based
+;; chapter index), `:chapters' (chapter count), `:can-back' and
+;; `:can-forward'.  The snapshot copies every value, so mutating it never
+;; changes the session.
+;;
+;; Function: etaf-manual-reader-toc (session)
+;; Return SESSION's navigation outline as a list of part plists.
+;; Each part has `:number', `:title' and `:chapters'; each chapter has `:id',
+;; `:number', `:title', `:kind', `:current' and, for the current chapter,
+;; `:nodes' with `:title', `:level', `:anchor', `:index' and `:current'.
+;; The shape is data only; the mounted reader renders it as the navigation
+;; column.
+;;
+;; Function: etaf-manual-reader-goto (session chapter &optional node)
+;; Move SESSION to CHAPTER and NODE, recording the previous position.
+;; NODE is a zero-based index into the chapter's section nodes, or nil for
+;; the chapter top.
+;;
+;; Function: etaf-manual-reader-next (session)
+;; Move SESSION to the next section, rolling into the next chapter.
+;;
+;; Function: etaf-manual-reader-previous (session)
+;; Move SESSION to the previous section, rolling into the previous chapter.
+;;
+;; Function: etaf-manual-reader-up (session)
+;; Move SESSION one level up: a level-3 section to its level-2 parent, and a
+;; level-2 section to the chapter top.
+;;
+;; Function: etaf-manual-reader-back (session)
+;; Return SESSION to the previous reading position.
+;;
+;; Function: etaf-manual-reader-forward (session)
+;; Move SESSION to the next reading position.
+;;
+;; Function: etaf-manual-reader-set-language (session language)
+;; Read SESSION in LANGUAGE, keeping the chapter and the nearest section.
+;;
+;; Function: etaf-manual-reader-toggle-theme (session)
+;; Switch SESSION between the light and dark palettes; return the new one.
+;;
+;; Function: etaf-manual-reader-view (session)
+;; Return the application View of SESSION.
+;; Use it to embed the reader in your own `etaf-mount' call; prefer
+;; `etaf-manual-open' to also get a buffer, a keymap and window metrics.
+;;
 ;; Error: etaf-manual-error
 ;; ETAF manual error
 ;; Signaled for malformed book sources and failing runnable examples.
@@ -128,6 +209,8 @@
                (setq value (eval (car form) t)))
              value)))
       (error (signal 'etaf-manual-error (list "Runnable example failed" id error))))))
+
+(require 'etaf-manual-reader)
 
 (provide 'etaf-manual)
 ;;; etaf-manual.el ends here

@@ -45,6 +45,61 @@
       "name": "etaf-manual-generated-content-covers-the-book",
       "file": "tests/etaf-manual-tests.el",
       "purpose": "Every generated appendix and index carries content and links each interface or index term it promises."
+    },
+    {
+      "name": "etaf-manual-reader-create-reports-state",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "A new session reads the first chapter and exposes its outline."
+    },
+    {
+      "name": "etaf-manual-reader-navigation-walks-sections-and-chapters",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "Next and previous move through sections and roll into other chapters."
+    },
+    {
+      "name": "etaf-manual-reader-up-follows-levels",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "Up moves a level-3 section to its level-2 parent and then to the top."
+    },
+    {
+      "name": "etaf-manual-reader-history-walks-both-ways",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "Back and forward move through the reading history."
+    },
+    {
+      "name": "etaf-manual-reader-language-switch-keeps-position",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "Switching language keeps the chapter and reads the other translation."
+    },
+    {
+      "name": "etaf-manual-reader-toggle-theme-switches-palette",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "Toggling the theme flips between the dark and light palettes."
+    },
+    {
+      "name": "etaf-manual-reader-toc-marks-the-current-chapter",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "The outline names the parts, chapters and current sections."
+    },
+    {
+      "name": "etaf-manual-reader-view-renders-chapter-and-example",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "The mounted reader shows the article, chrome and a runnable example."
+    },
+    {
+      "name": "etaf-manual-reader-example-runs-and-stops-in-place",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "The run control renders the real View; stop clears it again."
+    },
+    {
+      "name": "etaf-manual-reader-example-modes-switch",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "Source, preview and side-by-side modes switch per example."
+    },
+    {
+      "name": "etaf-manual-reader-shows-definition-cards",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "A chapter with definition entries renders their cards."
     }
   ]
 }

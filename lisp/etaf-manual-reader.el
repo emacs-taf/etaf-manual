@@ -1,0 +1,318 @@
+;;; etaf-manual-reader.el --- The ETAF manual reader application -*- lexical-binding: t; -*-
+
+;; SPDX-License-Identifier: GPL-3.0-or-later
+
+;;; Commentary:
+;;
+;; The application entry of the manual reader: the mounted Component, the
+;; buffer and keymap, and the commands that drive `etaf-manual-reader-model'.
+;; A reader session is a headless value; this module gives it a buffer and
+;; the interactive commands, and `etaf-manual-lookup' opens the manual at a
+;; symbol's definition entry from anywhere in Emacs.
+;;
+;; Public entry points are recorded in the `etaf-manual' Commentary.
+
+;;; Code:
+
+(require 'cl-lib)
+(require 'subr-x)
+(require 'etaf)
+(require 'etaf-ui)
+(require 'etaf-manual-reader-model)
+(require 'etaf-manual-reader-style)
+(require 'etaf-manual-reader-views)
+
+(declare-function etaf-manual-book "etaf-manual" (&optional language))
+(declare-function etaf-manual-definition "etaf-manual" (name &optional kind language))
+
+(defvar-local etaf-manual-reader--session nil
+  "Manual reader session shown by the current buffer's runtime.")
+
+;;;; Component
+
+(etaf-define-component etaf-manual-reader-app (&key session)
+  "Render the mounted manual reader for SESSION and own its lifecycle.
+SESSION must come from `etaf-manual-reader-create'.  Mounting provides the
+palette for its subtree; every displayed value is read from the session's
+reactive sources, so a chapter change, a language switch or a theme switch
+repaints the reader without a remount."
+  :bindings ((reader (or session
+                         (signal 'etaf-manual-error
+                                 '("etaf-manual-reader-app needs the :session from `etaf-manual-reader-create'"))))
+             (theme (etaf-manual-reader--ref reader :theme))
+             (tokens (etaf-computed
+                      (lambda ()
+                        (etaf-manual-reader-theme-tokens (etaf-value theme)))
+                      :name 'etaf-manual-reader-theme-tokens)))
+  :setup
+  (etaf-theme-provide tokens)
+  :render
+  ;; A headless mount (batch or a hidden buffer) reports a zero viewport, so
+  ;; only positive measurements are trusted; the renderer then keeps its
+  ;; wide layout and a default page height.
+  (let* ((viewport (etaf-viewport))
+         (columns (and viewport (numberp (car viewport)) (> (car viewport) 0)
+                       (max 20 (/ (car viewport) (max 1 (frame-char-width))))))
+         (rows (and viewport (numberp (cdr viewport)) (> (cdr viewport) 0)
+                    (cdr viewport))))
+    (etaf-manual-reader--shell reader (etaf-manual-reader--env reader columns rows))))
+
+(defun etaf-manual-reader-view (session)
+  "Return the application View of SESSION.
+Use it to embed the reader in your own `etaf-mount' call; prefer
+`etaf-manual-open' to also get a buffer, a keymap and window metrics."
+  (etaf-view (etaf-manual-reader-app :session session)))
+
+;;;; Buffer and commands
+
+(defun etaf-manual-reader--current ()
+  "Return the session of the current buffer."
+  (or etaf-manual-reader--session
+      (user-error "当前缓冲区不是 ETAF 手册阅读器")))
+
+(defun etaf-manual-reader--display (session name)
+  "Mount SESSION in the buffer NAME and return that buffer."
+  (let ((buffer (get-buffer-create name)))
+    (plist-put session :buffer buffer)
+    (with-current-buffer buffer
+      (etaf-manual-reader-mode)
+      (setq-local etaf-manual-reader--session session)
+      (setq-local truncate-lines t)
+      ;; The reader owns every column it paints; a sub-cell rounding
+      ;; remainder must not surface as Emacs's truncation glyph.
+      (setq-local buffer-display-table
+                  (let ((table (copy-sequence (or standard-display-table
+                                                  (make-display-table)))))
+                    (set-display-table-slot table 'truncation ?\s)
+                    table)))
+    ;; The reader is a whole-window application: replace the selected
+    ;; window instead of splitting it.
+    (pop-to-buffer buffer '(display-buffer-same-window))
+    (etaf-mount buffer (etaf-manual-reader-view session))
+    (etaf-runtime-flush (etaf-runtime-for-buffer buffer))
+    buffer))
+
+(defun etaf-manual-open (&optional chapter)
+  "Open the ETAF manual reader and return its buffer.
+CHAPTER names the starting chapter identifier; interactively the manual
+opens on its first chapter."
+  (interactive)
+  (etaf-manual-reader--display
+   (etaf-manual-reader-create :chapter chapter)
+   "*ETAF 手册*"))
+
+(defun etaf-manual-close ()
+  "Unmount and kill the current manual reader buffer."
+  (interactive)
+  (let ((session (etaf-manual-reader--current))
+        (buffer (current-buffer)))
+    (when-let* ((runtime (etaf-runtime-for-buffer buffer)))
+      (etaf-unmount runtime))
+    (plist-put session :buffer nil)
+    (when (buffer-live-p buffer)
+      (kill-buffer buffer))))
+
+(defun etaf-manual-reader--reusable-session ()
+  "Return an existing reader session, or nil."
+  (cl-loop for buffer in (buffer-list)
+           for session = (and (buffer-live-p buffer)
+                              (buffer-local-value 'etaf-manual-reader--session buffer))
+           when session return session))
+
+(defun etaf-manual-reader--definition-names (&optional language)
+  "Return the manual's definition entry names in LANGUAGE."
+  (let ((names nil)
+        (seen (make-hash-table :test #'eq)))
+    (dolist (chapter (plist-get (etaf-manual-book language) :chapters))
+      (dolist (definition (plist-get chapter :definitions))
+        (let ((name (plist-get definition :name)))
+          (unless (gethash name seen)
+            (puthash name t seen)
+            (push name names)))))
+    (nreverse names)))
+
+(defun etaf-manual-reader--index-targets (&optional language)
+  "Return the manual's index completion targets in LANGUAGE.
+Each entry is (LABEL . PLIST) where PLIST carries `:chapter' and either
+`:anchor' (a section anchor, from an index marker) or `:definition'."
+  (let ((targets nil)
+        (seen (make-hash-table :test #'equal)))
+    (dolist (chapter (plist-get (etaf-manual-book language) :chapters))
+      (dolist (entry (plist-get chapter :index))
+        (let ((label (plist-get entry :term)))
+          (unless (gethash (cons 'term label) seen)
+            (puthash (cons 'term label) t seen)
+            (push (cons (format "%s — %s" label (plist-get chapter :title))
+                        (list :chapter (plist-get chapter :id)
+                              :anchor (plist-get entry :anchor)))
+                  targets))))
+      (dolist (definition (plist-get chapter :definitions))
+        (let* ((name (plist-get definition :name))
+               (kind (plist-get definition :kind))
+               (key (cons 'definition name)))
+          (unless (gethash key seen)
+            (puthash key t seen)
+            (push (cons (format "%s — %s（%s）" name (plist-get chapter :title) kind)
+                        (list :chapter (plist-get chapter :id)
+                              :definition name))
+                  targets)))))
+    (nreverse targets)))
+
+(defun etaf-manual-lookup (symbol &optional kind)
+  "Open the manual at the definition entry of SYMBOL.
+KIND restricts the entry to one definition kind.  A symbol without an entry
+signals a `user-error'.  With an open reader the same buffer is reused."
+  (interactive
+   (list (intern (completing-read
+                  "符号: "
+                  (mapcar #'symbol-name (etaf-manual-reader--definition-names))
+                  nil t nil nil
+                  (let ((at (thing-at-point 'symbol t)))
+                    (and at (list at)))))
+         nil))
+  (let ((definition (etaf-manual-definition symbol kind)))
+    (unless definition
+      (user-error "手册里没有 %s 的定义" symbol))
+    (let* ((session (or (etaf-manual-reader--reusable-session)
+                        (etaf-manual-reader-create)))
+           (buffer (or (etaf-manual-reader--buffer session)
+                       (etaf-manual-reader--display session "*ETAF 手册*"))))
+      (etaf-manual-reader-goto session (plist-get definition :chapter))
+      (pop-to-buffer buffer)
+      (etaf-manual-reader-scroll-to-definition session symbol))))
+
+(defun etaf-manual-reader--buffer (session)
+  "Return SESSION's live buffer, or nil."
+  (when-let* ((buffer (plist-get session :buffer)))
+    (and (buffer-live-p buffer) buffer)))
+
+(defun etaf-manual-reader-index ()
+  "Choose an index term or a definition entry and jump to it."
+  (interactive)
+  (let* ((session (etaf-manual-reader--current))
+         (language (etaf-manual-reader--read session :language))
+         (targets (etaf-manual-reader--index-targets language))
+         (choice (completing-read "索引: " (mapcar #'car targets) nil t))
+         (target (cdr (assoc choice targets))))
+    (when target
+      (etaf-manual-reader-goto session (plist-get target :chapter))
+      (if-let* ((name (plist-get target :definition)))
+          (etaf-manual-reader-scroll-to-definition session name)
+        (etaf-manual-reader--goto-anchor session (or (plist-get target :anchor) ""))
+        (etaf-manual-reader--after-navigation session))
+      (etaf-manual-reader-message session (format "已跳转：%s" choice)))))
+
+;;;; Interactive commands
+
+(defun etaf-manual-reader--report (error)
+  "Report ERROR in the reader status area."
+  (etaf-manual-reader-message (etaf-manual-reader--current)
+                              (error-message-string error)))
+
+(defun etaf-manual-reader-next-command ()
+  "Move to the next section."
+  (interactive)
+  (let ((session (etaf-manual-reader--current)))
+    (condition-case error
+        (progn (etaf-manual-reader-next session)
+               (etaf-manual-reader--after-navigation session))
+      (user-error (etaf-manual-reader--report error)))))
+
+(defun etaf-manual-reader-previous-command ()
+  "Move to the previous section."
+  (interactive)
+  (let ((session (etaf-manual-reader--current)))
+    (condition-case error
+        (progn (etaf-manual-reader-previous session)
+               (etaf-manual-reader--after-navigation session))
+      (user-error (etaf-manual-reader--report error)))))
+
+(defun etaf-manual-reader-up-command ()
+  "Move one level up in the outline."
+  (interactive)
+  (let ((session (etaf-manual-reader--current)))
+    (condition-case error
+        (progn (etaf-manual-reader-up session)
+               (etaf-manual-reader--after-navigation session))
+      (user-error (etaf-manual-reader--report error)))))
+
+(defun etaf-manual-reader-back-command ()
+  "Return to the previous reading position."
+  (interactive)
+  (let ((session (etaf-manual-reader--current)))
+    (condition-case error
+        (progn (etaf-manual-reader-back session)
+               (etaf-manual-reader--after-navigation session))
+      (user-error (etaf-manual-reader--report error)))))
+
+(defun etaf-manual-reader-forward-command ()
+  "Move to the next reading position."
+  (interactive)
+  (let ((session (etaf-manual-reader--current)))
+    (condition-case error
+        (progn (etaf-manual-reader-forward session)
+               (etaf-manual-reader--after-navigation session))
+      (user-error (etaf-manual-reader--report error)))))
+
+(defun etaf-manual-reader-next-chapter-command ()
+  "Move to the next chapter."
+  (interactive)
+  (let ((session (etaf-manual-reader--current)))
+    (condition-case error
+        (progn (etaf-manual-reader-next-chapter session)
+               (etaf-manual-reader--after-navigation session))
+      (user-error (etaf-manual-reader--report error)))))
+
+(defun etaf-manual-reader-previous-chapter-command ()
+  "Move to the previous chapter."
+  (interactive)
+  (let ((session (etaf-manual-reader--current)))
+    (condition-case error
+        (progn (etaf-manual-reader-previous-chapter session)
+               (etaf-manual-reader--after-navigation session))
+      (user-error (etaf-manual-reader--report error)))))
+
+(defun etaf-manual-reader-switch-language-command ()
+  "Switch the reader between Chinese and English."
+  (interactive)
+  (let* ((session (etaf-manual-reader--current))
+         (language (etaf-manual-reader--read session :language)))
+    (etaf-manual-reader--switch-language
+     session (if (equal language "zh-CN") "en" "zh-CN"))
+    (etaf-manual-reader--after-navigation session)))
+
+(defun etaf-manual-reader-toggle-theme-command ()
+  "Switch the reader between the light and dark palettes."
+  (interactive)
+  (let ((session (etaf-manual-reader--current)))
+    (etaf-manual-reader-toggle-theme session)
+    (message "主题：%s" (if (eq (etaf-manual-reader--read session :theme) 'dark)
+                          "深色"
+                        "浅色"))))
+
+;;;; Mode
+
+(defvar etaf-manual-reader-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "n") #'etaf-manual-reader-next-command)
+    (define-key map (kbd "p") #'etaf-manual-reader-previous-command)
+    (define-key map (kbd "u") #'etaf-manual-reader-up-command)
+    (define-key map (kbd "l") #'etaf-manual-reader-back-command)
+    (define-key map (kbd "r") #'etaf-manual-reader-forward-command)
+    (define-key map (kbd "]") #'etaf-manual-reader-next-chapter-command)
+    (define-key map (kbd "[") #'etaf-manual-reader-previous-chapter-command)
+    (define-key map (kbd "g") #'etaf-manual-reader-switch-language-command)
+    (define-key map (kbd "i") #'etaf-manual-reader-index)
+    (define-key map (kbd "t") #'etaf-manual-reader-toggle-theme-command)
+    (define-key map (kbd "q") #'etaf-manual-close)
+    map)
+  "Keymap of a buffer opened by `etaf-manual-open'.
+The renderer keeps the framework keys (`TAB', `RET', arrows, `M-g', `?'),
+so focus movement, control activation and the key help stay available.")
+
+(define-derived-mode etaf-manual-reader-mode special-mode "ETAF手册"
+  "Major mode of an ETAF manual reader buffer.
+\\{etaf-manual-reader-mode-map}")
+
+(provide 'etaf-manual-reader)
+;;; etaf-manual-reader.el ends here

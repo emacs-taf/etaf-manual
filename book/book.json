@@ -252,6 +252,13 @@
         "en": "Standard Key Bindings",
         "zh-CN": "标准键位"
       }
+    },
+    {
+      "id": "user-options-and-variables",
+      "title": {
+        "en": "User Options and Variables",
+        "zh-CN": "用户选项与变量"
+      }
     }
   ],
   "indices": []

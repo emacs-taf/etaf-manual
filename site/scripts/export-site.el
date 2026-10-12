@@ -189,27 +189,19 @@ import { Icon } from '@astrojs/starlight/components';
   </figure>
   <figure>
     <a class='etaf-shot-link' href='/shots/etaf-weread.webp'><img src='/shots/etaf-weread.webp' alt='WeChat Reading client in Emacs' loading='lazy' class='etaf-shot' /></a>
-    <figcaption><a href='https://github.com/emacs-taf/etaf-weread'>etaf-weread</a>: shelf, notebook and reading statistics</figcaption>
+    <figcaption><a href='https://github.com/emacs-taf/etaf-weread'>etaf-weread</a>: the shelf and a book's progress, contents and notes</figcaption>
   </figure>
   <figure>
     <a class='etaf-shot-link' href='/shots/etaf-md-preview.webp'><img src='/shots/etaf-md-preview.webp' alt='Markdown reading view beside its source in Emacs' loading='lazy' class='etaf-shot' /></a>
     <figcaption><a href='https://github.com/emacs-taf/etaf-md-preview'>etaf-md-preview</a>: the source beside the rendered view</figcaption>
   </figure>
   <figure>
-    <a class='etaf-shot-link' href='/shots/etaf-pi.webp'><img src='/shots/etaf-pi.webp' alt='Pi agent client in Emacs' loading='lazy' class='etaf-shot' /></a>
-    <figcaption><a href='https://github.com/emacs-taf/etaf-pi'>etaf-pi</a>: a resumed session with tool output</figcaption>
-  </figure>
-  <figure>
     <a class='etaf-shot-link' href='/shots/etaf-telega.webp'><img src='/shots/etaf-telega.webp' alt='Telegram client in Emacs' loading='lazy' class='etaf-shot' /></a>
-    <figcaption><a href='https://github.com/emacs-taf/etaf-telega'>etaf-telega</a>: chats, groups and channels</figcaption>
+    <figcaption><a href='https://github.com/emacs-taf/etaf-telega'>etaf-telega</a>: chats beside a channel's live messages</figcaption>
   </figure>
   <figure>
     <a class='etaf-shot-link' href='/shots/etaf-desktop.webp'><img src='/shots/etaf-desktop.webp' alt='ETAF Desktop window manager' loading='lazy' class='etaf-shot' /></a>
     <figcaption><a href='https://github.com/emacs-taf/etaf-desktop'>etaf-desktop</a>: windows, workspaces and a launcher</figcaption>
-  </figure>
-  <figure>
-    <a class='etaf-shot-link' href='/shots/etaf-algo-lab.webp'><img src='/shots/etaf-algo-lab.webp' alt='Algorithm lab in Emacs' loading='lazy' class='etaf-shot' /></a>
-    <figcaption><a href='https://github.com/emacs-taf/etaf-algo-lab'>etaf-algo-lab</a>: watch, steer and compare algorithms</figcaption>
   </figure>
   <figure>
     <a class='etaf-shot-link' href='/shots/etaf-video-player.webp'><img src='/shots/etaf-video-player.webp' alt='Video player in Emacs' loading='lazy' class='etaf-shot' /></a>
@@ -302,27 +294,19 @@ import { Icon } from '@astrojs/starlight/components';
   </figure>
   <figure>
     <a class='etaf-shot-link' href='/shots/etaf-weread.webp'><img src='/shots/etaf-weread.webp' alt='Emacs 里的微信读书客户端' loading='lazy' class='etaf-shot' /></a>
-    <figcaption><a href='https://github.com/emacs-taf/etaf-weread'>etaf-weread</a>：书架、笔记本与阅读统计</figcaption>
+    <figcaption><a href='https://github.com/emacs-taf/etaf-weread'>etaf-weread</a>：书架，以及选中书的进度、目录与笔记</figcaption>
   </figure>
   <figure>
     <a class='etaf-shot-link' href='/shots/etaf-md-preview.webp'><img src='/shots/etaf-md-preview.webp' alt='Emacs 里并排显示 Markdown 原文与渲染' loading='lazy' class='etaf-shot' /></a>
     <figcaption><a href='https://github.com/emacs-taf/etaf-md-preview'>etaf-md-preview</a>：左边原文，右边渲染</figcaption>
   </figure>
   <figure>
-    <a class='etaf-shot-link' href='/shots/etaf-pi.webp'><img src='/shots/etaf-pi.webp' alt='Emacs 里的 Pi 代理客户端' loading='lazy' class='etaf-shot' /></a>
-    <figcaption><a href='https://github.com/emacs-taf/etaf-pi'>etaf-pi</a>：恢复的会话与工具输出</figcaption>
-  </figure>
-  <figure>
     <a class='etaf-shot-link' href='/shots/etaf-telega.webp'><img src='/shots/etaf-telega.webp' alt='Emacs 里的 Telegram 客户端' loading='lazy' class='etaf-shot' /></a>
-    <figcaption><a href='https://github.com/emacs-taf/etaf-telega'>etaf-telega</a>：会话、群组与频道</figcaption>
+    <figcaption><a href='https://github.com/emacs-taf/etaf-telega'>etaf-telega</a>：会话列表与频道的实时消息</figcaption>
   </figure>
   <figure>
     <a class='etaf-shot-link' href='/shots/etaf-desktop.webp'><img src='/shots/etaf-desktop.webp' alt='ETAF Desktop 窗口管理器' loading='lazy' class='etaf-shot' /></a>
     <figcaption><a href='https://github.com/emacs-taf/etaf-desktop'>etaf-desktop</a>：窗口、工作区与启动器</figcaption>
-  </figure>
-  <figure>
-    <a class='etaf-shot-link' href='/shots/etaf-algo-lab.webp'><img src='/shots/etaf-algo-lab.webp' alt='Emacs 里的算法实验室' loading='lazy' class='etaf-shot' /></a>
-    <figcaption><a href='https://github.com/emacs-taf/etaf-algo-lab'>etaf-algo-lab</a>：观看、操控并对比算法运行</figcaption>
   </figure>
   <figure>
     <a class='etaf-shot-link' href='/shots/etaf-video-player.webp'><img src='/shots/etaf-video-player.webp' alt='Emacs 里的视频播放器' loading='lazy' class='etaf-shot' /></a>

@@ -86,12 +86,17 @@ html[data-has-hero] .hero {
   position: relative;
 }
 
+html[data-has-hero] {
+  /* The hero wash below must never widen the document on narrow screens. */
+  overflow-x: clip;
+}
+
 html[data-has-hero] .hero::before {
   background:
     radial-gradient(55% 60% at 22% 12%, rgb(124 92 224 / 0.16), transparent 72%),
     radial-gradient(45% 55% at 82% 6%, rgb(56 148 255 / 0.12), transparent 72%);
   content: '';
-  inset: -6rem -30vw auto;
+  inset: -6rem 0 auto;
   height: 34rem;
   pointer-events: none;
   position: absolute;
@@ -161,6 +166,7 @@ html[data-has-hero] .hero .tagline {
 .etaf-features {
   display: grid;
   gap: 1rem;
+  grid-auto-rows: 1fr;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
   margin-block: 1.75rem 2.5rem;
 }
@@ -169,6 +175,7 @@ html[data-has-hero] .hero .tagline {
   background: var(--sl-color-bg-nav);
   border: 1px solid var(--sl-color-hairline);
   border-radius: 0.85rem;
+  height: 100%;
   padding: 1.05rem 1.15rem;
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
@@ -245,4 +252,24 @@ html[data-has-hero] .hero .tagline {
     border-radius: 0;
     max-height: 100vh;
   }
+}
+
+/* Nothing on the site scrolls sideways.  Starlight lets code blocks and
+   tables scroll horizontally; here they reflow instead, so a narrow window
+   never shows a sideways scrollbar (requested behaviour, tested at 390 and
+   360 CSS pixels). */
+.sl-markdown-content pre {
+  overflow-x: visible;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.sl-markdown-content table {
+  display: table;
+  overflow-x: visible;
+  width: 100%;
+}
+
+.sl-markdown-content table :is(th, td) {
+  overflow-wrap: anywhere;
 }

@@ -72,3 +72,7 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
 - The Introduction and the Reactivity chapter in English and Simplified Chinese.
 - The `etaf-manual` package: `etaf-manual-book`, `etaf-manual-definition`, `etaf-manual-example-view`, the `etaf-manual-language` option and the `etaf-manual-error` condition.
 - A gate that checks the book against the provider packages: signatures, public names, versions, links, coverage, translation structure and one line per paragraph. Runnable examples are mounted by the acceptance tests.
+
+### Changed
+
+- The "Testing and Validation" and "Development and Release" chapters are folded into "Extending the Framework" as "How a change is verified" and "How a change is delivered", and the chapter that referred to them links to the new location.

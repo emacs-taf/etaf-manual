@@ -175,6 +175,16 @@
         "ebox-files-and-preview",
         "ebox-errors"
       ]
+    },
+    {
+      "id": "standalone-ecss",
+      "title": {
+        "en": "ECSS as a General Library",
+        "zh-CN": "ECSS 作为通用库"
+      },
+      "chapters": [
+        "ecss-schema-packages"
+      ]
     }
   ],
   "appendices": [],

@@ -201,7 +201,8 @@
       },
       "chapters": [
         "ekp-principles",
-        "ekp-cjk"
+        "ekp-cjk",
+        "ekp-hyphenation"
       ]
     }
   ],

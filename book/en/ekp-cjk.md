@@ -44,7 +44,7 @@ The released amount is the ratio times the glyph's measured width, floored to wh
 
 The option and its ratios are part of the paragraph key, so toggling protrusion or editing a ratio re-resolves paragraphs; with protrusion off, nothing is released and every line respects the maximum width.
 
-**Example.** For six repetitions of `四字一句。` at 20 pixels, every line measures exactly 20 pixels with protrusion off. With the default ratios, every line measures 21 — the fullwidth `。` hangs one pixel of its two. Raising the `cjk-close` ratio to 1.0 makes them 22, and lowering it to 0 makes them 20 again. For a hyphenated break at 40 pixels, the line measures 41 with the default `hyphen` ratio of 1.0 and 40 with protrusion off.
+**Example.** For six repetitions of `四字一句。` at 20 pixels, every line measures exactly 20 pixels with protrusion off. With the default ratios, every line measures 21 — the fullwidth `。` hangs one pixel of its two. Raising the `cjk-close` ratio to 1.0 makes them 22, and lowering it to 0 makes them 20 again. For a [hyphenated break](ekp-hyphenation.md) at 40 pixels, the line measures 41 with the default `hyphen` ratio of 1.0 and 40 with protrusion off.
 
 ## Numbers and units
 

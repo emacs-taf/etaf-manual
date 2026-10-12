@@ -12,7 +12,7 @@ A paragraph is a sequence of **boxes**. A box is the smallest unit a line break 
 
 The space between boxes is **glue**. Glue has no single width: it has an ideal width, an amount it may stretch, and an amount it may shrink, all in pixels. EKP assigns each gap one of three glue classes — the Latin word space between two Latin words, the mixed space between Latin and CJK, and the CJK space used around CJK characters and punctuation — and adds no glue at a rigid join, where a break is impossible or the characters supply their own spacing. The nine pixels that describe the three classes are the model's spacing parameters.
 
-A **penalty** is the cost charged for a break. An ordinary break costs nothing; a break at a hyphenation point costs `ekp-hyphen-penalty`. A charge like this lets a legal but slightly stretched line win over a hyphenated one.
+A **penalty** is the cost charged for a break. An ordinary break costs nothing; a break at a [hyphenation](ekp-hyphenation.md) point costs `ekp-hyphen-penalty`. A charge like this lets a legal but slightly stretched line win over a hyphenated one.
 
 A line's **badness** measures how far its glued width misses the target width. Glue at its ideal width gives badness 0; the more the line must stretch or shrink relative to what its glue can do, the larger the badness, up to a cap treated as infinite. The same ratio gives the line a **fitness class** — tight, decent, loose or very loose — and **demerits** combine badness, the break penalty and two consistency charges: a jump of more than one fitness class between neighboring lines, and runs of consecutive hyphenated lines. The formulas are under [Scoring a line](#scoring-a-line).
 

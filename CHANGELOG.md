@@ -11,6 +11,12 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
   `make site` and deployed by `make site-publish`; the other repositories now
   link chapters with site URLs (`https://etaf.top/<chapter>/`), and
   `scripts/check-references.py` resolves those links against the book.
+- The gate checks bare `⇒` result lines without evaluating them: the line
+  must follow a complete form and read as a value or end in a `; display`
+  comment, and a wrapped value continues on the next line.  Appendix A, B
+  and D must name every public error, hook and variable of the core packages.
+- The Style System, Viewport and Scrolling chapters show one inline figure
+  each, in both languages.
 - The Emacs manual reader: `etaf-manual-open`, `etaf-manual-close` and
   `etaf-manual-lookup`, plus the headless session API
   (`etaf-manual-reader-create`, `etaf-manual-reader-state`,

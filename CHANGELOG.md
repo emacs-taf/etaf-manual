@@ -28,6 +28,12 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
   and `etaf-manual-reader-search-match` drive the same search headlessly,
   and `etaf-manual-lookup` starts from the symbol at point when it has an
   entry.
+- Reader browsing: the navigation column lists the parts, chapters and
+  level-2 sections; a frame wide enough for a third column shows an
+  on-this-page outline that marks the current section; each chapter ends
+  with previous/next chapter cards; and the reader remembers its reading
+  position across sessions (`etaf-manual-reader-position-file',
+  `etaf-manual-reader-remember', `etaf-manual-reader-restore').
 - The generated concept index groups terms under symbols and A–Z, filing
   Chinese terms by the Pinyin of their first character; the symbol index
   groups functions, macros, variables, hooks and errors by package and the

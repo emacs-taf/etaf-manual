@@ -80,6 +80,7 @@ Use it to embed the reader in your own `etaf-mount' call; prefer
     (with-current-buffer buffer
       (etaf-manual-reader-mode)
       (setq-local etaf-manual-reader--session session)
+      (add-hook 'kill-buffer-hook #'etaf-manual-reader--remember-on-kill nil t)
       (setq-local truncate-lines t)
       ;; The reader owns every column it paints; a sub-cell rounding
       ;; remainder must not surface as Emacs's truncation glyph.
@@ -99,17 +100,25 @@ Use it to embed the reader in your own `etaf-mount' call; prefer
 (defun etaf-manual-open (&optional chapter)
   "Open the ETAF manual reader and return its buffer.
 CHAPTER names the starting chapter identifier; interactively the manual
-opens on its first chapter."
+opens at the remembered reading position when there is one, otherwise at
+its first chapter."
   (interactive)
-  (etaf-manual-reader--display
-   (etaf-manual-reader-create :chapter chapter)
-   "*ETAF 手册*"))
+  (let ((session (etaf-manual-reader-create :chapter chapter)))
+    (unless chapter
+      (etaf-manual-reader-restore session))
+    (etaf-manual-reader--display session "*ETAF 手册*")))
+
+(defun etaf-manual-reader--remember-on-kill ()
+  "Remember the reading position of the reader buffer being killed."
+  (when etaf-manual-reader--session
+    (etaf-manual-reader-remember etaf-manual-reader--session)))
 
 (defun etaf-manual-close ()
   "Unmount and kill the current manual reader buffer."
   (interactive)
   (let ((session (etaf-manual-reader--current))
         (buffer (current-buffer)))
+    (etaf-manual-reader-remember session)
     (when-let* ((runtime (etaf-runtime-for-buffer buffer)))
       (etaf-unmount runtime))
     (plist-put session :buffer nil)

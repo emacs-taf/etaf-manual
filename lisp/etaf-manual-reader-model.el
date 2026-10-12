@@ -30,6 +30,17 @@
 (defconst etaf-manual-reader--history-limit 64
   "Maximum remembered positions per direction.")
 
+(defcustom etaf-manual-reader-position-file nil
+  "File remembering the reader's last reading position.
+The file stores the language, palette, chapter and section as a plist; a
+missing, unreadable or malformed file is ignored.  nil uses
+`etaf-manual-position.eld' under `user-emacs-directory'."
+  :type '(choice (const :tag "Default location" nil) file)
+  :group 'etaf-manual)
+
+(defvar etaf-manual-reader--remember-timers (make-hash-table :test 'eq :weakness 'key)
+  "SESSION to its pending position save.")
+
 (defun etaf-manual-reader--default-language ()
   "Return the default reader language."
   (if (boundp 'etaf-manual-reader-language)
@@ -418,6 +429,80 @@ The result has `:chapter', `:node' and `:definition' (the symbol of the
 definition entry the match belongs to, or nil)."
   (when-let* ((search (etaf-manual-reader--search-state session)))
     (nth (plist-get search :index) (plist-get search :matches))))
+
+;;;; Reading position memory
+
+(defun etaf-manual-reader--position-file ()
+  "Return the file remembering the reading position."
+  (or etaf-manual-reader-position-file
+      (locate-user-emacs-file "etaf-manual-position.eld")))
+
+(defun etaf-manual-reader--position ()
+  "Return the remembered reading position as a plist, or nil."
+  (let ((file (etaf-manual-reader--position-file)))
+    (when (file-readable-p file)
+      (condition-case nil
+          (with-temp-buffer
+            (insert-file-contents file)
+            (let ((value (read (current-buffer))))
+              (and (listp value) (plist-get value :chapter) value)))
+        (error nil)))))
+
+(defun etaf-manual-reader-remember (session)
+  "Remember SESSION's reading position for `etaf-manual-reader-restore'.
+Write language, palette, chapter and section to
+`etaf-manual-reader-position-file' and return non-nil when the write
+succeeded; write errors are ignored.  A displayed session also saves by
+itself a moment after each navigation."
+  (let ((file (etaf-manual-reader--position-file)))
+    (condition-case nil
+        (progn
+          (write-region
+           (let ((print-length nil) (print-level nil))
+             (prin1-to-string
+              (list :language (etaf-manual-reader--read session :language)
+                    :theme (etaf-manual-reader--read session :theme)
+                    :chapter (etaf-manual-reader--read session :chapter)
+                    :node (etaf-manual-reader--read session :node))))
+           nil file nil 'silent)
+          t)
+      (error nil))))
+
+(defun etaf-manual-reader-restore (session)
+  "Apply the remembered reading position to SESSION and return it.
+Reads `etaf-manual-reader-position-file'; a missing, unreadable, malformed
+or stale entry leaves the corresponding setting untouched.  Return
+non-nil when a chapter was applied."
+  (when-let* ((saved (etaf-manual-reader--position)))
+    (let ((language (plist-get saved :language)))
+      (when (member language '("en" "zh-CN"))
+        (etaf-manual-book language)
+        (etaf-manual-reader--write session :language language)))
+    (let ((theme (plist-get saved :theme)))
+      (when (memq theme '(light dark))
+        (etaf-manual-reader--write session :theme theme)))
+    (let* ((chapter (plist-get saved :chapter))
+           (entry (and (symbolp chapter)
+                       (cl-find chapter (plist-get (etaf-manual-reader--book session)
+                                                   :chapters)
+                                :key (lambda (item) (plist-get item :id))))))
+      (when entry
+        (let ((node (plist-get saved :node)))
+          (etaf-manual-reader--jump
+           session chapter
+           (when (and (integerp node) (>= node 0)
+                      (< node (length (plist-get entry :nodes))))
+             node))))
+      entry)))
+
+(defun etaf-manual-reader--schedule-remember (session)
+  "Remember SESSION's position a moment after the current navigation."
+  (when (plist-get session :buffer)
+    (when-let* ((timer (gethash session etaf-manual-reader--remember-timers)))
+      (cancel-timer timer))
+    (puthash session
+             (run-with-idle-timer 0.5 nil #'etaf-manual-reader-remember session)
+             etaf-manual-reader--remember-timers)))
 
 ;;;; Navigation
 

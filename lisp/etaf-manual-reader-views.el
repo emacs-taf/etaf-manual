@@ -97,8 +97,9 @@ the reading position."
         (ignore-errors (etaf-scroll-to runtime etaf-manual-reader--article-ref 0))))))
 
 (defun etaf-manual-reader--after-navigation (session)
-  "Scroll SESSION after the pending render settles."
-  (run-at-time 0 nil #'etaf-manual-reader--scroll-to-node session))
+  "Scroll SESSION after the pending render settles and remember its place."
+  (run-at-time 0 nil #'etaf-manual-reader--scroll-to-node session)
+  (etaf-manual-reader--schedule-remember session))
 
 (defun etaf-manual-reader--scroll-to-definition (session name)
   "Scroll SESSION's article to the definition card of NAME."
@@ -298,15 +299,16 @@ level-3 section widens the gutter and marks it with a dot."
               rows)
         (when (plist-get chapter :current)
           (dolist (node (plist-get chapter :nodes))
-            (push (etaf-manual-reader--sidebar-row
-                   session env
-                   (list :label (plist-get node :title)
-                         :chapter (plist-get chapter :id)
-                         :node (plist-get node :index)
-                         :level (plist-get node :level)
-                         :current (plist-get chapter :current)
-                         :current-node (plist-get node :current)))
-                  rows)))))
+            (when (eql (plist-get node :level) 2)
+              (push (etaf-manual-reader--sidebar-row
+                     session env
+                     (list :label (plist-get node :title)
+                           :chapter (plist-get chapter :id)
+                           :node (plist-get node :index)
+                           :level 2
+                           :current (plist-get chapter :current)
+                           :current-node (plist-get node :current)))
+                    rows))))))
     (nreverse rows)))
 
 (defun etaf-manual-reader--sidebar (session env)
@@ -335,6 +337,127 @@ level-3 section widens the gutter and marks it with a dot."
                    :item-gap '(lh 0)
                    :ref etaf-manual-reader--overview-ref)
              (etaf-manual-reader--sidebar-rows session env)))
+
+;;;; On-this-page column
+
+(defun etaf-manual-reader--outline-row (session env node)
+  "Return one on-this-page ROW of NODE in ENV.
+A level-3 section indents under its level-2 parent; the reading position
+carries the accent color, a tinted surface and an accent bar."
+  (let* ((level (plist-get node :level))
+         (index (plist-get node :index))
+         (current (plist-get node :current))
+         (title (plist-get node :title)))
+    (etaf-node 'box
+               (list :width 'stretch
+                     :wrap-mode 'word
+                     :box-sizing 'border-box
+                     :padding-top '(lh 0)
+                     :padding-bottom '(lh 0)
+                     :padding-left (if (eql level 3) '(ch 5) '(ch 2))
+                     :padding-right '(ch 1)
+                     :border-left
+                     (list '(px 2) 'solid
+                           (if current
+                               (etaf-manual-reader--color env :accent)
+                             (etaf-manual-reader--color env :bg)))
+                     :background-color (when current
+                                         (etaf-manual-reader--color env :sidebar-current))
+                     :color (cond (current (etaf-manual-reader--color env :accent))
+                                  ((eql level 3) (etaf-manual-reader--color env :muted))
+                                  (t (etaf-manual-reader--color env :ink)))
+                     :font-weight (if (and current (eql level 2)) 'bold nil)
+                     :role 'button
+                     :tab-index 0
+                     :pointer 'hand
+                     :help-echo title
+                     :on-press (lambda ()
+                                 (etaf-manual-reader-goto session
+                                                          (etaf-manual-reader--read session :chapter)
+                                                          index)
+                                 (etaf-manual-reader--after-navigation session)))
+               (list (etaf-node 'text nil (list title))))))
+
+(defun etaf-manual-reader--outline (session env)
+  "Return the on-this-page column View of SESSION in ENV."
+  (let ((current (etaf-manual-reader--read session :node)))
+    (etaf-node 'column
+               (list :width (list 'ch etaf-manual-reader--outline-width)
+                     :height 'stretch
+                     :flex-shrink 0
+                     :overflow 'scroll
+                     :box-sizing 'border-box
+                     :border-left (etaf-manual-reader--border env)
+                     :padding '((lh 1) (ch 0))
+                     :item-gap '(lh 0)
+                     :ref 'etaf-manual-page-outline)
+               (append
+                (list (etaf-node 'text
+                                 (list :font-weight 'bold
+                                       :color (etaf-manual-reader--color env :muted))
+                                 (list "本页"))
+                      (etaf-manual-reader--spacer))
+                (cl-loop for node in (etaf-manual-reader--nodes session)
+                         for index from 0
+                         collect (etaf-manual-reader--outline-row
+                                  session env
+                                  (list :title (plist-get node :title)
+                                        :level (plist-get node :level)
+                                        :index index
+                                        :current (eql index current))))))))
+
+;;;; Chapter cards
+
+(defun etaf-manual-reader--chapter-card (session env id direction)
+  "Return the previous/next chapter card for ID in ENV.
+DIRECTION is `previous' or `next'; the card opens the neighbour chapter."
+  (let* ((title (etaf-manual-reader--chapter-title session id))
+         (label (if (eq direction 'previous) "上一章" "下一章"))
+         (align (if (eq direction 'previous) 'right 'left)))
+        (etaf-node 'row
+               (list :ref (if (eq direction 'previous)
+                              'etaf-manual-chapter-previous
+                            'etaf-manual-chapter-next)
+                     :flex-grow 1 :flex-basis '(px 0) :min-width '(px 0)
+                     :box-sizing 'border-box
+                     :background-color (etaf-manual-reader--color env :panel)
+                     :border (etaf-manual-reader--border env)
+                     :padding etaf-manual-reader--card-pad
+                     :item-gap '(ch 2)
+                     :cross-align 'center
+                     :role 'button :tab-index 0 :pointer 'hand
+                     :help-echo title
+                     :on-press (lambda ()
+                                 (etaf-manual-reader-goto session id)
+                                 (etaf-manual-reader--after-navigation session)))
+               (append
+                (when (eq direction 'previous)
+                  (list (etaf-manual-reader--icon env 'chevron-left :faint)))
+                (list (etaf-node 'box
+                                 (list :flex-grow 1 :flex-basis '(px 0)
+                                       :min-width '(px 0)
+                                       :text-align align)
+                                 (list (etaf-manual-reader--label env label)
+                                       (etaf-node 'text
+                                                  (list :color (etaf-manual-reader--color
+                                                                env :heading))
+                                                  (list title)))))
+                (when (eq direction 'next)
+                  (list (etaf-manual-reader--icon env 'chevron-right :faint)))))))
+
+(defun etaf-manual-reader--chapter-cards (session env)
+  "Return the previous/next chapter cards of SESSION in ENV, or nil."
+  (let* ((index (etaf-manual-reader--chapter-index session))
+         (previous (etaf-manual-reader--chapter-at session (1- index)))
+         (next (etaf-manual-reader--chapter-at session (1+ index))))
+    (when (or previous next)
+      (etaf-node 'row
+                 (list :width 'stretch :item-gap '(ch 2) :cross-align 'stretch)
+                 (append
+                  (when previous
+                    (list (etaf-manual-reader--chapter-card session env previous 'previous)))
+                  (when next
+                    (list (etaf-manual-reader--chapter-card session env next 'next))))))))
 
 ;;;; Article column
 
@@ -415,7 +538,9 @@ KEYS is the page Host's `:keys' table, so `?' lists the reader's keys."
                             (append
                              (when wide
                                (list (etaf-manual-reader--sidebar session env)))
-                             (list article))))))
+                             (list article)
+                             (when (etaf-manual-reader--outline-p env)
+                               (list (etaf-manual-reader--outline session env))))))))
     (etaf-manual-reader--page
      env
      (list (etaf-manual-reader--header-view session env)

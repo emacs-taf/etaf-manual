@@ -22,6 +22,7 @@
 (require 'etaf-manual-reader-model)
 
 (declare-function etaf-manual-example-view "etaf-manual" (example))
+(declare-function etaf-manual-reader--chapter-cards "etaf-manual-reader-views" (session env))
 (declare-function etaf-ui-markdown-view-block "etaf-ui" (block env))
 (declare-function etaf-ui-markdown-view-blocks "etaf-ui" (blocks env &optional tight))
 
@@ -445,6 +446,8 @@ their props."
          (head (car split))
          (extent (etaf-manual-reader--read session :extent))
          (sections (if extent (seq-take (cdr split) extent) (cdr split)))
+         (complete (or (null extent) (>= extent (length (cdr split)))))
+         (cards (when complete (etaf-manual-reader--chapter-cards session env)))
          (env (etaf-manual-reader--article-env session env document))
          (part (etaf-manual-reader--part session))
          (number (plist-get (etaf-manual-reader--chapter session) :number))
@@ -470,7 +473,9 @@ their props."
                 lead
                 (list (etaf-node 'column
                                  (list :width 'stretch :item-gap '(lh 2))
-                                 (nreverse body)))))))
+                                 (nreverse body)))
+                (when cards
+                  (list (etaf-manual-reader--spacer) cards))))))
 
 (etaf-define-component etaf-manual-reader--article-view
     (&key session env)

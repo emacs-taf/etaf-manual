@@ -41,9 +41,16 @@
 (defconst etaf-manual-reader--sidebar-width 38
   "Width of the navigation column in character cells.")
 
+(defconst etaf-manual-reader--outline-width 26
+  "Width of the on-this-page column in character cells.")
+
 (defconst etaf-manual-reader--wide-threshold 104
   "Frame width, in character cells, that keeps the navigation column beside
 the article; narrower frames collapse it into the overview screen.")
+
+(defconst etaf-manual-reader--outline-threshold 116
+  "Frame width, in character cells, that also frames the on-this-page
+column; narrower frames keep the article's wider measure.")
 
 (defconst etaf-manual-reader--compact-threshold 88
   "Frame width, in character cells, below which the chrome drops details.
@@ -197,14 +204,23 @@ carry its rank, so it stays on the line grid."
   (let ((columns (etaf-manual-reader--viewport-columns env)))
     (and columns (< columns etaf-manual-reader--compact-threshold))))
 
+(defun etaf-manual-reader--outline-p (env)
+  "Return non-nil when ENV frames the on-this-page column."
+  (let ((columns (etaf-manual-reader--viewport-columns env)))
+    (or (null columns)
+        (>= columns etaf-manual-reader--outline-threshold))))
+
 (defun etaf-manual-reader--measure (env)
   "Return the article measure in character cells for ENV."
   (let* ((columns (etaf-manual-reader--viewport-columns env))
          (sidebar (if (etaf-manual-reader--wide-p env)
                       etaf-manual-reader--sidebar-width
                     0))
+         (outline (if (etaf-manual-reader--outline-p env)
+                      etaf-manual-reader--outline-width
+                    0))
          (available (if columns
-                        (- columns sidebar 4)
+                        (- columns sidebar outline 6)
                       etaf-manual-reader--measure-max)))
     (max etaf-manual-reader--measure-min
          (min etaf-manual-reader--measure-max available))))

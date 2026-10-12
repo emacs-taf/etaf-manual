@@ -72,8 +72,9 @@
 ;; Function: etaf-manual-open (&optional chapter)
 ;;;###autoload (autoload 'etaf-manual-open "etaf-manual" nil t)
 ;; Open the manual reader in its own buffer and return that buffer.
-;; CHAPTER names a chapter identifier to start from, defaulting to the first
-;; chapter.  The buffer gets `etaf-manual-reader-mode': `n' and `p' move
+;; CHAPTER names a chapter identifier to start from, defaulting to the
+;; remembered reading position when there is one and to the first chapter
+;; otherwise.  The buffer gets `etaf-manual-reader-mode': `n' and `p' move
 ;; between sections, `u' goes up one level, `l' and `r' walk the reading
 ;; history, `[' and `]' change chapter, `/` searches the whole book and
 ;; `M-n'/`M-p' walk the matches, `g' switches between Chinese and
@@ -175,6 +176,25 @@
 ;; Return SESSION's current search result as a plist, or nil.
 ;; The result has `:chapter', `:node' and `:definition', the symbol of the
 ;; definition entry the match belongs to, or nil.
+;;
+;; Function: etaf-manual-reader-remember (session)
+;; Remember SESSION's reading position for `etaf-manual-reader-restore'.
+;; Write language, palette, chapter and section to
+;; `etaf-manual-reader-position-file' and return non-nil when the write
+;; succeeded; write errors are ignored.  A displayed session also saves by
+;; itself a moment after each navigation.
+;;
+;; Function: etaf-manual-reader-restore (session)
+;; Apply the remembered reading position to SESSION and return it.
+;; Reads `etaf-manual-reader-position-file'; a missing, unreadable,
+;; malformed or stale entry leaves the corresponding setting untouched.
+;; Return non-nil when a chapter was applied.
+;;
+;; Variable: etaf-manual-reader-position-file
+;; File remembering the reader's last reading position.
+;; The file stores the language, palette, chapter and section as a plist; a
+;; missing, unreadable or malformed file is ignored.  nil uses
+;; `etaf-manual-position.eld' under `user-emacs-directory'.
 ;;
 ;; Function: etaf-manual-reader-set-language (session language)
 ;; Read SESSION in LANGUAGE, keeping the chapter and the nearest section.

@@ -27,7 +27,7 @@ To read a chapter as Markdown, open its file below `book/en/` or `book/zh-CN/`; 
 
 ## Reading the manual in Emacs
 
-`M-x etaf-manual-open` opens the manual in its own buffer, built with ETAF itself. The reader shows a navigation column with the three-level outline, the article with definition cards and runnable examples, a header with the reading position and the language and palette switches, and a key-hint footer. Every line keeps the standard line height, so scrolling never shifts the layout; a narrow frame collapses the navigation column into an overview screen.
+`M-x etaf-manual-open` opens the manual in its own buffer, built with ETAF itself. The reader reopens at the remembered reading position and shows a navigation column listing the parts, chapters and level-2 sections, the article with definition cards and runnable examples, and — on wide frames — an on-this-page column that marks the section being read. A header carries the language and palette switches, a footer shows the key hints, and each chapter ends with previous/next chapter cards. Every line keeps the standard line height, so scrolling never shifts the layout; a narrow frame collapses the navigation column into an overview screen.
 
 ![The reader at a wide frame: navigation column, article and key-hint footer](examples/etaf-manual-reader-wide.png)
 

@@ -145,6 +145,21 @@
       "name": "etaf-manual-reader-inline-symbols-link-to-definitions",
       "file": "tests/etaf-manual-reader-tests.el",
       "purpose": "A code span naming a definition entry carries a definition help echo and RET jumps to its section."
+    },
+    {
+      "name": "etaf-manual-reader-page-outline-lists-sections",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "A wide reader frames the on-this-page column of the current chapter beside the article."
+    },
+    {
+      "name": "etaf-manual-reader-chapter-cards-open-neighbours",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "The end-of-chapter cards open the previous and next chapter."
+    },
+    {
+      "name": "etaf-manual-reader-remembers-the-reading-position",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "A remembered position restores its language, chapter and section, and a malformed file is ignored."
     }
   ]
 }

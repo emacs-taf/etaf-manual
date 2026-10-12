@@ -143,7 +143,7 @@
         (should (string-match-p "范围" text))
         (should (string-match-p "可运行示例" text))
         (should (string-match-p "尚未运行" text))
-        (should (string-match-p "索引" text))))))
+        (should (string-match-p "跳转" text))))))
 
 (ert-deftest etaf-manual-reader-example-runs-and-stops-in-place ()
   "The run control renders the real View; stop clears it again."
@@ -341,6 +341,65 @@
         (goto-char (1+ position))
         (execute-kbd-macro (kbd "RET"))))
     (should (eql expected (plist-get (etaf-manual-reader-state session) :node)))))
+
+(ert-deftest etaf-manual-reader-page-outline-lists-sections ()
+  "The mounted wide reader shows the on-this-page column of the chapter."
+  (let* ((session (etaf-manual-reader-create :language "zh-CN" :chapter 'components))
+         (nodes (plist-get (etaf-manual-reader-state session) :nodes)))
+    (etaf-manual-reader-test--with-reader session
+      ;; The batch frame is narrow; refit the runtime to a wide viewport.
+      (etaf-runtime-refit (etaf-runtime-for-buffer etaf-manual-reader-test--buffer)
+                          (* 150 (frame-char-width)) 60)
+      (etaf-runtime-flush (etaf-runtime-for-buffer etaf-manual-reader-test--buffer))
+      (let ((text (etaf-manual-reader-test--text)))
+        (should (string-match-p "本页" text))
+        (should (string-match-p (regexp-quote (car nodes)) text))))))
+
+(ert-deftest etaf-manual-reader-chapter-cards-open-neighbours ()
+  "The end-of-chapter cards move to the previous and next chapter."
+  (let ((session (etaf-manual-reader-create :language "zh-CN" :chapter 'components)))
+    (etaf-manual-reader-test--with-reader session
+      (let ((runtime (etaf-runtime-for-buffer etaf-manual-reader-test--buffer)))
+        ;; A tall wide viewport keeps the end-of-chapter cards in the buffer.
+        (etaf-runtime-refit runtime (* 150 (frame-char-width)) 2000)
+        (etaf-runtime-flush runtime)
+        (let ((text (etaf-manual-reader-test--text)))
+          (should (string-match-p "上一章" text))
+          (should (string-match-p "下一章" text)))
+        (etaf-dispatch-event runtime 'etaf-manual-chapter-next 'press)
+        (etaf-runtime-flush runtime)))
+    (should-not (eq 'components (plist-get (etaf-manual-reader-state session) :chapter)))
+    (etaf-manual-reader-test--with-reader session
+      (let ((runtime (etaf-runtime-for-buffer etaf-manual-reader-test--buffer)))
+        (etaf-runtime-refit runtime (* 150 (frame-char-width)) 2000)
+        (etaf-runtime-flush runtime)
+        (etaf-dispatch-event runtime 'etaf-manual-chapter-previous 'press)
+        (etaf-runtime-flush runtime)))
+    (should (eq 'components (plist-get (etaf-manual-reader-state session) :chapter)))))
+
+(ert-deftest etaf-manual-reader-remembers-the-reading-position ()
+  "Remembering a position restores it in a later session."
+  (let ((etaf-manual-reader-position-file (make-temp-file "etaf-manual-position")))
+    (unwind-protect
+        (progn
+          (let ((session (etaf-manual-reader-create :language "zh-CN")))
+            (etaf-manual-reader-set-language session "en")
+            (etaf-manual-reader-goto session 'components 1)
+            (should (etaf-manual-reader-remember session)))
+          (let ((session (etaf-manual-reader-create :language "zh-CN")))
+            (should (etaf-manual-reader-restore session))
+            (let ((state (etaf-manual-reader-state session)))
+              (should (equal "en" (plist-get state :language)))
+              (should (eq 'components (plist-get state :chapter)))
+              (should (eql 1 (plist-get state :node)))))
+          ;; A malformed or stale file leaves the session untouched.
+          (with-temp-file etaf-manual-reader-position-file
+            (insert "(this is not a position"))
+          (let ((session (etaf-manual-reader-create :language "zh-CN")))
+            (should-not (etaf-manual-reader-restore session))
+            (should (eq 'introduction
+                        (plist-get (etaf-manual-reader-state session) :chapter)))))
+      (delete-file etaf-manual-reader-position-file))))
 
 (provide 'etaf-manual-reader-tests)
 ;;; etaf-manual-reader-tests.el ends here

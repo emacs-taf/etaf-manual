@@ -220,7 +220,8 @@
       "chapters": [
         "module-map",
         "update-trace",
-        "core-records"
+        "core-records",
+        "invariants"
       ]
     }
   ],

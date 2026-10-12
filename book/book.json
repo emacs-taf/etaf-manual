@@ -298,6 +298,13 @@
         "en": "Glossary",
         "zh-CN": "术语表"
       }
+    },
+    {
+      "id": "versions-and-migration",
+      "title": {
+        "en": "Versions and Migration",
+        "zh-CN": "版本与迁移"
+      }
     }
   ],
   "indices": []

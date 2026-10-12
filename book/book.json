@@ -187,7 +187,8 @@
         "ecss-subjects-and-adapters",
         "ecss-stylesheets-and-scopes",
         "ecss-computed-style",
-        "ecss-rule-files"
+        "ecss-rule-files",
+        "ecss-incremental-hosts"
       ]
     }
   ],

@@ -295,4 +295,4 @@ ETAF 不注册 theme hook，也不会在 Emacs frame 变化时重新解析 Theme
 
 <!-- index: 规则文件; .ecss; 样式表重载 -->
 
-写在组件定义之外的规则同样能成为组件样式。ECSS 规则文件被读成有序规则列表（读取接口由 ECSS 部分的「规则文件」一章定义），`etaf-component-set-styles` 接受这份列表，因此样式表文件、预览工具或热重载循环都能在不碰组件定义的情况下替换它的规则。`.ebox` 文件格式及其同伴规则属于 Ebox 部分；Component 自己的 `:styles` 子句仍是静态数据，不能自己读取文件。
+写在组件定义之外的规则同样能成为组件样式。ECSS 规则文件被读成有序规则列表（读取接口由[规则文件](ecss-rule-files.md)一章定义），`etaf-component-set-styles` 接受这份列表，因此样式表文件、预览工具或热重载循环都能在不碰组件定义的情况下替换它的规则。`.ebox` 文件格式及其同伴规则属于 Ebox 部分；Component 自己的 `:styles` 子句仍是静态数据，不能自己读取文件。

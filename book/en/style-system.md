@@ -33,7 +33,7 @@ A *rule file* holds one ordered rule list as inert data, with no quote or wrappe
  (".badge.active" :color "#334155"))
 ```
 
-Reading a rule file never evaluates the values. `ecss-file-read` reads a file, and `ecss-read-rules` and `ecss-validate-rules` accept the same list from memory. An `.ebox` file can load a same-basename `.ecss` companion or name one in its expression, and a tool can install a file's rules as a Component's styles with `etaf-component-set-styles`; the Rule Files chapter defines the file contract, and [Component Styles and Themes](component-styles-and-themes.md) defines the replacement interface.
+Reading a rule file never evaluates the values. `ecss-file-read` reads a file, and `ecss-read-rules` and `ecss-validate-rules` accept the same list from memory. An `.ebox` file can load a same-basename `.ecss` companion or name one in its expression, and a tool can install a file's rules as a Component's styles with `etaf-component-set-styles`; [Rule Files](ecss-rule-files.md) defines the file contract, and [Component Styles and Themes](component-styles-and-themes.md) defines the replacement interface.
 
 ## Ownership
 

@@ -219,7 +219,8 @@
       },
       "chapters": [
         "module-map",
-        "update-trace"
+        "update-trace",
+        "core-records"
       ]
     }
   ],

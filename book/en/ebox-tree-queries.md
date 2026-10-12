@@ -138,9 +138,9 @@ Call FUNCTION on NODE and its descendants in document order.
 
 Return NODE's border box as a plist (:x :y :width :height).
 
-**Semantics.** The plist reports the border box in layout coordinates: `:x` and `:width` in pixels, `:y` and `:height` in root lines. It is available once the node has been laid out, which happens at render or mount; before that, and for a node whose tree was never laid out, the answer is nil. Text nodes have no border box and answer nil too — their painted run is what `ebox-node-bounds` reports instead. The values are a snapshot of the current layout: a mutation that relayouts the node changes them at the next flush.
+**Semantics.** The plist reports the border box in layout coordinates: `:x` and `:width` in pixels, `:y` and `:height` in root lines. It is available once the node has been laid out, which happens at render or mount; before that, and for a node whose tree was never laid out, the answer is nil. A text node reports geometry when it is laid out as its own layout item, such as a direct child of a `row` or `column`; a text node whose line layout is owned by an anonymous paragraph held by its `box` has no border box of its own and answers nil, and its painted run is what `ebox-node-bounds` reports instead. The values are a snapshot of the current layout: a mutation that relayouts the node changes them at the next flush.
 
-**Returns.** The plist, or nil when NODE is not laid out or is a text node.
+**Returns.** The plist, or nil when NODE is not laid out or is a text node owned by an anonymous paragraph.
 
 **Errors.** None.
 
@@ -165,7 +165,7 @@ Return NODE's border box as a plist (:x :y :width :height).
 
 Return the root line of NODE's border-box top, or nil when not laid out.
 
-**Semantics.** This is the vertical position alone, the same value as the `:y` of `ebox-node-geometry` without building the plist. Use it to sort nodes by their vertical position or to test whether two nodes start on the same row. Like geometry, it answers nil for a node that is not laid out and for a text node.
+**Semantics.** This is the vertical position alone, the same value as the `:y` of `ebox-node-geometry` without building the plist. Use it to sort nodes by their vertical position or to test whether two nodes start on the same row. Like geometry, it answers nil for a node that is not laid out and for a text node whose line layout is owned by an anonymous paragraph.
 
 **Returns.** The root line as an integer, or nil.
 

@@ -305,6 +305,13 @@
         "en": "Versions and Migration",
         "zh-CN": "版本与迁移"
       }
+    },
+    {
+      "id": "license",
+      "title": {
+        "en": "License",
+        "zh-CN": "许可"
+      }
     }
   ],
   "indices": []

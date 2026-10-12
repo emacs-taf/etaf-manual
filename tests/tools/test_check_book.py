@@ -84,6 +84,7 @@ CHINESE = """\
 
     ## 引用
 
+    <!-- index: 引用 -->
     #### Function: etaf-ref (initial-value &key test name)
     #### Error: etaf-error
     #### Property: :on-press
@@ -250,6 +251,11 @@ class CheckBookTests(unittest.TestCase):
                         'section structure differs from en',
                         'runnable examples differ from en'):
             self.assertIn('book/zh-CN/reactivity.md:1: ' + message, result.stderr)
+
+    def test_translations_keep_index_terms(self):
+        self.write('book/zh-CN/reactivity.md',
+                   CHINESE.replace('    <!-- index: 引用 -->\n', ''))
+        self.assert_reported('book/zh-CN/reactivity.md:1: index terms differ from en')
 
     def test_unlisted_chapter_and_malformed_heading_are_reported(self):
         self.write('book/en/notes.md', '# Notes\n')

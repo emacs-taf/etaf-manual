@@ -236,7 +236,7 @@ Controller 一次只做一个请求。开始一次加载或写入会把上一个
 
 ## 修改
 
-<!-- index: 修改; 待决写入; 批量修改; 确定度 -->
+<!-- index: 修改; 待决写入; 批量修改; 批; 确定度 -->
 
 #### Function: etaf-data-mutate (controller operation payload)
 

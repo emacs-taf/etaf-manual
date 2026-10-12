@@ -138,7 +138,7 @@
 | `PACKAGE is version X, not Y` | 版本号片段与包不一致 |
 | `link to unknown chapter: TARGET`、`link to unknown heading: TARGET` | 链接目标不存在 |
 | `hard-wrapped line: write each paragraph on one line` | 段落或列表项在下一行继续 |
-| `definition entries differ from LANGUAGE`、`section structure differs from LANGUAGE`、`runnable examples differ from LANGUAGE` | 译本与基准语言不一致 |
+| `definition entries differ from LANGUAGE`、`section structure differs from LANGUAGE`、`runnable examples differ from LANGUAGE`、`index terms differ from LANGUAGE` | 译本与基准语言不一致 |
 | `generated NAME does not link KIND NAME`、`generated concept index does not link TARGET`／`does not list TERM` | 生成内容缺少它承诺包含的接口或索引词 |
 | `Unknown generated content` | `generate` 没有对应已实现的生成器 |
 | `provider checkout missing: DIRECTORY`、`cannot read provider source` | 读不到提供者仓库 |

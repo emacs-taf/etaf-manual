@@ -330,6 +330,10 @@ give the version in that package's entry header."
                (unless (= (length (plist-get chapter :examples))
                           (length (plist-get other :examples)))
                  (etaf-manual-check--problem file 1 "runnable examples differ from %s"
+                                             (plist-get reference :language)))
+               (unless (= (length (plist-get chapter :index))
+                          (length (plist-get other :index)))
+                 (etaf-manual-check--problem file 1 "index terms differ from %s"
                                              (plist-get reference :language)))))))
 
 (defconst etaf-manual-check--generated-kinds

@@ -314,5 +314,22 @@
       }
     }
   ],
-  "indices": []
+  "indices": [
+    {
+      "id": "concept-index",
+      "generate": "concept-index",
+      "title": {
+        "en": "Concept Index",
+        "zh-CN": "概念索引"
+      }
+    },
+    {
+      "id": "symbol-index",
+      "generate": "symbol-index",
+      "title": {
+        "en": "Symbol Index",
+        "zh-CN": "符号索引"
+      }
+    }
+  ]
 }

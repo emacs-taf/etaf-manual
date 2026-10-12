@@ -40,6 +40,11 @@
       "name": "etaf-manual-example-view-reports-failures",
       "file": "tests/etaf-manual-tests.el",
       "purpose": "A failing example signals etaf-manual-error naming the example."
+    },
+    {
+      "name": "etaf-manual-generated-content-covers-the-book",
+      "file": "tests/etaf-manual-tests.el",
+      "purpose": "Every generated appendix and index carries content and links each interface or index term it promises."
     }
   ]
 }

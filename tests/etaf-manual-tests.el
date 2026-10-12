@@ -29,6 +29,14 @@
       (with-current-buffer buffer (count-lines (point-min) (point-max)))
     0))
 
+(defconst etaf-manual-tests--generated-kinds
+  '((token-table token)
+    (style-quick-reference style)
+    (host-and-property-quick-reference host property)
+    (component-quick-reference component)
+    (symbol-index function macro variable hook error component property style token))
+  "Definition kinds each generated appendix and index promises to link.")
+
 (ert-deftest etaf-manual-book-numbers-parts-and-chapters ()
   "Both languages list the same chapters in reading order with numbers."
   (dolist (language '("en" "zh-CN"))
@@ -112,5 +120,39 @@
                               (list :id "broken-1" :code "(car 1)"))
                              :type 'etaf-manual-error)))
     (should (member "broken-1" error))))
+
+(ert-deftest etaf-manual-generated-content-covers-the-book ()
+  "Generated appendices carry content and link every interface they promise."
+  (dolist (language '("en" "zh-CN"))
+    (let* ((book (etaf-manual-book language))
+           (chapters (plist-get book :chapters))
+           (definitions (cl-loop for chapter in chapters
+                                 append (plist-get chapter :definitions)))
+           (generated (cl-remove-if-not (lambda (chapter)
+                                          (plist-get chapter :generate))
+                                        chapters)))
+      (should (equal (mapcar (lambda (chapter) (plist-get chapter :generate)) generated)
+                     '(token-table style-quick-reference
+                       host-and-property-quick-reference component-quick-reference
+                       concept-index symbol-index)))
+      (dolist (chapter generated)
+        (let ((content (plist-get chapter :content))
+              (links (mapcar #'cdr (plist-get chapter :links)))
+              (kinds (alist-get (plist-get chapter :generate)
+                                etaf-manual-tests--generated-kinds)))
+          (should (stringp content))
+          (should (> (length content) 0))
+          (should-not (plist-get chapter :file))
+          (dolist (definition definitions)
+            (when (memq (plist-get definition :kind) kinds)
+              (should (member (format "%s.md#%s"
+                                      (plist-get definition :chapter)
+                                      (plist-get definition :anchor))
+                              links)))))
+        (when (eq (plist-get chapter :generate) 'concept-index)
+          (dolist (other chapters)
+            (dolist (record (plist-get other :index))
+              (should (string-match-p (regexp-quote (plist-get record :term))
+                                      (plist-get chapter :content))))))))))
 
 ;;; etaf-manual-tests.el ends here

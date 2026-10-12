@@ -25,7 +25,7 @@ The manual documents behavior that is implemented. Where the workspace architect
 
 ## Readers and reading paths
 
-The manual has three kinds of readers. Each can start at the beginning of the listed parts and consult the rest through the index and cross-references.
+The manual has three kinds of readers. Each can start at the beginning of the listed parts and consult the rest through the [concept index](concept-index.md), the [symbol index](symbol-index.md) and cross-references.
 
 | Reader | Read first | Then, as needed |
 | --- | --- | --- |
@@ -192,4 +192,4 @@ The `etaf-manual` package provides the manual as data. `etaf-manual-book` return
 ;; ⇒ reactivity
 ```
 
-An interactive reader with Info-style navigation, an index, entry cards and symbol lookup is not implemented yet, nor is the HTML edition.
+This edition ships a generated [concept index](concept-index.md) and [symbol index](symbol-index.md); an interactive reader with Info-style navigation, entry cards and symbol lookup is not implemented yet, nor is the HTML edition.

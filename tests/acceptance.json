@@ -110,6 +110,16 @@
       "name": "etaf-manual-reader-page-keys-drive-navigation",
       "file": "tests/etaf-manual-reader-tests.el",
       "purpose": "The page Host's :keys dispatch the reader keys in the mounted runtime."
+    },
+    {
+      "name": "etaf-manual-concept-index-groups-terms-by-initial",
+      "file": "tests/etaf-manual-tests.el",
+      "purpose": "The concept index groups terms under symbols and A-Z, filing Han terms by the Pinyin of their first character."
+    },
+    {
+      "name": "etaf-manual-symbol-index-groups-symbols-by-package",
+      "file": "tests/etaf-manual-tests.el",
+      "purpose": "The symbol index opens with the packages in manual order and lists each prefixed symbol under its own package."
     }
   ]
 }

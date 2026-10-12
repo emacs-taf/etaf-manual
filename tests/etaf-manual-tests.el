@@ -155,4 +155,61 @@
               (should (string-match-p (regexp-quote (plist-get record :term))
                                       (plist-get chapter :content))))))))))
 
+(defun etaf-manual-tests--sections (content)
+  "Return CONTENT's level-2 sections as ((HEADING . BODY) ...)."
+  (let (sections)
+    (with-temp-buffer
+      (insert content)
+      (goto-char (point-min))
+      (while (re-search-forward "^## \\(.*\\)$" nil t)
+        (let ((heading (match-string 1))
+              (start (1+ (line-end-position))))
+          (push (cons heading
+                      (buffer-substring start (if (re-search-forward "^## " nil t)
+                                                  (progn (goto-char (match-beginning 0))
+                                                         (point))
+                                                (point-max))))
+                sections))))
+    (nreverse sections)))
+
+(defun etaf-manual-tests--generated (language generator)
+  "Return the content of LANGUAGE's chapter made by GENERATOR."
+  (plist-get (cl-find generator (plist-get (etaf-manual-book language) :chapters)
+                      :key (lambda (chapter) (plist-get chapter :generate)))
+             :content))
+
+(ert-deftest etaf-manual-concept-index-groups-terms-by-initial ()
+  "The concept index groups terms by letter, Han terms by their Pinyin."
+  (let ((sections (etaf-manual-tests--sections
+                   (etaf-manual-tests--generated "zh-CN" 'concept-index))))
+    (should (equal (car (car sections)) "符号"))
+    (let ((letters (mapcar #'car (cdr sections))))
+      (should (cl-every (lambda (letter) (string-match-p "\\`[A-Z]\\'" letter)) letters))
+      (should (equal letters (sort (copy-sequence letters) #'string<))))
+    (should (string-match-p "\\*\\*默认值\\*\\*" (cdr (assoc "M" sections))))
+    (should (string-match-p "\\*\\*颜色\\*\\*" (cdr (assoc "Y" sections))))))
+
+(ert-deftest etaf-manual-symbol-index-groups-symbols-by-package ()
+  "The symbol index lists packages first, each prefixed symbol under its own."
+  (dolist (language '("en" "zh-CN"))
+    (let ((sections (etaf-manual-tests--sections
+                     (etaf-manual-tests--generated language 'symbol-index))))
+      (let ((packages (seq-filter (lambda (heading)
+                                    (member heading '("ecss" "ekp" "ebox" "etaf"
+                                                      "etaf-ui" "etaf-db")))
+                                  (mapcar #'car sections))))
+        (should (equal (seq-take (mapcar #'car sections) (length packages)) packages))
+        (should (equal packages
+                       (seq-filter (lambda (package) (member package packages))
+                                   '("ecss" "ekp" "ebox" "etaf" "etaf-ui" "etaf-db")))))
+      (dolist (package '("ebox" "etaf-ui" "etaf"))
+        (with-temp-buffer
+          (insert (cdr (assoc package sections)))
+          (goto-char (point-min))
+          (while (re-search-forward "^- \\[`\\([^`]+\\)`\\]" nil t)
+            (let ((name (match-string 1)))
+              (should (string-prefix-p (concat package "-") name))
+              (when (equal package "etaf")
+                (should-not (string-match-p "\\`etaf-\\(?:ui\\|db\\)-" name))))))))))
+
 ;;; etaf-manual-tests.el ends here

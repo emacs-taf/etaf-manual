@@ -321,10 +321,14 @@ give the version in that package's entry header."
                                       (plist-get other :definitions)))
                  (etaf-manual-check--problem file 1 "definition entries differ from %s"
                                              (plist-get reference :language)))
-               (unless (equal (mapcar (lambda (node) (plist-get node :level))
+               ;; A generated chapter is not a translation: its sections
+               ;; group each language's own terms, and the written chapters
+               ;; it derives from are checked here already.
+               (unless (or (plist-get other :content)
+                           (equal (mapcar (lambda (node) (plist-get node :level))
                                       (plist-get chapter :nodes))
                               (mapcar (lambda (node) (plist-get node :level))
-                                      (plist-get other :nodes)))
+                                      (plist-get other :nodes))))
                  (etaf-manual-check--problem file 1 "section structure differs from %s"
                                              (plist-get reference :language)))
                (unless (= (length (plist-get chapter :examples))

@@ -16,6 +16,10 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
   side-by-side modes.  Every line keeps the standard line height, so
   scrolling never shifts the layout.  The reader's keys are declared on the page Host as
   `:keys', so `?' opens the ETAF key help listing them with their labels.
+- The generated concept index groups terms under symbols and A–Z, filing
+  Chinese terms by the Pinyin of their first character; the symbol index
+  groups functions, macros, variables, hooks and errors by package and the
+  other entries by kind.
 - The Introduction and the Reactivity chapter in English and Simplified Chinese.
 - The `etaf-manual` package: `etaf-manual-book`, `etaf-manual-definition`, `etaf-manual-example-view`, the `etaf-manual-language` option and the `etaf-manual-error` condition.
 - A gate that checks the book against the provider packages: signatures, public names, versions, links, coverage, translation structure and one line per paragraph. Runnable examples are mounted by the acceptance tests.

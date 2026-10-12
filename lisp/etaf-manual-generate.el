@@ -49,11 +49,16 @@
     (component-name "Component" . "组件")
     (component-signature "Signature" . "签名")
     (concept-lead
-     "Concepts, properties and mechanisms named by the chapters, with the sections that discuss them."
-     . "各章命名的概念、属性与机制，以及讨论它们的节。")
+     "Concepts, properties and mechanisms named by the chapters, with the sections that discuss them, grouped by initial letter; terms that start with a symbol come first."
+     . "各章命名的概念、属性与机制，以及讨论它们的节。词条按首字母分组，中文词条按首字的拼音归入同一字母序列，符号开头的词条排在最前。")
+    (concept-symbols "Symbols" . "符号")
     (symbol-lead
-     "Every documented function, macro, variable, hook, error, component, semantic property, style property and Theme token, in one alphabetical list. The entry behind each name gives its contract."
-     . "全部有记录的 function、宏、变量、钩子、错误、组件、语义属性、样式属性与主题 token，按名字字母序合为一个索引。每个名字链接到给出契约的条目。"))
+     "Every documented function, macro, variable, hook, error, component, semantic property, style property and Theme token. Functions, macros, variables, hooks and errors are grouped by the package their prefix names, components and the other entries by kind, and each group is alphabetical. The entry behind each name gives its contract."
+     . "全部有记录的 function、宏、变量、钩子、错误、组件、语义属性、样式属性与主题 token。function、宏、变量、钩子与错误按名字前缀所属的包分组，组件与其余条目按种类分组，组内按字母序。每个名字链接到给出契约的条目。")
+    (symbol-component "Components" . "组件")
+    (symbol-property "Semantic Properties" . "语义属性")
+    (symbol-style "Style Properties" . "样式属性")
+    (symbol-token "Theme Tokens" . "主题 token"))
   "Localized strings of the generated appendices.")
 
 (defconst etaf-manual-generate--symbol-kinds
@@ -255,8 +260,72 @@ is skipped."
      title (etaf-manual-generate--string 'component-lead language)
      (nreverse sections))))
 
+(defvar jka-compr-verbose)
+
+(defvar etaf-manual-generate--pinyin nil
+  "Hash table from Han characters to their first Pinyin syllable, or `none'.")
+
+(defun etaf-manual-generate--pinyin (char)
+  "Return CHAR's first Pinyin syllable, or nil.
+The syllables come from the Pinyin rules of Emacs's own `chinese-py' input
+method, read once; an Emacs without them groups Han terms together."
+  (unless etaf-manual-generate--pinyin
+    (setq etaf-manual-generate--pinyin
+          (let ((file (locate-library "quail/PY.el" t)))
+            (if (not file)
+                'none
+              (let ((table (make-hash-table :test #'eq)) rules)
+                (with-temp-buffer
+                  (let ((jka-compr-verbose nil))
+                    (insert-file-contents file))
+                  (goto-char (point-min))
+                  (when (search-forward "(quail-define-rules" nil t)
+                    (goto-char (match-beginning 0))
+                    (setq rules (cdr (read (current-buffer))))))
+                (dolist (rule rules)
+                  (when (and (stringp (car-safe rule)) (stringp (cadr rule)))
+                    (mapc (lambda (han)
+                            (unless (gethash han table)
+                              (puthash han (car rule) table)))
+                          (cadr rule))))
+                table)))))
+  (and (hash-table-p etaf-manual-generate--pinyin)
+       (gethash char etaf-manual-generate--pinyin)))
+
+(defun etaf-manual-generate--sort-key (term)
+  "Return TERM's index sort key: its text, a Han initial spelled in Pinyin."
+  (let ((syllable (etaf-manual-generate--pinyin (aref term 0))))
+    (downcase (if syllable (concat syllable " " term) term))))
+
+(defun etaf-manual-generate--initial (term)
+  "Return TERM's index group letter, or nil for a term led by a symbol."
+  (let* ((key (etaf-manual-generate--sort-key term))
+         (char (aref key 0)))
+    (and (<= ?a char ?z) (string (upcase char)))))
+
+(defun etaf-manual-generate--groups (items key-function group-function)
+  "Group ITEMS sorted by KEY-FUNCTION under GROUP-FUNCTION's labels.
+Return ((LABEL . ITEMS) ...) in order of first appearance."
+  (let ((sorted (sort (mapcar (lambda (item)
+                                (cons (funcall key-function item) item))
+                              items)
+                      (lambda (first second)
+                        (string< (car first) (car second)))))
+        groups)
+    (dolist (pair sorted)
+      (let* ((item (cdr pair))
+             (label (funcall group-function item))
+             (group (assoc label groups)))
+        (if group
+            (push item (cdr group))
+          (push (list label item) groups))))
+    (mapcar (lambda (group) (cons (car group) (nreverse (cdr group))))
+            (nreverse groups))))
+
 (defun etaf-manual-generate--concept-index (language title chapters)
-  "Return the concept index in LANGUAGE from the chapters' index markers."
+  "Return the concept index in LANGUAGE from the chapters' index markers.
+Terms are grouped by initial letter; Han terms join the letter of their
+first character's Pinyin, and terms led by a symbol form the first group."
   (let ((terms (make-hash-table :test #'equal)))
     (dolist (chapter chapters)
       (let* ((id (plist-get chapter :id))
@@ -275,45 +344,85 @@ is skipped."
                  (existing (gethash term terms)))
             (unless (member entry existing)
               (puthash term (append existing (list entry)) terms))))))
-    (let ((sorted (sort (hash-table-keys terms)
-                        (lambda (first second)
-                          (let ((down-first (downcase first))
-                                (down-second (downcase second)))
-                            (if (equal down-first down-second)
-                                (string< first second)
-                              (string< down-first down-second)))))))
+    (let* ((symbols (etaf-manual-generate--string 'concept-symbols language))
+           (groups (etaf-manual-generate--groups
+                    (hash-table-keys terms)
+                    (lambda (term)
+                      (let ((key (etaf-manual-generate--sort-key term)))
+                        ;; Symbol-led terms sort before every letter.
+                        (concat (if (etaf-manual-generate--initial term) "1" "0")
+                                key)))
+                    (lambda (term)
+                      (or (etaf-manual-generate--initial term) symbols)))))
       (etaf-manual-generate--document
        title (etaf-manual-generate--string 'concept-lead language)
-       (list (string-join
-              (mapcar (lambda (term)
-                        (format "- **%s** — %s" term
-                                (mapconcat #'identity (gethash term terms) "; ")))
-                      sorted)
-              "\n"))))))
+       (mapcar (lambda (group)
+                 (etaf-manual-generate--section
+                  (car group)
+                  (mapconcat (lambda (term)
+                               (format "- **%s** — %s" term
+                                       (mapconcat #'identity
+                                                  (gethash term terms) "; ")))
+                             (cdr group) "\n")))
+               groups)))))
+
+(defconst etaf-manual-generate--symbol-packages
+  '("ecss" "ekp" "ebox" "etaf-ui" "etaf-db" "etaf")
+  "Package prefixes that group the symbol index, longer prefixes first.")
+
+(defun etaf-manual-generate--symbol-group (name kind language)
+  "Return the symbol index group of NAME of KIND in LANGUAGE.
+A prefixed Lisp symbol belongs to its package; a component, whose name does
+not tell its providing package, and the other entries belong to their kind."
+  (or (and (memq kind '(function macro variable hook error))
+           (cl-find-if (lambda (package)
+                         (string-prefix-p (concat package "-") name))
+                       etaf-manual-generate--symbol-packages))
+      (etaf-manual-generate--string
+       (pcase kind
+         ('component 'symbol-component)
+         ('property 'symbol-property)
+         ('style 'symbol-style)
+         (_ 'symbol-token))
+       language)))
 
 (defun etaf-manual-generate--symbol-index (language title chapters)
-  "Return the symbol index in LANGUAGE for the named definitions in CHAPTERS."
+  "Return the symbol index in LANGUAGE for the named definitions in CHAPTERS.
+Groups follow the manual's package order, then the component, property,
+style and token kinds; each group is alphabetical."
   (let (rows)
     (dolist (kind etaf-manual-generate--symbol-kinds)
       (dolist (definition (etaf-manual-generate--definitions chapters kind))
-        (push (list (symbol-name (plist-get definition :name)) kind definition) rows)))
-    (setq rows (sort rows
-                     (lambda (first second)
-                       (if (equal (car first) (car second))
-                           (string< (symbol-name (cadr first))
-                                         (symbol-name (cadr second)))
-                         (string< (car first) (car second))))))
-    (etaf-manual-generate--document
-     title (etaf-manual-generate--string 'symbol-lead language)
-     (list (string-join
-            (mapcar (lambda (row)
-                      (format "- %s — %s"
-                              (etaf-manual-generate--link
-                               (etaf-manual-generate--code (car row))
-                               (nth 2 row))
-                              (capitalize (symbol-name (nth 1 row)))))
-                    rows)
-            "\n")))))
+        (let ((name (symbol-name (plist-get definition :name))))
+          (push (list name kind definition
+                      (etaf-manual-generate--symbol-group name kind language))
+                rows))))
+    (let* ((order (append '("ecss" "ekp" "ebox" "etaf" "etaf-ui" "etaf-db")
+                          (mapcar (lambda (key)
+                                    (etaf-manual-generate--string key language))
+                                  '(symbol-component symbol-property
+                                    symbol-style symbol-token))))
+           (groups (etaf-manual-generate--groups
+                    rows
+                    (lambda (row)
+                      (format "%02d %s %s"
+                              (or (cl-position (nth 3 row) order :test #'equal) 99)
+                              (car row)
+                              (symbol-name (nth 1 row))))
+                    (lambda (row) (nth 3 row)))))
+      (etaf-manual-generate--document
+       title (etaf-manual-generate--string 'symbol-lead language)
+       (mapcar (lambda (group)
+                 (etaf-manual-generate--section
+                  (car group)
+                  (mapconcat (lambda (row)
+                               (format "- %s — %s"
+                                       (etaf-manual-generate--link
+                                        (etaf-manual-generate--code (car row))
+                                        (nth 2 row))
+                                       (capitalize (symbol-name (nth 1 row)))))
+                             (cdr group) "\n")))
+               groups)))))
 
 (defun etaf-manual-generate (name language title chapters)
   "Return the Markdown of generated NAME in LANGUAGE with TITLE.

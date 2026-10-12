@@ -6,6 +6,11 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
 
 ### Added
 
+- The manual is published as a website at <https://etaf.top> (`/` for English,
+  `/zh-cn/` for Simplified Chinese).  It is built from the same book sources by
+  `make site` and deployed by `make site-publish`; the other repositories now
+  link chapters with site URLs (`https://etaf.top/<chapter>/`), and
+  `scripts/check-references.py` resolves those links against the book.
 - The Emacs manual reader: `etaf-manual-open`, `etaf-manual-close` and
   `etaf-manual-lookup`, plus the headless session API
   (`etaf-manual-reader-create`, `etaf-manual-reader-state`,

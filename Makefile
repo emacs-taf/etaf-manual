@@ -41,6 +41,16 @@ structure-check:
 setup-hooks:
 	git config --local core.hooksPath .githooks
 
+# Build the manual site from book/ into site/dist/.
+.PHONY: site
+site:
+	cd site && npm run build
+
+# Build and publish the manual site to https://etaf.top.
+.PHONY: site-publish
+site-publish:
+	site/scripts/publish.sh
+
 .PHONY: acceptance
 acceptance:
 	python3 scripts/run-acceptance.py --emacs "$(EMACS)"

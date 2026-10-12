@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Check external repository links that point into the ETAF Reference Manual."""
+"""Check external links that point into the published ETAF Reference Manual.
+
+The manual is published at https://etaf.top; repository files reference its
+chapters with site URLs such as https://etaf.top/zh-cn/ebox-node-construction/.
+This check resolves every such link against the book sources: the chapter must
+exist and a section anchor must name a heading of that chapter.  It also rejects
+the retired repository paths (…/etaf-manual/src/branch/main/book/…) so the site
+stays the single link target."""
 from __future__ import annotations
 
 import argparse
@@ -13,9 +20,14 @@ from urllib.parse import unquote
 
 SKIP_DIRECTORIES = {'.git', '.jj', 'node_modules', '__pycache__'}
 REFERENCE = re.compile(
-    r'https?://[^/\s)]+/emacs-taf/etaf-manual/'
-    r'(?:src|tree)/branch/main/book/(?P<language>en|zh-CN)/'
-    r'(?P<chapter>[a-z0-9-]+)\.md(?:#(?P<anchor>[^)\s]+))?'
+    r'https?://etaf\.top/'
+    r'(?:(?P<language>zh-cn)/)?'
+    r'(?P<chapter>[a-z0-9-]+)/?'
+    r'(?:#(?P<anchor>[^)\s]+))?'
+)
+OLD_REFERENCE = re.compile(
+    r'https?://[^/\s)]+/emacs-taf/etaf-manual/(?:src|tree)/branch/main/book/'
+    r'(?P<language>en|zh-CN)/(?P<chapter>[a-z0-9-]+)\.md'
 )
 HEADING = re.compile(r'^[ ]{0,3}(#{1,6})[ \t]+(.*?)[ \t]*#*[ \t]*$')
 FENCE = re.compile(r'^[ ]{0,3}(`{3,}|~{3,})[ \t]*(.*)$')
@@ -120,8 +132,12 @@ def check(root, manuscript):
         except OSError:
             continue
         for number, line in enumerate(lines, start=1):
+            for retired in OLD_REFERENCE.finditer(line):
+                problems.append((source_name(source, root), number,
+                                 'retired repository path, use '
+                                 f'https://etaf.top/{retired.group("chapter")}/'))
             for reference in REFERENCE.finditer(line):
-                language = reference.group('language')
+                language = 'zh-CN' if reference.group('language') else 'en'
                 chapter_id = reference.group('chapter')
                 target_name = f'book/{language}/{chapter_id}.md'
                 if chapter_id in generated:

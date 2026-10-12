@@ -6,7 +6,7 @@ The ETAF Reference Manual documents every public interface of the core ETAF pack
 
 This repository holds the book source, the `etaf-manual` package, which reads the book as data for Emacs tools and the site build, and the Emacs reader application built with ETAF itself. The book is checked against the code: a build fails when a signature differs from its package's Commentary, when the text names a symbol that is not public, when a stated version is out of date, when a translation diverges, or when a runnable example fails to mount.
 
-The book is complete: 87 chapters in twelve parts, appendices A-K, the concept index and the symbol index, in both languages. `M-x etaf-manual-open` opens it in Emacs; the HTML edition is not implemented yet.
+The book is complete: 87 chapters in twelve parts, appendices A-K, the concept index and the symbol index, in both languages. `M-x etaf-manual-open` opens it in Emacs, and the same sources are published as a website at <https://etaf.top>: English at the root, Simplified Chinese under `/zh-cn/`. `make site` builds the site from `book/`; `make site-publish` publishes it.
 
 ## Requirements
 

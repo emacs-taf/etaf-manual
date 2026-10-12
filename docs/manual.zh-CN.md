@@ -17,9 +17,17 @@
 | `book/zh-CN/ID.md` | 同一章的简体中文译本 |
 | `etaf-manual.el`、`lisp/` | 把全书作为数据读取的包 |
 | `scripts/check-book.el` | 门禁 |
+| `scripts/check-references.py` | 检查其他仓库指向手册的站点链接能否落到章和标题 |
+| `site/` | 把全书发布到 <https://etaf.top> 的网站 |
 | `tests/` | 可运行示例与读书接口的场景，以及门禁的工具测试 |
 
 英文是主语言。每一章在每种语言下都有同名文件。
+
+`site/` 是发布全书的 Astro 工程。`site/scripts/export-site.el` 读取解析好的书，
+把页面和侧栏写到 `site/src/content/` 下（生成内容不进版本库）；`site/astro.config.mjs`
+配置 Starlight，英文在根路径、简体中文在 `/zh-cn/` 下；`site/scripts/publish.sh`
+构建站点并把新版本部署到 `current` 软链之后。页面内的章间链接会改写成站点路由，
+`elisp :run` 与 `:figure` 代码块会变成带标签的普通 `elisp` 块，因为静态页面无法挂载 View。
 
 ## 全书描述
 
@@ -160,8 +168,12 @@
 | `make coverage` | 运行门禁，并列出每个包和词表已有条目的接口数 |
 | `make test` | 运行 `tests/acceptance.json` 中的公共场景，包括挂载每个可运行示例 |
 | `make check` | 结构、编译、门禁、场景、API 边界和工具测试 |
+| `make site` | 由 `book/` 生成网站到 `site/dist/` |
+| `make site-publish` | 生成网站并发布到 <https://etaf.top> |
 
 也可以直接运行门禁：`emacs -Q --batch -L . -L lisp -l scripts/check-book.el [--book DIRECTORY] [--providers DIRECTORY] [--coverage]`。`--book` 默认是 `book/`，`--providers` 默认是上级目录。
+
+其他仓库用站点链接引用章节，例如 `https://etaf.top/zh-cn/ebox-node-construction/`。`scripts/check-references.py` 会把每个这样的链接对照书源解析：章必须存在，带锚点时锚点必须是该章的某个标题；工具测试会在整个工作区上运行它，旧的仓库路径会被报为问题。
 
 包改动公共接口时，在同一次交付里更新所有语言中受影响的章节。一个包的全部接口都有条目后，把它加入 `coverage`，门禁会保证它始终完整。
 

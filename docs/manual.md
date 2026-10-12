@@ -17,9 +17,20 @@ The book documents the public interfaces of the core packages: ecss, ekp, ebox, 
 | `book/zh-CN/ID.md` | The Simplified Chinese translation of the same chapter |
 | `etaf-manual.el`, `lisp/` | The package that reads the book as data |
 | `scripts/check-book.el` | The gate |
+| `scripts/check-references.py` | Checks that site links from other repositories resolve to a chapter and heading |
+| `site/` | The website that publishes the book at <https://etaf.top> |
 | `tests/` | The runnable-example and book-reading scenarios, and the gate's tool tests |
 
 English is the primary language. Every chapter exists in every language, with the same file name.
+
+`site/` is an Astro project that publishes the book.  `site/scripts/export-site.el`
+reads the parsed book and writes the pages and the sidebar under
+`site/src/content/` (generated content is untracked); `site/astro.config.mjs`
+configures Starlight with English at the root and Simplified Chinese under
+`/zh-cn/`; `site/scripts/publish.sh` builds the site and deploys it as a new
+release behind the `current` symlink.  Chapter links inside the pages are
+rewritten to site routes, and `elisp :run` and `:figure` fences become plain
+`elisp` blocks with a label, because a static page cannot mount a view.
 
 ## The book description
 
@@ -160,8 +171,12 @@ Run these from the repository root, with the provider repositories checked out a
 | `make coverage` | Run the gate and print how many interfaces of each package and vocabulary have an entry |
 | `make test` | Run the public scenarios in `tests/acceptance.json`, including mounting every runnable example |
 | `make check` | Structure, compilation, gate, scenarios, API boundary and tool tests |
+| `make site` | Build the website from `book/` into `site/dist/` |
+| `make site-publish` | Build the website and publish it to <https://etaf.top> |
 
 The gate can also run directly: `emacs -Q --batch -L . -L lisp -l scripts/check-book.el [--book DIRECTORY] [--providers DIRECTORY] [--coverage]`. `--book` defaults to `book/` and `--providers` to the parent directory.
+
+Other repositories link chapters with site URLs such as `https://etaf.top/zh-cn/ebox-node-construction/`. `scripts/check-references.py` resolves every such link against the book (the chapter must exist and a section anchor must name one of its headings), and the tool tests run it over the workspace; the retired repository paths are reported as problems.
 
 When a package changes a public interface, update the affected chapters in every language in the same delivery. When every interface of a package has an entry, add the package to `coverage` so the gate keeps it complete.
 

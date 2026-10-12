@@ -221,7 +221,8 @@
         "module-map",
         "update-trace",
         "core-records",
-        "invariants"
+        "invariants",
+        "extending-the-framework"
       ]
     }
   ],

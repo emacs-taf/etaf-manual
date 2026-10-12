@@ -57,3 +57,34 @@ html {
   --sl-color-text: hsl(224, 16%, 15%);
   --sl-color-text-accent: hsl(234, 80%, 36%);
 }
+
+/* Landing page: the hero icon and the screenshot wall. */
+.etaf-hero-icon {
+  width: 9rem;
+  height: auto;
+}
+
+.etaf-shots {
+  display: grid;
+  gap: 1rem 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  margin-block: 1.25rem 2rem;
+}
+
+.etaf-shots figure {
+  margin: 0;
+}
+
+.etaf-shots .etaf-shot {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--sl-color-hairline);
+  border-radius: 0.4rem;
+}
+
+.etaf-shots figcaption {
+  margin-top: 0.45rem;
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-gray-3);
+}

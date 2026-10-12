@@ -88,4 +88,7 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
 
 ### Changed
 
+- The site home page is a splash page: the icon, the pitch, four capability
+  cards and a wall of application and game screenshots replace the single
+  paragraph.
 - The "Testing and Validation" and "Development and Release" chapters are folded into "Extending the Framework" as "How a change is verified" and "How a change is delivered", and the chapter that referred to them links to the new location.

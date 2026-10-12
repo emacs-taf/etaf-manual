@@ -133,11 +133,146 @@ chapter links become site routes."
           (export-site--transform (export-site--chapter-text chapter)
                                   language locale ids)))
 
+(defconst export-site--landing-en
+  "---
+title: ETAF
+description: Build complete text applications in Emacs with a web-style model.
+template: splash
+hero:
+  tagline: >-
+    Build complete text applications in Emacs with a web-style model:
+    declarative components, reactive state, CSS cascade styling, Box/Flex/Grid
+    layout, and incremental buffer updates instead of full redraws.
+  image:
+    html: <img src='/etaf-icon.svg' alt='' class='etaf-hero-icon' width='512' height='512' />
+  actions:
+    - text: Read the manual
+      link: /introduction/
+      icon: open-book
+      variant: primary
+    - text: GitHub
+      link: https://github.com/emacs-taf
+      icon: github
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid stagger>
+  <Card title='Declarative components' icon='puzzle'>
+    Compose reusable Components with named bindings and reactive state; the
+    runtime owns re-rendering, identity and lifecycle.
+  </Card>
+  <Card title='Cascade and computed styles' icon='seti:css'>
+    Style subjects through selectors, specificity and cascade, and read the
+    computed result back instead of setting faces by hand.
+  </Card>
+  <Card title='Box, Flex and Grid layout' icon='laptop'>
+    Lay text out with the box model, normal flow, flex and grid, measured down
+    to the pixel.
+  </Card>
+  <Card title='Incremental updates' icon='rocket'>
+    Retained rendering publishes only what changed, so an update costs what it
+    changed instead of a full redraw.
+  </Card>
+</CardGrid>
+
+## Built with ETAF
+
+<div class='etaf-shots'>
+  <figure>
+    <img src='/shots/etaf-ncm.webp' alt='NetEase Cloud Music player in Emacs' loading='lazy' class='etaf-shot' />
+    <figcaption><strong>etaf-ncm</strong>: NetEase Cloud Music player with lyrics and queue</figcaption>
+  </figure>
+  <figure>
+    <img src='/shots/etaf-weread.webp' alt='WeChat Reading client in Emacs' loading='lazy' class='etaf-shot' />
+    <figcaption><strong>etaf-weread</strong>: WeChat Reading shelf, notebook and statistics</figcaption>
+  </figure>
+  <figure>
+    <img src='/shots/etaf-desktop.webp' alt='ETAF Desktop window manager' loading='lazy' class='etaf-shot' />
+    <figcaption><strong>etaf-desktop</strong>: draggable windows and workspaces</figcaption>
+  </figure>
+  <figure>
+    <img src='/shots/etaf-xiangqi.webp' alt='Chu He xiangqi' loading='lazy' class='etaf-shot' />
+    <figcaption><strong>etaf-xiangqi</strong>: Chinese chess on a native vector board</figcaption>
+  </figure>
+</div>
+
+This manual documents every public interface of ecss, ekp, ebox, etaf, etaf-ui
+and etaf-db, with the mechanisms behind them. Read the
+[Introduction](/introduction/) first, or jump to
+[Style Properties](/style-properties/), the [UI Overview](/ui-overview/), the
+[Glossary](/glossary/) and the [Symbol Index](/symbol-index/).
+"
+  "English splash page for the site in `site/'.")
+
+(defconst export-site--landing-zh
+  "---
+title: ETAF
+description: 用 Web 的方式在 Emacs 里构建完整的文本应用。
+template: splash
+hero:
+  tagline: >-
+    在 Emacs 里构建完整的文本应用：声明式组件、响应式状态、CSS 级联样式、
+    Box/Flex/Grid 布局，用增量更新代替整屏重绘。
+  image:
+    html: <img src='/etaf-icon.svg' alt='' class='etaf-hero-icon' width='512' height='512' />
+  actions:
+    - text: 阅读手册
+      link: /zh-cn/introduction/
+      icon: open-book
+      variant: primary
+    - text: GitHub
+      link: https://github.com/emacs-taf
+      icon: github
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid stagger>
+  <Card title='声明式组件' icon='puzzle'>
+    用命名绑定与响应式状态组合可复用组件，重渲染、身份和生命周期由运行时负责。
+  </Card>
+  <Card title='级联与计算样式' icon='seti:css'>
+    用选择器、优先级和级联给主体写样式，再读回计算样式，而不是手工设置 face。
+  </Card>
+  <Card title='Box、Flex 与 Grid 布局' icon='laptop'>
+    用盒模型、常规流、Flex 与 Grid 排布文本，精确到像素。
+  </Card>
+  <Card title='增量更新' icon='rocket'>
+    保留式渲染只发布变化的部分，更新的代价取决于改动的大小，而不是整屏重绘。
+  </Card>
+</CardGrid>
+
+## 用 ETAF 构建的应用
+
+<div class='etaf-shots'>
+  <figure>
+    <img src='/shots/etaf-ncm.webp' alt='Emacs 里的网易云音乐播放器' loading='lazy' class='etaf-shot' />
+    <figcaption><strong>etaf-ncm</strong>：网易云音乐播放器，含歌词与播放队列</figcaption>
+  </figure>
+  <figure>
+    <img src='/shots/etaf-weread.webp' alt='Emacs 里的微信读书客户端' loading='lazy' class='etaf-shot' />
+    <figcaption><strong>etaf-weread</strong>：微信读书书架、笔记本与阅读统计</figcaption>
+  </figure>
+  <figure>
+    <img src='/shots/etaf-desktop.webp' alt='ETAF Desktop 窗口管理器' loading='lazy' class='etaf-shot' />
+    <figcaption><strong>etaf-desktop</strong>：可拖拽的窗口与工作区</figcaption>
+  </figure>
+  <figure>
+    <img src='/shots/etaf-xiangqi.webp' alt='楚河中国象棋' loading='lazy' class='etaf-shot' />
+    <figcaption><strong>etaf-xiangqi</strong>：矢量棋盘的中国象棋</figcaption>
+  </figure>
+</div>
+
+这里收录 ecss、ekp、ebox、etaf、etaf-ui 与 etaf-db 的全部公共接口，以及它们背后的机制。先读[引言](/zh-cn/introduction/)，也可以直接跳到[样式属性参考](/zh-cn/style-properties/)、[UI 总论](/zh-cn/ui-overview/)、[术语表](/zh-cn/glossary/)与[符号索引](/zh-cn/symbol-index/)。
+"
+  "Chinese splash page for the site in `site/'.")
+
 (defun export-site--landing (language)
   "Return the landing page text of LANGUAGE."
-  (if (equal language "en")
-      (format "---\ntitle: \"ETAF Reference Manual\"\n---\n\nEvery public interface of ecss, ekp, ebox, etaf, etaf-ui and etaf-db, with the mechanisms behind them. Read the [Introduction](/introduction/) first, or jump to [Style Properties](/style-properties/), the [UI Overview](/ui-overview/), the [Glossary](/glossary/) and the [Symbol Index](/symbol-index/).\n")
-    (format "---\ntitle: \"ETAF 参考手册\"\n---\n\necss、ekp、ebox、etaf、etaf-ui 与 etaf-db 的全部公共接口，以及它们背后的机制。先读[引言](/zh-cn/introduction/)，也可以直接跳到[样式属性参考](/zh-cn/style-properties/)、[UI 总论](/zh-cn/ui-overview/)、[术语表](/zh-cn/glossary/)与[符号索引](/zh-cn/symbol-index/)。\n")))
+  (if (equal language "zh-CN")
+      export-site--landing-zh
+    export-site--landing-en))
 
 (defun export-site--sidebar-item (chapter language)
   "Return CHAPTER's sidebar entry for LANGUAGE."
@@ -224,7 +359,7 @@ chapter links become site routes."
            (expand-file-name (format "%s.md" (plist-get chapter :id)) directory)
            (export-site--page chapter language locale ids)))
         (export-site--write
-         (expand-file-name "index.md" directory)
+         (expand-file-name "index.mdx" directory)
          (export-site--landing language))))
     (export-site--write
      (expand-file-name "src/sidebar.mjs" site)

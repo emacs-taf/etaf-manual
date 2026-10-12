@@ -27,7 +27,8 @@
     "etaf-db",
     "etaf-ui",
     "tokens",
-    "ebox"
+    "ebox",
+    "ecss"
   ],
   "parts": [
     {
@@ -188,7 +189,8 @@
         "ecss-stylesheets-and-scopes",
         "ecss-computed-style",
         "ecss-rule-files",
-        "ecss-incremental-hosts"
+        "ecss-incremental-hosts",
+        "ecss-errors"
       ]
     }
   ],

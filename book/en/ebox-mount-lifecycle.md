@@ -10,7 +10,7 @@ A mount is the binding between one root node and one buffer. The tree stays the 
 
 A mount is also the unit of update. Layout and paint run per mount, `ebox-mount-flush-count` counts how often that happened, and viewport handling, observers and input sessions all hang off it. Because a root records the mount it feeds, a root is mounted once: mounting the same root in a second buffer does not copy it, and later mutations reach only the newest mount. Showing the same contents in two buffers therefore means copying the tree with `ebox-node-copy` or building it twice.
 
-The lifecycle has three states. A tree is detached after construction; it is live while a mount binds it to a buffer; releasing the mount leaves the tree detached again and the buffer holding the last rendered text. Killing the buffer also releases the mount, without the release hook that an explicit unmount runs — the buffer simply disappears.
+The lifecycle has three states. A tree is detached after construction; it is live while a mount binds it to a buffer; releasing the mount leaves the tree detached again and the buffer holding the last rendered text. Killing the buffer also releases the mount and runs the same release hook; the buffer simply disappears afterwards.
 
 ## Rendering to a string
 
@@ -121,7 +121,7 @@ Release the mount of BUFFER-OR-NAME, keeping its text. Return non-nil if any.
 
 **Arguments.** BUFFER-OR-NAME is a buffer or a name, defaulting to the current buffer.
 
-**Semantics.** The release runs the abnormal hook `ebox-unmount-functions`, restores the display settings Ebox took over, removes the background remapping, ends an input session if one is active, and detaches the root, in that order. The text is not touched, so the buffer keeps showing what the tree last rendered; it is now just text, and later mutations of the tree do not reach it. The mount object stops answering, the root is detached again, and the buffer can be mounted with a new tree. Killing a mounted buffer releases the mount too, but does not run the hook — a dying buffer has no use for the callback.
+**Semantics.** The release runs the abnormal hook `ebox-unmount-functions`, restores the display settings Ebox took over, removes the background remapping, ends an input session if one is active, and detaches the root, in that order. The text is not touched, so the buffer keeps showing what the tree last rendered; it is now just text, and later mutations of the tree do not reach it. The mount object stops answering, the root is detached again, and the buffer can be mounted with a new tree. Killing a mounted buffer releases the mount too, and it runs the same hook before the buffer goes away.
 
 **Returns.** Non-nil when a mount was released, nil when the buffer had none or is dead.
 
@@ -141,7 +141,7 @@ Abnormal hook run with a buffer whose mount is being released.
 
 `ebox-render` and `ebox-mount` share one input contract — a detached root node or an author form — and one layout; the first returns the string, the second keeps writing it into a buffer. `ebox-render-to-buffer` is the mount variant that returns the buffer. A program that mounts usually keeps the root it passed: the mount adds nothing to the tree's API, so every mutation entry point from [Incremental Updates and Publication](incremental-updates-and-publication.md) keeps working unchanged.
 
-The query entries answer the three questions a caller asks about a live mount: is this buffer mounted (`ebox-buffer-mount`), what tree does it show (`ebox-buffer-root`), and how much work has it done (`ebox-mount-flush-count`). The release entries end the binding: `ebox-unmount-buffer` for an orderly release with the hook, buffer kill for a buffer that is going away anyway. After either, the buffer and the tree are independent again, and the tree can be mounted elsewhere.
+The query entries answer the three questions a caller asks about a live mount: is this buffer mounted (`ebox-buffer-mount`), what tree does it show (`ebox-buffer-root`), and how much work has it done (`ebox-mount-flush-count`). The release entries end the binding: `ebox-unmount-buffer` for an explicit release, buffer kill for a buffer that is going away; both run the hook. After either, the buffer and the tree are independent again, and the tree can be mounted elsewhere.
 
 ## Semantic details
 
@@ -151,7 +151,7 @@ Mounting is a small transaction. The buffer's text is replaced, the mode is enab
 
 Three pieces of buffer state belong to the mount. The display settings make rows behave as layout composed them: no native continuation wrapping, no bidi reordering, and no long-line scanning. The background remapping makes the window area below the last row show the root's background instead of the frame's. Both are removed on release; settings the buffer had locally are restored to their previous values. An input session, if one is running, is ended by the release.
 
-Killing a buffer releases its mount through the buffer's kill hook, without running `ebox-unmount-functions`. The distinction is deliberate in effect if not in the code: explicit unmount is a lifecycle step a program wants to observe, while a killed buffer is going away and the text is about to be collected.
+Killing a buffer releases its mount through the buffer's kill hook and runs `ebox-unmount-functions`, restores the display settings and background remapping, ends an input session and detaches the root, exactly like an explicit unmount; only the mode teardown is moot for a dying buffer. A callback that releases outside resources therefore runs on either path.
 
 ## Errors and recovery
 
@@ -161,6 +161,6 @@ Killing a buffer releases its mount through the buffer's kill hook, without runn
 | INPUT is a malformed author form | the construction errors of [Node Construction](ebox-node-construction.md) |
 | A mount fails while building | the previous mount and text stay in place |
 | The unmount hook signals | the error propagates and the release stops; the mount stays live |
-| A buffer is killed | the mount is released without the hook; the buffer disappears |
+| A buffer is killed | the mount is released, the hook runs and the buffer disappears |
 
 Recovery follows the state. A rejected input leaves the tree detached and the buffer as it was, so the form can be fixed and the mount retried. A hook error leaves the mount live, so it can be released again after the hook is fixed. Once a mount is released — by `ebox-unmount-buffer` or by killing the buffer — the tree is detached and can be mounted again or rendered as a string.

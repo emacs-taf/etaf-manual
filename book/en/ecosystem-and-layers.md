@@ -74,7 +74,7 @@ The Commentary of the entry file is the authoritative list of the package's supp
 ;; Function: etaf-mount (buffer-or-name view &optional options)
 ```
 
-A symbol that the Commentary does not list is internal, even when its name has no double hyphen, and so is every feature and file under `lisp/`. The manual neither documents nor names them. Calling an internal function, reading an internal variable, loading an internal file and redefining an internal symbol are all unsupported, including through a symbol computed at run time.
+A symbol that the Commentary does not list is internal, even when its name has no double hyphen, and so is every feature and file under `lisp/`. [Module Map](module-map.md) describes what those modules are responsible for, but not their symbols. Calling an internal function, reading an internal variable, loading an internal file and redefining an internal symbol are all unsupported, including through a symbol computed at run time.
 
 Besides the records, the packages publish vocabularies that Views and stylesheets use by name: ETAF publishes the Host kinds and their properties, Ebox the style properties, and the component catalog its theme tokens. They are public in the same way as the records, and each has a definition entry in this manual. [Layers and stability](introduction.md#layers-and-stability) describes how changes to public interfaces are recorded.
 

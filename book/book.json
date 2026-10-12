@@ -210,6 +210,16 @@
         "ekp-native-module",
         "ekp-implementation"
       ]
+    },
+    {
+      "id": "framework-internals",
+      "title": {
+        "en": "Framework Internals and Extension",
+        "zh-CN": "框架内部与扩展"
+      },
+      "chapters": [
+        "module-map"
+      ]
     }
   ],
   "appendices": [],

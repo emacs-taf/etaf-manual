@@ -200,7 +200,8 @@
         "zh-CN": "EKP 段落排版"
       },
       "chapters": [
-        "ekp-principles"
+        "ekp-principles",
+        "ekp-cjk"
       ]
     }
   ],

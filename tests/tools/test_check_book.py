@@ -264,6 +264,69 @@ class CheckBookTests(unittest.TestCase):
         self.write('book/en/hosts.md', HOSTS + '#### Box details\n')
         self.assert_reported('Level-4 headings are definition entries')
 
+    def append_hosts(self, block):
+        for language in ('en', 'zh-CN'):
+            path = self.root / 'book' / language / 'hosts.md'
+            path.write_text(path.read_text() + textwrap.dedent(block))
+
+    def test_result_lines_are_evaluated_and_compared(self):
+        self.append_hosts("""
+            ```elisp
+            (+ 1 2)
+            ;; ⇒ 3
+            ```
+        """)
+        result = self.run_gate()
+        self.assertEqual(0, result.returncode, result.stderr)
+
+    def test_a_wrong_result_line_is_reported(self):
+        self.append_hosts("""
+            ```elisp
+            (+ 1 2)
+            ;; ⇒ 4
+            ```
+        """)
+        self.assert_reported('result line claims 4 but the form returns 3')
+
+    def test_a_multiline_result_line_is_compared(self):
+        self.append_hosts("""
+            ```elisp
+            (list 1
+                  2)
+            ;; ⇒ (1
+            ;;    2)
+            ```
+        """)
+        result = self.run_gate()
+        self.assertEqual(0, result.returncode, result.stderr)
+
+    def test_a_described_result_line_is_not_compared(self):
+        self.append_hosts("""
+            ```elisp
+            (list 1 2)
+            ;; ⇒ a two-element list ; display
+            ```
+        """)
+        result = self.run_gate()
+        self.assertEqual(0, result.returncode, result.stderr)
+
+    def test_an_unreadable_result_line_is_reported(self):
+        self.append_hosts("""
+            ```elisp
+            (list 1 2)
+            ;; ⇒ (1
+            ```
+        """)
+        self.assert_reported('result line is no readable value: (1')
+
+    def test_a_result_line_without_a_form_is_reported(self):
+        self.append_hosts("""
+            ```elisp
+            ;; ⇒ 3
+            ```
+        """)
+        self.assert_reported('result line has no preceding form')
+
 
 if __name__ == '__main__':
     unittest.main()

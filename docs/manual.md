@@ -96,6 +96,8 @@ A style entry starts with a table giving the value syntax, the initial value, wh
 | `error→` | The form signals the condition that follows |
 | `-\|` | Text written to `*Messages*` |
 
+A result line written as a `;; ⇒` comment is checked: the gate evaluates the top-level form before the line and compares the value with the text after `⇒`. A result that describes an object without a stable printed form instead of giving a value ends with a `; display` comment and is not compared.
+
 In signatures, argument names are lowercase. In prose, refer to an argument in uppercase, as in "SOURCE is a ref".
 
 ### Index terms
@@ -142,10 +144,11 @@ The gate reads the book and the sibling provider checkouts and reports each prob
 | `PACKAGE is version X, not Y` | A version span differs from the package |
 | `link to unknown chapter: TARGET`, `link to unknown heading: TARGET` | A link has no target |
 | `hard-wrapped line: write each paragraph on one line` | A paragraph or list item continues on the next line |
+| `result line claims X but the form returns Y`, `result line is no readable value: TEXT`, `result line has no preceding form`, `result form signals ERROR` | A `;; ⇒` result line does not match the value of the form before it |
 | `definition entries differ from LANGUAGE`, `section structure differs from LANGUAGE`, `runnable examples differ from LANGUAGE`, `index terms differ from LANGUAGE` | A translation does not match the reference language |
 | `generated NAME does not link KIND NAME`, `generated concept index does not link TARGET` / `does not list TERM` | Generated content misses an interface or index term it promises |
 | `Unknown generated content` | `generate` names no implemented generator |
-| `provider checkout missing: DIRECTORY`, `cannot read provider source` | A provider cannot be read |
+| `provider checkout missing: DIRECTORY`, `cannot read provider source`, `cannot load provider package PACKAGE` | A provider cannot be read or loaded |
 
 ## Commands
 

@@ -84,7 +84,7 @@ Construct a normalized ETAF View from the structural FORM.
 
 ```elisp
 (etaf-view (text :font-weight 'bold "Hi"))
-;; ⇒ a text View
+;; ⇒ a text View ; display
 ```
 
 **See also.** `etaf-node`, `etaf-render`, and the chapters on [Hosts](hosts.md), [Components](components.md) and [Runtime](runtime.md).
@@ -256,7 +256,7 @@ Lower a normalized VIEW to one canonical detached Ebox root without a Runtime.
 
 ```elisp
 (etaf-render (etaf-view (text "Hi")))
-;; ⇒ an Ebox text node
+;; ⇒ an Ebox text node ; display
 ```
 
 **See also.** `etaf-mount` and [Runtime](runtime.md) for mounting and lifecycle.

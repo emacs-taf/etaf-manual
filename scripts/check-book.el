@@ -416,6 +416,155 @@ paragraph would otherwise render as a space."
                       file line "hard-wrapped line: write each paragraph on one line"))
                (t (setq open t))))))))))
 
+;;;; Printed results
+
+(defconst etaf-manual-check--result-re
+  "\\`[ \t]*;;[ \t]*⇒[ \t]*\\(.*\\)\\'"
+  "A code-block result line: `;; ⇒ value' as the Introduction documents it.")
+
+(defconst etaf-manual-check--display-re
+  ";[ \t]*display[ \t]*\\'"
+  "Result lines ending this way describe their outcome instead of comparing it.")
+
+(defun etaf-manual-check--fenced-blocks (file)
+  "Return FILE's elisp fenced blocks as lists of (LINE . TEXT)."
+  (with-temp-buffer
+    (insert-file-contents file)
+    (goto-char (point-min))
+    (let ((line 0) fence block blocks)
+      (while (not (eobp))
+        (setq line (1+ line))
+        (let ((text (buffer-substring-no-properties
+                     (line-beginning-position) (line-end-position))))
+          (cond
+           ((string-match "\\`[ ]\\{0,3\\}\\(```+\\|~~~+\\)[ \t]*\\(.*\\)\\'" text)
+            (if fence
+                (progn (push (nreverse block) blocks)
+                       (setq fence nil block nil))
+              (when (string-match "\\`elisp\\_>" (or (match-string 2 text) ""))
+                (setq fence t block nil))))
+           (fence (push (cons line text) block))))
+        (forward-line 1))
+      (nreverse blocks))))
+
+(defun etaf-manual-check--incomplete (text)
+  "Return non-nil when TEXT starts a datum that is not complete yet."
+  (condition-case nil
+      (progn (ignore (read-from-string text)) nil)
+    (end-of-file t)
+    (error nil)))
+
+(defun etaf-manual-check--block-claims (block)
+  "Return (CODE . CLAIMS) for the result lines of BLOCK.
+CODE is the block source without its result lines, so the form before a
+claim can be read directly.  Each claim is (LINE EXPECTED OFFSET) with
+OFFSET the length of CODE up to that line.  A comment line following an
+incomplete value continues that value, which is how a result wrapped over
+several lines stays readable."
+  (let ((code "") (claims nil) (pending nil))
+    (cl-labels ((finish () (when pending (push pending claims) (setq pending nil))))
+      (dolist (entry block)
+        (let ((line (car entry)) (text (cdr entry)))
+          (when pending
+            (if (and (string-match-p "\\`[ \t]*;;" text)
+                     (not (string-match-p "⇒" text))
+                     (etaf-manual-check--incomplete (nth 1 pending)))
+                (progn
+                  (setf (nth 1 pending)
+                        (concat (nth 1 pending) " "
+                                (replace-regexp-in-string "\\`[ \t]*;;[ \t]*" "" text)))
+                  (setq text nil))
+              (finish)))
+          (when text
+            (cond
+             ((string-match etaf-manual-check--result-re text)
+              (setq pending (list line (match-string 1 text) (length code))))
+             ((string-match-p "\\`[ \t]*\\(?:⇒\\|error→\\|▷\\|-|\\)" text))
+             (t (setq code (concat code text "\n")))))))
+      (finish))
+    (cons code (nreverse claims))))
+
+(defun etaf-manual-check--forms (code)
+  "Return the top-level forms of CODE as (FORM . END) pairs, in order."
+  (let ((position 0) forms)
+    (condition-case nil
+        (while (< position (length code))
+          (let ((start (save-match-data (string-match "[^ \t\n]" code position))))
+            (if (not start)
+                (setq position (length code))
+              (setq position start)
+              (let ((result (read-from-string code position)))
+                (push (cons (car result) (cdr result)) forms)
+                (setq position (cdr result))))))
+      (end-of-file nil)
+      (invalid-read-syntax nil))
+    (nreverse forms)))
+
+(defun etaf-manual-check--summary (value)
+  "Return a bounded printed form of VALUE for a problem report."
+  (let ((print-length 8) (print-level 4) (print-circle t))
+    (prin1-to-string value)))
+
+(defun etaf-manual-check--check-claim (file line expected value)
+  "Check the result VALUE of a form against EXPECTED at FILE and LINE."
+  (unless (string-match-p etaf-manual-check--display-re (string-trim-right expected))
+    (let ((datum (condition-case nil
+                     (car (read-from-string expected))
+                   (error :unreadable))))
+      (cond
+       ((eq datum :unreadable)
+        (etaf-manual-check--problem
+         file line "result line is no readable value: %s (mark a described result `; display')"
+         expected))
+       ((not (equal datum value))
+        (etaf-manual-check--problem
+         file line "result line claims %s but the form returns %s"
+         (etaf-manual-check--summary datum) (etaf-manual-check--summary value)))))))
+
+(defun etaf-manual-check--results (book)
+  "Check BOOK's `;; ⇒' result lines by evaluating the form before each.
+The Introduction documents the notation; a line marked `; display'
+describes an object without a stable printed form and is not compared."
+  (dolist (chapter (plist-get book :chapters))
+    (let ((file (etaf-manual-check--chapter-file chapter)))
+      (when (and file (file-exists-p file))
+        (dolist (block (etaf-manual-check--fenced-blocks file))
+          (pcase-let* ((`(,code . ,claims) (etaf-manual-check--block-claims block))
+                       (forms (etaf-manual-check--forms code)))
+            (dolist (claim claims)
+              (pcase-let ((`(,line ,expected ,offset) claim))
+                (let ((form (cl-find-if (lambda (entry) (<= (cdr entry) offset))
+                                        (reverse forms))))
+                  (cond
+                   ((null form)
+                    (etaf-manual-check--problem file line "result line has no preceding form"))
+                   ((string-match-p etaf-manual-check--display-re (string-trim-right expected)))
+                   (t
+                    (condition-case error
+                        (etaf-manual-check--check-claim file line expected
+                                                        (eval (car form) t))
+                      (error
+                       (etaf-manual-check--problem
+                        file line "result form signals %s" (error-message-string error)))))))))))))))
+
+(defun etaf-manual-check--load-providers (description providers)
+  "Put the packages of DESCRIPTION in PROVIDERS on `load-path' and load them.
+Return non-nil when every package loaded; each failure is reported."
+  (let ((loaded t))
+    (dolist (package (plist-get description :packages))
+      (add-to-list 'load-path (expand-file-name package providers))
+      (condition-case error
+          (require (intern package))
+        (error
+         (setq loaded nil)
+         (etaf-manual-check--problem nil nil "cannot load provider package %s: %s"
+                                     package (error-message-string error)))))
+    ;; The checker's own package provides the book lookup some examples use.
+    ;; It may be unavailable in a fixture checkout; a claim that needs it then
+    ;; reports the missing function when it is evaluated.
+    (condition-case nil (require 'etaf-manual) (error nil))
+    loaded))
+
 (defun etaf-manual-check-run (book-directory providers)
   "Check the book in BOOK-DIRECTORY against PROVIDERS; return coverage rows."
   (setq etaf-manual-check--problems nil
@@ -424,6 +573,7 @@ paragraph would otherwise render as a space."
   (let* ((description (etaf-manual--read-json
                        (expand-file-name "book.json" book-directory)))
          (facts (etaf-manual-check--providers description providers))
+         (loaded (etaf-manual-check--load-providers description providers))
          (books nil) rows)
     (dolist (language (plist-get description :languages))
       (condition-case error
@@ -437,6 +587,7 @@ paragraph would otherwise render as a space."
         (etaf-manual-check--generated book)
         (etaf-manual-check--orphans book)
         (etaf-manual-check--line-breaks book)
+        (when loaded (etaf-manual-check--results book))
         (let ((book-rows (etaf-manual-check--coverage book facts defined)))
           (unless rows (setq rows book-rows)))))
     (when (= (length books) (length (plist-get description :languages)))

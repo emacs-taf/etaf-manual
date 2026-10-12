@@ -84,7 +84,7 @@ NAME 是 Host 符号（如 `text`、`column`），或用 `etaf-define-component`
 
 ```elisp
 (etaf-view (text :font-weight 'bold "Hi"))
-;; ⇒ 一个 text View
+;; ⇒ 一个 text View ; display
 ```
 
 **参见。** `etaf-node`、`etaf-render`，以及 [Host](hosts.md)、[组件](components.md)和 [Runtime](runtime.md) 三章。
@@ -256,7 +256,7 @@ fragment 的身份由 `:key` 决定；没有 `:key` 时由编译它的调用点�
 
 ```elisp
 (etaf-render (etaf-view (text "Hi")))
-;; ⇒ 一个 Ebox text 节点
+;; ⇒ 一个 Ebox text 节点 ; display
 ```
 
 **参见。** `etaf-mount` 以及 [Runtime](runtime.md)，其中讲挂载和生命周期。

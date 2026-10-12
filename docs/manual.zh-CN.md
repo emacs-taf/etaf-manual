@@ -96,6 +96,8 @@
 | `error→` | 该表达式发出后面写的错误条件 |
 | `-\|` | 写到 `*Messages*` 的文字 |
 
+写成 `;; ⇒` 注释的结果行会受到检查：门禁会求值该行前面那个顶层表达式，并把它与 `⇒` 之后的文字比较。结果是打印形式不稳定的对象时，该行改为描述它，并以 `; display` 注释结尾，不做比较。
+
 签名里的参数名用小写。正文里提到参数时用大写，例如「SOURCE 是一个 ref」。
 
 ### 索引词
@@ -142,10 +144,11 @@
 | `PACKAGE is version X, not Y` | 版本号片段与包不一致 |
 | `link to unknown chapter: TARGET`、`link to unknown heading: TARGET` | 链接目标不存在 |
 | `hard-wrapped line: write each paragraph on one line` | 段落或列表项在下一行继续 |
+| `result line claims X but the form returns Y`、`result line is no readable value: TEXT`、`result line has no preceding form`、`result form signals ERROR` | `;; ⇒` 结果行与它前面形式的求值结果不一致 |
 | `definition entries differ from LANGUAGE`、`section structure differs from LANGUAGE`、`runnable examples differ from LANGUAGE`、`index terms differ from LANGUAGE` | 译本与基准语言不一致 |
 | `generated NAME does not link KIND NAME`、`generated concept index does not link TARGET`／`does not list TERM` | 生成内容缺少它承诺包含的接口或索引词 |
 | `Unknown generated content` | `generate` 没有对应已实现的生成器 |
-| `provider checkout missing: DIRECTORY`、`cannot read provider source` | 读不到提供者仓库 |
+| `provider checkout missing: DIRECTORY`、`cannot read provider source`、`cannot load provider package PACKAGE` | 读不到或加载不了提供者仓库 |
 
 ## 命令
 

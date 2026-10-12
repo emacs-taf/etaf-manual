@@ -49,6 +49,8 @@ State styling is selector styling: a rule such as `&.selected` or `&:disabled` m
 
 Hover is different: it is a native Emacs text-property effect, not a retained visual state. A Host declares `:hover-style` with a plist of paint properties, and Ebox applies it as the mouse face while the pointer is over the node; `:hover-content` can replace one line of text the same way. Both are semantic properties of Hosts, defined in [Host](hosts.md). A `:hover-style` value may contain deferred Theme tokens: ETAF resolves them together with the rest of the instance's styles, because an unresolved token would be an invalid face attribute.
 
+The catalog derives a hover fill when the Theme names none. Buttons and menu rows read `:ui-button-primary-hover-bg`, `:ui-button-secondary-hover-bg`, `:ui-button-ghost-hover-bg` or `:ui-accent-soft-bg` when the application provides them, and otherwise mix the surface toward the label color, so a dark palette keeps its light text readable instead of inheriting a light tint from the fallback palette. Application hover styles follow the same rule: read the fill from the Theme or derive it from the Theme's own colors, and check the pointer in both palettes.
+
 ```elisp :figure Component rules read the Theme: a provided token paints the chips and a state class switches one to the disabled colors
 (etaf-define-component demo-theme-states ()
   :setup (etaf-theme-provide '(:chip-bg "#0F766E" :chip-fg "#ECFDF5"))

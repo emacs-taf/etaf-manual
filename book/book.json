@@ -202,7 +202,8 @@
       "chapters": [
         "ekp-principles",
         "ekp-cjk",
-        "ekp-hyphenation"
+        "ekp-hyphenation",
+        "ekp-interactive-use"
       ]
     }
   ],

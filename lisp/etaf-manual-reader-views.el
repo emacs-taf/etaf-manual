@@ -269,8 +269,12 @@ level-3 section widens the gutter and marks it with a dot."
                                       :min-width '(px 0) :wrap-mode 'word)
                                 (list (etaf-node 'text nil (list label))))))))
 
-(defun etaf-manual-reader--sidebar-rows (session env)
-  "Return the navigation rows of SESSION in ENV."
+(defun etaf-manual-reader--sidebar-rows (session env &optional sections)
+  "Return the navigation rows of SESSION in ENV.
+The rows list every part and chapter.  With SECTIONS, the current
+chapter's sections follow it; the narrow-screen overview asks for them
+when no on-this-page column is shown, while the wide navigation column
+leaves page navigation to that column."
   (let ((rows nil) (first t))
     (dolist (part (etaf-manual-reader-toc session))
       (unless first
@@ -297,18 +301,17 @@ level-3 section widens the gutter and marks it with a dot."
                      :level 0
                      :current (plist-get chapter :current)))
               rows)
-        (when (plist-get chapter :current)
+        (when (and sections (plist-get chapter :current))
           (dolist (node (plist-get chapter :nodes))
-            (when (eql (plist-get node :level) 2)
-              (push (etaf-manual-reader--sidebar-row
-                     session env
-                     (list :label (plist-get node :title)
-                           :chapter (plist-get chapter :id)
-                           :node (plist-get node :index)
-                           :level 2
-                           :current (plist-get chapter :current)
-                           :current-node (plist-get node :current)))
-                    rows))))))
+            (push (etaf-manual-reader--sidebar-row
+                   session env
+                   (list :label (plist-get node :title)
+                         :chapter (plist-get chapter :id)
+                         :node (plist-get node :index)
+                         :level (plist-get node :level)
+                         :current (plist-get chapter :current)
+                         :current-node (plist-get node :current)))
+                  rows)))))
     (nreverse rows)))
 
 (defun etaf-manual-reader--sidebar (session env)
@@ -326,7 +329,9 @@ level-3 section widens the gutter and marks it with a dot."
              (etaf-manual-reader--sidebar-rows session env)))
 
 (defun etaf-manual-reader--overview (session env)
-  "Return the narrow-screen overview panel of SESSION in ENV."
+  "Return the narrow-screen overview panel of SESSION in ENV.
+Without an on-this-page column the overview carries the current chapter's
+sections too, so page navigation stays reachable on a narrow frame."
   (etaf-node 'column
              (list :width 'stretch
                    :height 'stretch
@@ -336,7 +341,7 @@ level-3 section widens the gutter and marks it with a dot."
                    :padding '((lh 1) (ch 2))
                    :item-gap '(lh 0)
                    :ref etaf-manual-reader--overview-ref)
-             (etaf-manual-reader--sidebar-rows session env)))
+             (etaf-manual-reader--sidebar-rows session env t)))
 
 ;;;; On-this-page column
 
@@ -354,7 +359,7 @@ carries the accent color, a tinted surface and an accent bar."
                      :box-sizing 'border-box
                      :padding-top '(lh 0)
                      :padding-bottom '(lh 0)
-                     :padding-left (if (eql level 3) '(ch 5) '(ch 2))
+                     :padding-left (if (eql level 3) '(ch 4) '(ch 2))
                      :padding-right '(ch 1)
                      :border-left
                      (list '(px 2) 'solid
@@ -392,10 +397,17 @@ carries the accent color, a tinted surface and an accent bar."
                      :item-gap '(lh 0)
                      :ref 'etaf-manual-page-outline)
                (append
-                (list (etaf-node 'text
-                                 (list :font-weight 'bold
-                                       :color (etaf-manual-reader--color env :muted))
-                                 (list "本页"))
+                (list (etaf-node 'box
+                                 (list :width 'stretch
+                                       :box-sizing 'border-box
+                                       :padding-left '(ch 2)
+                                       :padding-right '(ch 1)
+                                       :padding-bottom '(lh 0)
+                                       :border-bottom (etaf-manual-reader--border env))
+                                 (list (etaf-node 'text
+                                                  (list :font-weight 'bold
+                                                        :color (etaf-manual-reader--color env :faint))
+                                                  (list "本页"))))
                       (etaf-manual-reader--spacer))
                 (cl-loop for node in (etaf-manual-reader--nodes session)
                          for index from 0

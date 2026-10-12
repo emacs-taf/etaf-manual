@@ -41,7 +41,7 @@
 (defconst etaf-manual-reader--sidebar-width 38
   "Width of the navigation column in character cells.")
 
-(defconst etaf-manual-reader--outline-width 26
+(defconst etaf-manual-reader--outline-width 20
   "Width of the on-this-page column in character cells.")
 
 (defconst etaf-manual-reader--wide-threshold 104

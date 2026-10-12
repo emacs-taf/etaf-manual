@@ -130,6 +130,21 @@
       "name": "etaf-manual-lookup-reaches-the-end-of-a-long-chapter",
       "file": "tests/etaf-manual-reader-tests.el",
       "purpose": "Looking up the last entry of a long chapter shows its card immediately in the opened reader."
+    },
+    {
+      "name": "etaf-manual-reader-jump-targets-cover-the-book",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "The jump completion lists chapters, sections, definition entries and index terms with targets that resolve."
+    },
+    {
+      "name": "etaf-manual-reader-search-walks-matching-sections",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "Full-text search lands on matching sections and next/previous walk the result list."
+    },
+    {
+      "name": "etaf-manual-reader-inline-symbols-link-to-definitions",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "A code span naming a definition entry carries a definition help echo and RET jumps to its section."
     }
   ]
 }

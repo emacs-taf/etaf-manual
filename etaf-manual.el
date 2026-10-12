@@ -75,14 +75,18 @@
 ;; CHAPTER names a chapter identifier to start from, defaulting to the first
 ;; chapter.  The buffer gets `etaf-manual-reader-mode': `n' and `p' move
 ;; between sections, `u' goes up one level, `l' and `r' walk the reading
-;; history, `[' and `]' change chapter, `g' switches between Chinese and
-;; English, `i' opens the index, `t' switches the palette and `q' closes the
-;; reader.  The mounted page declares these keys as Host `:keys', so they
+;; history, `[' and `]' change chapter, `/` searches the whole book and
+;; `M-n'/`M-p' walk the matches, `g' switches between Chinese and
+;; English, `i' opens a jump completion listing chapters, sections,
+;; definition entries and index terms, `t' switches the palette and `q'
+;; closes the reader.  The mounted page declares these keys as Host `:keys', so they
 ;; also work when the reader View is embedded and `?' opens the read-only
 ;; ETAF key help listing them.  Tabs, arrows, RET, M-g and Escape keep the
 ;; framework behaviours, so controls inside runnable examples stay focusable
 ;; and operable; activating the run control of an example renders the real
-;; ETAF View in place.
+;; ETAF View in place.  A code span in the article whose text names a
+;; definition entry is itself a link: RET or a click over it opens that
+;; entry.
 ;;
 ;; Function: etaf-manual-close ()
 ;;;###autoload (autoload 'etaf-manual-close "etaf-manual" nil t)
@@ -92,9 +96,10 @@
 ;;;###autoload (autoload 'etaf-manual-lookup "etaf-manual" nil t)
 ;; Open the manual at the definition entry of SYMBOL.
 ;; KIND restricts the entry to one definition kind; without it the first
-;; entry in reading order is used.  An open reader buffer is reused instead
-;; of opening a second one.  A symbol without an entry signals a
-;; `user-error'.
+;; entry in reading order is used.  Interactively the symbol at point is
+;; used when it has a definition entry; otherwise the command reads a name
+;; with completion.  An open reader buffer is reused instead of opening a
+;; second one.  A symbol without an entry signals a `user-error'.
 ;;
 ;; Function: etaf-manual-reader-create (&key language theme chapter)
 ;; Create a headless manual reader session and return it.
@@ -141,6 +146,35 @@
 ;;
 ;; Function: etaf-manual-reader-forward (session)
 ;; Move SESSION to the next reading position.
+;;
+;; Function: etaf-manual-reader-jump-targets (session)
+;; Return SESSION's jump targets as a list of (LABEL . TARGET) pairs.
+;; LABEL names the target for completion; TARGET is a plist with `:chapter'
+;; and one of `:node' (a zero-based section index), `:definition' (a symbol)
+;; or `:anchor' (a section anchor), or only `:chapter' for the chapter
+;; itself.  Chapters, their sections, definition entries and index terms all
+;; appear in reading order; the mounted reader opens them from `i'.
+;;
+;; Function: etaf-manual-reader-search (session query)
+;; Search SESSION's book for QUERY and move to the first matching section.
+;; Matching ignores case and starts after the reading position, wrapping to
+;; the first result when the search reaches the end.  Store the result list
+;; for `etaf-manual-reader-search-next' and `-search-previous'.  Return the
+;; number of matching sections, or 0 when nothing matches; an empty QUERY
+;; signals a `user-error'.
+;;
+;; Function: etaf-manual-reader-search-next (session)
+;; Move SESSION to its next search result and return that match; signal a
+;; `user-error' when no search is active or the last result is current.
+;;
+;; Function: etaf-manual-reader-search-previous (session)
+;; Move SESSION to its previous search result and return that match; signal
+;; a `user-error' when no search is active or the first result is current.
+;;
+;; Function: etaf-manual-reader-search-match (session)
+;; Return SESSION's current search result as a plist, or nil.
+;; The result has `:chapter', `:node' and `:definition', the symbol of the
+;; definition entry the match belongs to, or nil.
 ;;
 ;; Function: etaf-manual-reader-set-language (session language)
 ;; Read SESSION in LANGUAGE, keeping the chapter and the nearest section.

@@ -135,45 +135,25 @@ opens on its first chapter."
             (push name names)))))
     (nreverse names)))
 
-(defun etaf-manual-reader--index-targets (&optional language)
-  "Return the manual's index completion targets in LANGUAGE.
-Each entry is (LABEL . PLIST) where PLIST carries `:chapter' and either
-`:anchor' (a section anchor, from an index marker) or `:definition'."
-  (let ((targets nil)
-        (seen (make-hash-table :test #'equal)))
-    (dolist (chapter (plist-get (etaf-manual-book language) :chapters))
-      (dolist (entry (plist-get chapter :index))
-        (let ((label (plist-get entry :term)))
-          (unless (gethash (cons 'term label) seen)
-            (puthash (cons 'term label) t seen)
-            (push (cons (format "%s — %s" label (plist-get chapter :title))
-                        (list :chapter (plist-get chapter :id)
-                              :anchor (plist-get entry :anchor)))
-                  targets))))
-      (dolist (definition (plist-get chapter :definitions))
-        (let* ((name (plist-get definition :name))
-               (kind (plist-get definition :kind))
-               (key (cons 'definition name)))
-          (unless (gethash key seen)
-            (puthash key t seen)
-            (push (cons (format "%s — %s（%s）" name (plist-get chapter :title) kind)
-                        (list :chapter (plist-get chapter :id)
-                              :definition name))
-                  targets)))))
-    (nreverse targets)))
-
 (defun etaf-manual-lookup (symbol &optional kind)
   "Open the manual at the definition entry of SYMBOL.
-KIND restricts the entry to one definition kind.  A symbol without an entry
-signals a `user-error'.  With an open reader the same buffer is reused."
+KIND restricts the entry to one definition kind.  Interactively the symbol
+at point is used when it has a definition entry; otherwise the command
+reads a name with completion.  A symbol without an entry signals a
+`user-error'.  With an open reader the same buffer is reused."
   (interactive
-   (list (intern (completing-read
-                  "符号: "
-                  (mapcar #'symbol-name (etaf-manual-reader--definition-names))
-                  nil t nil nil
-                  (let ((at (thing-at-point 'symbol t)))
-                    (and at (list at)))))
-         nil))
+   (let* ((at (thing-at-point 'symbol t))
+          (session (etaf-manual-reader--reusable-session))
+          (language (and session (etaf-manual-reader--read session :language)))
+          (name (and at (intern at))))
+     (list (if (and name (etaf-manual-definition name nil language))
+               name
+             (intern (completing-read
+                      "符号: "
+                      (mapcar #'symbol-name
+                              (etaf-manual-reader--definition-names language))
+                      nil t nil nil (and at (list at)))))
+           nil)))
   (let ((definition (etaf-manual-definition symbol kind)))
     (unless definition
       (user-error "手册里没有 %s 的定义" symbol))
@@ -181,7 +161,10 @@ signals a `user-error'.  With an open reader the same buffer is reused."
                         (etaf-manual-reader-create)))
            (buffer (or (etaf-manual-reader--buffer session)
                        (etaf-manual-reader--display session "*ETAF 手册*"))))
-      (etaf-manual-reader-goto session (plist-get definition :chapter))
+      (etaf-manual-reader-goto
+       session (plist-get definition :chapter)
+       (etaf-manual-reader--node-for-line session (plist-get definition :line)
+                                          (plist-get definition :chapter)))
       (pop-to-buffer buffer)
       (etaf-manual-reader-scroll-to-definition session symbol))))
 
@@ -191,20 +174,87 @@ signals a `user-error'.  With an open reader the same buffer is reused."
     (and (buffer-live-p buffer) buffer)))
 
 (defun etaf-manual-reader-index ()
-  "Choose an index term or a definition entry and jump to it."
+  "Choose a chapter, section, definition entry or index term and jump to it."
   (interactive)
   (let* ((session (etaf-manual-reader--current))
-         (language (etaf-manual-reader--read session :language))
-         (targets (etaf-manual-reader--index-targets language))
-         (choice (completing-read "索引: " (mapcar #'car targets) nil t))
+         (targets (etaf-manual-reader-jump-targets session))
+         (choice (completing-read "跳转: " (mapcar #'car targets) nil t))
          (target (cdr (assoc choice targets))))
     (when target
-      (etaf-manual-reader-goto session (plist-get target :chapter))
-      (if-let* ((name (plist-get target :definition)))
-          (etaf-manual-reader-scroll-to-definition session name)
-        (etaf-manual-reader--goto-anchor session (or (plist-get target :anchor) ""))
-        (etaf-manual-reader--after-navigation session))
+      (etaf-manual-reader-goto session (plist-get target :chapter)
+                               (plist-get target :node))
+      (when-let* ((anchor (plist-get target :anchor)))
+        (etaf-manual-reader--goto-anchor session anchor))
+      (etaf-manual-reader--after-navigation session)
+      (when-let* ((name (plist-get target :definition)))
+        (etaf-manual-reader-scroll-to-definition session name))
       (etaf-manual-reader-message session (format "已跳转：%s" choice)))))
+
+;;;; Search
+
+(defun etaf-manual-reader--search-status (session)
+  "Return a status line for SESSION's current search result."
+  (pcase-let* ((search (etaf-manual-reader--read session :search))
+               (index (plist-get search :index))
+               (count (length (plist-get search :matches)))
+               (state (etaf-manual-reader-state session)))
+    (format "「%s」第 %d/%d 个结果 · %s"
+            (plist-get search :query) (1+ index) count
+            (if-let* ((node-title (plist-get state :node-title)))
+                (format "%s › %s" (plist-get state :chapter-title) node-title)
+              (plist-get state :chapter-title)))))
+
+(defun etaf-manual-reader--scroll-to-search-match (session)
+  "Scroll SESSION to the definition entry of its current search result."
+  (when-let* ((match (etaf-manual-reader-search-match session))
+              (name (plist-get match :definition)))
+    (etaf-manual-reader-scroll-to-definition session name)))
+
+(defun etaf-manual-reader-search-command (&optional query)
+  "Search the manual for QUERY and move to the first matching section."
+  (interactive)
+  (let ((session (etaf-manual-reader--current)))
+    (condition-case error
+        (let* ((previous (plist-get (etaf-manual-reader--read session :search) :query))
+               (query (or query
+                          (read-string (if previous
+                                           (format "搜索（默认 %s）: " previous)
+                                         "搜索: ")
+                                       nil nil previous)))
+               (count (etaf-manual-reader-search session query)))
+          (when (> count 0)
+            (etaf-manual-reader--after-navigation session)
+            (etaf-manual-reader--scroll-to-search-match session)
+            (etaf-manual-reader-message session (etaf-manual-reader--search-status session))))
+      (user-error (etaf-manual-reader--report error)))))
+
+(defun etaf-manual-reader-search-next-command ()
+  "Move to the next search result, asking for a query when none is active."
+  (interactive)
+  (let ((session (etaf-manual-reader--current)))
+    (if (null (plist-get (etaf-manual-reader--read session :search) :matches))
+        (call-interactively #'etaf-manual-reader-search-command)
+      (condition-case error
+          (progn
+            (etaf-manual-reader-search-next session)
+            (etaf-manual-reader--after-navigation session)
+            (etaf-manual-reader--scroll-to-search-match session)
+            (etaf-manual-reader-message session (etaf-manual-reader--search-status session)))
+        (user-error (etaf-manual-reader--report error))))))
+
+(defun etaf-manual-reader-search-previous-command ()
+  "Move to the previous search result."
+  (interactive)
+  (let ((session (etaf-manual-reader--current)))
+    (if (null (plist-get (etaf-manual-reader--read session :search) :matches))
+        (call-interactively #'etaf-manual-reader-search-command)
+      (condition-case error
+          (progn
+            (etaf-manual-reader-search-previous session)
+            (etaf-manual-reader--after-navigation session)
+            (etaf-manual-reader--scroll-to-search-match session)
+            (etaf-manual-reader-message session (etaf-manual-reader--search-status session)))
+        (user-error (etaf-manual-reader--report error))))))
 
 ;;;; Interactive commands
 
@@ -304,8 +354,11 @@ signals a `user-error'.  With an open reader the same buffer is reused."
     ("r" etaf-manual-reader-forward-command "前进")
     ("[" etaf-manual-reader-previous-chapter-command "上一章")
     ("]" etaf-manual-reader-next-chapter-command "下一章")
+    ("/" etaf-manual-reader-search-command "搜索")
+    ("M-n" etaf-manual-reader-search-next-command "下一处")
+    ("M-p" etaf-manual-reader-search-previous-command "上一处")
     ("g" etaf-manual-reader-switch-language-command "中英文切换")
-    ("i" etaf-manual-reader-index "索引")
+    ("i" etaf-manual-reader-index "跳转")
     ("t" etaf-manual-reader-toggle-theme-command "深浅主题")
     ("q" etaf-manual-close "退出阅读器"))
   "Reader keys as (KEY COMMAND LABEL).

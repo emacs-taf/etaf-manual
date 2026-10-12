@@ -76,7 +76,19 @@ document order, where INDEX counts the chapter's section nodes."
         :open-link (plist-get env :open-link)
         :footnote-jump (plist-get env :footnote-jump)
         :render-code-block (plist-get env :render-code-block)
+        :code-link (when-let* ((reader (plist-get env :reader)))
+                     (etaf-manual-reader--code-link-callback reader))
         :line-grid t))
+
+(defun etaf-manual-reader--code-link-callback (session)
+  "Return SESSION's code-span linking callback.
+A code span whose text names a definition entry links to that entry, so
+RET and a click over the span open the definition."
+  (let ((table (etaf-manual-reader--definition-table session)))
+    (lambda (text)
+      (when (gethash text table)
+        (cons (format "manual-symbol:%s" text)
+              (format "查看定义：%s" text))))))
 
 (defun etaf-manual-reader--code-pane (env text &optional language)
   "Return the source pane for TEXT with optional LANGUAGE tag.

@@ -367,9 +367,9 @@ level-3 section widens the gutter and marks it with a dot."
 (defun etaf-manual-reader--footer-hints (env)
   "Return the key hints the footer shows in ENV."
   (if (etaf-manual-reader--compact-p env)
-      '(("n/p" . "节") ("i" . "索引") ("?" . "按键"))
+      '(("n/p" . "节") ("/" . "搜索") ("i" . "跳转") ("?" . "按键"))
     '(("n/p" . "上下节") ("[ ]" . "上下章") ("u" . "上级")
-      ("i" . "索引") ("?" . "全部按键"))))
+      ("/" . "搜索") ("i" . "跳转") ("?" . "全部按键"))))
 
 (defun etaf-manual-reader--footer (session env)
   "Return the footer View of SESSION in ENV: the reading position or the

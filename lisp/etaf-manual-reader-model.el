@@ -24,6 +24,8 @@
 (require 'etaf-manual-reader-theme)
 
 (declare-function etaf-manual-book "etaf-manual" (&optional language))
+(declare-function etaf-manual-reader-scroll-to-definition
+                  "etaf-manual-reader-views" (session name))
 
 (defconst etaf-manual-reader--history-limit 64
   "Maximum remembered positions per direction.")
@@ -56,6 +58,7 @@ no buffer, so it is a complete headless reader for scripts and tests."
      :toc (etaf-ref nil :name 'etaf-manual-reader-toc-visible)
      :message (etaf-ref nil :name 'etaf-manual-reader-message)
      :extent (etaf-ref nil :name 'etaf-manual-reader-extent)
+     :search (etaf-ref nil :name 'etaf-manual-reader-search)
      :documents (make-hash-table :test #'equal)
      :buffer nil)))
 
@@ -169,6 +172,252 @@ but callers read the chapter before asking, so a chapter change re-parses."
 (defun etaf-manual-reader--chapter-definitions (session &optional id)
   "Return SESSION's definition entries of chapter ID, in document order."
   (plist-get (etaf-manual-reader--chapter session id) :definitions))
+
+(defun etaf-manual-reader--definition-table (session)
+  "Return SESSION's definition entries as a NAME string hash table.
+The table is built once per language; the first entry of a name wins."
+  (let* ((language (etaf-manual-reader--read session :language))
+         (key (list 'definitions language))
+         (cache (plist-get session :documents)))
+    (or (gethash key cache)
+        (puthash key
+                 (let ((table (make-hash-table :test #'equal)))
+                   (dolist (chapter (etaf-manual-reader--chapters session))
+                     (dolist (definition (plist-get chapter :definitions))
+                       (let ((name (format "%s" (plist-get definition :name))))
+                         (unless (gethash name table)
+                           (puthash name definition table)))))
+                   table)
+                 cache))))
+
+(defun etaf-manual-reader--node-for-line (session line &optional id)
+  "Return SESSION's section index containing LINE of chapter ID, or nil.
+The section is the last section node that starts at or before LINE."
+  (when (numberp line)
+    (let ((index nil))
+      (cl-loop for node in (etaf-manual-reader--nodes session id)
+               for position from 0
+               do (when (and (plist-get node :line)
+                             (<= (plist-get node :line) line))
+                    (setq index position)))
+      index)))
+
+;;;; Jump targets
+
+(defun etaf-manual-reader--chapter-kind-label (chapter)
+  "Return CHAPTER's completion label prefix."
+  (pcase (plist-get chapter :kind)
+    ('appendix "附录")
+    ('index "索引")
+    (_ "章")))
+
+(defun etaf-manual-reader-jump-targets (session)
+  "Return SESSION's jump targets as a list of (LABEL . TARGET) pairs.
+LABEL names the target for completion; TARGET is a plist with `:chapter'
+and one of `:node' (a zero-based section index), `:definition' (a symbol)
+or `:anchor' (a section anchor), or only `:chapter' for the chapter itself.
+Chapters, their sections, definition entries and index terms all appear in
+reading order."
+  (let (targets)
+    (dolist (chapter (etaf-manual-reader--chapters session))
+      (let* ((id (plist-get chapter :id))
+             (title (etaf-manual-reader--chapter-title session id))
+             (prefix (etaf-manual-reader--chapter-kind-label chapter)))
+        (push (cons (format "%s · %s" prefix title)
+                    (list :chapter id))
+              targets)
+        (cl-loop for node in (plist-get chapter :nodes)
+                 for index from 0
+                 do (push (cons (format "节 · %s › %s" title (plist-get node :title))
+                                (list :chapter id :node index))
+                          targets))
+        (dolist (definition (plist-get chapter :definitions))
+          (push (cons (format "定义 · %s（%s）— %s"
+                              (plist-get definition :name)
+                              (plist-get definition :kind)
+                              title)
+                      (list :chapter id
+                            :node (etaf-manual-reader--node-for-line
+                                   session (plist-get definition :line) id)
+                            :definition (plist-get definition :name)))
+                targets))
+        (dolist (entry (plist-get chapter :index))
+          (push (cons (format "术语 · %s — %s" (plist-get entry :term) title)
+                      (list :chapter id :anchor (plist-get entry :anchor)))
+                targets))))
+    (nreverse targets)))
+
+;;;; Search
+
+(defun etaf-manual-reader--inline-text (nodes)
+  "Return the plain text of inline NODES."
+  (mapconcat (lambda (node)
+               (concat (or (plist-get node :text) "")
+                       (etaf-manual-reader--inline-text (plist-get node :children))))
+             nodes ""))
+
+(defun etaf-manual-reader--block-text (block)
+  "Return the plain text of BLOCK."
+  (pcase (plist-get block :type)
+    ('list (mapconcat (lambda (item)
+                        (mapconcat (lambda (child)
+                                     (etaf-manual-reader--block-text child))
+                                   (plist-get item :children) " "))
+                      (plist-get block :items) " "))
+    ('table (mapconcat (lambda (row)
+                         (mapconcat #'etaf-manual-reader--inline-text row " "))
+                       (append (list (plist-get block :header))
+                               (plist-get block :rows))
+                       " "))
+    ((or 'blockquote 'footnote-def)
+     (mapconcat #'etaf-manual-reader--block-text (plist-get block :children) " "))
+    (_ (concat (or (plist-get block :text) "")
+               (etaf-manual-reader--inline-text (plist-get block :children))))))
+
+(defun etaf-manual-reader--search-entries (session chapter-id)
+  "Return SESSION's searchable text of CHAPTER-ID, in document order.
+Each entry is `(:chapter ID :node NIL-or-INDEX :definition NAME :text
+STRING)'; NODE is nil before the first section and NAME is the definition
+entry the block belongs to, if any."
+  (let* ((language (etaf-manual-reader--read session :language))
+         (key (list 'search language chapter-id))
+         (cache (plist-get session :documents)))
+    (or (gethash key cache)
+        (puthash key
+                 (let ((node -1) (definition nil) entries)
+                   (dolist (block (plist-get (etaf-manual-reader-document session chapter-id)
+                                             :children))
+                     (let* ((heading (eq (plist-get block :type) 'heading))
+                            (level (and heading (plist-get block :level)))
+                            (text (etaf-manual-reader--block-text block)))
+                       (cond
+                        ((memq level '(2 3)) (cl-incf node) (setq definition nil))
+                        ((= (or level 0) 4)
+                         (setq definition
+                               (and (string-match
+                                     "\\`[A-Za-z]+: \\([^ \t\n]+\\)"
+                                     (string-trim text))
+                                    (intern (match-string 1 (string-trim text)))))))
+                       (unless (string-empty-p text)
+                         (push (list :chapter chapter-id
+                                     :node (and (>= node 0) node)
+                                     :definition definition
+                                     :text text)
+                               entries))))
+                   (nreverse entries))
+                 cache))))
+
+(defun etaf-manual-reader--match-order (session match)
+  "Return (CHAPTER-INDEX . NODE) ordering key of MATCH in SESSION."
+  (cons (or (cl-position (plist-get match :chapter)
+                         (etaf-manual-reader--chapters session)
+                         :key (lambda (chapter) (plist-get chapter :id)))
+            0)
+        (or (plist-get match :node) -1)))
+
+(defun etaf-manual-reader--record-order (session)
+  "Return SESSION's reading position as an ordering key."
+  (cons (or (etaf-manual-reader--chapter-index session) 0)
+        (or (etaf-manual-reader--read session :node) -1)))
+
+(defun etaf-manual-reader--order-before-p (a b)
+  "Return non-nil when ordering key A precedes B."
+  (or (< (car a) (car b))
+      (and (= (car a) (car b)) (< (cdr a) (cdr b)))))
+
+(defun etaf-manual-reader--search-matches (session query)
+  "Return SESSION's sections containing QUERY, in reading order.
+A section contributes one match per definition entry and one for its own
+text, so repeated occurrences do not repeat the jump."
+  (let ((case-fold-search t)
+        (pattern (regexp-quote query))
+        matches)
+    (dolist (chapter (etaf-manual-reader--chapters session))
+      (let ((seen (make-hash-table :test #'equal)))
+        (dolist (entry (etaf-manual-reader--search-entries session (plist-get chapter :id)))
+          (when (string-match-p pattern (plist-get entry :text))
+            (let ((key (list (plist-get entry :node) (plist-get entry :definition))))
+              (unless (gethash key seen)
+                (puthash key t seen)
+                (push (list :chapter (plist-get entry :chapter)
+                            :node (plist-get entry :node)
+                            :definition (plist-get entry :definition))
+                      matches)))))))
+    (nreverse matches)))
+
+(defun etaf-manual-reader--goto-match (session match)
+  "Move SESSION to MATCH and reveal its definition entry when it has one."
+  (etaf-manual-reader-goto session (plist-get match :chapter) (plist-get match :node))
+  (when-let* ((name (plist-get match :definition)))
+    (etaf-manual-reader-reveal-definition session name)))
+
+(defun etaf-manual-reader--search-state (session)
+  "Return SESSION's search state, or nil."
+  (etaf-manual-reader--read session :search))
+
+(defun etaf-manual-reader-search (session query)
+  "Search SESSION's book for QUERY and move to the first matching section.
+Matching ignores case and starts after the reading position, wrapping to
+the first result when the search reaches the end.  Store the result list
+for `etaf-manual-reader-search-next' and `-search-previous'.  Return the
+number of matching sections, or 0 when nothing matches; an empty QUERY
+signals `user-error'."
+  (unless (and (stringp query) (not (string-empty-p query)))
+    (user-error "搜索词不能为空"))
+  (let* ((matches (etaf-manual-reader--search-matches session query))
+         (count (length matches)))
+    (if (zerop count)
+        (progn
+          (etaf-manual-reader--write session :search nil)
+          0)
+      (let* ((current (etaf-manual-reader--record-order session))
+             (index (or (cl-position-if (lambda (match)
+                                          (etaf-manual-reader--order-before-p
+                                           current
+                                           (etaf-manual-reader--match-order session match)))
+                                        matches)
+                        0)))
+        (etaf-manual-reader--write
+         session :search (list :query query :matches matches :index index))
+        (etaf-manual-reader--goto-match session (nth index matches))
+        count))))
+
+(defun etaf-manual-reader-search-next (session)
+  "Move SESSION to its next search result and return that match.
+Signal `user-error' without searching or at the last result."
+  (let* ((search (etaf-manual-reader--search-state session))
+         (matches (plist-get search :matches)))
+    (unless matches
+      (user-error "尚未搜索"))
+    (let ((index (1+ (plist-get search :index))))
+      (when (>= index (length matches))
+        (user-error "已是最后一条结果"))
+      (etaf-manual-reader--write session :search
+                                 (plist-put (copy-sequence search) :index index))
+      (etaf-manual-reader--goto-match session (nth index matches))
+      (nth index matches))))
+
+(defun etaf-manual-reader-search-previous (session)
+  "Move SESSION to its previous search result and return that match.
+Signal `user-error' without searching or at the first result."
+  (let* ((search (etaf-manual-reader--search-state session))
+         (matches (plist-get search :matches)))
+    (unless matches
+      (user-error "尚未搜索"))
+    (let ((index (1- (plist-get search :index))))
+      (when (< index 0)
+        (user-error "已是第一条结果"))
+      (etaf-manual-reader--write session :search
+                                 (plist-put (copy-sequence search) :index index))
+      (etaf-manual-reader--goto-match session (nth index matches))
+      (nth index matches))))
+
+(defun etaf-manual-reader-search-match (session)
+  "Return SESSION's current search result as a plist, or nil.
+The result has `:chapter', `:node' and `:definition' (the symbol of the
+definition entry the match belongs to, or nil)."
+  (when-let* ((search (etaf-manual-reader--search-state session)))
+    (nth (plist-get search :index) (plist-get search :matches))))
 
 ;;;; Navigation
 
@@ -332,11 +581,26 @@ neighbouring chapter through a negative index."
                                  index)
       (etaf-manual-reader-message session (format "找不到锚点 #%s" anchor)))))
 
+(defun etaf-manual-reader--follow-symbol (session name)
+  "Move SESSION to the definition entry of symbol NAME, or report it."
+  (let ((definition (gethash name (etaf-manual-reader--definition-table session))))
+    (if (not definition)
+        (etaf-manual-reader-message session (format "手册里没有 %s 的定义" name))
+      (etaf-manual-reader-goto
+       session (plist-get definition :chapter)
+       (etaf-manual-reader--node-for-line session (plist-get definition :line)
+                                          (plist-get definition :chapter)))
+      (etaf-manual-reader-scroll-to-definition session (plist-get definition :name))
+      (etaf-manual-reader-message
+       session (format "已跳转：%s 的定义" (plist-get definition :name))))))
+
 (defun etaf-manual-reader-follow (session url)
   "Open URL from SESSION's document.
-In-document anchors and links to another chapter stay inside the reader;
-anything else goes to the browser."
+In-document anchors, links to another chapter and symbol links stay inside
+the reader; anything else goes to the browser."
   (cond
+   ((string-prefix-p "manual-symbol:" url)
+    (etaf-manual-reader--follow-symbol session (substring url (length "manual-symbol:"))))
    ((string-prefix-p "#" url)
     (etaf-manual-reader--goto-anchor session (substring url 1)))
    ((string-match "\\`\\([^#]+\\)\\(?:#\\(.*\\)\\)?\\'" url)

@@ -261,5 +261,86 @@
       (when (buffer-live-p buffer)
         (with-current-buffer buffer (etaf-manual-close))))))
 
+(ert-deftest etaf-manual-reader-jump-targets-cover-the-book ()
+  "The jump completion lists chapters, sections, definitions and terms."
+  (let* ((session (etaf-manual-reader-create :language "zh-CN"))
+         (targets (etaf-manual-reader-jump-targets session))
+         (sections (cl-remove-if-not
+                    (lambda (entry) (plist-get (cdr entry) :node)) targets))
+         (definitions (cl-remove-if-not
+                       (lambda (entry) (plist-get (cdr entry) :definition)) targets))
+         (terms (cl-remove-if-not
+                 (lambda (entry) (plist-get (cdr entry) :anchor)) targets))
+         (chapter (cl-find 'introduction (plist-get (etaf-manual-book "zh-CN") :chapters)
+                           :key (lambda (entry) (plist-get entry :id))))
+         (chapter-target (cl-find-if
+                          (lambda (entry)
+                            (equal (list :chapter 'introduction) (cdr entry)))
+                          targets)))
+    (should (> (length targets) 3000))
+    (should (> (length sections) 700))
+    (should (> (length definitions) 700))
+    (should (> (length terms) 1500))
+    (should chapter-target)
+    (should (string-match-p "\\`章 · " (car chapter-target)))
+    (should (etaf-manual-definition
+             (plist-get (cdr (car definitions)) :definition)))
+    (should (equal (list :chapter 'introduction)
+                   (cdr chapter-target)))
+    (should (plist-get chapter :nodes))))
+
+(ert-deftest etaf-manual-reader-search-walks-matching-sections ()
+  "Search finds matching sections and next/previous walk the results."
+  (let* ((session (etaf-manual-reader-create :language "zh-CN"))
+         (count (etaf-manual-reader-search session "etaf-ref")))
+    (should (> count 1))
+    (let ((first (etaf-manual-reader-search-match session)))
+      (should (plist-get first :chapter))
+      ;; The first result has nothing before it.
+      (should-error (etaf-manual-reader-search-previous session) :type 'user-error)
+      (let ((second (etaf-manual-reader-search-next session)))
+        (should (equal second (etaf-manual-reader-search-match session)))
+        (should (equal first (etaf-manual-reader-search-previous session)))
+        (should (equal first (etaf-manual-reader-search-match session)))))
+    (should-error (etaf-manual-reader-search-previous session) :type 'user-error)
+    ;; A query with no match clears the results; an empty query is an error.
+    (should (zerop (etaf-manual-reader-search session "zzz-not-in-the-book")))
+    (should-not (etaf-manual-reader-search-match session))
+    (should-error (etaf-manual-reader-search-next session) :type 'user-error)
+    (should-error (etaf-manual-reader-search session "") :type 'user-error)))
+
+(ert-deftest etaf-manual-reader-inline-symbols-link-to-definitions ()
+  "A code span naming a definition entry activates as a link."
+  (let* ((session (etaf-manual-reader-create :language "zh-CN" :chapter 'reactivity))
+         (definition (etaf-manual-definition 'etaf-watch))
+         (chapter (cl-find (plist-get definition :chapter)
+                           (plist-get (etaf-manual-book "zh-CN") :chapters)
+                           :key (lambda (entry) (plist-get entry :id))))
+         (expected (let ((index nil))
+                     (cl-loop for node in (plist-get chapter :nodes)
+                              for position from 0
+                              do (when (and (plist-get node :line)
+                                            (<= (plist-get node :line)
+                                                (plist-get definition :line)))
+                                   (setq index position)))
+                     index)))
+    (should expected)
+    (etaf-manual-reader-test--with-reader session
+      (let* ((text (etaf-manual-reader-test--text))
+             (start 0)
+             (position nil))
+        (while (and (not position)
+                    (setq start (string-match "etaf-watch" text start)))
+          (when (equal "查看定义：etaf-watch"
+                       (get-text-property (1+ start) 'help-echo))
+            (setq position start))
+          (setq start (1+ start)))
+        (should position)
+        ;; RET over the span follows the link exactly like a click.
+        (set-window-buffer (selected-window) (current-buffer))
+        (goto-char (1+ position))
+        (execute-kbd-macro (kbd "RET"))))
+    (should (eql expected (plist-get (etaf-manual-reader-state session) :node)))))
+
 (provide 'etaf-manual-reader-tests)
 ;;; etaf-manual-reader-tests.el ends here

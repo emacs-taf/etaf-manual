@@ -18,6 +18,16 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
   `:keys', so `?' opens the ETAF key help listing them with their labels.
   A long chapter shows its first sections at once and appends the rest while
   Emacs is idle; a lookup renders through its entry immediately.
+- Reader navigation and search: `/` searches the whole book and `M-n` /
+  `M-p` walk the matching sections; `i` opens a jump completion over every
+  chapter, section, definition entry and index term
+  (`etaf-manual-reader-jump-targets`); and a code span in the article whose
+  text names a definition entry links to that entry, so `RET` or a click
+  over it opens the definition.  `etaf-manual-reader-search`,
+  `etaf-manual-reader-search-next`, `etaf-manual-reader-search-previous`
+  and `etaf-manual-reader-search-match` drive the same search headlessly,
+  and `etaf-manual-lookup` starts from the symbol at point when it has an
+  entry.
 - The generated concept index groups terms under symbols and A–Z, filing
   Chinese terms by the Pinyin of their first character; the symbol index
   groups functions, macros, variables, hooks and errors by package and the

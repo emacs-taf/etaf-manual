@@ -34,13 +34,15 @@ To read a chapter as Markdown, open its file below `book/en/` or `book/zh-CN/`; 
 ![The reader at a narrow frame: the navigation column collapses to the overview switch](examples/etaf-manual-reader-narrow.png)
 
 - `n` / `p` move between sections, `u` goes one level up, `l` / `r` walk the reading history.
-- `[` / `]` change chapter, `i` opens an index of terms and definition entries, `g` switches between Chinese and English, `t` switches the palette, `q` closes the reader.
+- `[` / `]` change chapter, `/` searches the whole book and `M-n` / `M-p` walk the matching sections, `i` jumps to a chapter, section, definition entry or index term, `g` switches between Chinese and English, `t` switches the palette, `q` closes the reader.
 - `?` opens the ETAF key help listing the reader's keys with their labels.
 - `TAB`, the arrows, `RET`, `M-g` and `Escape` keep the framework behaviours, so controls inside runnable examples stay focusable and operable.
 
+A code span in the article whose text names a definition entry is itself a link: `RET` or a click over it opens that entry.
+
 Every `elisp :run` example renders in place. Its viewer card offers *source*, *preview* and *side-by-side* modes, a run/rerun control and a stop control; the preview is the real, interactive ETAF View the example builds, not a screenshot.
 
-`M-x etaf-manual-lookup` opens the manual at a symbol's definition entry from any buffer.
+`M-x etaf-manual-lookup` opens the manual at a symbol's definition entry from any buffer; interactively it starts from the symbol at point when that symbol has an entry.
 
 ## Documentation
 

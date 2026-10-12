@@ -207,7 +207,8 @@
         "ekp-interactive-use",
         "ekp-programming-interface",
         "ekp-parameters",
-        "ekp-native-module"
+        "ekp-native-module",
+        "ekp-implementation"
       ]
     }
   ],

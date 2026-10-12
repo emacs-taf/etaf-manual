@@ -49,6 +49,20 @@ State styling is selector styling: a rule such as `&.selected` or `&:disabled` m
 
 Hover is different: it is a native Emacs text-property effect, not a retained visual state. A Host declares `:hover-style` with a plist of paint properties, and Ebox applies it as the mouse face while the pointer is over the node; `:hover-content` can replace one line of text the same way. Both are semantic properties of Hosts, defined in [Host](hosts.md). A `:hover-style` value may contain deferred Theme tokens: ETAF resolves them together with the rest of the instance's styles, because an unresolved token would be an invalid face attribute.
 
+```elisp :figure Component rules read the Theme: a provided token paints the chips and a state class switches one to the disabled colors
+(etaf-define-component demo-theme-states ()
+  :setup (etaf-theme-provide '(:chip-bg "#0F766E" :chip-fg "#ECFDF5"))
+  :styles (("& .chip" :background-color (etaf-theme-token :chip-bg "#334155")
+                     :color (etaf-theme-token :chip-fg "#F8FAFC"))
+           ("& .chip.muted" :background-color (etaf-theme-token :ui-disabled-bg "#e5e7eb")
+                            :color (etaf-theme-token :ui-disabled-fg "#687386")))
+  :view
+  (row :item-gap '(ch 1)
+       (box :class "chip" :padding '((lh 0) (ch 1)) (text "在线"))
+       (box :class "chip muted" :padding '((lh 0) (ch 1)) (text "离线"))))
+(etaf-view (demo-theme-states))
+```
+
 ## Providing a Theme
 
 <!-- index: Theme provision; Host defaults; UA origin -->

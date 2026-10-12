@@ -14,6 +14,17 @@ An inline style property that the Host kind does not accept is rejected when the
 
 Only seven properties inherit: `:color`, `:font-family`, `:font-size`, `:font-weight`, `:font-style`, `:text-align` and `:wrap-mode`. Everything else starts from its initial value on every node and is combined only by explicit declarations and the cascade.
 
+```elisp :figure The seven inherited properties: color and font-weight flow into children, and an override touches only its own branch
+(etaf-view
+ (column :width '(ch 44) :item-gap '(lh 0)
+         :color (etaf-theme-token :ui-accent "#0969da")
+         :font-weight 'bold
+         (text "这一行继承颜色与字重。")
+         (text :color (etaf-theme-token :ui-panel-fg "#1f2328") "这一行覆盖颜色，字重仍继承。")
+         (text :color (etaf-theme-token :ui-muted-fg "#526174") :font-weight 'normal
+               "这一行两个属性都覆盖。")))
+```
+
 ## Text
 
 <!-- index: color; font; text decoration -->

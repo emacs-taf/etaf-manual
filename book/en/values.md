@@ -20,6 +20,20 @@ Lengths stay typed in computed styles: a declaration of `(% 50)` computes to `(%
 
 A color value is a string or the symbol `currentColor`. Ebox does not parse color syntax: any string is accepted and handed to Emacs as a face attribute, so hex strings such as `"#B45309"` and named colors such as `"red"` both work. `currentColor` is a reference to the element's own computed `:color`, and it is the initial value of the border colors and of `:text-decoration-color`.
 
+```elisp :figure Length units and color values: ch, px, a percentage and a calculated length, in named, hex and token colors
+(etaf-view
+ (column :width '(ch 44) :item-gap '(lh 1)
+         (row :item-gap '(ch 1)
+              (box :height '(lh 1) :width '(ch 6) :background-color "red")
+              (box :height '(lh 1) :width '(px 48) :background-color "#0969da")
+              (box :height '(lh 1) :width '(% 25) :background-color (etaf-theme-token :ui-accent "#0969da"))
+              (box :height '(lh 1) :width '(calc (* 2 (ch 3))) :background-color "#e5e7eb"))
+         (text :color (etaf-theme-token :ui-muted-fg "#526174")
+               "宽度依次用 ch、px、% 与 calc。")
+         (text :color (etaf-theme-token :ui-muted-fg "#526174")
+               "颜色依次用命名色、十六进制与 token。")))
+```
+
 ## Fonts
 
 <!-- index: font family; font size; font weight; font style -->

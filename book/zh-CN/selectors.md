@@ -103,6 +103,19 @@ Ebox 把每个保留节点暴露成主体，选择器词表因此与节点模型
 
 作用域之外没有可点名的根，所以在裸 `ecss-selector-match-p` 调用或 `ebox-selector-query` 里，`&` 与 `:scope` 不匹配任何东西；只有在匹配带作用域的样式表时它们才有意义。
 
+```elisp :figure 组件规则里的类选择器：.item 给每行上色，.item.selected 给选中行，.item .marker 给行内文字
+(etaf-define-component demo-selector-list ()
+  :styles ((".item" :padding ((lh 0) (ch 1)) :background-color "#f6f8fa")
+           (".item.selected" :background-color "#dbeafe")
+           (".item .marker" :color "#0969da" :font-weight bold))
+  :view
+  (column :width '(ch 44) :item-gap '(lh 0)
+          (row :class "item" (text "普通行"))
+          (row :class "item selected" (text "选中行"))
+          (row :class "item" (text :class "marker" "标记文字"))))
+(etaf-view (demo-selector-list))
+```
+
 ## 选择器接口
 
 <!-- index: 选择器 AST; 选择器校验 -->

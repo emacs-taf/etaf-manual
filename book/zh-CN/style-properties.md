@@ -14,6 +14,17 @@
 
 只有七个属性继承：`:color`、`:font-family`、`:font-size`、`:font-weight`、`:font-style`、`:text-align` 和 `:wrap-mode`。其余属性在每个节点上都从初值开始，只由显式声明与层叠组合。
 
+```elisp :figure 七个可继承属性：color 与 font-weight 流进子节点，覆盖只影响自己这一支
+(etaf-view
+ (column :width '(ch 44) :item-gap '(lh 0)
+         :color (etaf-theme-token :ui-accent "#0969da")
+         :font-weight 'bold
+         (text "这一行继承颜色与字重。")
+         (text :color (etaf-theme-token :ui-panel-fg "#1f2328") "这一行覆盖颜色，字重仍继承。")
+         (text :color (etaf-theme-token :ui-muted-fg "#526174") :font-weight 'normal
+               "这一行两个属性都覆盖。")))
+```
+
 ## 文字
 
 <!-- index: 颜色; 字体; 文字装饰 -->

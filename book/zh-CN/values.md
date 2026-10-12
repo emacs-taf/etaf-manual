@@ -20,6 +20,20 @@
 
 颜色值是字符串或符号 `currentColor`。Ebox 不解析颜色语法：任何字符串都接受并作为 face 属性交给 Emacs，因此十六进制字符串 `"#B45309"` 与颜色名 `"red"` 都能用。`currentColor` 引用元素自己计算出的 `:color`，也是边框颜色与 `:text-decoration-color` 的初值。
 
+```elisp :figure 长度单位与颜色值：ch、px、百分比与计算长度，以及命名色、十六进制色与 token 色
+(etaf-view
+ (column :width '(ch 44) :item-gap '(lh 1)
+         (row :item-gap '(ch 1)
+              (box :height '(lh 1) :width '(ch 6) :background-color "red")
+              (box :height '(lh 1) :width '(px 48) :background-color "#0969da")
+              (box :height '(lh 1) :width '(% 25) :background-color (etaf-theme-token :ui-accent "#0969da"))
+              (box :height '(lh 1) :width '(calc (* 2 (ch 3))) :background-color "#e5e7eb"))
+         (text :color (etaf-theme-token :ui-muted-fg "#526174")
+               "宽度依次用 ch、px、% 与 calc。")
+         (text :color (etaf-theme-token :ui-muted-fg "#526174")
+               "颜色依次用命名色、十六进制与 token。")))
+```
+
 ## 字体
 
 <!-- index: 字体族; 字号; 字重; 字体样式 -->

@@ -49,6 +49,20 @@ Component 通过一份静态规则列表拥有自己的默认外观，并通过�
 
 悬停不一样：它是 Emacs 原生的文本属性效果，不是保留的视觉状态。Host 用 `:hover-style` 声明一个绘制属性 plist，指针位于节点上时由 Ebox 作为 mouse face 应用；`:hover-content` 能以同样方式替换一行文本。两者都是 Host 的语义属性，定义见 [Host](hosts.md)。`:hover-style` 的值可以包含延迟的 Theme token：ETAF 把它们与实例的其余样式一起解析，因为未解析的 token 是无效的 face 属性。
 
+```elisp :figure 组件规则读取 Theme：提供的 token 给标签上色，state class 把其中一个切到禁用色
+(etaf-define-component demo-theme-states ()
+  :setup (etaf-theme-provide '(:chip-bg "#0F766E" :chip-fg "#ECFDF5"))
+  :styles (("& .chip" :background-color (etaf-theme-token :chip-bg "#334155")
+                     :color (etaf-theme-token :chip-fg "#F8FAFC"))
+           ("& .chip.muted" :background-color (etaf-theme-token :ui-disabled-bg "#e5e7eb")
+                            :color (etaf-theme-token :ui-disabled-fg "#687386")))
+  :view
+  (row :item-gap '(ch 1)
+       (box :class "chip" :padding '((lh 0) (ch 1)) (text "在线"))
+       (box :class "chip muted" :padding '((lh 0) (ch 1)) (text "离线"))))
+(etaf-view (demo-theme-states))
+```
+
 ## 提供 Theme
 
 <!-- index: Theme 提供; Host 默认值; UA 来源 -->

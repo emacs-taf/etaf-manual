@@ -73,6 +73,7 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
 - The `etaf-manual` package: `etaf-manual-book`, `etaf-manual-definition`, `etaf-manual-example-view`, the `etaf-manual-language` option and the `etaf-manual-error` condition.
 - A gate that checks the book against the provider packages: signatures, public names, versions, links, coverage, translation structure and one line per paragraph. Runnable examples are mounted by the acceptance tests.
 - The gate evaluates every `;; ⇒` result line in an `elisp` block and reports a value the form before it does not return, a result line without a preceding form, and a result value that is no readable datum; a line ending in a `; display` comment describes an object without a stable printed form and is not compared.
+- The Values, Selectors, Style Properties and Component Styles and Themes chapters show one inline figure each, in both languages.
 
 ### Changed
 

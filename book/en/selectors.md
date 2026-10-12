@@ -103,6 +103,19 @@ A rule selector that does not name the scope root is anchored to the scope: it i
 
 Outside a scope there is no root to name, so `&` and `:scope` match nothing in a plain `ecss-selector-match-p` call or an `ebox-selector-query`; they become meaningful only while a scoped stylesheet is being matched.
 
+```elisp :figure Class selectors in a Component's rules: .item styles every row, .item.selected the selected row, and .item .marker the text inside a row
+(etaf-define-component demo-selector-list ()
+  :styles ((".item" :padding ((lh 0) (ch 1)) :background-color "#f6f8fa")
+           (".item.selected" :background-color "#dbeafe")
+           (".item .marker" :color "#0969da" :font-weight bold))
+  :view
+  (column :width '(ch 44) :item-gap '(lh 0)
+          (row :class "item" (text "普通行"))
+          (row :class "item selected" (text "选中行"))
+          (row :class "item" (text :class "marker" "标记文字"))))
+(etaf-view (demo-selector-list))
+```
+
 ## The selector interface
 
 <!-- index: selector AST; selector validation -->

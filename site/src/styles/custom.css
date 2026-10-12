@@ -1,0 +1,14 @@
+/* Typography.
+
+   English and digits use Pragmata Pro when it is installed locally (it is a
+   commercial font, so it cannot be served); Chinese uses LXGW WenKai, which
+   the site loads as a subset webfont in astro.config.mjs, and code uses the
+   matching WenKai Mono.  The system stack comes after these names through
+   Starlight's own variables. */
+
+:root {
+  --sl-font: "PragmataPro", "LXGW WenKai", "霞鹜文楷", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --sl-font-mono: "PragmataPro", "LXGW WenKai Mono", "霞鹜文楷等宽",
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+}

@@ -33,6 +33,16 @@
   "Return the plain text of the mounted reader buffer."
   (substring-no-properties (buffer-string)))
 
+(defun etaf-manual-reader-test--hover-p (needle)
+  "Return non-nil when some NEEDLE occurrence carries a mouse face."
+  (let ((position 0) (found nil))
+    (while (and (not found)
+                (setq position (string-match needle (buffer-string) position)))
+      (when (get-text-property (1+ position) 'mouse-face)
+        (setq found t))
+      (setq position (1+ position)))
+    found))
+
 (ert-deftest etaf-manual-reader-create-reports-state ()
   "A new session reads the first chapter and exposes its outline."
   (let* ((session (etaf-manual-reader-create :language "zh-CN"))
@@ -478,6 +488,19 @@
         (call-interactively (key-binding (kbd "<right>") t))
         (etaf-runtime-flush runtime)))
     (should (> (plist-get (etaf-manual-reader-state session) :sidebar-width) 30))))
+
+(ert-deftest etaf-manual-reader-interactive-surfaces-hover ()
+  "Navigation rows and rendered links carry a pointer hover face."
+  (let ((session (etaf-manual-reader-create :language "zh-CN" :chapter 'introduction)))
+    (etaf-manual-reader-test--with-reader session
+      (etaf-runtime-refit (etaf-runtime-for-buffer etaf-manual-reader-test--buffer)
+                          (* 150 (frame-char-width)) 44)
+      (etaf-runtime-flush (etaf-runtime-for-buffer etaf-manual-reader-test--buffer))
+      ;; An inactive chapter row hovers; the chapter being read keeps its
+      ;; selected surface.
+      (should (etaf-manual-reader-test--hover-p "生态与分层"))
+      (should-not (etaf-manual-reader-test--hover-p "引言"))
+      (should (etaf-manual-reader-test--hover-p "响应式系统")))))
 
 (provide 'etaf-manual-reader-tests)
 ;;; etaf-manual-reader-tests.el ends here

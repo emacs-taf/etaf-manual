@@ -16,13 +16,13 @@ Each control reads its input through the same contract. An explicit `:value` or 
 
 <!-- index: etaf-button; button variant; failed publication; ghost -->
 
-#### Component: etaf-button (&key label on-press disabled id ref class color bgcolor border padding font-size font-weight tab-index aria-label help-echo hover-content hover-group pointer use variant)
+#### Component: etaf-button (&key label on-press disabled id ref class color bgcolor border padding font-size font-weight tab-index aria-label aria-selected help-echo hover-content hover-group pointer use variant)
 
 Render a standard pressable Button with a committed callback.
 
-**Arguments.** LABEL names the button and is shown unless a default slot replaces it. ON-PRESS is the zero-argument callback. DISABLED removes the callback and the default Tab index. VARIANT is `primary` (accent fill, bold; the default), `secondary` (soft accent tint) or `ghost` (inherits its surface, narrower padding); every variant is a borderless single-row pill whose second class name carries the variant. The presentation props COLOR, BGCOLOR, BORDER, PADDING, FONT-SIZE and FONT-WEIGHT override the variant's defaults. ID reaches the rendered Host so anchor-based surfaces can reference the Button by identity; CLASS, REF, TAB-INDEX, ARIA-LABEL, HELP-ECHO, HOVER-CONTENT, HOVER-GROUP, POINTER and USE are the ordinary Host capabilities.
+**Arguments.** LABEL names the button and is shown unless a default slot replaces it. ON-PRESS is the zero-argument callback. DISABLED removes the callback and the default Tab index. VARIANT is `primary` (accent fill, bold; the default), `secondary` (soft accent tint) or `ghost` (inherits its surface, narrower padding); every variant is a borderless single-row pill whose second class name carries the variant. The presentation props COLOR, BGCOLOR, BORDER, PADDING, FONT-SIZE and FONT-WEIGHT override the variant's defaults. ID reaches the rendered Host so anchor-based surfaces can reference the Button by identity; CLASS, REF, TAB-INDEX, ARIA-LABEL, ARIA-SELECTED, HELP-ECHO, HOVER-CONTENT, HOVER-GROUP, POINTER and USE are the ordinary Host capabilities.
 
-**Semantics.** The Runtime publishes ON-PRESS together with the visible Button, so a render that fails to publish keeps the previous callback and the values it captured. A Button is one row: it never shrinks below its label or wraps the label's text, so a Flex line that runs out of room moves the whole Button instead of splitting its text.  A default slot replaces the visible label with ordinary non-interactive content, such as a title and description; LABEL or ARIA-LABEL still names the single focus and activation target, and nested controls inside a button are inappropriate. The native root attributes `:pointer`, `:help-echo`, `:hover-style` and `:hover-content` request Ebox's text-property capabilities, and an explicit nil blocks an inherited capability.
+**Semantics.** The Runtime publishes ON-PRESS together with the visible Button, so a render that fails to publish keeps the previous callback and the values it captured. A Button is one row: it never shrinks below its label or wraps the label's text, so a Flex line that runs out of room moves the whole Button instead of splitting its text.  An enabled, unselected Button paints its variant's hover fill while the pointer is over it; ARIA-SELECTED controls such as tabs and segments keep their selected presentation instead.  A default slot replaces the visible label with ordinary non-interactive content, such as a title and description; LABEL or ARIA-LABEL still names the single focus and activation target, and nested controls inside a button are inappropriate. The native root attributes `:pointer`, `:help-echo`, `:hover-style` and `:hover-content` request Ebox's text-property capabilities, and an explicit nil blocks an inherited capability.
 
 **Returns.** A View.
 
@@ -179,6 +179,12 @@ The foreground of a primary button.
 
 The fill of a primary button.
 
+#### Token: :ui-button-primary-hover-bg
+
+The hover fill of a primary button.
+
+**Semantics.** While the pointer is over an enabled primary button, its fill changes to this color, so the button reacts to the pointer without moving or resizing.
+
 #### Token: :ui-button-secondary-fg
 
 The foreground of a secondary button and of a selected choice.
@@ -189,11 +195,23 @@ The foreground of a secondary button and of a selected choice.
 
 The tint of a secondary button and of a selected choice.
 
+#### Token: :ui-button-secondary-hover-bg
+
+The hover tint of a secondary button.
+
+**Semantics.** While the pointer is over an enabled secondary button, its tint changes to this color; selected choices keep their selected color.
+
 #### Token: :ui-button-ghost-fg
 
 The foreground of a ghost button.
 
 **Semantics.** A ghost button inherits its surface and paints only its text, which is why an unselected segment or a plain tag close control reads as content rather than as a box.
+
+#### Token: :ui-button-ghost-hover-bg
+
+The hover surface of a ghost button.
+
+**Semantics.** While the pointer is over an enabled ghost button, it paints this surface; the button itself stays transparent so the surrounding panel shows through when the pointer leaves.
 
 #### Token: :ui-checkbox-enabled-fg
 

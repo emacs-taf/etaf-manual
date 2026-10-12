@@ -52,6 +52,11 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
   longest section title; and an example's toolbar keeps every control on
   one intact row, reserving the stop control's slot so running an
   example never resizes the card.
+- Interactive reader surfaces react to the pointer: navigation and
+  outline rows, chapter cards and code blocks paint the theme's `:hover'
+  surface while hovered, and rendered links use the shared accent hover.
+  Consecutive Chinese and Latin text keeps a separating space, including
+  joined labels such as a chapter card's "上一章 18 盒与常规流".
 - The generated concept index groups terms under symbols and A–Z, filing
   Chinese terms by the Pinyin of their first character; the symbol index
   groups functions, macros, variables, hooks and errors by package and the

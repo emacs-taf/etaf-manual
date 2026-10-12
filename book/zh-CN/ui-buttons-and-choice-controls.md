@@ -16,13 +16,13 @@
 
 <!-- index: etaf-button; button variant; failed publication; ghost -->
 
-#### Component: etaf-button (&key label on-press disabled id ref class color bgcolor border padding font-size font-weight tab-index aria-label help-echo hover-content hover-group pointer use variant)
+#### Component: etaf-button (&key label on-press disabled id ref class color bgcolor border padding font-size font-weight tab-index aria-label aria-selected help-echo hover-content hover-group pointer use variant)
 
 渲染带提交回调的标准可按压按钮。
 
-**参数。** LABEL 命名按钮，除非 default slot 取而代之。ON-PRESS 是零参回调。DISABLED 移除回调与默认 Tab 序号。VARIANT 是 `primary`（accent 填充、加粗；默认）、`secondary`（accent 浅色）或 `ghost`（继承表面、内边距更窄）；每个变体都是无边框的单行药丸，variant 名进入第二个类名。呈现类 prop COLOR、BGCOLOR、BORDER、PADDING、FONT-SIZE 与 FONT-WEIGHT 覆盖变体默认值。ID 到达渲染出的 Host，使基于锚点的表面能按身份引用该按钮；CLASS、REF、TAB-INDEX、ARIA-LABEL、HELP-ECHO、HOVER-CONTENT、HOVER-GROUP、POINTER 与 USE 是普通 Host 能力。
+**参数。** LABEL 命名按钮，除非 default slot 取而代之。ON-PRESS 是零参回调。DISABLED 移除回调与默认 Tab 序号。VARIANT 是 `primary`（accent 填充、加粗；默认）、`secondary`（accent 浅色）或 `ghost`（继承表面、内边距更窄）；每个变体都是无边框的单行药丸，variant 名进入第二个类名。呈现类 prop COLOR、BGCOLOR、BORDER、PADDING、FONT-SIZE 与 FONT-WEIGHT 覆盖变体默认值。ID 到达渲染出的 Host，使基于锚点的表面能按身份引用该按钮；CLASS、REF、TAB-INDEX、ARIA-LABEL、ARIA-SELECTED、HELP-ECHO、HOVER-CONTENT、HOVER-GROUP、POINTER 与 USE 是普通 Host 能力。
 
-**语义。** Runtime 把 ON-PRESS 与可见按钮一起发布，因此渲染失败时保留此前的回调及它捕获的值。按钮是一行的：它不会缩到标签以下，也不会拆开标签文字，因此空间不足的 Flex 行会整体移动按钮，而不是拆开它的文字。default slot 用普通的非交互内容（比如标题与描述）取代可见标签；LABEL 或 ARIA-LABEL 仍命名单一的焦点与激活目标，按钮内部嵌套控件是不合适的。原生根属性 `:pointer`、`:help-echo`、`:hover-style` 与 `:hover-content` 请求 Ebox 的文本属性能力，显式 nil 阻断继承来的能力。
+**语义。** Runtime 把 ON-PRESS 与可见按钮一起发布，因此渲染失败时保留此前的回调及它捕获的值。按钮是一行的：它不会缩到标签以下，也不会拆开标签文字，因此空间不足的 Flex 行会整体移动按钮，而不是拆开它的文字。启用且未选中的按钮在指针悬停时画变体的 hover 填充；tab 与 segmented 这类 ARIA-SELECTED 控件保持选中表现，不叠加悬停高亮。default slot 用普通的非交互内容（比如标题与描述）取代可见标签；LABEL 或 ARIA-LABEL 仍命名单一的焦点与激活目标，按钮内部嵌套控件是不合适的。原生根属性 `:pointer`、`:help-echo`、`:hover-style` 与 `:hover-content` 请求 Ebox 的文本属性能力，显式 nil 阻断继承来的能力。
 
 **返回。** 一个 View。
 
@@ -179,6 +179,12 @@ primary 按钮的前景。
 
 primary 按钮的填充。
 
+#### Token: :ui-button-primary-hover-bg
+
+primary 按钮的悬停填充。
+
+**语义。** 指针悬停在启用的 primary 按钮上时，填充换成这个颜色；按钮不移动也不改变尺寸。
+
 #### Token: :ui-button-secondary-fg
 
 secondary 按钮与选中项的前景。
@@ -189,11 +195,23 @@ secondary 按钮与选中项的前景。
 
 secondary 按钮与选中项的浅色。
 
+#### Token: :ui-button-secondary-hover-bg
+
+secondary 按钮的悬停浅色。
+
+**语义。** 指针悬停在启用的 secondary 按钮上时，浅色换成这个颜色；选中项保持自己的选中颜色。
+
 #### Token: :ui-button-ghost-fg
 
 ghost 按钮的前景。
 
 **语义。** ghost 按钮继承自己的表面、只画文字，因此未选中的分段或朴素的 tag 关闭控件读作内容而不是盒子。
+
+#### Token: :ui-button-ghost-hover-bg
+
+ghost 按钮的悬停表面。
+
+**语义。** 指针悬停在启用的 ghost 按钮上时，它画上这个表面；指针离开后按钮依旧透明，露出周围的 panel。
 
 #### Token: :ui-checkbox-enabled-fg
 

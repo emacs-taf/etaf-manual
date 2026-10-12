@@ -175,6 +175,11 @@
       "name": "etaf-manual-reader-resizes-the-side-columns",
       "file": "tests/etaf-manual-reader-tests.el",
       "purpose": "The side columns report their widths, clamp the setters and step from the focused divider."
+    },
+    {
+      "name": "etaf-manual-reader-interactive-surfaces-hover",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "Clickable navigation rows and rendered links carry a pointer hover face."
     }
   ]
 }

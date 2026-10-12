@@ -141,6 +141,12 @@ PROPS override the panel's own style."
   "Return an empty spacer LINES lines tall."
   (etaf-node 'box (list :height (list 'lh (or lines 1))) nil))
 
+(defun etaf-manual-reader--hover (env &optional key)
+  "Return ENV's pointer-hover paint for interactive surfaces.
+KEY names the palette color (default `:hover'), so one rail, row or card
+highlight matches every other interactive surface in the reader."
+  (list :background-color (etaf-manual-reader--color env (or key :hover))))
+
 ;;;; Text ranks
 
 (defun etaf-manual-reader--icon (env name &optional color)

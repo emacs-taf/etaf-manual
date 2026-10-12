@@ -247,6 +247,10 @@ level-3 section widens the gutter and marks it with a dot."
                      :color color
                      :font-weight (if (or selected (and chapter-row current)) 'bold nil)
                      :pointer 'hand
+                     ;; The reading position keeps its own selected surface;
+                     ;; hover belongs to rows that are not already active.
+                     :hover-style (unless (and chapter-row current)
+                                    (etaf-manual-reader--hover env))
                      :role 'button
                      :tab-index 0
                      :help-echo label
@@ -402,6 +406,7 @@ carries the accent color, a tinted surface and an accent bar."
                      :role 'button
                      :tab-index 0
                      :pointer 'hand
+                     :hover-style (unless current (etaf-manual-reader--hover env))
                      :help-echo title
                      :on-press (lambda ()
                                  (etaf-manual-reader-goto session
@@ -465,6 +470,7 @@ DIRECTION is `previous' or `next'; the card opens the neighbour chapter."
                      :item-gap '(ch 2)
                      :cross-align 'center
                      :role 'button :tab-index 0 :pointer 'hand
+                     :hover-style (etaf-manual-reader--hover env)
                      :help-echo title
                      :on-press (lambda ()
                                  (etaf-manual-reader-goto session id)
@@ -476,7 +482,7 @@ DIRECTION is `previous' or `next'; the card opens the neighbour chapter."
                                  (list :flex-grow 1 :flex-basis '(px 0)
                                        :min-width '(px 0)
                                        :text-align align)
-                                 (list (etaf-manual-reader--label env label)
+                                 (list (etaf-manual-reader--label env (concat label " "))
                                        (etaf-node 'text
                                                   (list :color (etaf-manual-reader--color
                                                                 env :heading))

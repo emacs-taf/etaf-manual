@@ -365,6 +365,7 @@ button beside the language tag."
                      :border (etaf-manual-reader--border env)
                      :padding '((lh 1) (ch 2))
                      :tab-index 0
+                     :hover-style (etaf-manual-reader--hover env)
                      :on-focus-enter (lambda ()
                                        (when reader
                                          (etaf-set-value

@@ -88,8 +88,10 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
 
 ### Changed
 
-- The site home page is a splash page: the icon, the pitch, four capability
-  cards and a wall of application and game screenshots replace the single
-  paragraph, and the landing sets its text in a modern sans pairing (Inter and
-  Space Grotesk) instead of the manual's reading fonts.
+- The site home page is a splash page: the icon, the pitch, one aligned
+  capability grid and application and game galleries replace the single
+  paragraph.  Every picture is a real session, links to its repository and
+  opens full screen in a lightbox; the layout adapts down to a phone
+  viewport, and the landing sets its text in a modern sans pairing (Inter
+  and Space Grotesk) instead of the manual's reading fonts.
 - The "Testing and Validation" and "Development and Release" chapters are folded into "Extending the Framework" as "How a change is verified" and "How a change is delivered", and the chapter that referred to them links to the new location.

@@ -401,5 +401,58 @@
                         (plist-get (etaf-manual-reader-state session) :chapter)))))
       (delete-file etaf-manual-reader-position-file))))
 
+(ert-deftest etaf-manual-reader-edits-and-reruns-an-example ()
+  "Submitting the in-place example editor reruns the edited draft."
+  (let ((buffer (etaf-manual-open 'introduction)))
+    (unwind-protect
+        (with-current-buffer buffer
+          (let ((runtime (etaf-runtime-for-buffer buffer)))
+            (etaf-runtime-refit runtime (* 150 (frame-char-width)) 400)
+            (etaf-runtime-flush runtime)
+            ;; Focus the example card and open it for editing with the page key.
+            (etaf-focus runtime 'etaf-manual-example-introduction-1)
+            (execute-kbd-macro (kbd "e"))
+            (etaf-runtime-flush runtime)
+            (should (string-match-p "C-c C-c 运行" (substring-no-properties (buffer-string))))
+            ;; Type a trailing comment and submit it with C-c C-c.
+            (etaf-dispatch-event runtime 'etaf-manual-example-edit-introduction-1 'press)
+            (execute-kbd-macro "\n;; note")
+            (execute-kbd-macro (kbd "C-c C-c"))
+            (etaf-runtime-flush runtime)
+            (should-not (etaf-text-input-active-p runtime))
+            ;; The run control reruns the submitted draft and w copies it.
+            (etaf-dispatch-event runtime 'etaf-manual-example-run-introduction-1 'press)
+            (etaf-runtime-flush runtime)
+            (should (string-match-p "Hello" (substring-no-properties (buffer-string))))
+            (execute-kbd-macro (kbd "w"))
+            (should (string-match-p ";; note" (current-kill 0)))))
+      (when (buffer-live-p buffer)
+        (with-current-buffer buffer (etaf-manual-close))))))
+
+(ert-deftest etaf-manual-reader-copies-the-section-code ()
+  "The w key copies the current section's code to the kill ring."
+  (let* ((session (etaf-manual-reader-create :language "zh-CN" :chapter 'introduction))
+         (index (cl-position "求值、渲染、错误与输出的记法"
+                             (plist-get (etaf-manual-reader-state session) :nodes)
+                             :test #'equal))
+         (buffer nil))
+    (should index)
+    (unwind-protect
+        (progn
+          (setq buffer (etaf-manual-open 'introduction))
+          (with-current-buffer buffer
+            (let ((runtime (etaf-runtime-for-buffer buffer)))
+              (etaf-runtime-refit runtime (* 150 (frame-char-width)) 400)
+              (etaf-runtime-flush runtime)
+              ;; Move to the section that holds the static code block.
+              (dotimes (_ (1+ index)) (execute-kbd-macro (kbd "n")))
+              (etaf-runtime-flush runtime)
+              (execute-kbd-macro (kbd "w"))
+              (etaf-runtime-flush runtime)
+              (should (string-match-p (regexp-quote "(etaf-value (etaf-ref 3))")
+                                      (current-kill 0))))))
+      (when (buffer-live-p buffer)
+        (with-current-buffer buffer (etaf-manual-close))))))
+
 (provide 'etaf-manual-reader-tests)
 ;;; etaf-manual-reader-tests.el ends here

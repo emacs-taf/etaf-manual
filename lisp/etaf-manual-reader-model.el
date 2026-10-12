@@ -70,6 +70,9 @@ no buffer, so it is a complete headless reader for scripts and tests."
      :message (etaf-ref nil :name 'etaf-manual-reader-message)
      :extent (etaf-ref nil :name 'etaf-manual-reader-extent)
      :search (etaf-ref nil :name 'etaf-manual-reader-search)
+     :focus (etaf-ref nil :name 'etaf-manual-reader-focus)
+     :editing (etaf-ref nil :name 'etaf-manual-reader-editing)
+     :drafts (etaf-ref nil :name 'etaf-manual-reader-drafts)
      :documents (make-hash-table :test #'equal)
      :buffer nil)))
 

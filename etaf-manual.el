@@ -77,7 +77,9 @@
 ;; otherwise.  The buffer gets `etaf-manual-reader-mode': `n' and `p' move
 ;; between sections, `u' goes up one level, `l' and `r' walk the reading
 ;; history, `[' and `]' change chapter, `/` searches the whole book and
-;; `M-n'/`M-p' walk the matches, `g' switches between Chinese and
+;; `M-n'/`M-p' walk the matches, `e' edits the example at the reading
+;; position and `C-c C-c' reruns it, `w' copies the code at the reading
+;; position, `g' switches between Chinese and
 ;; English, `i' opens a jump completion listing chapters, sections,
 ;; definition entries and index terms, `t' switches the palette and `q'
 ;; closes the reader.  The mounted page declares these keys as Host `:keys', so they

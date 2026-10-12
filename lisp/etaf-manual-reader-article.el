@@ -76,9 +76,10 @@ document order, where INDEX counts the chapter's section nodes."
         :features (plist-get env :markdown-features)
         :open-link (plist-get env :open-link)
         :footnote-jump (plist-get env :footnote-jump)
-        :render-code-block (plist-get env :render-code-block)
+        :render-code-block #'etaf-manual-reader--render-code-block
         :code-link (when-let* ((reader (plist-get env :reader)))
                      (etaf-manual-reader--code-link-callback reader))
+        :reader (plist-get env :reader)
         :line-grid t))
 
 (defun etaf-manual-reader--code-link-callback (session)
@@ -118,14 +119,56 @@ caption row of its own."
 
 ;;;; Example viewer
 
-(defun etaf-manual-reader--run-example (example result)
-  "Evaluate EXAMPLE and publish its View or its error into RESULT."
-  (condition-case error
-      (etaf-set-value result (list :view (etaf-manual-example-view example)))
-    (error (etaf-set-value result (list :error (error-message-string error))))))
+(defun etaf-manual-reader--run-example (example result &optional code)
+  "Evaluate EXAMPLE, with CODE when given, into RESULT as View or error."
+  (let ((example (if (and code (not (equal code (plist-get example :code))))
+                     (plist-put (copy-sequence example) :code code)
+                   example)))
+    (condition-case error
+        (etaf-set-value result (list :view (etaf-manual-example-view example)))
+      (error (etaf-set-value result (list :error (error-message-string error)))))))
 
-(defun etaf-manual-reader--example-preview (example result)
-  "Return the preview surface of EXAMPLE backed by RESULT."
+(defun etaf-manual-reader--example-code (session example)
+  "Return EXAMPLE's current source in SESSION: its draft when edited."
+  (or (cdr (assoc (plist-get example :id)
+                  (etaf-value (etaf-manual-reader--ref session :drafts))))
+      (plist-get example :code)))
+
+(defun etaf-manual-reader--submit-example (session example result code)
+  "Store CODE as EXAMPLE's draft in SESSION and run it into RESULT."
+  (let* ((id (plist-get example :id))
+         (ref (etaf-manual-reader--ref session :drafts)))
+    (etaf-set-value ref (cons (cons id code)
+                              (assoc-delete-all id (etaf-value ref) #'equal))))
+  (etaf-manual-reader--run-example example result code))
+
+(defun etaf-manual-reader--example-editor (session example result code env)
+  "Return EXAMPLE's native editing surface in SESSION, backed by RESULT.
+C-c C-c submits the field text: it becomes the example's draft and the
+example reruns in place."
+  (etaf-node 'column
+             (list :width 'stretch :item-gap '(lh 0))
+             (list
+              (etaf-node 'flex
+                         (list :width 'stretch :justify-content 'flex-end)
+                         (list (etaf-manual-reader--label env "C-c C-c 运行")))
+              (etaf-node 'box
+                         (list :width 'stretch
+                               :font-family (etaf-manual-reader--mono-family))
+                         (list (etaf-node 'etaf-text-input
+                                          (list :value code
+                                                :rows (max 4 (1+ (cl-count ?\n code)))
+                                                :variant 'plain
+                                                :ref (intern (format "etaf-manual-example-edit-%s"
+                                                                     (plist-get example :id)))
+                                                :on-submit
+                                                (lambda (text)
+                                                  (etaf-manual-reader--submit-example
+                                                   session example result text)))
+                                          nil))))))
+
+(defun etaf-manual-reader--example-preview (example result code)
+  "Return the preview surface of EXAMPLE with CODE backed by RESULT."
   (let ((outcome (etaf-value result)))
     (cond
      ((plist-get outcome :view)
@@ -146,23 +189,34 @@ caption row of its own."
                        :description "运行示例，这里会出现真实的 ETAF 界面。"
                        :action-label "▶ 运行"
                        :on-action (lambda ()
-                                    (etaf-manual-reader--run-example example result)))
+                                    (etaf-manual-reader--run-example example result code)))
                  nil)))))
 
 (etaf-define-component etaf-manual-reader--example
     (&key example env)
-  "Render one runnable EXAMPLE with source, preview and split modes."
+  "Render one runnable EXAMPLE with source, preview and split modes.
+The toolbar edits the source: a submitted text becomes the example's draft,
+reruns it in place and is what `etaf-manual-reader-code-at' copies."
   :bindings ((mode (etaf-ref "preview" :name 'etaf-manual-example-mode))
              (result (etaf-ref nil :name 'etaf-manual-example-result)))
   :render
-  (let* ((current (etaf-value mode))
+  (let* ((session (plist-get env :reader))
+         (selected (etaf-value mode))
          (id (plist-get example :id))
+         (editing (and session
+                       (equal id (etaf-value (etaf-manual-reader--ref session :editing)))))
+         ;; Editing always shows the editor beside the preview.
+         (current (if editing "split" selected))
          (run-ref (intern (format "etaf-manual-example-run-%s" id)))
          (stop-ref (intern (format "etaf-manual-example-stop-%s" id)))
-         (source (plist-get example :code))
+         (source (if session
+                     (etaf-manual-reader--example-code session example)
+                   (plist-get example :code)))
          (language (or (plist-get example :language) "elisp"))
-         (code (etaf-manual-reader--code-pane env source language))
-         (preview (etaf-manual-reader--example-preview example result))
+         (code (if (and editing session)
+                   (etaf-manual-reader--example-editor session example result source env)
+                 (etaf-manual-reader--code-pane env source language)))
+         (preview (etaf-manual-reader--example-preview example result source))
          (running (etaf-value result))
          (toolbar
           (etaf-node 'flex
@@ -192,13 +246,23 @@ caption row of its own."
                       (etaf-node 'box
                                  (list :flex-grow 1 :flex-basis '(px 0) :min-width '(px 0))
                                  nil)
+                      (when session
+                        (etaf-node 'etaf-button
+                                   (list :ref (intern (format "etaf-manual-example-edit-button-%s" id))
+                                         :label (if editing "完成" "编辑")
+                                         :variant 'ghost
+                                         :on-press (lambda ()
+                                                     (etaf-set-value
+                                                      (etaf-manual-reader--ref session :editing)
+                                                      (unless editing id))))
+                                   nil))
                       (etaf-node 'etaf-button
                                  (list :ref run-ref
                                        :label (if running "重新运行" "▶ 运行")
                                        :variant 'primary
                                        :on-press (lambda ()
                                                    (etaf-manual-reader--run-example
-                                                    example result)))
+                                                    example result source)))
                                  nil)
                       (when running
                         (etaf-node 'etaf-button
@@ -237,22 +301,132 @@ caption row of its own."
                                         (etaf-manual-reader--label env "预览")
                                         preview)))))))))
     (etaf-node 'column
-               (list :width 'stretch
+               (list :ref (intern (format "etaf-manual-example-%s" id))
+                     :width 'stretch
                      :background-color (etaf-manual-reader--color env :panel)
                      :border (etaf-manual-reader--border env)
                      :box-sizing 'border-box
-                     :item-gap '(lh 0))
-               (append
-                (list toolbar)
-                (list (etaf-node 'column
-                                 (list :width 'stretch :item-gap '(lh 0))
-                                 content))))))
+                     :item-gap '(lh 0)
+                     :tab-index 0
+                     :on-focus-enter (lambda ()
+                                       (when session
+                                         (etaf-set-value
+                                          (etaf-manual-reader--ref session :focus)
+                                          (list :example id)))))
+               (list toolbar
+                     (etaf-node 'column
+                                (list :width 'stretch :item-gap '(lh 0))
+                                content)))))
 
 (defun etaf-manual-reader--example-viewer (example env)
   "Return the viewer View for EXAMPLE in ENV."
   (etaf-node 'etaf-manual-reader--example
              (list :example example :env env)
              nil))
+
+;;;; Code blocks
+
+(defun etaf-manual-reader--render-code-block (block env)
+  "Return the reader's View for a static fenced BLOCK in ENV.
+The block is focusable, so `w' copies it, and its header carries a copy
+button beside the language tag."
+  (let* ((reader (plist-get env :reader))
+         (text (or (plist-get block :text) ""))
+         (language (plist-get block :lang))
+         (mono (etaf-manual-reader--mono-family)))
+    (etaf-node 'box
+               (list :width 'stretch
+                     :box-sizing 'border-box
+                     :background-color (etaf-manual-reader--color env :panel)
+                     :border (etaf-manual-reader--border env)
+                     :padding '((lh 1) (ch 2))
+                     :tab-index 0
+                     :on-focus-enter (lambda ()
+                                       (when reader
+                                         (etaf-set-value
+                                          (etaf-manual-reader--ref reader :focus)
+                                          (list :code text)))))
+               (list
+                (etaf-node 'flex
+                           (list :width 'stretch
+                                 :justify-content 'space-between
+                                 :align-items 'center)
+                           (list
+                            (if language
+                                (etaf-manual-reader--label env language)
+                              (etaf-node 'box nil nil))
+                            (etaf-node 'etaf-button
+                                       (list :label "复制"
+                                             :variant 'ghost
+                                             :on-press
+                                             (lambda ()
+                                               (kill-new text)
+                                               (when reader
+                                                 (etaf-manual-reader-message
+                                                  reader "已复制代码"))))
+                                       nil)))
+                (etaf-node 'box
+                           (list :width 'stretch :wrap-mode 'char
+                                 :font-family mono
+                                 :color (etaf-manual-reader--color env :ink))
+                           (list (etaf-node 'text nil (list text))))))))
+
+;;;; Example and code targeting
+
+(defun etaf-manual-reader--example-by-id (session id)
+  "Return SESSION's current chapter example with ID, or nil."
+  (cl-find id (etaf-manual-reader--chapter-examples session)
+           :key (lambda (example) (plist-get example :id)) :test #'equal))
+
+(defun etaf-manual-reader--focused-example (session)
+  "Return SESSION's example that most recently held focus, or nil."
+  (when-let* ((id (plist-get (etaf-manual-reader--read session :focus) :example)))
+    (etaf-manual-reader--example-by-id session id)))
+
+(defun etaf-manual-reader--section-blocks (session)
+  "Return the blocks of SESSION's current section."
+  (let* ((document (etaf-manual-reader-document session))
+         (split (etaf-manual-reader--chapter-cache
+                 session 'sections
+                 (lambda () (etaf-manual-reader--sections (plist-get document :children)))))
+         (node (etaf-manual-reader--read session :node)))
+    (if node (cdr (nth node (cdr split))) (car split))))
+
+(defun etaf-manual-reader--section-example (session)
+  "Return the first runnable example of SESSION's current section, or nil."
+  (let ((table (etaf-manual-reader--example-table session)))
+    (cl-loop for block in (etaf-manual-reader--section-blocks session)
+             when (etaf-manual-reader--run-block-p block)
+             thereis (gethash block table))))
+
+(defun etaf-manual-reader--section-code (session)
+  "Return the source of the first code block of SESSION's current section."
+  (let ((table (etaf-manual-reader--example-table session)))
+    (cl-loop for block in (etaf-manual-reader--section-blocks session)
+             when (eq (plist-get block :type) 'code-block)
+             thereis (if-let* ((example (gethash block table)))
+                       (etaf-manual-reader--example-code session example)
+                     (plist-get block :text)))))
+
+(defun etaf-manual-reader--example-at (session)
+  "Return the example of SESSION to edit, or nil.
+Prefer the example that most recently held focus, then the first runnable
+example of the current section."
+  (or (etaf-manual-reader--focused-example session)
+      (etaf-manual-reader--section-example session)))
+
+(defun etaf-manual-reader--code-at (session)
+  "Return the code text SESSION's reading position points at, or nil.
+Prefer the focused code block, then the focused example's source, then the
+first code block of the current section."
+  (let ((focus (etaf-manual-reader--read session :focus)))
+    (cond
+     ((plist-get focus :code) (plist-get focus :code))
+     ((plist-get focus :example)
+      (when-let* ((example (etaf-manual-reader--example-by-id
+                            session (plist-get focus :example))))
+        (etaf-manual-reader--example-code session example)))
+     (t (etaf-manual-reader--section-code session)))))
 
 ;;;; Definition cards
 

@@ -160,6 +160,16 @@
       "name": "etaf-manual-reader-remembers-the-reading-position",
       "file": "tests/etaf-manual-reader-tests.el",
       "purpose": "A remembered position restores its language, chapter and section, and a malformed file is ignored."
+    },
+    {
+      "name": "etaf-manual-reader-edits-and-reruns-an-example",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "Submitting the in-place example editor reruns the edited draft and w copies it."
+    },
+    {
+      "name": "etaf-manual-reader-copies-the-section-code",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "The w key copies the current section's code to the kill ring."
     }
   ]
 }

@@ -265,6 +265,35 @@ reads a name with completion.  A symbol without an entry signals a
             (etaf-manual-reader-message session (etaf-manual-reader--search-status session)))
         (user-error (etaf-manual-reader--report error))))))
 
+;;;; Examples and code
+
+(defun etaf-manual-reader-edit-example-command ()
+  "Edit the example at the reading position; C-c C-c reruns it."
+  (interactive)
+  (let* ((session (etaf-manual-reader--current))
+         (example (etaf-manual-reader--example-at session)))
+    (if (null example)
+        (etaf-manual-reader-message session "本节没有可编辑的示例")
+      (let ((id (plist-get example :id)))
+        (etaf-manual-reader--write session :editing id)
+        (when-let* ((runtime (etaf-manual-reader--runtime session)))
+          (run-at-time 0 nil
+                       (lambda (runtime ref)
+                         (ignore-errors (etaf-text-input-begin runtime ref)))
+                       runtime
+                       (intern (format "etaf-manual-example-edit-%s" id))))))))
+
+(defun etaf-manual-reader-copy-code-command ()
+  "Copy the code at the reading position to the kill ring."
+  (interactive)
+  (let* ((session (etaf-manual-reader--current))
+         (code (etaf-manual-reader--code-at session)))
+    (if (and (stringp code) (not (string-empty-p code)))
+        (progn
+          (kill-new code)
+          (etaf-manual-reader-message session "已复制代码"))
+      (etaf-manual-reader-message session "本节没有可复制的代码"))))
+
 ;;;; Interactive commands
 
 (defun etaf-manual-reader--report (error)
@@ -366,6 +395,8 @@ reads a name with completion.  A symbol without an entry signals a
     ("/" etaf-manual-reader-search-command "搜索")
     ("M-n" etaf-manual-reader-search-next-command "下一处")
     ("M-p" etaf-manual-reader-search-previous-command "上一处")
+    ("e" etaf-manual-reader-edit-example-command "编辑示例")
+    ("w" etaf-manual-reader-copy-code-command "复制代码")
     ("g" etaf-manual-reader-switch-language-command "中英文切换")
     ("i" etaf-manual-reader-index "跳转")
     ("t" etaf-manual-reader-toggle-theme-command "深浅主题")

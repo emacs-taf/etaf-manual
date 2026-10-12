@@ -126,7 +126,7 @@ Every language has the same chapters, the same sequence of section levels, the s
 
 ## What the gate checks
 
-The gate reads the book and the sibling provider checkouts and reports each problem as `FILE:LINE: MESSAGE`.
+The gate reads the book and the sibling provider checkouts and reports each problem as `FILE:LINE: MESSAGE`. As a tool test, `scripts/check-references.py` validates external repository links and anchors that point into this book.
 
 | Message | Cause |
 | --- | --- |

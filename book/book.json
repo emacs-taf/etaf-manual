@@ -28,7 +28,8 @@
     "etaf-ui",
     "tokens",
     "ebox",
-    "ecss"
+    "ecss",
+    "ekp"
   ],
   "parts": [
     {
@@ -205,7 +206,8 @@
         "ekp-hyphenation",
         "ekp-interactive-use",
         "ekp-programming-interface",
-        "ekp-parameters"
+        "ekp-parameters",
+        "ekp-native-module"
       ]
     }
   ],

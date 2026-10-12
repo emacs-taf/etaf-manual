@@ -317,7 +317,7 @@ leaves page navigation to that column."
 (defun etaf-manual-reader--sidebar (session env)
   "Return the navigation column View of SESSION in ENV."
   (etaf-node 'column
-             (list :width (list 'ch etaf-manual-reader--sidebar-width)
+             (list :width (list 'ch (etaf-manual-reader--sidebar-width env))
                    :height 'stretch
                    :flex-shrink 0
                    :overflow 'scroll
@@ -344,6 +344,33 @@ sections too, so page navigation stays reachable on a narrow frame."
              (etaf-manual-reader--sidebar-rows session env t)))
 
 ;;;; On-this-page column
+
+(defun etaf-manual-reader--column-pixels (columns)
+  "Return COLUMNS character cells as pixels on the reader's frame."
+  (* (max 1 (frame-char-width)) columns))
+
+(defun etaf-manual-reader--resizer (session env kind)
+  "Return the draggable divider resizing KIND in ENV.
+KIND is `sidebar' for the navigation column or `outline' for the
+on-this-page column; the divider reports candidate widths in pixels and
+SESSION clamps the column it accepts."
+  (let ((sidebar (eq kind 'sidebar)))
+    (etaf-node 'etaf-pane-resizer
+               (list :ref (if sidebar 'etaf-manual-sidebar-resizer
+                            'etaf-manual-outline-resizer)
+                     :size (etaf-manual-reader--column-pixels
+                            (if sidebar (etaf-manual-reader--sidebar-width env)
+                              (etaf-manual-reader--outline-width env)))
+                     :side (if sidebar 'right 'left)
+                     :line (etaf-manual-reader--color env :border)
+                     :background (etaf-manual-reader--color env :bg)
+                     :on-change (lambda (pixels)
+                                  (if sidebar
+                                      (etaf-manual-reader-set-sidebar-width
+                                       session (/ pixels (max 1 (frame-char-width))))
+                                    (etaf-manual-reader-set-outline-width
+                                     session (/ pixels (max 1 (frame-char-width)))))))
+               nil)))
 
 (defun etaf-manual-reader--outline-row (session env node)
   "Return one on-this-page ROW of NODE in ENV.
@@ -549,10 +576,14 @@ KEYS is the page Host's `:keys' table, so `?' lists the reader's keys."
                                   :min-height '(lh 0))
                             (append
                              (when wide
-                               (list (etaf-manual-reader--sidebar session env)))
+                               (list (etaf-manual-reader--sidebar session env)
+                                     (etaf-manual-reader--resizer
+                                      session env 'sidebar)))
                              (list article)
                              (when (etaf-manual-reader--outline-p env)
-                               (list (etaf-manual-reader--outline session env))))))))
+                               (list (etaf-manual-reader--resizer
+                                      session env 'outline)
+                                     (etaf-manual-reader--outline session env))))))))
     (etaf-manual-reader--page
      env
      (list (etaf-manual-reader--header-view session env)

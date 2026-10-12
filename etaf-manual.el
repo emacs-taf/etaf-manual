@@ -84,7 +84,11 @@
 ;; definition entries and index terms, `t' switches the palette and `q'
 ;; closes the reader.  The mounted page declares these keys as Host `:keys', so they
 ;; also work when the reader View is embedded and `?' opens the read-only
-;; ETAF key help listing them.  Tabs, arrows, RET, M-g and Escape keep the
+;; ETAF key help listing them.  The navigation column and, on wide frames,
+;; the on-this-page column are draggable dividers: dragging one resizes
+;; that column, and a focused divider steps one column per Left or Right
+;; press; `etaf-manual-reader-set-sidebar-width' and
+;; `-set-outline-width' set the widths programmatically.  Tabs, arrows, RET, M-g and Escape keep the
 ;; framework behaviours, so controls inside runnable examples stay focusable
 ;; and operable; activating the run control of an example renders the real
 ;; ETAF View in place.  A code span in the article whose text names a
@@ -117,9 +121,10 @@
 ;; Keys are `:language', `:theme', `:chapter', `:chapter-title', `:part',
 ;; `:node' (the zero-based section index, or nil at the chapter top),
 ;; `:node-title', `:nodes' (section titles in order), `:position' (zero-based
-;; chapter index), `:chapters' (chapter count), `:can-back' and
-;; `:can-forward'.  The snapshot copies every value, so mutating it never
-;; changes the session.
+;; chapter index), `:chapters' (chapter count), `:can-back', `:can-forward',
+;; `:sidebar-width' and `:outline-width' (the effective side-column widths
+;; in character cells).  The snapshot copies every value, so mutating it
+;; never changes the session.
 ;;
 ;; Function: etaf-manual-reader-toc (session)
 ;; Return SESSION's navigation outline as a list of part plists.
@@ -197,6 +202,17 @@
 ;; The file stores the language, palette, chapter and section as a plist; a
 ;; missing, unreadable or malformed file is ignored.  nil uses
 ;; `etaf-manual-position.eld' under `user-emacs-directory'.
+;;
+;; Function: etaf-manual-reader-set-sidebar-width (session columns)
+;; Set SESSION's navigation column width to COLUMNS character cells.
+;; COLUMNS is clamped to the supported range; nil restores the default.
+;; In the mounted reader the column's divider is draggable and steps one
+;; column per Left or Right press when focused.
+;;
+;; Function: etaf-manual-reader-set-outline-width (session columns)
+;; Set SESSION's on-this-page column width to COLUMNS character cells.
+;; COLUMNS is clamped to the supported range; nil restores the width that
+;; hugs the chapter's section titles.
 ;;
 ;; Function: etaf-manual-reader-set-language (session language)
 ;; Read SESSION in LANGUAGE, keeping the chapter and the nearest section.

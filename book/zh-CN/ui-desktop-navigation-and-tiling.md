@@ -130,11 +130,11 @@
 
 **参见。** `etaf-pane-resizer`、[拖拽与手势](dragging-and-gestures.md)。
 
-#### Component: etaf-pane-resizer (&key size side min max on-change on-end line background)
+#### Component: etaf-pane-resizer (&key size side min max on-change on-end line background ref)
 
 渲染可缩放相邻固定宽面板的垂直分隔条。
 
-**参数。** SIZE 是面板当前像素宽——数字、ref 或 computed。SIDE 为 `right`（默认）时分隔条位于面板右侧，向右拖动加宽；`left` 服务于分隔条右侧的面板。每次拖动把候选宽（给定 MIN 与 MAX 时按像素夹紧）传给 ON-CHANGE；ON-END 接收最终宽。LINE（默认 t）在 BACKGROUND 上贴着面板画一条发丝线。
+**参数。** SIZE 是面板当前像素宽——数字、ref 或 computed。SIDE 为 `right`（默认）时分隔条位于面板右侧，向右拖动加宽；`left` 服务于分隔条右侧的面板。每次拖动把候选宽（给定 MIN 与 MAX 时按像素夹紧）传给 ON-CHANGE；ON-END 接收最终宽。LINE（默认 t）在 BACKGROUND 上贴着面板画一条发丝线。REF 到达渲染出的分隔条，供调用方聚焦或引用。
 
 **语义。** 分隔条宽到足以抓取，带 `separator` role 与垂直方向，拖动时从不移动其它格子。有回调时它是 Tab 停靠点，Left 与 Right 按压每次把宽度步进一列。宽度归调用方所有：组件报告候选值，应用保存它接受的面板宽。
 

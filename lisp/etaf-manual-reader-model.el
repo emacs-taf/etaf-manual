@@ -30,6 +30,24 @@
 (defconst etaf-manual-reader--history-limit 64
   "Maximum remembered positions per direction.")
 
+(defconst etaf-manual-reader--sidebar-default-columns 38
+  "Default navigation column width in character cells.")
+
+(defconst etaf-manual-reader--sidebar-min-columns 24
+  "Narrowest navigation column in character cells.")
+
+(defconst etaf-manual-reader--sidebar-max-columns 64
+  "Widest navigation column in character cells.")
+
+(defconst etaf-manual-reader--outline-min-columns 12
+  "Narrowest on-this-page column in character cells.")
+
+(defconst etaf-manual-reader--outline-max-columns 44
+  "Widest on-this-page column in character cells.")
+
+(defconst etaf-manual-reader--outline-default-max-columns 30
+  "Widest automatic on-this-page width in character cells.")
+
 (defcustom etaf-manual-reader-position-file nil
   "File remembering the reader's last reading position.
 The file stores the language, palette, chapter and section as a plist; a
@@ -73,6 +91,8 @@ no buffer, so it is a complete headless reader for scripts and tests."
      :focus (etaf-ref nil :name 'etaf-manual-reader-focus)
      :editing (etaf-ref nil :name 'etaf-manual-reader-editing)
      :drafts (etaf-ref nil :name 'etaf-manual-reader-drafts)
+     :sidebar-width (etaf-ref nil :name 'etaf-manual-reader-sidebar-width)
+     :outline-width (etaf-ref nil :name 'etaf-manual-reader-outline-width)
      :documents (make-hash-table :test #'equal)
      :buffer nil)))
 
@@ -433,6 +453,48 @@ definition entry the match belongs to, or nil)."
   (when-let* ((search (etaf-manual-reader--search-state session)))
     (nth (plist-get search :index) (plist-get search :matches))))
 
+;;;; Column widths
+
+(defun etaf-manual-reader--sidebar-columns (session)
+  "Return SESSION's navigation column width in character cells."
+  (or (etaf-manual-reader--read session :sidebar-width)
+      etaf-manual-reader--sidebar-default-columns))
+
+(defun etaf-manual-reader--outline-columns (session)
+  "Return SESSION's on-this-page column width in character cells.
+A caller-set width wins; otherwise the column hugs the current chapter's
+widest section title between the default bounds."
+  (or (etaf-manual-reader--read session :outline-width)
+      (let ((needs (mapcar (lambda (node)
+                             (+ (string-width (or (plist-get node :title) ""))
+                                (if (eql (plist-get node :level) 3) 6 4)))
+                           (etaf-manual-reader--nodes session))))
+        (max etaf-manual-reader--outline-min-columns
+             (min etaf-manual-reader--outline-default-max-columns
+                  (apply #'max 0 needs))))))
+
+(defun etaf-manual-reader-set-sidebar-width (session columns)
+  "Set SESSION's navigation column width to COLUMNS character cells.
+COLUMNS is clamped to the supported range; nil restores the default.
+Return SESSION."
+  (etaf-manual-reader--write
+   session :sidebar-width
+   (when columns
+     (max etaf-manual-reader--sidebar-min-columns
+          (min etaf-manual-reader--sidebar-max-columns (round columns)))))
+  session)
+
+(defun etaf-manual-reader-set-outline-width (session columns)
+  "Set SESSION's on-this-page column width to COLUMNS character cells.
+COLUMNS is clamped to the supported range; nil restores the width that
+hugs the chapter's section titles.  Return SESSION."
+  (etaf-manual-reader--write
+   session :outline-width
+   (when columns
+     (max etaf-manual-reader--outline-min-columns
+          (min etaf-manual-reader--outline-max-columns (round columns)))))
+  session)
+
 ;;;; Reading position memory
 
 (defun etaf-manual-reader--position-file ()
@@ -466,7 +528,9 @@ itself a moment after each navigation."
               (list :language (etaf-manual-reader--read session :language)
                     :theme (etaf-manual-reader--read session :theme)
                     :chapter (etaf-manual-reader--read session :chapter)
-                    :node (etaf-manual-reader--read session :node))))
+                    :node (etaf-manual-reader--read session :node)
+                    :sidebar-width (etaf-manual-reader--read session :sidebar-width)
+                    :outline-width (etaf-manual-reader--read session :outline-width))))
            nil file nil 'silent)
           t)
       (error nil))))
@@ -484,6 +548,10 @@ non-nil when a chapter was applied."
     (let ((theme (plist-get saved :theme)))
       (when (memq theme '(light dark))
         (etaf-manual-reader--write session :theme theme)))
+    (when (numberp (plist-get saved :sidebar-width))
+      (etaf-manual-reader-set-sidebar-width session (plist-get saved :sidebar-width)))
+    (when (numberp (plist-get saved :outline-width))
+      (etaf-manual-reader-set-outline-width session (plist-get saved :outline-width)))
     (let* ((chapter (plist-get saved :chapter))
            (entry (and (symbolp chapter)
                        (cl-find chapter (plist-get (etaf-manual-reader--book session)
@@ -876,7 +944,9 @@ chapter index), `:chapters' (count), `:can-back' and `:can-forward'."
           :position (etaf-manual-reader--chapter-index session)
           :chapters (length (etaf-manual-reader--chapters session))
           :can-back (and (etaf-manual-reader--read session :back) t)
-          :can-forward (and (etaf-manual-reader--read session :forward) t))))
+          :can-forward (and (etaf-manual-reader--read session :forward) t)
+          :sidebar-width (etaf-manual-reader--sidebar-columns session)
+          :outline-width (etaf-manual-reader--outline-columns session))))
 
 (provide 'etaf-manual-reader-model)
 ;;; etaf-manual-reader-model.el ends here

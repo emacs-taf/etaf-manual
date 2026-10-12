@@ -130,11 +130,11 @@ Render a controlled split layout with a keyboard-focusable divider.
 
 **See also.** `etaf-pane-resizer`, [Dragging and Gestures](dragging-and-gestures.md).
 
-#### Component: etaf-pane-resizer (&key size side min max on-change on-end line background)
+#### Component: etaf-pane-resizer (&key size side min max on-change on-end line background ref)
 
 Render a vertical divider that resizes an adjacent fixed-width pane.
 
-**Arguments.** SIZE is the pane's current width in pixels — a number, ref or computed. SIDE `right` (default) places the divider on the pane's right so dragging right widens it; `left` serves a pane on the divider's right. Each drag move passes the candidate width, clamped to MIN and MAX pixels when given, to ON-CHANGE; ON-END receives the final width. LINE (default t) draws a hairline in the divider color beside the pane over BACKGROUND.
+**Arguments.** SIZE is the pane's current width in pixels — a number, ref or computed. SIDE `right` (default) places the divider on the pane's right so dragging right widens it; `left` serves a pane on the divider's right. Each drag move passes the candidate width, clamped to MIN and MAX pixels when given, to ON-CHANGE; ON-END receives the final width. LINE (default t) draws a hairline in the divider color beside the pane over BACKGROUND. REF reaches the rendered divider so callers can focus or address it.
 
 **Semantics.** The divider is wide enough to grab, carries the `separator` role with a vertical orientation, and never moves other cells while dragging. With a callback it is a Tab stop whose Left and Right presses step the width one column. The width stays caller-owned: the component reports candidates and the application stores the pane width it accepts.
 

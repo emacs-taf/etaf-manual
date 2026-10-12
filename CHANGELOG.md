@@ -33,7 +33,11 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
   frames and in the narrow overview screen otherwise; each chapter ends
   with previous/next chapter cards; and the reader remembers its reading
   position across sessions (`etaf-manual-reader-position-file',
-  `etaf-manual-reader-remember', `etaf-manual-reader-restore').
+  `etaf-manual-reader-remember', `etaf-manual-reader-restore').  Both
+  side columns are draggable dividers: dragging resizes the column, a
+  focused divider steps one column per arrow press, and
+  `etaf-manual-reader-set-sidebar-width' / `-set-outline-width' set the
+  widths programmatically; the remembered position includes them.
 - Runnable examples can be edited in place: `e' opens the focused (or the
   current section's) example in a native editor and `C-c C-c' stores the
   text as its draft and reruns it beside the preview; the draft is what

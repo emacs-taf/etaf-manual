@@ -454,5 +454,30 @@
       (when (buffer-live-p buffer)
         (with-current-buffer buffer (etaf-manual-close))))))
 
+(ert-deftest etaf-manual-reader-resizes-the-side-columns ()
+  "The side columns report their widths and resize from their dividers."
+  (let ((session (etaf-manual-reader-create :language "zh-CN" :chapter 'components)))
+    (should (eql 38 (plist-get (etaf-manual-reader-state session) :sidebar-width)))
+    (should (>= (plist-get (etaf-manual-reader-state session) :outline-width) 12))
+    (etaf-manual-reader-set-sidebar-width session 30)
+    (should (eql 30 (plist-get (etaf-manual-reader-state session) :sidebar-width)))
+    ;; Out-of-range values clamp to the supported width.
+    (etaf-manual-reader-set-sidebar-width session 1000)
+    (should (eql 64 (plist-get (etaf-manual-reader-state session) :sidebar-width)))
+    (etaf-manual-reader-set-outline-width session 24)
+    (should (eql 24 (plist-get (etaf-manual-reader-state session) :outline-width)))
+    ;; nil restores the adaptive width.
+    (etaf-manual-reader-set-outline-width session nil)
+    (should (>= (plist-get (etaf-manual-reader-state session) :outline-width) 12))
+    ;; The focused divider steps the width one column per arrow press.
+    (etaf-manual-reader-test--with-reader session
+      (let ((runtime (etaf-runtime-for-buffer etaf-manual-reader-test--buffer)))
+        (etaf-runtime-refit runtime (* 150 (frame-char-width)) 44)
+        (etaf-runtime-flush runtime)
+        (should (etaf-focus runtime 'etaf-manual-sidebar-resizer))
+        (call-interactively (key-binding (kbd "<right>") t))
+        (etaf-runtime-flush runtime)))
+    (should (> (plist-get (etaf-manual-reader-state session) :sidebar-width) 30))))
+
 (provide 'etaf-manual-reader-tests)
 ;;; etaf-manual-reader-tests.el ends here

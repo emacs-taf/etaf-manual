@@ -170,6 +170,11 @@
       "name": "etaf-manual-reader-copies-the-section-code",
       "file": "tests/etaf-manual-reader-tests.el",
       "purpose": "The w key copies the current section's code to the kill ring."
+    },
+    {
+      "name": "etaf-manual-reader-resizes-the-side-columns",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "The side columns report their widths, clamp the setters and step from the focused divider."
     }
   ]
 }

@@ -34,6 +34,10 @@
 
 (declare-function etaf-manual-reader--nodes
                   "etaf-manual-reader-model" (session &optional id))
+(declare-function etaf-manual-reader--sidebar-columns
+                  "etaf-manual-reader-model" (session))
+(declare-function etaf-manual-reader--outline-columns
+                  "etaf-manual-reader-model" (session))
 
 (defconst etaf-manual-reader--measure-max 96
   "Widest reading measure of the article column, in character cells.")
@@ -41,33 +45,24 @@
 (defconst etaf-manual-reader--measure-min 44
   "Narrowest reading measure that still keeps prose readable.")
 
-(defconst etaf-manual-reader--sidebar-width 38
-  "Width of the navigation column in character cells.")
-
-(defconst etaf-manual-reader--outline-min-width 12
-  "Narrowest on-this-page column, in character cells.")
-
-(defconst etaf-manual-reader--outline-max-width 30
-  "Widest on-this-page column, in character cells.")
+(defconst etaf-manual-reader--sidebar-fallback-width 38
+  "Navigation column width used when ENV carries no reader session.")
 
 (defconst etaf-manual-reader--wide-threshold 104
   "Frame width, in character cells, that keeps the navigation column beside
 the article; narrower frames collapse it into the overview screen.")
 
+(defun etaf-manual-reader--sidebar-width (env)
+  "Return ENV's navigation column width in character cells."
+  (if-let* ((reader (plist-get env :reader)))
+      (etaf-manual-reader--sidebar-columns reader)
+    etaf-manual-reader--sidebar-fallback-width))
+
 (defun etaf-manual-reader--outline-width (env)
-  "Return ENV's on-this-page column width in character cells.
-The column hugs the current chapter's widest section title.  A chapter of
-short titles leaves no wide empty rail, and a long title fits on one line
-up to `etaf-manual-reader--outline-max-width'."
-  (let* ((reader (plist-get env :reader))
-         (needs (when reader
-                  (mapcar (lambda (node)
-                            (+ (string-width (or (plist-get node :title) ""))
-                               (if (eql (plist-get node :level) 3) 6 4)))
-                          (etaf-manual-reader--nodes reader)))))
-    (max etaf-manual-reader--outline-min-width
-         (min etaf-manual-reader--outline-max-width
-              (apply #'max 0 needs)))))
+  "Return ENV's on-this-page column width in character cells."
+  (if-let* ((reader (plist-get env :reader)))
+      (etaf-manual-reader--outline-columns reader)
+    30))
 
 (defconst etaf-manual-reader--compact-threshold 88
   "Frame width, in character cells, below which the chrome drops details.
@@ -225,7 +220,7 @@ carry its rank, so it stays on the line grid."
   "Return non-nil when ENV frames the on-this-page column."
   (let ((columns (etaf-manual-reader--viewport-columns env)))
     (or (null columns)
-        (>= columns (+ etaf-manual-reader--sidebar-width
+        (>= columns (+ (etaf-manual-reader--sidebar-width env)
                        (etaf-manual-reader--outline-width env)
                        etaf-manual-reader--measure-min 6)))))
 
@@ -233,13 +228,17 @@ carry its rank, so it stays on the line grid."
   "Return the article measure in character cells for ENV."
   (let* ((columns (etaf-manual-reader--viewport-columns env))
          (sidebar (if (etaf-manual-reader--wide-p env)
-                      etaf-manual-reader--sidebar-width
+                      (etaf-manual-reader--sidebar-width env)
                     0))
          (outline (if (etaf-manual-reader--outline-p env)
                       (etaf-manual-reader--outline-width env)
                     0))
+         ;; Each draggable divider costs one extra column of slack.
+         (resizers (cond ((zerop sidebar) 0)
+                         ((zerop outline) 1)
+                         (t 2)))
          (available (if columns
-                        (- columns sidebar outline 6)
+                        (- columns sidebar outline resizers 6)
                       etaf-manual-reader--measure-max)))
     (max etaf-manual-reader--measure-min
          (min etaf-manual-reader--measure-max available))))

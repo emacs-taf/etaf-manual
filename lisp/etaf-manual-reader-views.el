@@ -387,7 +387,7 @@ carries the accent color, a tinted surface and an accent bar."
   "Return the on-this-page column View of SESSION in ENV."
   (let ((current (etaf-manual-reader--read session :node)))
     (etaf-node 'column
-               (list :width (list 'ch etaf-manual-reader--outline-width)
+               (list :width (list 'ch (etaf-manual-reader--outline-width env))
                      :height 'stretch
                      :flex-shrink 0
                      :overflow 'scroll

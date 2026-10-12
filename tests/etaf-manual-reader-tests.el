@@ -141,7 +141,7 @@
         (should (string-match-p "手册" text))
         (should (string-match-p "引言" text))
         (should (string-match-p "范围" text))
-        (should (string-match-p "可运行示例" text))
+        (should (string-match-p "示例 · introduction-1" text))
         (should (string-match-p "尚未运行" text))
         (should (string-match-p "跳转" text))))))
 

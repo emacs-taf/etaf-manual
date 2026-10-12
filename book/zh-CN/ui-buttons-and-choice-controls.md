@@ -22,7 +22,7 @@
 
 **参数。** LABEL 命名按钮，除非 default slot 取而代之。ON-PRESS 是零参回调。DISABLED 移除回调与默认 Tab 序号。VARIANT 是 `primary`（accent 填充、加粗；默认）、`secondary`（accent 浅色）或 `ghost`（继承表面、内边距更窄）；每个变体都是无边框的单行药丸，variant 名进入第二个类名。呈现类 prop COLOR、BGCOLOR、BORDER、PADDING、FONT-SIZE 与 FONT-WEIGHT 覆盖变体默认值。ID 到达渲染出的 Host，使基于锚点的表面能按身份引用该按钮；CLASS、REF、TAB-INDEX、ARIA-LABEL、HELP-ECHO、HOVER-CONTENT、HOVER-GROUP、POINTER 与 USE 是普通 Host 能力。
 
-**语义。** Runtime 把 ON-PRESS 与可见按钮一起发布，因此渲染失败时保留此前的回调及它捕获的值。default slot 用普通的非交互内容（比如标题与描述）取代可见标签；LABEL 或 ARIA-LABEL 仍命名单一的焦点与激活目标，按钮内部嵌套控件是不合适的。原生根属性 `:pointer`、`:help-echo`、`:hover-style` 与 `:hover-content` 请求 Ebox 的文本属性能力，显式 nil 阻断继承来的能力。
+**语义。** Runtime 把 ON-PRESS 与可见按钮一起发布，因此渲染失败时保留此前的回调及它捕获的值。按钮是一行的：它不会缩到标签以下，也不会拆开标签文字，因此空间不足的 Flex 行会整体移动按钮，而不是拆开它的文字。default slot 用普通的非交互内容（比如标题与描述）取代可见标签；LABEL 或 ARIA-LABEL 仍命名单一的焦点与激活目标，按钮内部嵌套控件是不合适的。原生根属性 `:pointer`、`:help-echo`、`:hover-style` 与 `:hover-content` 请求 Ebox 的文本属性能力，显式 nil 阻断继承来的能力。
 
 **返回。** 一个 View。
 

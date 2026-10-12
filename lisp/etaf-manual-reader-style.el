@@ -32,6 +32,9 @@
 (require 'etaf)
 (require 'etaf-ui)
 
+(declare-function etaf-manual-reader--nodes
+                  "etaf-manual-reader-model" (session &optional id))
+
 (defconst etaf-manual-reader--measure-max 96
   "Widest reading measure of the article column, in character cells.")
 
@@ -41,16 +44,30 @@
 (defconst etaf-manual-reader--sidebar-width 38
   "Width of the navigation column in character cells.")
 
-(defconst etaf-manual-reader--outline-width 20
-  "Width of the on-this-page column in character cells.")
+(defconst etaf-manual-reader--outline-min-width 12
+  "Narrowest on-this-page column, in character cells.")
+
+(defconst etaf-manual-reader--outline-max-width 30
+  "Widest on-this-page column, in character cells.")
 
 (defconst etaf-manual-reader--wide-threshold 104
   "Frame width, in character cells, that keeps the navigation column beside
 the article; narrower frames collapse it into the overview screen.")
 
-(defconst etaf-manual-reader--outline-threshold 116
-  "Frame width, in character cells, that also frames the on-this-page
-column; narrower frames keep the article's wider measure.")
+(defun etaf-manual-reader--outline-width (env)
+  "Return ENV's on-this-page column width in character cells.
+The column hugs the current chapter's widest section title.  A chapter of
+short titles leaves no wide empty rail, and a long title fits on one line
+up to `etaf-manual-reader--outline-max-width'."
+  (let* ((reader (plist-get env :reader))
+         (needs (when reader
+                  (mapcar (lambda (node)
+                            (+ (string-width (or (plist-get node :title) ""))
+                               (if (eql (plist-get node :level) 3) 6 4)))
+                          (etaf-manual-reader--nodes reader)))))
+    (max etaf-manual-reader--outline-min-width
+         (min etaf-manual-reader--outline-max-width
+              (apply #'max 0 needs)))))
 
 (defconst etaf-manual-reader--compact-threshold 88
   "Frame width, in character cells, below which the chrome drops details.
@@ -208,7 +225,9 @@ carry its rank, so it stays on the line grid."
   "Return non-nil when ENV frames the on-this-page column."
   (let ((columns (etaf-manual-reader--viewport-columns env)))
     (or (null columns)
-        (>= columns etaf-manual-reader--outline-threshold))))
+        (>= columns (+ etaf-manual-reader--sidebar-width
+                       (etaf-manual-reader--outline-width env)
+                       etaf-manual-reader--measure-min 6)))))
 
 (defun etaf-manual-reader--measure (env)
   "Return the article measure in character cells for ENV."
@@ -217,7 +236,7 @@ carry its rank, so it stays on the line grid."
                       etaf-manual-reader--sidebar-width
                     0))
          (outline (if (etaf-manual-reader--outline-p env)
-                      etaf-manual-reader--outline-width
+                      (etaf-manual-reader--outline-width env)
                     0))
          (available (if columns
                         (- columns sidebar outline 6)

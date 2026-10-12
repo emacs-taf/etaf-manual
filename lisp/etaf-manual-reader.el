@@ -231,10 +231,13 @@ reads a name with completion.  A symbol without an entry signals a
                                          "搜索: ")
                                        nil nil previous)))
                (count (etaf-manual-reader-search session query)))
-          (when (> count 0)
-            (etaf-manual-reader--after-navigation session)
-            (etaf-manual-reader--scroll-to-search-match session)
-            (etaf-manual-reader-message session (etaf-manual-reader--search-status session))))
+          (if (> count 0)
+              (progn
+                (etaf-manual-reader--after-navigation session)
+                (etaf-manual-reader--scroll-to-search-match session)
+                (etaf-manual-reader-message session
+                                             (etaf-manual-reader--search-status session)))
+            (etaf-manual-reader-message session (format "找不到 \"%s\"" query))))
       (user-error (etaf-manual-reader--report error)))))
 
 (defun etaf-manual-reader-search-next-command ()

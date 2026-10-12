@@ -42,9 +42,12 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
   code block to the kill ring, and every static code block carries a copy
   button.
 - Reader polish: inline code and code blocks use a dedicated `:code-bg'
-  palette color, so code stays readable inside tinted definition cards,
-  and a heading-only section keeps its following heading close instead of
-  a full section gap.
+  palette color, so code stays readable inside tinted definition cards;
+  a heading-only section keeps its following heading close instead of
+  a full section gap; the on-this-page column hugs the current chapter's
+  longest section title; and an example's toolbar keeps every control on
+  one intact row, reserving the stop control's slot so running an
+  example never resizes the card.
 - The generated concept index groups terms under symbols and A–Z, filing
   Chinese terms by the Pinyin of their first character; the symbol index
   groups functions, macros, variables, hooks and errors by package and the

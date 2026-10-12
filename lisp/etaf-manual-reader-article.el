@@ -222,55 +222,79 @@ reruns it in place and is what `etaf-manual-reader-code-at' copies."
           (etaf-node 'flex
                      (list :width 'stretch
                            :flex-direction 'row
+                           :flex-wrap 'wrap
+                           :justify-content 'space-between
                            :background-color (etaf-manual-reader--color env :panel2)
                            :border-bottom (etaf-manual-reader--border env)
                            :box-sizing 'border-box
                            :padding '((lh 0) (ch 1))
                            :column-gap '(ch 2)
+                           :row-gap '(lh 0)
                            :align-items 'center)
                      (list
-                      (etaf-manual-reader--label
-                       env (format "可运行示例 · %s" (plist-get example :id)))
-                      (etaf-node 'etaf-tabs
-                                 (list :items (list (list :key "source" :label "源码"
-                                                          :ref (intern (format "etaf-manual-example-source-%s" id)))
-                                                    (list :key "preview" :label "预览"
-                                                          :ref (intern (format "etaf-manual-example-preview-%s" id)))
-                                                    (list :key "split" :label "并排"
-                                                          :ref (intern (format "etaf-manual-example-split-%s" id))))
-                                       :active current
-                                       :variant 'underline
-                                       :width 'max-content
-                                       :on-change (lambda (key) (etaf-set-value mode key)))
-                                 nil)
-                      (etaf-node 'box
-                                 (list :flex-grow 1 :flex-basis '(px 0) :min-width '(px 0))
-                                 nil)
-                      (when session
-                        (etaf-node 'etaf-button
-                                   (list :ref (intern (format "etaf-manual-example-edit-button-%s" id))
-                                         :label (if editing "完成" "编辑")
-                                         :variant 'ghost
-                                         :on-press (lambda ()
-                                                     (etaf-set-value
-                                                      (etaf-manual-reader--ref session :editing)
-                                                      (unless editing id))))
-                                   nil))
-                      (etaf-node 'etaf-button
-                                 (list :ref run-ref
-                                       :label (if running "重新运行" "▶ 运行")
-                                       :variant 'primary
-                                       :on-press (lambda ()
-                                                   (etaf-manual-reader--run-example
-                                                    example result source)))
-                                 nil)
-                      (when running
-                        (etaf-node 'etaf-button
-                                   (list :ref stop-ref
-                                         :label "■ 停止"
-                                         :variant 'ghost
-                                         :on-press (lambda () (etaf-set-value result nil)))
-                                   nil)))))
+                      ;; Title and view tabs; the action buttons wrap below them
+                      ;; as a group when the article is narrow, never inside a
+                      ;; button.
+                      (etaf-node 'flex
+                                 (list :flex-direction 'row
+                                       :align-items 'center
+                                       :column-gap '(ch 2)
+                                       :min-width '(px 0))
+                                 (list
+                                  (etaf-manual-reader--label
+                                   env (format "示例 · %s" (plist-get example :id)))
+                                  ;; The Tabs strip stretches to its own row; a
+                                  ;; max-content wrapper keeps that row's width
+                                  ;; out of the toolbar's wrap decision.
+                                  (etaf-node 'box
+                                             (list :width 'max-content :flex-shrink 0)
+                                             (list
+                                              (etaf-node 'etaf-tabs
+                                                         (list :items (list (list :key "source" :label "源码"
+                                                                                  :ref (intern (format "etaf-manual-example-source-%s" id)))
+                                                                            (list :key "preview" :label "预览"
+                                                                                  :ref (intern (format "etaf-manual-example-preview-%s" id)))
+                                                                            (list :key "split" :label "并排"
+                                                                                  :ref (intern (format "etaf-manual-example-split-%s" id))))
+                                                               :active current
+                                                               :variant 'underline
+                                                               :width 'max-content
+                                                               :on-change (lambda (key) (etaf-set-value mode key)))
+                                                         nil)))))
+                      (etaf-node 'flex
+                                 (list :flex-direction 'row
+                                       :align-items 'center
+                                       :column-gap '(ch 2)
+                                       :flex-shrink 0)
+                                 (list
+                                  (when session
+                                    (etaf-node 'etaf-button
+                                               (list :ref (intern (format "etaf-manual-example-edit-button-%s" id))
+                                                     :label (if editing "完成" "编辑")
+                                                     :variant 'ghost
+                                                     :on-press (lambda ()
+                                                                 (etaf-set-value
+                                                                  (etaf-manual-reader--ref session :editing)
+                                                                  (unless editing id))))
+                                               nil))
+                                  (etaf-node 'etaf-button
+                                             (list :ref run-ref
+                                                   :label "▶ 运行"
+                                                   :variant 'primary
+                                                   :on-press (lambda ()
+                                                               (etaf-manual-reader--run-example
+                                                                example result source)))
+                                             nil)
+                                  ;; The stop control keeps its slot while idle so
+                                  ;; starting an example never changes the
+                                  ;; toolbar's width or height.
+                                  (etaf-node 'etaf-button
+                                             (list :ref stop-ref
+                                                   :label "■ 停止"
+                                                   :variant 'ghost
+                                                   :disabled (not running)
+                                                   :on-press (lambda () (etaf-set-value result nil)))
+                                             nil))))))
          (content
           (pcase current
             ("source" (list code))

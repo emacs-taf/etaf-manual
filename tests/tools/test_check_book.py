@@ -33,6 +33,16 @@ PROVIDER = {
         (defun etaf--commit (runtime &optional force) (list runtime force :on-press))
         (provide 'etaf-view)
         """,
+    'etaf-ui/etaf-ui.el': """\
+        ;;; etaf-ui.el --- Fixture UI provider -*- lexical-binding: t; -*-
+        ;; Version: 0.1.0
+        ;;; Commentary:
+        ;; Component: etaf-button (&key label)
+        ;; A button.
+        ;;; Code:
+        ;; Fixture token vocabulary: (:name :ui-fg :id ebox/color)
+        (provide 'etaf-ui)
+        """,
 }
 
 ENGLISH = """\
@@ -50,6 +60,13 @@ ENGLISH = """\
     #### Function: etaf-ref (initial-value &key test name)
     #### Error: etaf-error
     #### Property: :on-press
+    #### Token: :ui-fg
+
+    The default foreground.
+
+    #### Component: etaf-button (&key label)
+
+    A button.
 
     ```elisp :run
     (etaf-ref 1)
@@ -70,6 +87,13 @@ CHINESE = """\
     #### Function: etaf-ref (initial-value &key test name)
     #### Error: etaf-error
     #### Property: :on-press
+    #### Token: :ui-fg
+
+    默认前景色。
+
+    #### Component: etaf-button (&key label)
+
+    一个按钮。
 
     ```elisp :run
     (etaf-ref 1)
@@ -95,13 +119,19 @@ class CheckBookTests(unittest.TestCase):
         self.description = {
             'title': {'en': 'Fixture', 'zh-CN': '样例'},
             'languages': ['en', 'zh-CN'],
-            'packages': ['etaf'],
+            'packages': ['etaf', 'etaf-ui'],
             'references': [],
-            'coverage': ['etaf'],
+            'coverage': ['etaf', 'etaf-ui'],
             'parts': [{'id': 'model', 'title': {'en': 'Model', 'zh-CN': '模型'},
                        'chapters': ['reactivity', 'hosts']}],
-            'appendices': [],
-            'indices': [],
+            'appendices': [
+                {'id': 'theme-token-table', 'generate': 'token-table',
+                 'title': {'en': 'Theme Token Table', 'zh-CN': '主题 token 表'}},
+            ],
+            'indices': [
+                {'id': 'concept-index', 'generate': 'concept-index',
+                 'title': {'en': 'Concept Index', 'zh-CN': '概念索引'}},
+            ],
         }
         self.write_description()
         self.write('book/en/reactivity.md', ENGLISH)
@@ -123,6 +153,7 @@ class CheckBookTests(unittest.TestCase):
     def run_gate(self, *arguments):
         return subprocess.run(
             [EMACS, '-Q', '--batch', '-L', str(ROOT), '-L', str(ROOT / 'lisp'),
+             '--eval', '(setq load-prefer-newer t)',
              '-l', str(ROOT / 'scripts/check-book.el'),
              '--book', str(self.root / 'book'), '--providers', str(self.root / 'providers'),
              *arguments],
@@ -137,7 +168,17 @@ class CheckBookTests(unittest.TestCase):
         result = self.run_gate('--coverage')
         self.assertEqual(0, result.returncode, result.stderr)
         self.assertIn('etaf          2 /    2', result.stdout)
+        self.assertIn('etaf-ui       1 /    1', result.stdout)
+        self.assertIn('tokens        1 /    1', result.stdout)
         self.assertIn('hosts         2 /    2', result.stdout)
+
+    def test_unknown_generated_content_is_reported(self):
+        self.description['appendices'] = [
+            {'id': 'broken-table', 'generate': 'no-such-table',
+             'title': {'en': 'Broken', 'zh-CN': '坏'}},
+        ]
+        self.write_description()
+        self.assert_reported('<generated:no-such-table>:0: Unknown generated content')
 
     def test_signature_drift_is_reported(self):
         for language in ('en', 'zh-CN'):

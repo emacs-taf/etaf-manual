@@ -35,14 +35,18 @@
 ;; chapter, appendix and index in reading order; each is a plist with :id
 ;; (a symbol), :kind (`chapter', `appendix' or `index'), :number (an integer
 ;; for chapters, a letter string for appendices, nil for indices), :title and
-;; :definitions, :nodes and :examples lists.  Written chapters also have :part
-;; and :file; generated appendices and indices have :generate naming their
-;; content.  A node is (:level 2-or-3 :title STRING :anchor STRING :line N).
-;; A definition is (:kind KIND :name SYMBOL :signature STRING :anchor STRING
-;; :line N :chapter ID).  An example is (:id STRING :chapter ID :line N
-;; :code STRING).  The result is cached until a source file changes; treat
-;; it as read-only.  Signals `etaf-manual-error' when book/book.json or a
-;; chapter is missing or malformed, or LANGUAGE is not provided.
+;; :definitions, :nodes, :examples and :index lists.  Written chapters also
+;; have :part and :file; generated appendices and indices have :generate
+;; naming their generator and :content with their Markdown text, parsed with
+;; the same rules as a written chapter.  A node is (:level 2-or-3 :title
+;; STRING :anchor STRING :line N).  A definition is (:kind KIND :name SYMBOL
+;; :signature STRING :anchor STRING :line N :chapter ID :body STRING-OR-NIL),
+;; where :body is the entry's Markdown text; consecutive entry headings share
+;; one body.  An example is (:id STRING :chapter ID :line N :code STRING).
+;; An index term is (:term STRING :line N :anchor STRING).  The result is
+;; cached until a source file changes; treat it as read-only.  Signals
+;; `etaf-manual-error' when book/book.json or a chapter is missing or
+;; malformed, or LANGUAGE is not provided.
 ;;
 ;; Function: etaf-manual-definition (name &optional kind language)
 ;;;###autoload (autoload 'etaf-manual-definition "etaf-manual" nil nil)

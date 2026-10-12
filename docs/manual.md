@@ -33,10 +33,12 @@ English is the primary language. Every chapter exists in every language, with th
 | `references` | Other repositories the text may name, such as the playgrounds; their Commentary records are also public |
 | `coverage` | Packages and vocabularies whose every interface must have a definition entry |
 | `parts` | Objects with `id`, a localized `title` and the `chapters` they contain, in reading order |
-| `appendices` | Objects with `id` and either a chapter file or `generate`, the name of generated content, and a localized `title` |
+| `appendices` | Objects with `id`, a localized `title` and either a chapter file below `LANGUAGE/ID.md` or `generate`, the name of an implemented generator |
 | `indices` | Objects with `id`, `generate` and a localized `title` |
 
 Parts are numbered with Roman numerals, chapters with integers across the whole book and appendices with letters, all in the order of this file. Numbers are therefore not stable: refer to a chapter by its title, and link to it by file name.
+
+A generated appendix or index has no source file. The package builds its Markdown from the definition entries and index markers, parses it with the same chapter parser and keeps it in the chapter's `:content`, so generated content is checked, translated and read like a written chapter.
 
 ## Chapter format
 
@@ -98,7 +100,7 @@ In signatures, argument names are lowercase. In prose, refer to an argument in u
 
 ### Index terms
 
-Put `<!-- index: TERM; TERM -->` on its own line after a heading to mark index terms for that section. The concept index will be generated from these terms; generating it is not implemented yet.
+Put `<!-- index: TERM; TERM -->` on its own line after a heading to mark index terms for that section. The concept index is generated from these terms and the symbol index from the definition entries.
 
 ### Runnable examples
 
@@ -137,6 +139,8 @@ The gate reads the book and the sibling provider checkouts and reports each prob
 | `link to unknown chapter: TARGET`, `link to unknown heading: TARGET` | A link has no target |
 | `hard-wrapped line: write each paragraph on one line` | A paragraph or list item continues on the next line |
 | `definition entries differ from LANGUAGE`, `section structure differs from LANGUAGE`, `runnable examples differ from LANGUAGE` | A translation does not match the reference language |
+| `generated NAME does not link KIND NAME`, `generated concept index does not link TARGET` / `does not list TERM` | Generated content misses an interface or index term it promises |
+| `Unknown generated content` | `generate` names no implemented generator |
 | `provider checkout missing: DIRECTORY`, `cannot read provider source` | A provider cannot be read |
 
 ## Commands

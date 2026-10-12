@@ -3,7 +3,7 @@
 EMACS ?= emacs
 PYTHON ?= python3
 LOAD_PATH = -L . -L lisp -L ../etaf -L ../etaf-ui -L ../ebox -L ../ecss -L ../ekp
-SOURCES = lisp/etaf-manual-book.el etaf-manual.el scripts/check-book.el
+SOURCES = lisp/etaf-manual-book.el lisp/etaf-manual-generate.el etaf-manual.el scripts/check-book.el
 
 .PHONY: all compile book-check coverage tool-check check clean
 

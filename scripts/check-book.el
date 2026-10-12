@@ -29,9 +29,14 @@
   "Directory that problem file names are reported relative to.")
 
 (defun etaf-manual-check--problem (file line format-string &rest arguments)
-  "Record a problem at FILE and LINE described by FORMAT-STRING and ARGUMENTS."
+  "Record a problem at FILE and LINE described by FORMAT-STRING and ARGUMENTS.
+FILE is an absolute chapter file, nil for a book-wide problem, or a label
+naming generated content."
   (push (format "%s:%s: %s"
-                (if file (file-relative-name file etaf-manual-check--base) "book")
+                (cond ((null file) "book")
+                      ((file-name-absolute-p file)
+                       (file-relative-name file etaf-manual-check--base))
+                      (t file))
                 (or line 0)
                 (apply #'format format-string arguments))
         etaf-manual-check--problems))
@@ -166,6 +171,11 @@ header, and the :host, :property, :style and :token vocabularies."
   "Return CHAPTER's source file, or nil for generated content."
   (plist-get chapter :file))
 
+(defun etaf-manual-check--label (chapter)
+  "Return CHAPTER's report label: its file or its generated-content name."
+  (or (etaf-manual-check--chapter-file chapter)
+      (format "<generated:%s>" (or (plist-get chapter :generate) (plist-get chapter :id)))))
+
 (defun etaf-manual-check--anchors (chapter)
   "Return the heading anchors CHAPTER defines."
   (append (list (etaf-manual--slug (plist-get chapter :title)))
@@ -180,7 +190,7 @@ Return a hash table from (KIND . NAME) to the definition."
   (let ((seen (make-hash-table :test #'equal))
         (records (plist-get facts :records)))
     (dolist (chapter (plist-get book :chapters))
-      (let ((file (etaf-manual-check--chapter-file chapter)))
+      (let ((file (etaf-manual-check--label chapter)))
         (dolist (definition (plist-get chapter :definitions))
           (let* ((kind (plist-get definition :kind))
                  (name (plist-get definition :name))
@@ -254,7 +264,7 @@ give the version in that package's entry header."
     (dolist (chapter (plist-get book :chapters))
       (puthash (plist-get chapter :id) chapter chapters))
     (dolist (chapter (plist-get book :chapters))
-      (let ((file (etaf-manual-check--chapter-file chapter)))
+      (let ((file (etaf-manual-check--label chapter)))
         (pcase-dolist (`(,line . ,target) (plist-get chapter :links))
           (unless (string-match-p "\\`[a-z][a-z0-9+.-]*:" target)
             (let* ((hash (string-search "#" target))
@@ -322,6 +332,45 @@ give the version in that package's entry header."
                  (etaf-manual-check--problem file 1 "runnable examples differ from %s"
                                              (plist-get reference :language)))))))
 
+(defconst etaf-manual-check--generated-kinds
+  '((token-table token)
+    (style-quick-reference style)
+    (host-and-property-quick-reference host property)
+    (component-quick-reference component)
+    (symbol-index function macro variable hook error component property style token))
+  "Definition kinds each generated appendix and index must link.")
+
+(defun etaf-manual-check--generated (book)
+  "Check that BOOK's generated content covers the interfaces and terms it promises."
+  (let ((chapters (plist-get book :chapters)))
+    (dolist (chapter chapters)
+      (let ((name (plist-get chapter :generate))
+            (links (mapcar #'cdr (plist-get chapter :links))))
+        (when-let* ((kinds (alist-get name etaf-manual-check--generated-kinds)))
+          (dolist (definition (cl-loop for other in chapters
+                                       append (plist-get other :definitions)))
+            (when (memq (plist-get definition :kind) kinds)
+              (unless (member (format "%s.md#%s"
+                                      (plist-get definition :chapter)
+                                      (plist-get definition :anchor))
+                              links)
+                (etaf-manual-check--problem
+                 nil nil "generated %s does not link %s %s"
+                 name (plist-get definition :kind) (plist-get definition :name))))))
+        (when (eq name 'concept-index)
+          (dolist (other chapters)
+            (dolist (record (plist-get other :index))
+              (let ((target (format "%s.md#%s" (plist-get other :id)
+                                    (or (plist-get record :anchor)
+                                        (etaf-manual--slug (plist-get other :title))))))
+                (unless (member target links)
+                  (etaf-manual-check--problem
+                   nil nil "generated concept index does not link %s" target)))
+              (unless (string-match-p (regexp-quote (plist-get record :term))
+                                      (or (plist-get chapter :content) ""))
+                (etaf-manual-check--problem
+                 nil nil "generated concept index does not list %s" (plist-get record :term))))))))))
+
 (defun etaf-manual-check--orphans (book)
   "Report Markdown files in BOOK's language directory that no entry reads."
   (let* ((directory (expand-file-name (plist-get book :language)
@@ -373,6 +422,7 @@ paragraph would otherwise render as a space."
     (dolist (book books)
       (let ((defined (etaf-manual-check--definitions book facts)))
         (etaf-manual-check--references book facts defined)
+        (etaf-manual-check--generated book)
         (etaf-manual-check--orphans book)
         (etaf-manual-check--line-breaks book)
         (let ((book-rows (etaf-manual-check--coverage book facts defined)))

@@ -33,10 +33,12 @@
 | `references` | 正文可以点名的其他仓库，例如两个 playground；它们的 Commentary 记录同样算公共接口 |
 | `coverage` | 每个接口都必须有定义条目的包和词表 |
 | `parts` | 对象列表，每项有 `id`、按语言给出的 `title`，以及按阅读顺序排列的 `chapters` |
-| `appendices` | 对象列表，每项有 `id`、按语言给出的 `title`，并且要么对应一个章节文件，要么用 `generate` 指定生成的内容 |
+| `appendices` | 对象列表，每项有 `id`、按语言给出的 `title`，并且要么对应 `LANGUAGE/ID.md` 下的一个章节文件，要么用 `generate` 指定一个已实现的生成器 |
 | `indices` | 对象列表，每项有 `id`、`generate` 和按语言给出的 `title` |
 
 部分用罗马数字编号，章在全书范围内用整数编号，附录用字母编号，顺序都取自这个文件。因此编号并不固定：正文里用标题称呼一章，链接时用文件名。
+
+生成的附录和索引没有源文件。包从定义条目和索引标记构造它们的 Markdown，用同一个章节解析器解析，并保存在该章的 `:content` 里，因此生成内容与手写章一样接受检查、翻译和读取。
 
 ## 章节格式
 
@@ -98,7 +100,7 @@
 
 ### 索引词
 
-在标题后单独一行写 `<!-- index: 词; 词 -->`，为这一节标记索引词。概念索引将由这些词生成，生成功能尚未实现。
+在标题后单独一行写 `<!-- index: 词; 词 -->`，为这一节标记索引词。概念索引由这些词生成，符号索引由定义条目生成。
 
 ### 可运行示例
 
@@ -137,6 +139,8 @@
 | `link to unknown chapter: TARGET`、`link to unknown heading: TARGET` | 链接目标不存在 |
 | `hard-wrapped line: write each paragraph on one line` | 段落或列表项在下一行继续 |
 | `definition entries differ from LANGUAGE`、`section structure differs from LANGUAGE`、`runnable examples differ from LANGUAGE` | 译本与基准语言不一致 |
+| `generated NAME does not link KIND NAME`、`generated concept index does not link TARGET`／`does not list TERM` | 生成内容缺少它承诺包含的接口或索引词 |
+| `Unknown generated content` | `generate` 没有对应已实现的生成器 |
 | `provider checkout missing: DIRECTORY`、`cannot read provider source` | 读不到提供者仓库 |
 
 ## 命令

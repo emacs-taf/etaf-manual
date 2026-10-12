@@ -85,72 +85,102 @@ underscores are kept, spaces become hyphens and everything else is dropped."
 
 ;;;; Chapters
 
-(defun etaf-manual--parse-chapter (file id)
-  "Parse chapter FILE with identifier ID into a partial chapter plist."
-  (with-temp-buffer
-    (insert-file-contents file)
-    (let ((seen (make-hash-table :test #'equal))
-          (line-number 0) fence title nodes definitions examples links code
-          index example-start example-lines)
-      (dolist (line (split-string (buffer-string) "\n"))
-        (cl-incf line-number)
-        (cond
-         ;; Inside a fence: collect example text until the closing fence.
-         (fence
-          (if (string-match-p (concat "\\`[ ]\\{0,3\\}" (regexp-quote fence) "[`~]*[ \t]*\\'") line)
-              (progn
-                (when example-start
-                  (push (list :id (format "%s-%d" id (1+ (length examples)))
-                              :chapter id :line example-start
-                              :code (string-join (nreverse example-lines) "\n"))
-                        examples))
-                (setq fence nil example-start nil example-lines nil))
-            (when example-start (push line example-lines))))
-         ((string-match "\\`[ ]\\{0,3\\}\\(```+\\|~~~+\\)[ \t]*\\(.*\\)\\'" line)
-          (setq fence (match-string 1 line))
-          (when (string-match-p "\\`elisp[ \t]+:run\\b" (match-string 2 line))
-            (setq example-start line-number)))
-         ((string-match "\\`\\(#\\{1,6\\}\\)[ \t]+\\(.*?\\)[ \t]*#*[ \t]*\\'" line)
-          (let* ((level (length (match-string 1 line)))
-                 (text (match-string 2 line))
-                 (anchor (etaf-manual--unique-anchor (etaf-manual--slug text) seen)))
-            (cond
-             ((= level 1)
-              (if title
-                  (signal 'etaf-manual-error (list "Chapter has several titles" file line-number))
-                (setq title text)))
-             ((= level 4)
-              (if (string-match etaf-manual--definition-regexp text)
-                  (push (list :kind (cdr (assoc (match-string 1 text)
-                                                etaf-manual--definition-kinds))
-                              :name (intern (match-string 2 text))
-                              :signature (or (match-string 3 text) "")
-                              :anchor anchor :line line-number :chapter id)
-                        definitions)
-                (signal 'etaf-manual-error
-                        (list "Level-4 headings are definition entries" file line-number))))
-             ((> level 4)
-              (signal 'etaf-manual-error (list "Headings deeper than level 4" file line-number))))
-            (when (memq level '(2 3))
-              (push (list :level level :title text :anchor anchor :line line-number)
+(defun etaf-manual--finish-definition-body (group body-lines)
+  "Attach the joined BODY-LINES to every definition plist in GROUP."
+  (let ((body (string-trim (string-join (nreverse body-lines) "\n"))))
+    (when (and group (not (string-empty-p body)))
+      (dolist (definition group)
+        (plist-put definition :body body)))))
+
+(defun etaf-manual--parse-chapter-text (text id label)
+  "Parse chapter TEXT with identifier ID, reporting problems at LABEL.
+TEXT is the Markdown source itself, so generated appendices and written
+chapters share one parser."
+  (let ((seen (make-hash-table :test #'equal))
+        (line-number 0) fence title nodes definitions examples links code
+        index example-start example-lines section-anchor group body-lines)
+    (dolist (line (split-string text "\n"))
+      (cl-incf line-number)
+      (cond
+       ;; Inside a fence: collect example text until the closing fence.
+       (fence
+        (when group (push line body-lines))
+        (if (string-match-p (concat "\\`[ ]\\{0,3\\}" (regexp-quote fence) "[`~]*[ \t]*\\'") line)
+            (progn
+              (when example-start
+                (push (list :id (format "%s-%d" id (1+ (length examples)))
+                            :chapter id :line example-start
+                            :code (string-join (nreverse example-lines) "\n"))
+                      examples))
+              (setq fence nil example-start nil example-lines nil))
+          (when example-start (push line example-lines))))
+       ((string-match "\\`[ ]\\{0,3\\}\\(```+\\|~~~+\\)[ \t]*\\(.*\\)\\'" line)
+        (when group (push line body-lines))
+        (setq fence (match-string 1 line))
+        (when (string-match-p "\\`elisp[ \t]+:run\\b" (match-string 2 line))
+          (setq example-start line-number)))
+       ((string-match "\\`\\(#\\{1,6\\}\\)[ \t]+\\(.*?\\)[ \t]*#*[ \t]*\\'" line)
+        (let* ((level (length (match-string 1 line)))
+               (heading (match-string 2 line))
+               (anchor (etaf-manual--unique-anchor (etaf-manual--slug heading) seen)))
+          (cond
+           ((= level 4)
+            (unless (string-match etaf-manual--definition-regexp heading)
+              (signal 'etaf-manual-error
+                      (list "Level-4 headings are definition entries" label line-number)))
+            (let ((definition (list :kind (cdr (assoc (match-string 1 heading)
+                                                      etaf-manual--definition-kinds))
+                                    :name (intern (match-string 2 heading))
+                                    :signature (or (match-string 3 heading) "")
+                                    :anchor anchor :line line-number :chapter id
+                                    :body nil)))
+              (push definition definitions)
+              ;; Consecutive headings share the description that follows them.
+              (if (and group (string-empty-p (string-join body-lines "")))
+                  (setq group (cons definition group))
+                (etaf-manual--finish-definition-body group body-lines)
+                (setq group (list definition) body-lines nil))))
+           (t
+            (etaf-manual--finish-definition-body group body-lines)
+            (setq group nil body-lines nil)
+            (when (> level 4)
+              (signal 'etaf-manual-error
+                      (list "Headings deeper than level 4" label line-number)))
+            (if (= level 1)
+                (if title
+                    (signal 'etaf-manual-error
+                            (list "Chapter has several titles" label line-number))
+                  (setq title heading))
+              (push (list :level level :title heading :anchor anchor :line line-number)
                     nodes))
-            (dolist (target (etaf-manual--links text))
-              (push (cons line-number target) links))))
-         (t
-          (when (string-match "\\`<!--[ \t]*index:[ \t]*\\(.*?\\)[ \t]*-->\\'" line)
-            (dolist (term (split-string (match-string 1 line) ";" t "[ \t]+"))
-              (push (list :term term :line line-number) index)))
-          (dolist (target (etaf-manual--links line))
-            (push (cons line-number target) links))
-          (dolist (span (etaf-manual--inline-code line))
-            (push (cons line-number span) code)))))
-      (when fence
-        (signal 'etaf-manual-error (list "Unclosed code fence" file)))
-      (unless title
-        (signal 'etaf-manual-error (list "Chapter needs a level-1 title" file)))
-      (list :title title :file file :nodes (nreverse nodes)
-            :definitions (nreverse definitions) :examples (nreverse examples)
-            :links (nreverse links) :code (nreverse code) :index (nreverse index)))))
+            (setq section-anchor anchor)))
+          (dolist (target (etaf-manual--links heading))
+            (push (cons line-number target) links))))
+       (t
+        (when group (push line body-lines))
+        (when (string-match "\\`<!--[ \t]*index:[ \t]*\\(.*?\\)[ \t]*-->\\'" line)
+          (dolist (term (split-string (match-string 1 line) ";" t "[ \t]+"))
+            (push (list :term term :line line-number :anchor section-anchor) index)))
+        (dolist (target (etaf-manual--links line))
+          (push (cons line-number target) links))
+        (dolist (span (etaf-manual--inline-code line))
+          (push (cons line-number span) code)))))
+    (etaf-manual--finish-definition-body group body-lines)
+    (when fence
+      (signal 'etaf-manual-error (list "Unclosed code fence" label)))
+    (unless title
+      (signal 'etaf-manual-error (list "Chapter needs a level-1 title" label)))
+    (list :title title :nodes (nreverse nodes)
+          :definitions (nreverse definitions) :examples (nreverse examples)
+          :links (nreverse links) :code (nreverse code) :index (nreverse index))))
+
+(defun etaf-manual--parse-chapter (file id)
+  "Parse chapter FILE with identifier ID into a chapter plist."
+  (let ((text (with-temp-buffer
+                (insert-file-contents file)
+                (buffer-string))))
+    (append (list :file file)
+            (etaf-manual--parse-chapter-text text id file))))
 
 ;;;; Books
 
@@ -215,9 +245,28 @@ underscores are kept, spaces become hyphens and everything else is dropped."
           (puthash key (cons stamp book) etaf-manual--cache)
           book)))))
 
+(declare-function etaf-manual-generate "etaf-manual-generate" (name language title chapters))
+
+(defun etaf-manual--generate (name language title chapters)
+  "Return the Markdown of generated NAME in LANGUAGE with TITLE."
+  (require 'etaf-manual-generate)
+  (etaf-manual-generate name language title chapters))
+
+(defun etaf-manual--resolve-generated (chapter language sources)
+  "Return CHAPTER with its generated Markdown content parsed into it.
+CHAPTER's :generate names the generator; SOURCES are the parsed chapters
+the generator reads."
+  (let* ((name (plist-get chapter :generate))
+         (content (etaf-manual--generate name language (plist-get chapter :title) sources))
+         (parsed (etaf-manual--parse-chapter-text
+                  content (plist-get chapter :id)
+                  (format "<generated:%s>" name))))
+    (cl-remf parsed :title)
+    (append chapter (list :content content) parsed)))
+
 (defun etaf-manual--build-book (directory language description)
   "Build LANGUAGE's book plist from DESCRIPTION below DIRECTORY."
-  (let ((chapter-number 0) (part-number 0) (appendix-number 0) parts chapters)
+  (let ((chapter-number 0) (part-number 0) (appendix-number 0) parts chapters appendices)
     (dolist (part (plist-get description :parts))
       (let ((part-id (intern (plist-get part :id))) ids)
         (dolist (slug (plist-get part :chapters))
@@ -234,33 +283,51 @@ underscores are kept, spaces become hyphens and everything else is dropped."
                     :title (etaf-manual--localized (plist-get part :title) language)
                     :chapters (nreverse ids))
               parts)))
+    ;; Written appendices parse now; generated ones are resolved below, once
+    ;; every written chapter is available.
     (dolist (appendix (plist-get description :appendices))
       (let* ((id (intern (plist-get appendix :id)))
              (generate (plist-get appendix :generate))
              (number (string (+ ?A appendix-number))))
         (cl-incf appendix-number)
         (push (if generate
-                  (list :id id :kind 'appendix :number number :generate (intern generate)
-                        :title (etaf-manual--localized (plist-get appendix :title) language)
-                        :nodes nil :definitions nil :examples nil)
+                  (list :id id :kind 'appendix :number number
+                        :generate (intern generate)
+                        :title (etaf-manual--localized (plist-get appendix :title) language))
                 (append (list :id id :kind 'appendix :number number)
                         (etaf-manual--parse-chapter
                          (expand-file-name (format "%s/%s.md" language id) directory)
                          id)))
-              chapters)))
-    (dolist (index (plist-get description :indices))
-      (push (list :id (intern (plist-get index :id)) :kind 'index
-                  :generate (intern (plist-get index :generate))
-                  :title (etaf-manual--localized (plist-get index :title) language)
-                  :nodes nil :definitions nil :examples nil)
-            chapters))
-    (list :language language :directory directory
-          :title (etaf-manual--localized (plist-get description :title) language)
-          :packages (plist-get description :packages)
-          :references (plist-get description :references)
-          :coverage (plist-get description :coverage)
-          :languages (plist-get description :languages)
-          :parts (nreverse parts) :chapters (nreverse chapters))))
+              appendices)))
+    (let* ((chapter-list (nreverse chapters))
+           (appendix-list (nreverse appendices))
+           (written (append chapter-list
+                            (cl-remove-if (lambda (chapter)
+                                            (plist-get chapter :generate))
+                                          appendix-list)))
+           (resolved (mapcar (lambda (appendix)
+                               (if (plist-get appendix :generate)
+                                   (etaf-manual--resolve-generated appendix language written)
+                                 appendix))
+                             appendix-list))
+           (indices (mapcar (lambda (spec)
+                              (etaf-manual--resolve-generated
+                               (list :id (intern (plist-get spec :id))
+                                     :kind 'index
+                                     :generate (intern (plist-get spec :generate))
+                                     :title (etaf-manual--localized
+                                             (plist-get spec :title) language))
+                               language
+                               (append written resolved)))
+                            (plist-get description :indices))))
+      (list :language language :directory directory
+            :title (etaf-manual--localized (plist-get description :title) language)
+            :packages (plist-get description :packages)
+            :references (plist-get description :references)
+            :coverage (plist-get description :coverage)
+            :languages (plist-get description :languages)
+            :parts (nreverse parts)
+            :chapters (append chapter-list resolved indices)))))
 
 (provide 'etaf-manual-book)
 ;;; etaf-manual-book.el ends here

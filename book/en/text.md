@@ -79,6 +79,18 @@ A text node caches its measurement: the face it was measured with, its payload, 
 
 Widths are measured per cluster and memoized per face, so a paragraph of repeated characters measures each cluster once. Font changes that keep the metrics identical — an inheritable weight change under a monospaced family, for example — repaint without re-measuring. When a whole-tree font change invalidates the measurements, `ebox-clear-cache` drops the width caches and the next layout measures again; [Rendering Model](rendering-model.md) defines the epoch that drives this.
 
+#### Function: etaf-string-pixel-width (string)
+
+Return the display pixel width of STRING's first line.
+
+**Semantics.** The measure honors STRING's `face` and `display` properties, so styled text and plain text can measure differently, and a newline ends the measurement. Applications use it to align content to glyph widths with the same measure the renderer used.
+
+**Returns.** The width in pixels; an empty string is zero.
+
+**Errors.** `error→ wrong-type-argument` naming `stringp` when STRING is not a string.
+
+**See also.** `ebox-text-create`.
+
 ## Errors and recovery
 
 <!-- index: text errors; unwrappable text; empty text -->

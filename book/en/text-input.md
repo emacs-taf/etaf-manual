@@ -82,6 +82,30 @@ Return a mounted Runtime's active input session, or nil.
 
 **See also.** `etaf-input-begin`, `ebox-input-active-p`.
 
+#### Function: etaf-input-edit-command-add (command)
+
+Add COMMAND to the commands that edit a native input session's text.
+
+**Semantics.** A command in this list that is bound in a session keymap edits the session value; other session bindings run in the mounted buffer. The list starts with the standard insertion, motion and yank commands, and a catalog component registers its own editing commands here.
+
+**Returns.** The updated command list.
+
+**Errors.** `error→ wrong-type-argument` naming `commandp` when COMMAND is not a command symbol.
+
+**See also.** `etaf-input-edit-command-remove`, `ebox-input-begin`.
+
+#### Function: etaf-input-edit-command-remove (command)
+
+Remove COMMAND from the native input session's text-editing commands.
+
+**Semantics.** Use it when a component unloads or when a command should stop editing the session value; the other session bindings then run in the mounted buffer again.
+
+**Returns.** The updated command list.
+
+**Errors.** `error→ wrong-type-argument` naming `commandp` when COMMAND is not a command symbol.
+
+**See also.** `etaf-input-edit-command-add`.
+
 ```elisp :run
 (etaf-define-component demo-input-mirror ()
   :bindings ((value (etaf-ref "")))

@@ -192,6 +192,18 @@ refit 是一次操作、一个结果：测量视口，与已提交值不同时�
 
 **参见。** `etaf-viewport`、`etaf-runtime-refit`。
 
+#### Function: etaf-runtime-window-viewport (&optional runtime)
+
+把 RUNTIME 的显示窗口视口作为 (WIDTH . HEIGHT) 返回。
+
+**语义。** WIDTH 是窗口提供给挂载树的像素宽，HEIGHT 是它的主体行数。RUNTIME 默认为当前缓冲区的 Runtime。这是一次普通快照，不是响应式读取；需要在窗口变化时重排的组件应读 `etaf-runtime-viewport`，它由视口变化结算后更新。显示面需要匹配窗口的像素几何、而不是排版出的文本视口时，用这个入口。
+
+**返回。** 窗口视口 cons；没有窗口显示 RUNTIME 的缓冲区、或显示不是图形终端时返回 nil。
+
+**错误。** 未挂载的 Runtime 报 `etaf-runtime-error`。
+
+**参见。** `etaf-runtime-viewport`、`etaf-runtime-refit`。
+
 ## 视口变化钩子
 
 <!-- index: 视口变化钩子; 稳定尺寸 -->

@@ -82,6 +82,30 @@ ETAF 函数按 Host 引用寻址会话，与应用其余 API 一致，并把会�
 
 **参见。** `etaf-input-begin`、`ebox-input-active-p`。
 
+#### Function: etaf-input-edit-command-add (command)
+
+把 COMMAND 加入「编辑原生输入会话文本」的命令列表。
+
+**语义。** 列表中的命令若绑定在会话 keymap 里就编辑会话值；其余会话绑定在挂载缓冲区里运行。列表初始包含标准的插入、移动与 yank 命令，目录组件用这个入口登记自己的编辑命令。
+
+**返回。** 更新后的命令列表。
+
+**错误。** COMMAND 不是命令符号时 `error→ wrong-type-argument`，数据点名 `commandp`。
+
+**参见。** `etaf-input-edit-command-remove`、`ebox-input-begin`。
+
+#### Function: etaf-input-edit-command-remove (command)
+
+把 COMMAND 从原生输入会话的文本编辑命令里移除。
+
+**语义。** 组件卸载、或某个命令不该再编辑会话值时用它；之后其余会话绑定重新在挂载缓冲区里运行。
+
+**返回。** 更新后的命令列表。
+
+**错误。** COMMAND 不是命令符号时 `error→ wrong-type-argument`，数据点名 `commandp`。
+
+**参见。** `etaf-input-edit-command-add`。
+
 ```elisp :run
 (etaf-define-component demo-input-mirror ()
   :bindings ((value (etaf-ref "")))

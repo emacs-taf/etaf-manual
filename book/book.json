@@ -225,7 +225,8 @@
         "invariants",
         "extending-the-framework",
         "performance-engineering",
-        "testing-and-validation"
+        "testing-and-validation",
+        "development-and-release"
       ]
     }
   ],

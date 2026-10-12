@@ -18,7 +18,7 @@
 
 #### Function: etaf-performance-mode (&optional arg)
 
-Record operations for the Runtime mounted in the current buffer.
+记录当前缓冲区所挂载 Runtime 的 operation。
 
 **参数。** ARG 遵循次模式惯例：nil 或省略开启模式，正数开启，零或负数关闭，`toggle` 取反。
 
@@ -32,7 +32,7 @@ Record operations for the Runtime mounted in the current buffer.
 
 #### Function: etaf-performance-start (runtime)
 
-Attach the recorder to mounted RUNTIME and return RUNTIME.
+把记录器挂到已挂载的 RUNTIME 上并返回 RUNTIME。
 
 **参数。** RUNTIME 是一个已挂载的 Runtime。
 
@@ -56,7 +56,7 @@ Attach the recorder to mounted RUNTIME and return RUNTIME.
 
 #### Function: etaf-performance-stop (runtime)
 
-Detach this recorder from RUNTIME and return RUNTIME.
+从 RUNTIME 摘下这个记录器并返回 RUNTIME。
 
 **参数。** RUNTIME 是一个 Runtime。
 
@@ -70,7 +70,7 @@ Detach this recorder from RUNTIME and return RUNTIME.
 
 #### Function: etaf-performance-clear ()
 
-Clear completed and unfinished performance records.
+清除已完成与未完成的性能记录。
 
 **语义。** 每条保留的 operation 与每条未完成的 operation 都被丢弃。性能面板若开着，会被还原成空集。记录器的 attachment 不受影响：清空之后记录继续。
 
@@ -80,7 +80,7 @@ Clear completed and unfinished performance records.
 
 #### Variable: etaf-performance-max-records
 
-Maximum completed operations retained by the recorder.
+记录器保留的已完成 operation 上限。
 
 **语义。** 默认 200。记录器按这个大小维持环形缓冲，超过上限时丢弃最旧的已完成 operation；调小时，下一次 operation 完成时按最新记录重建环形缓冲。零表示停止保留：下一次完成会丢弃已保留的集合、什么都不留。上限只覆盖已完成 operation；仍在进行中的不计入。
 
@@ -92,7 +92,7 @@ Maximum completed operations retained by the recorder.
 
 #### Macro: etaf-performance-with-operation ((runtime kind label) &rest body)
 
-Evaluate BODY through RUNTIME's canonical operation boundary.
+经 RUNTIME 的规范 operation 边界求值 BODY。
 
 **参数。** RUNTIME 是已挂载的 Runtime，KIND 是 operation 符号，LABEL 是描述性字符串。BODY 是要做的工作。
 
@@ -113,7 +113,7 @@ Evaluate BODY through RUNTIME's canonical operation boundary.
 
 #### Function: etaf-performance-call-operation (runtime kind label function)
 
-Call FUNCTION as KIND and LABEL through RUNTIME's operation boundary.
+经 RUNTIME 的 operation 边界把 FUNCTION 当作 KIND 与 LABEL 调用。
 
 **参数。** RUNTIME 是已挂载的 Runtime，KIND 是 operation 符号，LABEL 是字符串，FUNCTION 是无参函数。
 
@@ -131,7 +131,7 @@ Call FUNCTION as KIND and LABEL through RUNTIME's operation boundary.
 
 #### Function: etaf-performance-operation-p (x)
 
-Return non-nil when X is a completed operation record.
+X 是已完成的 operation 记录时返回非 nil。
 
 **语义。** 在从它读取槽位之前，用它检查集合里的值；否则槽位读取器报 `wrong-type-argument`。
 
@@ -141,7 +141,7 @@ Return non-nil when X is a completed operation record.
 
 #### Function: etaf-performance-operation-id (x)
 
-Access slot "id" of `etaf-performance-operation' struct X.
+读取 `etaf-performance-operation' 结构 X 的 "id" 槽。
 
 **语义。** 身份是整数，在所属 Runtime 内唯一、随调用顺序递增。嵌套调用报告外层 operation 的身份。
 
@@ -165,7 +165,7 @@ Access slot "id" of `etaf-performance-operation' struct X.
 
 #### Function: etaf-performance-operation-kind (x)
 
-Access slot "kind" of `etaf-performance-operation' struct X.
+读取 `etaf-performance-operation' 结构 X 的 "kind" 槽。
 
 **语义。** kind 是调用方传给 operation 边界的符号，例如 `refresh`、`event` 或包自定义的名字。`etaf-performance-summary` 就是按 kind 分组。
 
@@ -177,7 +177,7 @@ Access slot "kind" of `etaf-performance-operation' struct X.
 
 #### Function: etaf-performance-operation-label (x)
 
-Access slot "label" of `etaf-performance-operation' struct X.
+读取 `etaf-performance-operation' 结构 X 的 "label" 槽。
 
 **语义。** label 是调用方传入的描述性字符串；它补充 kind，例如 kind `refresh` 配 label `"reload"`。记录器保存防御性副本。
 
@@ -189,7 +189,7 @@ Access slot "label" of `etaf-performance-operation' struct X.
 
 #### Function: etaf-performance-operation-status (x)
 
-Access slot "status" of `etaf-performance-operation' struct X.
+读取 `etaf-performance-operation' 结构 X 的 "status" 槽。
 
 **语义。** 取 `success`（工作正常返回）、`error`（报了错）或 `quit`（被打断）之一。状态描述 operation 自身的结果，而不是缓冲区的状态；缓冲区状态由可携带报告里的修订号槽位描述。
 
@@ -201,7 +201,7 @@ Access slot "status" of `etaf-performance-operation' struct X.
 
 #### Function: etaf-performance-operation-elapsed (x)
 
-Access slot "elapsed" of `etaf-performance-operation' struct X.
+读取 `etaf-performance-operation' 结构 X 的 "elapsed" 槽。
 
 **语义。** 整条 operation 的墙钟耗时，单位毫秒，从打开计到闭合。它包含其中各 stage 的时间；它不是 stage 耗时之和，因为 stage 耗时可能重叠。
 
@@ -213,7 +213,7 @@ Access slot "elapsed" of `etaf-performance-operation' struct X.
 
 #### Function: etaf-performance-operation-gc-count (x)
 
-Access slot "gc-count" of `etaf-performance-operation' struct X.
+读取 `etaf-performance-operation' 结构 X 的 "gc-count" 槽。
 
 **语义。** operation 期间发生了多少次垃圾回收。耗时不长而次数很多，指向的是分配压力而不是慢代码。
 
@@ -225,7 +225,7 @@ Access slot "gc-count" of `etaf-performance-operation' struct X.
 
 #### Function: etaf-performance-operation-gc-elapsed (x)
 
-Access slot "gc-elapsed" of `etaf-performance-operation' struct X.
+读取 `etaf-performance-operation' 结构 X 的 "gc-elapsed" 槽。
 
 **语义。** 这些垃圾回收花掉的时间，单位毫秒。operation 自身的耗时就包含它。
 
@@ -237,7 +237,7 @@ Access slot "gc-elapsed" of `etaf-performance-operation' struct X.
 
 #### Function: etaf-performance-operation-stages (x)
 
-Access slot "stages" of `etaf-performance-operation' struct X.
+读取 `etaf-performance-operation' 结构 X 的 "stages" 槽。
 
 **语义。** operation 的扁平 provider 报告，按发出顺序排列：Runtime 自己的 stage，以及工作期间有写入的 provider 的缓冲区 flush 报告。列表是防御性副本；改动它不会改动保留的记录。
 
@@ -249,7 +249,7 @@ Access slot "stages" of `etaf-performance-operation' struct X.
 
 #### Function: etaf-performance-operation-stage-summary (operation)
 
-Summarize flat provider stages in OPERATION by category.
+按 category 汇总 OPERATION 里的扁平 provider stage。
 
 **语义。** 每项含 `:category`、`:count` 与 `:duration-ms`，按耗时之和从大到小排序。该耗时是可能重叠的 provider 耗时之和，所以它只能给类别排序，永远不是独占时间；要看整体就读 operation 的 elapsed。
 
@@ -267,7 +267,7 @@ Summarize flat provider stages in OPERATION by category.
 
 #### Function: etaf-performance-stage-name (x)
 
-Access slot "name" of `etaf-performance-stage' struct X.
+读取 `etaf-performance-stage' 结构 X 的 "name" 槽。
 
 **语义。** provider 报告过来的 stage 名，例如 Runtime 的闭合 stage 叫 `runtime-operation`，Ebox 的缓冲区写入叫 `flush`。
 
@@ -279,7 +279,7 @@ Access slot "name" of `etaf-performance-stage' struct X.
 
 #### Function: etaf-performance-stage-provider (x)
 
-Access slot "provider" of `etaf-performance-stage' struct X.
+读取 `etaf-performance-stage' 结构 X 的 "provider" 槽。
 
 **语义。** 发出报告的层名符号，例如 `etaf` 或 `ebox`。provider 告诉你一项开销该去哪个层找主人。
 
@@ -291,7 +291,7 @@ Access slot "provider" of `etaf-performance-stage' struct X.
 
 #### Function: etaf-performance-stage-category (x)
 
-Access slot "category" of `etaf-performance-stage' struct X.
+读取 `etaf-performance-stage' 结构 X 的 "category" 槽。
 
 **语义。** 摘要使用的公共分组：ETAF Runtime 自身发出的报告归 `runtime`，其它 provider 保留自己的名字，所以 `flush` 报告归 `ebox`。类别是拿来趋势化的，provider 是拿来点名的。
 
@@ -303,7 +303,7 @@ Access slot "category" of `etaf-performance-stage' struct X.
 
 #### Function: etaf-performance-stage-status (x)
 
-Access slot "status" of `etaf-performance-stage' struct X.
+读取 `etaf-performance-stage' 结构 X 的 "status" 槽。
 
 **语义。** 取 `success`、`error`、`quit` 之一，或 provider 不报告时为 nil。状态缺失表示 provider 认为这个 stage 正常。
 
@@ -315,7 +315,7 @@ Access slot "status" of `etaf-performance-stage' struct X.
 
 #### Function: etaf-performance-stage-duration (x)
 
-Access slot "duration" of `etaf-performance-stage' struct X.
+读取 `etaf-performance-stage' 结构 X 的 "duration" 槽。
 
 **语义。** 该 stage 自己的耗时，单位毫秒，由它的 provider 测量。各 stage 的 provider 耗时可能彼此重叠，所以只单独比较或按类别汇总，绝不加成一个独占总数。
 
@@ -327,7 +327,7 @@ Access slot "duration" of `etaf-performance-stage' struct X.
 
 #### Function: etaf-performance-stage-metadata (x)
 
-Access slot "metadata" of `etaf-performance-stage' struct X.
+读取 `etaf-performance-stage' 结构 X 的 "metadata" 槽。
 
 **语义。** 报告里类型化 stage 字段没有表示的、provider 特有的字段。Ebox 的 flush stage 在这里带上更新报告的策略、编辑数、行数、范围与 flush 计数器，所以记录器给出的细节与 `ebox-buffer-update-report` 相同，而不需要第二条采集路径。值是防御性副本，内容可能是 provider 报告的任何值。
 
@@ -343,7 +343,7 @@ Access slot "metadata" of `etaf-performance-stage' struct X.
 
 #### Function: etaf-performance-records (&optional runtime-id)
 
-Return newest-first immutable snapshots of completed records. When RUNTIME-ID is non-nil, select only that integer observer report identity, available as the `:runtime-id` of a portable report. This also selects historical records after unmount or reuse of a buffer name. Omitted or nil RUNTIME-ID selects all retained records.
+返回已完成记录的不可变快照，最新在前。RUNTIME-ID 非 nil 时只选该整数观察者报告身份，它由 `etaf-performance-operation-runtime-id` 给出、也是可携带报告里的 `:runtime-id`。这也会选中缓冲区名被复用或 Runtime 卸载之后的历史记录。省略或 nil 的 RUNTIME-ID 选中全部保留记录。
 
 **参数。** RUNTIME-ID 是整数身份或 nil。
 
@@ -365,7 +365,7 @@ Return newest-first immutable snapshots of completed records. When RUNTIME-ID is
 
 #### Function: etaf-performance-report-data (&optional (records (etaf-performance-records)))
 
-Return a detached portable report for completed RECORDS. Omitted RECORDS selects retained records; explicit nil selects none. The versioned plist includes :format-version, :environment, :summary and :operations. Operations identify :id, :runtime-id and :buffer-name and contain flat :stages with :provider, :stage, :duration-ms and provider :metadata. Nested provider durations may overlap. This read-only operation does not clear recordings, install observers, change the Runtime or invoke recorded application code.
+为已完成的 RECORDS 返回一份脱离记录器的可携带报告。省略 RECORDS 会选中保留记录，显式 nil 一个都不选。带版本的 plist 含 :format-version、:environment、:summary 与 :operations。每条 operation 标识 :id、:runtime-id 与 :buffer-name，并含扁平的 :stages，每项带 :provider、:stage、:duration-ms 与 provider 的 :metadata。嵌套 provider 的耗时可能重叠。这个只读操作不清空记录、不安装观察者、不改动 Runtime，也不调用被记录的应用代码。
 
 **参数。** RECORDS 是 operation 记录列表，或 nil 表示空报告。
 
@@ -377,7 +377,7 @@ Return a detached portable report for completed RECORDS. Omitted RECORDS selects
 
 #### Function: etaf-performance-summary (&optional (records (etaf-performance-records)))
 
-Summarize completed RECORDS by operation kind and label. Omitted RECORDS selects all retained records; explicit nil selects none.
+按 operation kind 与 label 汇总已完成的 RECORDS。省略 RECORDS 会选中全部保留记录，显式 nil 一个都不选。
 
 **参数。** RECORDS 是 operation 记录列表。
 
@@ -391,7 +391,7 @@ Summarize completed RECORDS by operation kind and label. Omitted RECORDS selects
 
 #### Function: etaf-performance-copy-report ()
 
-Copy all retained performance records to the kill ring.
+把所有保留的性能记录复制到 kill ring。
 
 **语义。** 命令写出与 `etaf-performance-export` 相同的可读 `;; ETAF performance report` 文本，放进 kill ring，并在回显区报告 operation 数。它是把报告粘进消息或 issue 的交互方式。
 
@@ -401,7 +401,7 @@ Copy all retained performance records to the kill ring.
 
 #### Function: etaf-performance-export (file)
 
-Export all retained performance records to FILE.
+把所有保留的性能记录导出到 FILE。
 
 **参数。** FILE 是目标路径。交互调用时从 minibuffer 读取，建议带时间戳的 `.eld` 名。
 
@@ -415,7 +415,7 @@ Export all retained performance records to FILE.
 
 #### Function: etaf-performance-show ()
 
-Show retained ETAF operations and stages in a tabulated panel.
+在表格化的面板里显示保留的 ETAF operation 与 stage。
 
 **语义。** 面板每条 operation 一行，随后它的每个 stage 一行，列为身份、类型、名字、类别、provider、sequence、耗时与状态；头部行重复环境快照，所以一张截图自带它的上下文。面板里 `c` 运行 `etaf-performance-copy-report`，`w` 运行 `etaf-performance-export`。再次调用命令复用面板缓冲区。
 
@@ -425,7 +425,7 @@ Show retained ETAF operations and stages in a tabulated panel.
 
 #### Function: etaf-performance-environment-data ()
 
-Return the environment snapshot used to interpret latency records.
+返回用于解读延迟记录的环境快照。
 
 **语义。** 快照在生成报告时取得，而不是在 operation 运行时，它记录决定两次测量可不可比的事实：Emacs 版本、系统类型、窗口系统与帧是否图形、帧与窗口的像素尺寸、GC 阈值与百分比、原生编译设置、负载均值，以及本机电源状态。电源状态报告当前来源（`battery`、`ac` 或 `unknown`）与系统低电量模式是开、关还是未知；读不到的系统两项都是 `unknown`，这是关于测量的陈述，不是错误。
 

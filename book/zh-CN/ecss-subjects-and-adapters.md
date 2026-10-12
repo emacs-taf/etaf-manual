@@ -30,7 +30,7 @@
 
 #### Function: ecss-subject-create (&key type id classes attributes states parent children)
 
-Create a generic subject.
+创建一个通用 subject。
 
 **参数。** TYPE 与 ID 标识主体，可以是任意值。CLASSES 与 STATES 是 token 列表，ATTRIBUTES 是 alist。PARENT 是已有主体或 nil。CHILDREN 是已有主体的列表，或 nil。
 
@@ -147,7 +147,7 @@ Create a generic subject.
 
 #### Function: ecss-subject-set-children (subject children)
 
-Replace SUBJECT's CHILDREN and maintain their parent links.
+替换 SUBJECT 的 CHILDREN 并维护它们的父级链接。
 
 **参数。** SUBJECT 是主体。CHILDREN 是主体的列表；空列表或 nil 清空子节点。
 
@@ -177,7 +177,7 @@ Replace SUBJECT's CHILDREN and maintain their parent links.
 
 #### Function: ecss-subject-adapter-create (&key type id classes attributes states parent children)
 
-Create a subject adapter from the supplied callbacks.
+用给定的回调创建 subject 适配器。
 
 **参数。** TYPE、ID、CLASSES、ATTRIBUTES、STATES、PARENT 与 CHILDREN 各接受一个调用方自己的主体并返回命名字段。七个回调全部必填。
 

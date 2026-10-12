@@ -13,6 +13,11 @@
    takes a hairline of text stroke; code keeps none, because the mono face
    is already even. */
 
+/* Webfonts for the landing page only; browsers fetch a face when a page
+   actually uses the family. */
+@import '@fontsource-variable/inter/wght.css';
+@import '@fontsource-variable/space-grotesk/wght.css';
+
 html {
   font-size: 93.75%; /* 15px base */
 }
@@ -58,10 +63,57 @@ html {
   --sl-color-text-accent: hsl(234, 80%, 36%);
 }
 
-/* Landing page: the hero icon and the screenshot wall. */
+/* Landing page.  Starlight marks splash pages with `data-has-hero`; the
+   manual's Pragmata Pro and WenKai stay for reading pages, while the landing
+   gets a modern sans pairing, a tinted hero wash and a screenshot wall. */
+html[data-has-hero] {
+  --sl-font: "Inter Variable", "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --sl-font-mono: "PragmataPro", ui-monospace, SFMono-Regular, "SF Mono",
+    Menlo, monospace;
+}
+
+html[data-has-hero] .hero h1,
+html[data-has-hero] .sl-markdown-content h2,
+html[data-has-hero] .card .title {
+  font-family: "Space Grotesk Variable", "Inter Variable", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  letter-spacing: -0.02em;
+}
+
+html[data-has-hero] .hero {
+  isolation: isolate;
+  position: relative;
+}
+
+html[data-has-hero] .hero::before {
+  background:
+    radial-gradient(55% 60% at 22% 12%, rgb(124 92 224 / 0.16), transparent 72%),
+    radial-gradient(45% 55% at 82% 6%, rgb(56 148 255 / 0.12), transparent 72%);
+  content: '';
+  inset: -6rem -30vw auto;
+  height: 34rem;
+  pointer-events: none;
+  position: absolute;
+  z-index: -1;
+}
+
+html[data-has-hero] .hero h1 {
+  font-size: clamp(2.75rem, 7vw, 4.5rem);
+  line-height: 1.05;
+}
+
+html[data-has-hero] .hero .tagline {
+  color: var(--sl-color-gray-3);
+  font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+  line-height: 1.65;
+  max-width: 34rem;
+}
+
 .etaf-hero-icon {
-  width: 9rem;
+  filter: drop-shadow(0 14px 28px rgb(124 92 224 / 0.32));
   height: auto;
+  width: 6.5rem;
 }
 
 .etaf-shots {
@@ -73,18 +125,29 @@ html {
 
 .etaf-shots figure {
   margin: 0;
+  transition: transform 0.2s ease;
+}
+
+.etaf-shots figure:hover {
+  transform: translateY(-3px);
 }
 
 .etaf-shots .etaf-shot {
-  display: block;
-  width: 100%;
-  height: auto;
   border: 1px solid var(--sl-color-hairline);
   border-radius: 0.4rem;
+  display: block;
+  height: auto;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+}
+
+.etaf-shots figure:hover .etaf-shot {
+  border-color: var(--sl-color-accent);
+  box-shadow: 0 14px 34px rgb(0 0 0 / 0.18);
 }
 
 .etaf-shots figcaption {
-  margin-top: 0.45rem;
-  font-size: var(--sl-text-sm);
   color: var(--sl-color-gray-3);
+  font-size: var(--sl-text-sm);
+  margin-top: 0.45rem;
 }

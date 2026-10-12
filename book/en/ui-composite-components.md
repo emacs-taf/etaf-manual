@@ -54,6 +54,66 @@ Compose a modal Dialog and List for caller-owned command selection.
 
 **See also.** `etaf-list`, `etaf-dialog`.
 
+## Markdown document rendering
+
+<!-- index: markdown; document tree; palette; render callback -->
+
+Markdown document rendering turns Markdown text into ordinary ETAF Views for a previewer, a manual reader or any other document view.  It works in two steps: `etaf-ui-markdown-parse` parses the text into a block tree that carries no presentation facts, and the render functions turn that tree plus an environment plist into Views.  Both steps are pure functions without a buffer, runtime state or file, so one code path serves headless tests and a mounted Component alike.
+
+#### Function: etaf-ui-markdown-parse (text &optional flavor)
+
+Parse Markdown TEXT into a document plist.
+
+**Arguments.** TEXT is the Markdown source.  FLAVOR selects the dialect: a name from `etaf-ui-markdown-flavors` (`gfm` is the default), a feature plist overriding individual extension flags, or nil for `etaf-ui-markdown-flavor`.
+
+**Semantics.** Parsing covers CommonMark block and inline structure plus the GitHub extensions: pipe tables, task list items, strikethrough, bare autolinks, footnotes and alert blocks; YAML front matter is stripped into document metadata.  A block is a plist whose `:type` is `heading`, `paragraph`, `code-block`, `blockquote`, `list`, `table`, `thematic-break`, `html-block` or `footnote-def`; an inline's `:type` is `text`, `code`, `emph`, `strong`, `strike`, `link`, `image`, `autolink`, `footnote-ref`, `html` or `break`.  The tree carries no presentation facts: the render functions own every style and ETAF node choice.  Headings get stable unique anchors, and link reference definitions and footnote definitions are collected while blocks are read and resolved into inline nodes.  Parsing is pure Elisp and reads no buffer, file or network.
+
+**Returns.** A document plist: `:meta` (front matter alist), `:title`, `:children` (top-level blocks with heading anchors), `:outline` (document-order `(LEVEL TEXT ID)`), `:footnotes` (with `:label`, `:number` and `:children`) and `:features` (the resolved extension plist).
+
+**Errors.** An unknown dialect name signals `error→ etaf-ui-markdown-error`.
+
+**Example.**
+
+```elisp
+(etaf-ui-markdown-parse "# Title\n\nBody.\n")
+```
+
+**See also.** `etaf-ui-markdown-view-blocks`, `etaf-ui-markdown-flavors`.
+
+#### Function: etaf-ui-markdown-view-block (block env)
+
+Render one block as an ETAF View, or nil when it has no rendered content.  BLOCK is one top-level block of `etaf-ui-markdown-parse` and ENV is the environment plist described by `etaf-ui-markdown-view-blocks`.  A block that expands to several Views is wrapped in one column, so callers own one node per block for scrolling, selection or per-block references.
+
+#### Function: etaf-ui-markdown-view-blocks (blocks env &optional tight)
+
+Return the list of Views for BLOCKS in document order, or nil for empty input.  Consecutive blocks are separated by one blank line unless TIGHT is non-nil.  The list carries no container, so callers wrap it themselves; render the `:footnotes` Views and append them when the document's footnote definitions belong in the flow.  ENV's `:palette` is required: an alist of semantic color keys (`:ink`, `:muted`, `:faint`, `:heading`, `:accent`, `:accent-soft`, `:panel`, `:border`, `:quote-bg`, `:quote-bar`, `:table-header`, `:table-stripe`, `:ok`, `:ok-soft`, `:warn`, `:warn-soft`, `:danger`, `:danger-soft`, `:important` and `:important-soft`); every color is read through it, so a palette change never leaks a half-updated set of colors, and an unknown key signals `error→ etaf-ui-markdown-error`.  The remaining entries are callbacks: `:open-link` receives a link URL; `:footnote-jump` receives a footnote label; `:render-media (kind node env)` returns the View for media, where KIND is `image`, `video`, `inline-image` or `html-media`, and without it media falls back to its alt text or URL; `:render-code-block (block env)` may return a View for a code block and nil keeps the default fenced block; `:alert-labels` overrides the callout labels kind by kind; and `:features`, the document's resolved extension plist, gates whether alert blocks render as callouts.  HTML comments render as nothing.
+
+#### Variable: etaf-ui-markdown-flavor
+
+Default markdown dialect of `etaf-ui-markdown-parse`.
+
+**Semantics.** An explicit FLAVOR argument wins over it.  `gfm` enables the GitHub extensions and front matter, `commonmark` parses the core specification only, and a feature plist toggles individual extensions.
+
+**See also.** `etaf-ui-markdown-parse`, `etaf-ui-markdown-flavors`.
+
+#### Variable: etaf-ui-markdown-flavors
+
+Named dialects and the extension flags they enable.
+
+**Semantics.** `commonmark` is the CommonMark core; `gfm` adds the GitHub extensions the renderer also treats as its default: tables, task lists, strikethrough, bare autolinks, footnotes and alert blocks, plus front matter, which is a document convention rather than a markdown extension.
+
+**See also.** `etaf-ui-markdown-parse`.
+
+#### Error: etaf-ui-markdown-error
+
+The condition of a rejected markdown document operation.
+
+**Semantics.** An unknown dialect name signals it during parsing; a missing `:palette` or a color key the palette does not define signals it during rendering, before any View is published.  The data is a list carrying a description string.
+
+**Recovery.** A failure produces no half-rendered document: a failed parse has no block tree and a failed render publishes no View.  Fix the dialect or supply the palette keys and call again.
+
+**See also.** `etaf-ui-markdown-parse`, `etaf-ui-markdown-view-blocks`.
+
 ## Errors and recovery
 
 - The date picker separates a draft from an error: text that is not yet a complete date is simply not reported, and submitting it signals `user-error` without writing the value; cancelling the session restores the activation value.

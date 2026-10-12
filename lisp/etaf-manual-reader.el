@@ -82,6 +82,11 @@ Use it to embed the reader in your own `etaf-mount' call; prefer
       (setq-local etaf-manual-reader--session session)
       (add-hook 'kill-buffer-hook #'etaf-manual-reader--remember-on-kill nil t)
       (setq-local truncate-lines t)
+      ;; The reader is a document surface: Ebox repaints the canvas in place
+      ;; while scrolling, so a buffer caret would look like it jumps between
+      ;; contents.  Hide it; editing fields raise their own bar cursor.
+      (setq-local cursor-type nil)
+      (setq-local scroll-preserve-screen-position t)
       ;; The reader owns every column it paints; a sub-cell rounding
       ;; remainder must not surface as Emacs's truncation glyph.
       (setq-local buffer-display-table

@@ -42,6 +42,8 @@ A code span in the article whose text names a definition entry is itself a link:
 
 Every `elisp :run` example renders in place. Its viewer card offers *source*, *preview* and *side-by-side* modes, a run/rerun control and a stop control; the preview is the real, interactive ETAF View the example builds, not a screenshot. Press `e` (or the card's *Edit* button) to open the example in a native editor and `C-c C-c` to store the text as the example's draft and rerun it in place. Press `w` (or a code block's *Copy* button) to copy a code block, or the edited example source, to the kill ring.
 
+An `elisp :figure` block is an inline illustration: the reader evaluates its last form and renders the View directly in the chapter, with a caption and no run controls, so a box model, a layout or a component can be shown where prose alone is not enough.
+
 `M-x etaf-manual-lookup` opens the manual at a symbol's definition entry from any buffer; interactively it starts from the symbol at point when that symbol has an entry.
 
 ## Documentation

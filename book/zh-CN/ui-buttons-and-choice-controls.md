@@ -36,6 +36,16 @@
 
 **参见。** `etaf-checkbox`、`:ui-button-primary-bg`。
 
+```elisp :figure primary、secondary、ghost 与禁用四种按钮
+(etaf-view
+ (column :item-gap '(lh 1)
+   (row :item-gap '(ch 1)
+     (etaf-button :label "主要" :on-press #'ignore)
+     (etaf-button :label "次要" :variant 'secondary :on-press #'ignore)
+     (etaf-button :label "幽灵" :variant 'ghost :on-press #'ignore)
+     (etaf-button :label "禁用" :disabled t))))
+```
+
 ## checkbox 与 switch
 
 <!-- index: etaf-checkbox; etaf-switch; checkbox mark; switch state -->

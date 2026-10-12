@@ -22,6 +22,23 @@
 
 **示例。** 基础尺寸 4 像素的两项，第一个增长因子 1、第二个 3，在 20 像素的行里填成 7 与 13 像素。同样两项基础尺寸 10、收缩因子 1，在 12 像素的行里解成 6 与 6；基础尺寸 8、收缩因子 3 与 1 时解成 5 与 7；而一对增长的项中若第一项有 `:min-width (px 15)`，它冻结在 15，另一项取走剩下的 9。
 
+```elisp :figure 一行 flex 里长 1 : 2 : 3 的三个盒子
+(etaf-view
+ (flex :flex-direction 'row :width '(ch 40) :column-gap '(ch 1)
+   (box :flex-grow 1
+        :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+        :padding '((lh 1) (ch 1))
+     (text "grow 1"))
+   (box :flex-grow 2
+        :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+        :padding '((lh 1) (ch 1))
+     (text "grow 2"))
+   (box :flex-grow 3
+        :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+        :padding '((lh 1) (ch 1))
+     (text "grow 3"))))
+```
+
 ## 换行
 
 <!-- index: flex 换行; flex 行; wrap-reverse -->

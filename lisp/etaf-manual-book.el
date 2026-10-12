@@ -97,28 +97,39 @@ underscores are kept, spaces become hyphens and everything else is dropped."
 TEXT is the Markdown source itself, so generated appendices and written
 chapters share one parser."
   (let ((seen (make-hash-table :test #'equal))
-        (line-number 0) fence title nodes definitions examples links code
-        index example-start example-lines section-anchor group body-lines)
+        (line-number 0) fence title nodes definitions examples figures links code
+        index fence-kind fence-start fence-caption fence-lines section-anchor group body-lines)
     (dolist (line (split-string text "\n"))
       (cl-incf line-number)
       (cond
-       ;; Inside a fence: collect example text until the closing fence.
+       ;; Inside a fence: collect its text until the closing fence.
        (fence
         (when group (push line body-lines))
         (if (string-match-p (concat "\\`[ ]\\{0,3\\}" (regexp-quote fence) "[`~]*[ \t]*\\'") line)
             (progn
-              (when example-start
-                (push (list :id (format "%s-%d" id (1+ (length examples)))
-                            :chapter id :line example-start
-                            :code (string-join (nreverse example-lines) "\n"))
-                      examples))
-              (setq fence nil example-start nil example-lines nil))
-          (when example-start (push line example-lines))))
+              (when fence-start
+                (push (append
+                       (list :id (if (eq fence-kind 'figure)
+                                     (format "%s-figure-%d" id (1+ (length figures)))
+                                   (format "%s-%d" id (1+ (length examples))))
+                             :chapter id :line fence-start)
+                       (when (eq fence-kind 'figure)
+                         (list :caption fence-caption))
+                       (list :code (string-join (nreverse fence-lines) "\n")))
+                      (if (eq fence-kind 'figure) figures examples)))
+              (setq fence nil fence-kind nil fence-start nil
+                    fence-caption nil fence-lines nil))
+          (when fence-start (push line fence-lines))))
        ((string-match "\\`[ ]\\{0,3\\}\\(```+\\|~~~+\\)[ \t]*\\(.*\\)\\'" line)
         (when group (push line body-lines))
         (setq fence (match-string 1 line))
-        (when (string-match-p "\\`elisp[ \t]+:run\\b" (match-string 2 line))
-          (setq example-start line-number)))
+        (let ((info (match-string 2 line)))
+          (cond
+           ((string-match "\\`elisp[ \t]+:run\\b" info)
+            (setq fence-kind 'run fence-start line-number))
+           ((string-match "\\`elisp[ \t]+:figure\\b\\(?:[ \t]+\\(.*\\)\\)?\\'" info)
+            (setq fence-kind 'figure fence-start line-number
+                  fence-caption (match-string 1 info))))))
        ((string-match "\\`\\(#\\{1,6\\}\\)[ \t]+\\(.*?\\)[ \t]*#*[ \t]*\\'" line)
         (let* ((level (length (match-string 1 line)))
                (heading (match-string 2 line))
@@ -172,6 +183,7 @@ chapters share one parser."
       (signal 'etaf-manual-error (list "Chapter needs a level-1 title" label)))
     (list :title title :nodes (nreverse nodes)
           :definitions (nreverse definitions) :examples (nreverse examples)
+          :figures (nreverse figures)
           :links (nreverse links) :code (nreverse code) :index (nreverse index))))
 
 (defun etaf-manual--parse-chapter (file id)

@@ -92,20 +92,21 @@
               'etaf-manual-error)))
 
 (ert-deftest etaf-manual-runnable-examples-mount ()
-  "Every runnable example in every language mounts without warnings."
+  "Every runnable example and inline figure in every language mounts."
   (let ((warnings (etaf-manual-tests--warning-count))
         (count 0))
     (dolist (language '("en" "zh-CN"))
       (dolist (chapter (plist-get (etaf-manual-book language) :chapters))
-        (dolist (example (plist-get chapter :examples))
+        (dolist (entry (append (plist-get chapter :examples)
+                               (plist-get chapter :figures)))
           (let ((buffer (generate-new-buffer " *etaf-manual-example*")))
             (unwind-protect
-                (let* ((view (etaf-manual-example-view example))
+                (let* ((view (etaf-manual-example-view entry))
                        (runtime (progn (etaf-mount buffer view)
                                        (etaf-runtime-for-buffer buffer)))
                        (text (with-current-buffer buffer
                                (buffer-substring-no-properties (point-min) (point-max))))
-                       (id (plist-get example :id)))
+                       (id (plist-get entry :id)))
                   (should (stringp id))
                   (should (string-match-p "[^[:space:]]" text))
                   (etaf-unmount runtime)

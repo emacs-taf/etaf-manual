@@ -22,6 +22,23 @@ Growth and shrink may push an item past its own minimum or maximum. When that ha
 
 **Example.** Two items of base 4 pixels, the first growing at 1 and the second at 3, fill a 20-pixel row as 7 and 13 pixels. The same two items at base 10 and shrink 1 in a 12-pixel row resolve to 6 and 6; with shrink 3 and 1 at base 8 they resolve to 5 and 7; and when the first item of a growing pair has `:min-width (px 15)`, it freezes at 15 and the other takes the remaining 9.
 
+```elisp :figure Three boxes growing 1 : 2 : 3 in one flex row
+(etaf-view
+ (flex :flex-direction 'row :width '(ch 40) :column-gap '(ch 1)
+   (box :flex-grow 1
+        :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+        :padding '((lh 1) (ch 1))
+     (text "grow 1"))
+   (box :flex-grow 2
+        :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+        :padding '((lh 1) (ch 1))
+     (text "grow 2"))
+   (box :flex-grow 3
+        :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+        :padding '((lh 1) (ch 1))
+     (text "grow 3"))))
+```
+
 ## Wrapping
 
 <!-- index: flex wrap; flex lines; wrap reverse -->

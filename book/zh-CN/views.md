@@ -18,6 +18,24 @@ View 的每个节点——Host 或组件调用——都写成一个形式：
 
 NAME 是 Host 符号（如 `text`、`column`），或用 `etaf-define-component` 定义的组件名。属性是关键字/值对，必须排在第一个子节点之前；子节点紧随其后，是节点的内容。属性值就是普通的 Elisp 形式，不是引用的数据语言，因此 `(text :font-weight (if alert 'bold 'normal) "Hi")` 是合法节点。
 
+```elisp :figure 一个 column、一个标题盒与一行两个盒子
+(etaf-view
+ (column :width '(ch 40) :item-gap '(lh 0)
+   (box :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+        :padding '((lh 0) (ch 2))
+     (text :color (etaf-theme-token :ui-accent "#0969da")
+           :font-weight 'bold "标题"))
+   (row
+    (box :width '(ch 20)
+         :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+         :padding '((lh 1) (ch 1))
+      (text :color (etaf-theme-token :ui-panel-fg "#1f2328") "左子节点"))
+    (box :width '(ch 20)
+         :background-color (etaf-theme-token :ui-disabled-bg "#e5e7eb")
+         :padding '((lh 1) (ch 1))
+      (text :color (etaf-theme-token :ui-disabled-fg "#687386") "右子节点")))))
+```
+
 ### View 值
 
 写下一个 View 形式会得到一个*规范化 View*：属于一个小型类型集合的某个值。

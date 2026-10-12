@@ -42,7 +42,10 @@
 ;; STRING :anchor STRING :line N).  A definition is (:kind KIND :name SYMBOL
 ;; :signature STRING :anchor STRING :line N :chapter ID :body STRING-OR-NIL),
 ;; where :body is the entry's Markdown text; consecutive entry headings share
-;; one body.  An example is (:id STRING :chapter ID :line N :code STRING).
+;; one body.  An example is (:id STRING :chapter ID :line N :code STRING); a
+;; figure is (:id STRING :chapter ID :line N :caption STRING-OR-NIL :code
+;; STRING) and the reader renders its last form inline as a static
+;; illustration.
 ;; An index term is (:term STRING :line N :anchor STRING).  The result is
 ;; cached until a source file changes; the sources are checked again at
 ;; most once per input event and second, so the lookups of one command

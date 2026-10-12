@@ -348,6 +348,58 @@ reruns it in place and is what `etaf-manual-reader-code-at' copies."
              (list :example example :env env)
              nil))
 
+;;;; Inline figures
+
+(defun etaf-manual-reader--figure-outcome (figure)
+  "Evaluate FIGURE once and return (:view VIEW) or (:error MESSAGE)."
+  (condition-case error
+      (list :view (etaf-manual-example-view figure))
+    (error (list :error (error-message-string error)))))
+
+(etaf-define-component etaf-manual-reader--figure (&key figure env)
+  "Render a static FIGURE from the manual inline, without run controls.
+The figure is evaluated once when its View is created; a failure shows an
+alert in place of the rendered View, so one broken figure cannot break the
+chapter."
+  :bindings ((outcome (etaf-ref nil :name 'etaf-manual-figure-outcome)))
+  :setup
+  (etaf-set-value outcome (etaf-manual-reader--figure-outcome figure))
+  :render
+  (let ((label (format "图 · %s" (or (plist-get figure :caption)
+                                     (plist-get figure :id))))
+        (result (etaf-value outcome)))
+    (etaf-node 'column
+               (list :width 'stretch
+                     :box-sizing 'border-box
+                     :background-color (etaf-manual-reader--color env :panel)
+                     :border (etaf-manual-reader--border env)
+                     :item-gap '(lh 0))
+               (list
+                (etaf-node 'flex
+                           (list :width 'stretch
+                                 :box-sizing 'border-box
+                                 :padding '((lh 0) (ch 1))
+                                 :background-color (etaf-manual-reader--color env :panel2)
+                                 :border-bottom (etaf-manual-reader--border env)
+                                 :align-items 'center)
+                           (list (etaf-manual-reader--label env label)))
+                (etaf-node 'box
+                           (list :width 'stretch
+                                 :box-sizing 'border-box
+                                 :min-height '(lh 2)
+                                 :padding '((lh 1) (ch 2)))
+                           (list (if-let* ((view (plist-get result :view)))
+                                     view
+                                   (etaf-node 'etaf-alert
+                                              (list :title "插图渲染失败"
+                                                    :message (plist-get result :error)
+                                                    :variant 'danger)
+                                              nil))))))))
+
+(defun etaf-manual-reader--figure-viewer (figure env)
+  "Return the composed figure View for FIGURE in ENV."
+  (etaf-node 'etaf-manual-reader--figure (list :figure figure :env env) nil))
+
 ;;;; Code blocks
 
 (defun etaf-manual-reader--render-code-block (block env)
@@ -516,12 +568,20 @@ viewer, separated from its neighbors by one blank line."
                     (push view views))
                   (setq static nil))))
       (dolist (block blocks)
-        (if-let* ((example (etaf-manual-reader--block-example block env)))
-            (progn
-              (flush)
-              (when views (push (etaf-manual-reader--spacer) views))
-              (push (etaf-manual-reader--example-viewer example env) views))
-          (push block static)))
+        (cond
+         ((etaf-manual-reader--block-example block env)
+          (flush)
+          (when views (push (etaf-manual-reader--spacer) views))
+          (push (etaf-manual-reader--example-viewer
+                 (etaf-manual-reader--block-example block env) env)
+                views))
+         ((etaf-manual-reader--block-figure block env)
+          (flush)
+          (when views (push (etaf-manual-reader--spacer) views))
+          (push (etaf-manual-reader--figure-viewer
+                 (etaf-manual-reader--block-figure block env) env)
+                views))
+         (t (push block static))))
       (flush))
     (nreverse views)))
 
@@ -532,6 +592,26 @@ viewer, separated from its neighbors by one blank line."
   (and (eq (plist-get block :type) 'code-block)
        (equal (plist-get block :lang) "elisp")
        (member ":run" (split-string (or (plist-get block :info) "")))))
+
+(defun etaf-manual-reader--figure-block-p (block)
+  "Return non-nil when BLOCK is an inline `elisp :figure' code block."
+  (and (eq (plist-get block :type) 'code-block)
+       (equal (plist-get block :lang) "elisp")
+       (member ":figure" (split-string (or (plist-get block :info) "")))))
+
+(defun etaf-manual-reader--figure-table (session)
+  "Return SESSION's current chapter table from `:figure' blocks to figures.
+The Nth figure block of the document is the chapter's Nth figure; the
+table is built once per chapter and language and compared by identity."
+  (etaf-manual-reader--chapter-cache
+   session 'figures
+   (lambda ()
+     (let ((table (make-hash-table :test #'eq))
+           (figures (etaf-manual-reader--chapter-figures session)))
+       (dolist (block (plist-get (etaf-manual-reader-document session) :children))
+         (when (and figures (etaf-manual-reader--figure-block-p block))
+           (puthash block (pop figures) table)))
+       table))))
 
 (defun etaf-manual-reader--example-table (session)
   "Return SESSION's current chapter table from run blocks to examples.
@@ -552,11 +632,21 @@ table is built once per chapter and language and compared by identity."
   (when-let* ((table (plist-get env :examples)))
     (gethash block table)))
 
+(defun etaf-manual-reader--block-figure (block env)
+  "Return the inline figure BLOCK presents in ENV, or nil."
+  (when-let* ((table (plist-get env :figures)))
+    (gethash block table)))
+
 (defun etaf-manual-reader--ordinary-view (block env)
-  "Return the View for an ordinary BLOCK in ENV, or its example viewer."
-  (if-let* ((example (etaf-manual-reader--block-example block env)))
-      (etaf-manual-reader--example-viewer example env)
-    (etaf-ui-markdown-view-block block (etaf-manual-reader--doc-env env))))
+  "Return the View for an ordinary BLOCK in ENV, or its viewer."
+  (cond
+   ((etaf-manual-reader--block-example block env)
+    (etaf-manual-reader--example-viewer
+     (etaf-manual-reader--block-example block env) env))
+   ((etaf-manual-reader--block-figure block env)
+    (etaf-manual-reader--figure-viewer
+     (etaf-manual-reader--block-figure block env) env))
+   (t (etaf-ui-markdown-view-block block (etaf-manual-reader--doc-env env)))))
 
 (defun etaf-manual-reader--render-blocks (blocks env)
   "Render BLOCKS in ENV with definition cards and example viewers."
@@ -633,7 +723,8 @@ their props."
         (cdr last)
       (setcar last env)
       (setcdr last (append env (list :markdown-features (plist-get document :features)
-                                     :examples (etaf-manual-reader--example-table session)))))))
+                                     :examples (etaf-manual-reader--example-table session)
+                                     :figures (etaf-manual-reader--figure-table session)))))))
 
 (cl-defun etaf-manual-reader--article (&key session env)
   "Return the article column View of SESSION's current chapter in ENV."

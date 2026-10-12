@@ -52,6 +52,14 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
   longest section title; and an example's toolbar keeps every control on
   one intact row, reserving the stop control's slot so running an
   example never resizes the card.
+- Inline figures: a `elisp :figure' block evaluates its last form and the
+  reader renders the View in the chapter as a static illustration with a
+  caption, without run controls; six chapters show one, the book format
+  documents the fence, and the acceptance tests mount every figure in
+  both languages.
+- The reader hides the buffer caret, so scrolling no longer makes a
+  caret jump between contents; editing fields still raise their own bar
+  cursor.
 - Interactive reader surfaces react to the pointer: navigation and
   outline rows, chapter cards and code blocks paint the theme's `:hover'
   surface while hovered, and rendered links use the shared accent hover.

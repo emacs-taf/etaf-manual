@@ -18,6 +18,24 @@ Every node of a View — a Host or a Component call — is written as one form:
 
 NAME is a Host symbol such as `text` or `column`, or the name of a Component defined by `etaf-define-component`. Properties are keyword/value pairs and must come before the first child; the children follow and are the content of the node. Property values are ordinary Elisp forms, not a quoted data language, so `(text :font-weight (if alert 'bold 'normal) "Hi")` is a valid node.
 
+```elisp :figure A column, a title box and a two-box row
+(etaf-view
+ (column :width '(ch 40) :item-gap '(lh 0)
+   (box :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+        :padding '((lh 0) (ch 2))
+     (text :color (etaf-theme-token :ui-accent "#0969da")
+           :font-weight 'bold "标题"))
+   (row
+    (box :width '(ch 20)
+         :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+         :padding '((lh 1) (ch 1))
+      (text :color (etaf-theme-token :ui-panel-fg "#1f2328") "左子节点"))
+    (box :width '(ch 20)
+         :background-color (etaf-theme-token :ui-disabled-bg "#e5e7eb")
+         :padding '((lh 1) (ch 1))
+      (text :color (etaf-theme-token :ui-disabled-fg "#687386") "右子节点")))))
+```
+
 ### View values
 
 Writing a View form produces a *normalized View*: one of a small set of typed values.

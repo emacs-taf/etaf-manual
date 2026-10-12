@@ -108,6 +108,10 @@ A fenced block opened with ```` ```elisp :run ```` is a runnable example. The pa
 
 An example must serve the entry or section it illustrates: give it a real task whose result is visible, keep it focused on that one feature, and do not assemble a multi-feature demo for it. An inline `**Example.**` block follows the same rule.
 
+### Inline figures
+
+A fenced block opened with ```` ```elisp :figure ````, optionally followed by a caption on the same line, is an inline figure. The package evaluates its last form to an ETAF View and the reader renders the View directly in the chapter as a static illustration, without run or stop controls, so a figure shows a box model, a layout or a component where prose alone is not enough. Figures are evaluated once when their section is rendered; the acceptance tests mount every figure in every language, so a figure that fails to evaluate or mount fails `make check`. Use a `:run` example instead when the reader should operate the result, and give each figure a caption that says what it shows.
+
 ### Links and names
 
 Link to another chapter by its file name, optionally followed by a heading anchor, such as `reactivity.md` or `reactivity.md#scopes`, and only to chapters that exist. Refer to an unwritten chapter in plain text by its title. When that chapter is written, update those mentions to links in the same delivery.
@@ -116,7 +120,7 @@ A code span that names a symbol with a package prefix, such as `etaf-ref`, must 
 
 ### Translations
 
-Every language has the same chapters, the same sequence of section levels, the same definition entries with the same signatures and the same number of runnable examples. Keep the code of runnable examples identical; comments in other code blocks may be translated. Keep these terms untranslated in Chinese: Runtime, Host, Context, View, Action, Theme and Scope.
+Every language has the same chapters, the same sequence of section levels, the same definition entries with the same signatures, the same number of runnable examples and the same number of inline figures. Keep the code of runnable examples and figures identical; comments in other code blocks may be translated. Keep these terms untranslated in Chinese: Runtime, Host, Context, View, Action, Theme and Scope.
 
 ## What the gate checks
 

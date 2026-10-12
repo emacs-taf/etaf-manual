@@ -335,6 +335,10 @@ give the version in that package's entry header."
                           (length (plist-get other :examples)))
                  (etaf-manual-check--problem file 1 "runnable examples differ from %s"
                                              (plist-get reference :language)))
+               (unless (= (length (plist-get chapter :figures))
+                          (length (plist-get other :figures)))
+                 (etaf-manual-check--problem file 1 "inline figures differ from %s"
+                                             (plist-get reference :language)))
                (unless (= (length (plist-get chapter :index))
                           (length (plist-get other :index)))
                  (etaf-manual-check--problem file 1 "index terms differ from %s"

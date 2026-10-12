@@ -177,6 +177,11 @@
       "purpose": "The side columns report their widths, clamp the setters and step from the focused divider."
     },
     {
+      "name": "etaf-manual-reader-renders-inline-figures",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "An inline figure renders its View in the chapter with a caption and no run controls."
+    },
+    {
       "name": "etaf-manual-reader-interactive-surfaces-hover",
       "file": "tests/etaf-manual-reader-tests.el",
       "purpose": "Clickable navigation rows and rendered links carry a pointer hover face."

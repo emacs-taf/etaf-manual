@@ -60,6 +60,17 @@ Text in a subtree that is hidden with `:visibility hidden` keeps its characters 
 
 **Example.** Underlining a box and rendering `ab` and `cd` as text gives both runs a face with `:underline`; making `cd` `line-through` replaces the underline on that run with a strike-through. A hidden six-character run three pixels wide still renders two blank lines.
 
+```elisp :figure Weight, slant and the two text decorations
+(etaf-view
+ (column :width '(ch 40) :item-gap '(lh 0)
+   (text :font-weight 'bold "加粗")
+   (text :font-style 'italic "倾斜")
+   (text :text-decoration-line '(underline) "下划线")
+   (text :text-decoration-line '(line-through) "删除线")
+   (text :font-family (or (face-attribute 'fixed-pitch :family nil t) "Monospace")
+         "等宽文本")))
+```
+
 ## Measurement caching
 
 <!-- index: text measurement; measurement cache; cluster width -->

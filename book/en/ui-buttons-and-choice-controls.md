@@ -36,6 +36,16 @@ Render a standard pressable Button with a committed callback.
 
 **See also.** `etaf-checkbox`, `:ui-button-primary-bg`.
 
+```elisp :figure The primary, secondary, ghost and disabled button variants
+(etaf-view
+ (column :item-gap '(lh 1)
+   (row :item-gap '(ch 1)
+     (etaf-button :label "主要" :on-press #'ignore)
+     (etaf-button :label "次要" :variant 'secondary :on-press #'ignore)
+     (etaf-button :label "幽灵" :variant 'ghost :on-press #'ignore)
+     (etaf-button :label "禁用" :disabled t))))
+```
+
 ## Checkbox and switch
 
 <!-- index: etaf-checkbox; etaf-switch; checkbox mark; switch state -->

@@ -30,6 +30,26 @@ An explicit position wins over automatic placement for that axis. When only one 
 
 **Example.** In a grid with columns 4, 6 and 2 pixels and a one-pixel column gap, an item with `:grid-column (1 :span 2)` is 11 pixels wide — 4 plus the gap plus 6 — and the next automatic item starts at column three, at x 12.
 
+```elisp :figure A three-column grid with one two-column span
+(etaf-view
+ (grid :width '(ch 40)
+       :grid-template-columns '((fr 1) (fr 1) (fr 1))
+       :gap '((lh 1) (ch 1))
+   (box :padding '((lh 1) (ch 1))
+        :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+     (text "A"))
+   (box :grid-column-span 2
+        :padding '((lh 1) (ch 1))
+        :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+     (text "B 跨两列"))
+   (box :padding '((lh 1) (ch 1))
+        :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+     (text "C"))
+   (box :padding '((lh 1) (ch 1))
+        :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+     (text "D"))))
+```
+
 ## Alignment
 
 <!-- index: justify items; justify self; align items; justify content; grid alignment -->

@@ -30,6 +30,26 @@
 
 **示例。** 列宽为 4、6、2 像素、列间隙 1 像素的网格里，`:grid-column (1 :span 2)` 的项宽 11 像素——4 加间隙加 6——下一个自动项从第三列开始，位于 x 12。
 
+```elisp :figure 三列网格，其中一个盒子跨两列
+(etaf-view
+ (grid :width '(ch 40)
+       :grid-template-columns '((fr 1) (fr 1) (fr 1))
+       :gap '((lh 1) (ch 1))
+   (box :padding '((lh 1) (ch 1))
+        :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+     (text "A"))
+   (box :grid-column-span 2
+        :padding '((lh 1) (ch 1))
+        :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+     (text "B 跨两列"))
+   (box :padding '((lh 1) (ch 1))
+        :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+     (text "C"))
+   (box :padding '((lh 1) (ch 1))
+        :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+     (text "D"))))
+```
+
 ## 对齐
 
 <!-- index: justify-items; justify-self; align-items; justify-content; grid 对齐 -->

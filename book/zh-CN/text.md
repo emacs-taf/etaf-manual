@@ -60,6 +60,17 @@ CJK 字符在 `word` 模式下像空格一样断：下一个字放不下时当�
 
 **示例。** 给一个盒子加下划线、渲染 `ab` 与 `cd` 两段文本，两段都得到带 `:underline` 的 face；把 `cd` 设为 `line-through` 后，该段的 face 变成删除线。6 个字符、3 像素宽的隐藏文本仍然渲染两行空白。
 
+```elisp :figure 字重、倾斜与两种文字装饰
+(etaf-view
+ (column :width '(ch 40) :item-gap '(lh 0)
+   (text :font-weight 'bold "加粗")
+   (text :font-style 'italic "倾斜")
+   (text :text-decoration-line '(underline) "下划线")
+   (text :text-decoration-line '(line-through) "删除线")
+   (text :font-family (or (face-attribute 'fixed-pitch :family nil t) "Monospace")
+         "等宽文本")))
+```
+
 ## 测量缓存
 
 <!-- index: 文本测量; 测量缓存; 字符簇宽度 -->

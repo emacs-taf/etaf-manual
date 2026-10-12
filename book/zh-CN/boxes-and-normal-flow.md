@@ -38,6 +38,20 @@
 
 上边框与下边框不是字符。它们用边框色给边框盒第一行或最后一行的每个字符加上 overline 或 underline 装饰，于是上边框在字符上方画线、下边框在字符下方画线，宽度正好等于盒子的像素宽。一个 face 只有一条这样的线，所以宽于一个像素的上/下边框没有诚实的画法；Ebox 报 `ebox-error`，而不是画近似。边框只在其样式为 `solid` 且宽度大于零时存在：初值样式 `none` 把边框解为零宽，因此既不占几何也不绘制。
 
+```elisp :figure 一个盒子的内容、内边距、边框与外边距
+(etaf-view
+ (box :width '(ch 40) :padding '((lh 1) (ch 2))
+      :background-color (etaf-theme-token :ui-disabled-bg "#e5e7eb")
+   (box :padding '((lh 1) (ch 2))
+        :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+        :border-width '(px 1)
+        :border-style 'solid
+        :border-color (etaf-theme-token :ui-panel-border "#687386")
+     (text :color (etaf-theme-token :ui-panel-fg "#1f2328") "内容")
+     (text :color (etaf-theme-token :ui-muted-fg "#526174")
+           " 两边是内边距，细线是边框，灰底是外边距"))))
+```
+
 ## row 与 column
 
 <!-- index: row; column; item-gap; 交叉轴对齐; 单轴 -->

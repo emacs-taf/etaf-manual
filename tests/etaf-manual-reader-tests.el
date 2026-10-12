@@ -502,5 +502,15 @@
       (should-not (etaf-manual-reader-test--hover-p "引言"))
       (should (etaf-manual-reader-test--hover-p "响应式系统")))))
 
+(ert-deftest etaf-manual-reader-renders-inline-figures ()
+  "A `:figure' block renders its View inline and offers no run control."
+  (let ((session (etaf-manual-reader-create :language "zh-CN" :chapter 'views)))
+    (etaf-manual-reader-test--with-reader session
+      (let ((text (etaf-manual-reader-test--text)))
+        (should (string-match-p "图 · 一个 column" text))
+        ;; The figure's own View is painted in the chapter.
+        (should (string-match-p "左子节点" text))
+        (should-not (string-match-p "▶ 运行" text))))))
+
 (provide 'etaf-manual-reader-tests)
 ;;; etaf-manual-reader-tests.el ends here

@@ -38,6 +38,20 @@ A border is painted with the tools a text buffer has. The left and right borders
 
 The top and bottom borders are not characters. They decorate every character of the border-box's first or last line with an overline or underline in the border color, so a top border draws its line above the line's characters and a bottom border draws its line below them, spanning exactly the box's pixel width. A face has one such stroke, so a top or bottom border wider than one pixel has no honest rendering; Ebox signals `ebox-error` instead of drawing an approximation. A border exists only when its style is `solid` and its width is greater than zero: the initial style `none` resolves the border to zero width, so it neither reserves geometry nor paints.
 
+```elisp :figure Content, padding, border and margin around one box
+(etaf-view
+ (box :width '(ch 40) :padding '((lh 1) (ch 2))
+      :background-color (etaf-theme-token :ui-disabled-bg "#e5e7eb")
+   (box :padding '((lh 1) (ch 2))
+        :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+        :border-width '(px 1)
+        :border-style 'solid
+        :border-color (etaf-theme-token :ui-panel-border "#687386")
+     (text :color (etaf-theme-token :ui-panel-fg "#1f2328") "内容")
+     (text :color (etaf-theme-token :ui-muted-fg "#526174")
+           " 两边是内边距，细线是边框，灰底是外边距"))))
+```
+
 ## Rows and columns
 
 <!-- index: row; column; item gap; cross alignment; single axis -->

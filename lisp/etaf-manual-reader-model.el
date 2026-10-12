@@ -203,6 +203,10 @@ but callers read the chapter before asking, so a chapter change re-parses."
   "Return SESSION's runnable examples of chapter ID, in document order."
   (plist-get (etaf-manual-reader--chapter session id) :examples))
 
+(defun etaf-manual-reader--chapter-figures (session &optional id)
+  "Return SESSION's inline figures of chapter ID, in document order."
+  (plist-get (etaf-manual-reader--chapter session id) :figures))
+
 (defun etaf-manual-reader--chapter-definitions (session &optional id)
   "Return SESSION's definition entries of chapter ID, in document order."
   (plist-get (etaf-manual-reader--chapter session id) :definitions))

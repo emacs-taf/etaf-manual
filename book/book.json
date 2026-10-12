@@ -226,7 +226,8 @@
         "extending-the-framework",
         "performance-engineering",
         "testing-and-validation",
-        "development-and-release"
+        "development-and-release",
+        "design-rationale"
       ]
     }
   ],

@@ -183,7 +183,8 @@
         "zh-CN": "ECSS 作为通用库"
       },
       "chapters": [
-        "ecss-schema-packages"
+        "ecss-schema-packages",
+        "ecss-subjects-and-adapters"
       ]
     }
   ],

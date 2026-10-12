@@ -291,6 +291,13 @@
         "en": "Component Quick Reference",
         "zh-CN": "组件速查"
       }
+    },
+    {
+      "id": "glossary",
+      "title": {
+        "en": "Glossary",
+        "zh-CN": "术语表"
+      }
     }
   ],
   "indices": []

@@ -133,6 +133,9 @@ chapter links become site routes."
           (export-site--transform (export-site--chapter-text chapter)
                                   language locale ids)))
 
+;;; Landing page (English): feature cards on their own grid, then an
+;; application gallery and a game gallery.  Every picture links to the full
+;; WebP and is opened in the lightbox by scripts/lightbox.js.
 (defconst export-site--landing-en
   "---
 title: ETAF
@@ -155,76 +158,87 @@ hero:
       icon: github
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Icon } from '@astrojs/starlight/components';
 
-<CardGrid stagger>
-  <Card title='Declarative components' icon='puzzle'>
-    Compose reusable Components with named bindings and reactive state; the
-    runtime owns re-rendering, identity and lifecycle.
-  </Card>
-  <Card title='Cascade and computed styles' icon='seti:css'>
-    Style subjects through selectors, specificity and cascade, and read the
-    computed result back instead of setting faces by hand.
-  </Card>
-  <Card title='Box, Flex and Grid layout' icon='laptop'>
-    Lay text out with the box model, normal flow, flex and grid, measured down
-    to the pixel.
-  </Card>
-  <Card title='Incremental updates' icon='rocket'>
-    Retained rendering publishes only what changed, so an update costs what it
-    changed instead of a full redraw.
-  </Card>
-</CardGrid>
+<div class='etaf-features'>
+  <div class='etaf-feature'>
+    <h3><Icon name='puzzle' class='etaf-feature-icon' /> Declarative components</h3>
+    <p>Compose reusable Components with named bindings and reactive state; the runtime owns re-rendering, identity and lifecycle.</p>
+  </div>
+  <div class='etaf-feature'>
+    <h3><Icon name='seti:css' class='etaf-feature-icon' /> Cascade and computed styles</h3>
+    <p>Style subjects through selectors, specificity and cascade, and read the computed result back instead of setting faces by hand.</p>
+  </div>
+  <div class='etaf-feature'>
+    <h3><Icon name='laptop' class='etaf-feature-icon' /> Box, Flex and Grid layout</h3>
+    <p>Lay text out with the box model, normal flow, flex and grid, measured down to the pixel.</p>
+  </div>
+  <div class='etaf-feature'>
+    <h3><Icon name='rocket' class='etaf-feature-icon' /> Incremental updates</h3>
+    <p>Retained rendering publishes only what changed, so an update costs what it changed instead of a full redraw.</p>
+  </div>
+</div>
 
 ## Built with ETAF
 
+### Applications
+
 <div class='etaf-shots'>
   <figure>
-    <img src='/shots/etaf-ncm.webp' alt='NetEase Cloud Music player in Emacs' loading='lazy' class='etaf-shot' />
+    <a class='etaf-shot-link' href='/shots/etaf-ncm.webp'><img src='/shots/etaf-ncm.webp' alt='NetEase Cloud Music player in Emacs' loading='lazy' class='etaf-shot' /></a>
     <figcaption><a href='https://github.com/emacs-taf/etaf-ncm'>etaf-ncm</a>: liked songs, lyrics and the queue</figcaption>
   </figure>
   <figure>
-    <img src='/shots/etaf-md-preview.webp' alt='Markdown reading view in Emacs' loading='lazy' class='etaf-shot' />
-    <figcaption><a href='https://github.com/emacs-taf/etaf-md-preview'>etaf-md-preview</a>: Markdown reading view</figcaption>
+    <a class='etaf-shot-link' href='/shots/etaf-weread.webp'><img src='/shots/etaf-weread.webp' alt='WeChat Reading client in Emacs' loading='lazy' class='etaf-shot' /></a>
+    <figcaption><a href='https://github.com/emacs-taf/etaf-weread'>etaf-weread</a>: shelf, notebook and reading statistics</figcaption>
   </figure>
   <figure>
-    <img src='/shots/etaf-pi.webp' alt='Pi agent client in Emacs' loading='lazy' class='etaf-shot' />
-    <figcaption><a href='https://github.com/emacs-taf/etaf-pi'>etaf-pi</a>: Pi agent client, tool output in a resumed session</figcaption>
+    <a class='etaf-shot-link' href='/shots/etaf-md-preview.webp'><img src='/shots/etaf-md-preview.webp' alt='Markdown reading view beside its source in Emacs' loading='lazy' class='etaf-shot' /></a>
+    <figcaption><a href='https://github.com/emacs-taf/etaf-md-preview'>etaf-md-preview</a>: the source beside the rendered view</figcaption>
   </figure>
   <figure>
-    <img src='/shots/etaf-telega.webp' alt='Telegram client in Emacs' loading='lazy' class='etaf-shot' />
-    <figcaption><a href='https://github.com/emacs-taf/etaf-telega'>etaf-telega</a>: Telegram chats, groups and channels</figcaption>
+    <a class='etaf-shot-link' href='/shots/etaf-pi.webp'><img src='/shots/etaf-pi.webp' alt='Pi agent client in Emacs' loading='lazy' class='etaf-shot' /></a>
+    <figcaption><a href='https://github.com/emacs-taf/etaf-pi'>etaf-pi</a>: a resumed session with tool output</figcaption>
   </figure>
   <figure>
-    <img src='/shots/etaf-desktop.webp' alt='ETAF Desktop window manager' loading='lazy' class='etaf-shot' />
+    <a class='etaf-shot-link' href='/shots/etaf-telega.webp'><img src='/shots/etaf-telega.webp' alt='Telegram client in Emacs' loading='lazy' class='etaf-shot' /></a>
+    <figcaption><a href='https://github.com/emacs-taf/etaf-telega'>etaf-telega</a>: chats, groups and channels</figcaption>
+  </figure>
+  <figure>
+    <a class='etaf-shot-link' href='/shots/etaf-desktop.webp'><img src='/shots/etaf-desktop.webp' alt='ETAF Desktop window manager' loading='lazy' class='etaf-shot' /></a>
     <figcaption><a href='https://github.com/emacs-taf/etaf-desktop'>etaf-desktop</a>: windows, workspaces and a launcher</figcaption>
   </figure>
   <figure>
-    <img src='/shots/etaf-algo-lab.webp' alt='Algorithm lab in Emacs' loading='lazy' class='etaf-shot' />
+    <a class='etaf-shot-link' href='/shots/etaf-algo-lab.webp'><img src='/shots/etaf-algo-lab.webp' alt='Algorithm lab in Emacs' loading='lazy' class='etaf-shot' /></a>
     <figcaption><a href='https://github.com/emacs-taf/etaf-algo-lab'>etaf-algo-lab</a>: watch, steer and compare algorithms</figcaption>
   </figure>
   <figure>
-    <img src='/shots/etaf-video-player.webp' alt='Video player in Emacs' loading='lazy' class='etaf-shot' />
+    <a class='etaf-shot-link' href='/shots/etaf-video-player.webp'><img src='/shots/etaf-video-player.webp' alt='Video player in Emacs' loading='lazy' class='etaf-shot' /></a>
     <figcaption><a href='https://github.com/emacs-taf/etaf-video-player'>etaf-video-player</a>: video as sharp image frames with sound</figcaption>
   </figure>
   <figure>
-    <img src='/shots/etaf-ascii-video.webp' alt='ASCII video in Emacs' loading='lazy' class='etaf-shot' />
+    <a class='etaf-shot-link' href='/shots/etaf-ascii-video.webp'><img src='/shots/etaf-ascii-video.webp' alt='ASCII video in Emacs' loading='lazy' class='etaf-shot' /></a>
     <figcaption><a href='https://github.com/emacs-taf/etaf-ascii-video'>etaf-ascii-video</a>: video rendered as characters</figcaption>
   </figure>
+</div>
+
+### Games
+
+<div class='etaf-shots'>
   <figure>
-    <img src='/shots/etaf-solitaire.webp' alt='Verdant solitaire in Emacs' loading='lazy' class='etaf-shot' />
+    <a class='etaf-shot-link' href='/shots/etaf-solitaire.webp'><img src='/shots/etaf-solitaire.webp' alt='Verdant solitaire in Emacs' loading='lazy' class='etaf-shot' /></a>
     <figcaption><a href='https://github.com/emacs-taf/etaf-solitaire'>etaf-solitaire</a>: Verdant, K+ Klondike solitaire</figcaption>
   </figure>
   <figure>
-    <img src='/shots/etaf-xiangqi.webp' alt='Chu He xiangqi' loading='lazy' class='etaf-shot' />
+    <a class='etaf-shot-link' href='/shots/etaf-xiangqi.webp'><img src='/shots/etaf-xiangqi.webp' alt='Chu He xiangqi' loading='lazy' class='etaf-shot' /></a>
     <figcaption><a href='https://github.com/emacs-taf/etaf-xiangqi'>etaf-xiangqi</a>: Chinese chess on a native vector board</figcaption>
   </figure>
   <figure>
-    <img src='/shots/etaf-tanks.webp' alt='Iron Tide tank battle' loading='lazy' class='etaf-shot' />
+    <a class='etaf-shot-link' href='/shots/etaf-tanks.webp'><img src='/shots/etaf-tanks.webp' alt='Iron Tide tank battle' loading='lazy' class='etaf-shot' /></a>
     <figcaption><a href='https://github.com/emacs-taf/etaf-tanks'>etaf-tanks</a>: Iron Tide, real-time tank battle</figcaption>
   </figure>
   <figure>
-    <img src='/shots/etaf-salvage.webp' alt='Salvage Station game' loading='lazy' class='etaf-shot' />
+    <a class='etaf-shot-link' href='/shots/etaf-salvage.webp'><img src='/shots/etaf-salvage.webp' alt='Salvage Station game' loading='lazy' class='etaf-shot' /></a>
     <figcaption><a href='https://github.com/emacs-taf/etaf-salvage'>etaf-salvage</a>: Salvage Station, real-time exploration</figcaption>
   </figure>
 </div>
@@ -258,72 +272,87 @@ hero:
       icon: github
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Icon } from '@astrojs/starlight/components';
 
-<CardGrid stagger>
-  <Card title='声明式组件' icon='puzzle'>
-    用命名绑定与响应式状态组合可复用组件，重渲染、身份和生命周期由运行时负责。
-  </Card>
-  <Card title='级联与计算样式' icon='seti:css'>
-    用选择器、优先级和级联给主体写样式，再读回计算样式，而不是手工设置 face。
-  </Card>
-  <Card title='Box、Flex 与 Grid 布局' icon='laptop'>
-    用盒模型、常规流、Flex 与 Grid 排布文本，精确到像素。
-  </Card>
-  <Card title='增量更新' icon='rocket'>
-    保留式渲染只发布变化的部分，更新的代价取决于改动的大小，而不是整屏重绘。
-  </Card>
-</CardGrid>
+<div class='etaf-features'>
+  <div class='etaf-feature'>
+    <h3><Icon name='puzzle' class='etaf-feature-icon' /> 声明式组件</h3>
+    <p>用命名绑定与响应式状态组合可复用组件，重渲染、身份和生命周期由运行时负责。</p>
+  </div>
+  <div class='etaf-feature'>
+    <h3><Icon name='seti:css' class='etaf-feature-icon' /> 级联与计算样式</h3>
+    <p>用选择器、优先级和级联给主体写样式，再读回计算样式，而不是手工设置 face。</p>
+  </div>
+  <div class='etaf-feature'>
+    <h3><Icon name='laptop' class='etaf-feature-icon' /> Box、Flex 与 Grid 布局</h3>
+    <p>用盒模型、常规流、Flex 与 Grid 排布文本，精确到像素。</p>
+  </div>
+  <div class='etaf-feature'>
+    <h3><Icon name='rocket' class='etaf-feature-icon' /> 增量更新</h3>
+    <p>保留式渲染只发布变化的部分，更新的代价取决于改动的大小，而不是整屏重绘。</p>
+  </div>
+</div>
 
 ## 用 ETAF 构建的应用
 
+### 应用
+
 <div class='etaf-shots'>
   <figure>
-    <img src='/shots/etaf-ncm.webp' alt='Emacs 里的网易云音乐播放器' loading='lazy' class='etaf-shot' />
+    <a class='etaf-shot-link' href='/shots/etaf-ncm.webp'><img src='/shots/etaf-ncm.webp' alt='Emacs 里的网易云音乐播放器' loading='lazy' class='etaf-shot' /></a>
     <figcaption><a href='https://github.com/emacs-taf/etaf-ncm'>etaf-ncm</a>：我喜欢的音乐、歌词与播放队列</figcaption>
   </figure>
   <figure>
-    <img src='/shots/etaf-md-preview.webp' alt='Emacs 里的 Markdown 阅读视图' loading='lazy' class='etaf-shot' />
-    <figcaption><a href='https://github.com/emacs-taf/etaf-md-preview'>etaf-md-preview</a>：Markdown 阅读视图</figcaption>
+    <a class='etaf-shot-link' href='/shots/etaf-weread.webp'><img src='/shots/etaf-weread.webp' alt='Emacs 里的微信读书客户端' loading='lazy' class='etaf-shot' /></a>
+    <figcaption><a href='https://github.com/emacs-taf/etaf-weread'>etaf-weread</a>：书架、笔记本与阅读统计</figcaption>
   </figure>
   <figure>
-    <img src='/shots/etaf-pi.webp' alt='Emacs 里的 Pi 代理客户端' loading='lazy' class='etaf-shot' />
-    <figcaption><a href='https://github.com/emacs-taf/etaf-pi'>etaf-pi</a>：Pi 代理客户端，恢复的会话与工具输出</figcaption>
+    <a class='etaf-shot-link' href='/shots/etaf-md-preview.webp'><img src='/shots/etaf-md-preview.webp' alt='Emacs 里并排显示 Markdown 原文与渲染' loading='lazy' class='etaf-shot' /></a>
+    <figcaption><a href='https://github.com/emacs-taf/etaf-md-preview'>etaf-md-preview</a>：左边原文，右边渲染</figcaption>
   </figure>
   <figure>
-    <img src='/shots/etaf-telega.webp' alt='Emacs 里的 Telegram 客户端' loading='lazy' class='etaf-shot' />
-    <figcaption><a href='https://github.com/emacs-taf/etaf-telega'>etaf-telega</a>：Telegram 会话、群组与频道</figcaption>
+    <a class='etaf-shot-link' href='/shots/etaf-pi.webp'><img src='/shots/etaf-pi.webp' alt='Emacs 里的 Pi 代理客户端' loading='lazy' class='etaf-shot' /></a>
+    <figcaption><a href='https://github.com/emacs-taf/etaf-pi'>etaf-pi</a>：恢复的会话与工具输出</figcaption>
   </figure>
   <figure>
-    <img src='/shots/etaf-desktop.webp' alt='ETAF Desktop 窗口管理器' loading='lazy' class='etaf-shot' />
+    <a class='etaf-shot-link' href='/shots/etaf-telega.webp'><img src='/shots/etaf-telega.webp' alt='Emacs 里的 Telegram 客户端' loading='lazy' class='etaf-shot' /></a>
+    <figcaption><a href='https://github.com/emacs-taf/etaf-telega'>etaf-telega</a>：会话、群组与频道</figcaption>
+  </figure>
+  <figure>
+    <a class='etaf-shot-link' href='/shots/etaf-desktop.webp'><img src='/shots/etaf-desktop.webp' alt='ETAF Desktop 窗口管理器' loading='lazy' class='etaf-shot' /></a>
     <figcaption><a href='https://github.com/emacs-taf/etaf-desktop'>etaf-desktop</a>：窗口、工作区与启动器</figcaption>
   </figure>
   <figure>
-    <img src='/shots/etaf-algo-lab.webp' alt='Emacs 里的算法实验室' loading='lazy' class='etaf-shot' />
+    <a class='etaf-shot-link' href='/shots/etaf-algo-lab.webp'><img src='/shots/etaf-algo-lab.webp' alt='Emacs 里的算法实验室' loading='lazy' class='etaf-shot' /></a>
     <figcaption><a href='https://github.com/emacs-taf/etaf-algo-lab'>etaf-algo-lab</a>：观看、操控并对比算法运行</figcaption>
   </figure>
   <figure>
-    <img src='/shots/etaf-video-player.webp' alt='Emacs 里的视频播放器' loading='lazy' class='etaf-shot' />
+    <a class='etaf-shot-link' href='/shots/etaf-video-player.webp'><img src='/shots/etaf-video-player.webp' alt='Emacs 里的视频播放器' loading='lazy' class='etaf-shot' /></a>
     <figcaption><a href='https://github.com/emacs-taf/etaf-video-player'>etaf-video-player</a>：清晰图像帧加声音播放视频</figcaption>
   </figure>
   <figure>
-    <img src='/shots/etaf-ascii-video.webp' alt='Emacs 里的字符视频' loading='lazy' class='etaf-shot' />
+    <a class='etaf-shot-link' href='/shots/etaf-ascii-video.webp'><img src='/shots/etaf-ascii-video.webp' alt='Emacs 里的字符视频' loading='lazy' class='etaf-shot' /></a>
     <figcaption><a href='https://github.com/emacs-taf/etaf-ascii-video'>etaf-ascii-video</a>：把视频渲染成字符</figcaption>
   </figure>
+</div>
+
+### 游戏
+
+<div class='etaf-shots'>
   <figure>
-    <img src='/shots/etaf-solitaire.webp' alt='Emacs 里的纸牌接龙' loading='lazy' class='etaf-shot' />
+    <a class='etaf-shot-link' href='/shots/etaf-solitaire.webp'><img src='/shots/etaf-solitaire.webp' alt='Emacs 里的纸牌接龙' loading='lazy' class='etaf-shot' /></a>
     <figcaption><a href='https://github.com/emacs-taf/etaf-solitaire'>etaf-solitaire</a>：Verdant，K+ Klondike 纸牌接龙</figcaption>
   </figure>
   <figure>
-    <img src='/shots/etaf-xiangqi.webp' alt='楚河中国象棋' loading='lazy' class='etaf-shot' />
+    <a class='etaf-shot-link' href='/shots/etaf-xiangqi.webp'><img src='/shots/etaf-xiangqi.webp' alt='楚河中国象棋' loading='lazy' class='etaf-shot' /></a>
     <figcaption><a href='https://github.com/emacs-taf/etaf-xiangqi'>etaf-xiangqi</a>：矢量棋盘上的中国象棋</figcaption>
   </figure>
   <figure>
-    <img src='/shots/etaf-tanks.webp' alt='钢铁洪流坦克战' loading='lazy' class='etaf-shot' />
+    <a class='etaf-shot-link' href='/shots/etaf-tanks.webp'><img src='/shots/etaf-tanks.webp' alt='钢铁洪流坦克战' loading='lazy' class='etaf-shot' /></a>
     <figcaption><a href='https://github.com/emacs-taf/etaf-tanks'>etaf-tanks</a>：Iron Tide 实时坦克战</figcaption>
   </figure>
   <figure>
-    <img src='/shots/etaf-salvage.webp' alt='Salvage Station 游戏' loading='lazy' class='etaf-shot' />
+    <a class='etaf-shot-link' href='/shots/etaf-salvage.webp'><img src='/shots/etaf-salvage.webp' alt='Salvage Station 游戏' loading='lazy' class='etaf-shot' /></a>
     <figcaption><a href='https://github.com/emacs-taf/etaf-salvage'>etaf-salvage</a>：Salvage Station 实时探索与回收</figcaption>
   </figure>
 </div>

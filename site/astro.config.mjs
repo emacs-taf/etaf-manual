@@ -24,6 +24,8 @@ export default defineConfig({
         { tag: 'link', attrs: { rel: 'stylesheet', href: `${wenkai}/lxgwwenkai-regular.css` } },
         { tag: 'link', attrs: { rel: 'stylesheet', href: `${wenkai}/lxgwwenkai-bold.css` } },
         { tag: 'link', attrs: { rel: 'stylesheet', href: `${wenkai}/lxgwwenkaimono-regular.css` } },
+        // Opens landing screenshots in a full-screen overlay.
+        { tag: 'script', attrs: { src: '/lightbox.js', defer: true } },
       ],
       locales: {
         root: { label: 'English', lang: 'en' },

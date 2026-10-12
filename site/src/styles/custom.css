@@ -4,11 +4,56 @@
    commercial font, so it cannot be served); Chinese uses LXGW WenKai, which
    the site loads as a subset webfont in astro.config.mjs, and code uses the
    matching WenKai Mono.  The system stack comes after these names through
-   Starlight's own variables. */
+   Starlight's own variables.
+
+   The manual is a reference, not a landing page: the base size is 15px, so
+   every rem-based size in the theme scales down with it, and the headings
+   are sized to read as sections rather than posters.  WenKai draws thin
+   strokes next to Pragmata Pro's wide Latin, so body text sits darker and
+   takes a hairline of text stroke; code keeps none, because the mono face
+   is already even. */
+
+html {
+  font-size: 93.75%; /* 15px base */
+}
 
 :root {
   --sl-font: "PragmataPro", "LXGW WenKai", "霞鹜文楷", "PingFang SC",
     "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   --sl-font-mono: "PragmataPro", "LXGW WenKai Mono", "霞鹜文楷等宽",
     ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+  --sl-text-h1: 1.7333rem;  /* 26px */
+  --sl-text-h2: 1.4rem;     /* 21px */
+  --sl-text-h3: 1.1667rem;  /* 17.5px */
+  --sl-text-h4: 1.0667rem;  /* 16px */
+  --sl-text-h5: 1rem;       /* 15px */
+  --sl-text-code: 0.875rem;
+  --sl-line-height: 1.7;
+}
+
+/* Use the bold WenKai face for headings instead of letting the browser
+   synthesize weight from the regular face, which smears the strokes. */
+.sl-markdown-content h1,
+.sl-markdown-content h2,
+.sl-markdown-content h3,
+.sl-markdown-content h4,
+.sl-markdown-content h5,
+.sl-markdown-content h6,
+.content-panel h1 {
+  font-weight: 700;
+}
+
+.sl-markdown-content :is(p, li, td, th, dd, dt),
+.sidebar-content a {
+  -webkit-text-stroke: 0.015em currentColor;
+}
+
+.sl-markdown-content :is(code, pre, kbd, samp) {
+  -webkit-text-stroke: 0;
+}
+
+:root[data-theme='light'] {
+  --sl-color-text: hsl(224, 16%, 15%);
+  --sl-color-text-accent: hsl(234, 80%, 36%);
 }

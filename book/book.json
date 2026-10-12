@@ -238,6 +238,20 @@
         "en": "Standard Errors",
         "zh-CN": "标准错误"
       }
+    },
+    {
+      "id": "standard-hooks",
+      "title": {
+        "en": "Standard Hooks",
+        "zh-CN": "标准钩子"
+      }
+    },
+    {
+      "id": "standard-key-bindings",
+      "title": {
+        "en": "Standard Key Bindings",
+        "zh-CN": "标准键位"
+      }
     }
   ],
   "indices": []

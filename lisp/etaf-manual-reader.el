@@ -55,7 +55,8 @@ repaints the reader without a remount."
                        (max 20 (/ (car viewport) (max 1 (frame-char-width))))))
          (rows (and viewport (numberp (cdr viewport)) (> (cdr viewport) 0)
                     (cdr viewport))))
-    (etaf-manual-reader--shell reader (etaf-manual-reader--env reader columns rows))))
+    (etaf-manual-reader--shell reader (etaf-manual-reader--env reader columns rows)
+                              (etaf-manual-reader--key-entries))))
 
 (defun etaf-manual-reader-view (session)
   "Return the application View of SESSION.
@@ -90,6 +91,7 @@ Use it to embed the reader in your own `etaf-mount' call; prefer
     (pop-to-buffer buffer '(display-buffer-same-window))
     (etaf-mount buffer (etaf-manual-reader-view session))
     (etaf-runtime-flush (etaf-runtime-for-buffer buffer))
+    (etaf-manual-reader--scroll-to-node session)
     buffer))
 
 (defun etaf-manual-open (&optional chapter)
@@ -290,25 +292,44 @@ signals a `user-error'.  With an open reader the same buffer is reused."
                           "深色"
                         "浅色"))))
 
-;;;; Mode
+;;;; Keys
+
+(defconst etaf-manual-reader--bindings
+  '(("n" etaf-manual-reader-next-command "下一节")
+    ("p" etaf-manual-reader-previous-command "上一节")
+    ("u" etaf-manual-reader-up-command "上一级")
+    ("l" etaf-manual-reader-back-command "后退")
+    ("r" etaf-manual-reader-forward-command "前进")
+    ("[" etaf-manual-reader-previous-chapter-command "上一章")
+    ("]" etaf-manual-reader-next-chapter-command "下一章")
+    ("g" etaf-manual-reader-switch-language-command "中英文切换")
+    ("i" etaf-manual-reader-index "索引")
+    ("t" etaf-manual-reader-toggle-theme-command "深浅主题")
+    ("q" etaf-manual-close "退出阅读器"))
+  "Reader keys as (KEY COMMAND LABEL).
+The buffer's mode map and the page Host's `:keys' both come from this table,
+so `?''s ETAF key help lists exactly the keys the reader binds.")
+
+(defun etaf-manual-reader--key-entries ()
+  "Return the reader's `:keys' entries for the page Host.
+`l' is omitted under the Vim direction scheme: the framework owns the letter
+as a direction key there, and a Host binding would be a render error."
+  (mapcar (lambda (entry) (list (nth 0 entry) (nth 1 entry) (nth 2 entry)))
+          (if (eq etaf-direction-scheme 'vim)
+              (cl-remove "l" etaf-manual-reader--bindings
+                         :key #'car :test #'equal)
+            etaf-manual-reader--bindings)))
 
 (defvar etaf-manual-reader-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "n") #'etaf-manual-reader-next-command)
-    (define-key map (kbd "p") #'etaf-manual-reader-previous-command)
-    (define-key map (kbd "u") #'etaf-manual-reader-up-command)
-    (define-key map (kbd "l") #'etaf-manual-reader-back-command)
-    (define-key map (kbd "r") #'etaf-manual-reader-forward-command)
-    (define-key map (kbd "]") #'etaf-manual-reader-next-chapter-command)
-    (define-key map (kbd "[") #'etaf-manual-reader-previous-chapter-command)
-    (define-key map (kbd "g") #'etaf-manual-reader-switch-language-command)
-    (define-key map (kbd "i") #'etaf-manual-reader-index)
-    (define-key map (kbd "t") #'etaf-manual-reader-toggle-theme-command)
-    (define-key map (kbd "q") #'etaf-manual-close)
+    (dolist (entry etaf-manual-reader--bindings)
+      (define-key map (kbd (car entry)) (nth 1 entry)))
     map)
   "Keymap of a buffer opened by `etaf-manual-open'.
-The renderer keeps the framework keys (`TAB', `RET', arrows, `M-g', `?'),
-so focus movement, control activation and the key help stay available.")
+The mounted page Host also carries the same table as `:keys', so the keys
+work when the reader View is embedded, `?' lists them with their labels in
+the ETAF key help, and the framework keeps `TAB', `RET', the arrows,
+`M-g', Escape and `?'.")
 
 (define-derived-mode etaf-manual-reader-mode special-mode "ETAF手册"
   "Major mode of an ETAF manual reader buffer.

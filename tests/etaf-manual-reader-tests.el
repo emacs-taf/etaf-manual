@@ -194,5 +194,33 @@
         (should (string-match-p "etaf-button" text))
         (should (string-match-p "Component" text))))))
 
+(ert-deftest etaf-manual-reader-key-help-lists-reader-keys ()
+  "The ETAF key help of the mounted reader lists the reader's own keys."
+  (let ((session (etaf-manual-reader-create :language "zh-CN" :chapter 'introduction)))
+    (etaf-manual-reader-test--with-reader session
+      (let ((help (etaf-help)))
+        (unwind-protect
+            (with-current-buffer help
+              (let ((text (buffer-string)))
+                (should (string-match-p "下一节" text))
+                (should (string-match-p "中英文切换" text))
+                (should (string-match-p "手册阅读器" text))))
+          (kill-buffer help))))))
+
+(ert-deftest etaf-manual-reader-page-keys-drive-navigation ()
+  "The page Host's `:keys' dispatch the reader keys in the runtime."
+  (let ((buffer (etaf-manual-open 'introduction)))
+    (unwind-protect
+        (progn
+          (with-current-buffer buffer
+            (should-not (string-match-p "章 · " (substring-no-properties (buffer-string)))))
+          (with-current-buffer buffer
+            (execute-kbd-macro (kbd "n"))
+            (etaf-runtime-flush (etaf-runtime-for-buffer buffer)))
+          (with-current-buffer buffer
+            (should (string-match-p "章 · " (substring-no-properties (buffer-string))))))
+      (when (buffer-live-p buffer)
+        (with-current-buffer buffer (etaf-manual-close))))))
+
 (provide 'etaf-manual-reader-tests)
 ;;; etaf-manual-reader-tests.el ends here

@@ -75,9 +75,12 @@
 ;; between sections, `u' goes up one level, `l' and `r' walk the reading
 ;; history, `[' and `]' change chapter, `g' switches between Chinese and
 ;; English, `i' opens the index, `t' switches the palette and `q' closes the
-;; reader.  Tabs, arrows, RET, M-g and ? keep the framework behaviours, so
-;; controls inside runnable examples stay focusable and operable; activating
-;; the run control of an example renders the real ETAF View in place.
+;; reader.  The mounted page declares these keys as Host `:keys', so they
+;; also work when the reader View is embedded and `?' opens the read-only
+;; ETAF key help listing them.  Tabs, arrows, RET, M-g and Escape keep the
+;; framework behaviours, so controls inside runnable examples stay focusable
+;; and operable; activating the run control of an example renders the real
+;; ETAF View in place.
 ;;
 ;; Function: etaf-manual-close ()
 ;;;###autoload (autoload 'etaf-manual-close "etaf-manual" nil t)

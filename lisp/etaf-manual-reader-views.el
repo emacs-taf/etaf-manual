@@ -27,6 +27,9 @@
 (defconst etaf-manual-reader--overview-ref 'etaf-manual-overview-column
   "Host reference of the narrow-screen overview column.")
 
+(defconst etaf-manual-reader--nav-current-ref 'etaf-manual-nav-current
+  "Host reference of the navigation row of the reading position.")
+
 ;;;; Environment and scrolling
 
 (defun etaf-manual-reader--env (session &optional viewport rows)
@@ -52,8 +55,12 @@ frame height in lines."
          (etaf-runtime-for-buffer buffer))))
 
 (defun etaf-manual-reader--scroll-to-node (session)
-  "Scroll SESSION's article so its current section starts at the top."
+  "Scroll SESSION's article so its current section starts at the top.
+The navigation column follows by the least distance that shows the row of
+the reading position."
   (when-let* ((runtime (etaf-manual-reader--runtime session)))
+    (ignore-errors
+      (etaf-scroll-into-view runtime etaf-manual-reader--nav-current-ref))
     (let ((node (etaf-manual-reader--read session :node)))
       (if node
           (let* ((anchor (plist-get (etaf-manual-reader--node-at session node)
@@ -96,23 +103,48 @@ frame height in lines."
     (error (etaf-manual-reader-message
             session (error-message-string error)))))
 
+(defun etaf-manual-reader--theme-options ()
+  "Return the theme switch options."
+  '((light . "浅色") (dark . "深色")))
+
+(defun etaf-manual-reader--breadcrumb (session env compact)
+  "Return SESSION's reading trail in ENV: part, chapter and section.
+COMPACT keeps only the chapter and section."
+  (let* ((part (etaf-manual-reader--part session))
+         (chapter (etaf-manual-reader--read session :chapter))
+         (node (etaf-manual-reader--node-at
+                session (etaf-manual-reader--read session :node)))
+         (crumbs (delq nil
+                       (list (and (not compact) part
+                                  (cons (plist-get part :title) :muted))
+                             (cons (etaf-manual-reader--chapter-title session chapter)
+                                   (if node :muted :ink))
+                             (and node (cons (plist-get node :title) :ink)))))
+         (nodes nil))
+    (dolist (crumb crumbs)
+      (when nodes
+        (push (etaf-manual-reader--icon env 'chevron-right :faint) nodes))
+      (push (etaf-node 'text
+                       (list :color (etaf-manual-reader--color env (cdr crumb)))
+                       (list (car crumb)))
+            nodes))
+    (etaf-node 'row
+               (list :item-gap '(ch 1) :cross-align 'center
+                     :min-width '(px 0) :overflow 'hidden)
+               (nreverse nodes))))
+
 (defun etaf-manual-reader--header-view (session env)
   "Return the header View of SESSION in ENV."
   (let* ((language (etaf-manual-reader--read session :language))
-         (theme (etaf-manual-reader--read session :theme))
+         (theme (or (etaf-manual-reader--read session :theme)
+                    (etaf-manual-reader-auto-theme)))
          (wide (etaf-manual-reader--wide-p env))
          (compact (etaf-manual-reader--compact-p env))
-         (breadcrumb (etaf-manual-reader--position-title session))
          (chrome (etaf-manual-reader--chrome
                   env
                   (list
                    (etaf-manual-reader--brand env (if compact "手册" "ETAF 手册"))
-                   (etaf-node 'text
-                              (list :color (etaf-manual-reader--color env :muted))
-                              (list "›"))
-                   (etaf-node 'text
-                              (list :color (etaf-manual-reader--color env :ink))
-                              (list breadcrumb))
+                   (etaf-manual-reader--breadcrumb session env compact)
                    (etaf-node 'box
                               (list :flex-grow 1 :flex-basis '(px 0)
                                     :min-width '(px 0))
@@ -120,9 +152,9 @@ frame height in lines."
                    (when (not wide)
                      (etaf-node 'etaf-button
                                 (list :label (if (etaf-manual-reader--read session :toc)
-                                                 "▤ 收起"
-                                               "▤ 目录")
-                                      :variant 'ghost
+                                                 "返回正文"
+                                               "目录")
+                                      :variant 'secondary
                                       :on-press (lambda ()
                                                   (etaf-set-value
                                                    (etaf-manual-reader--ref session :toc)
@@ -135,15 +167,13 @@ frame height in lines."
                                                  (etaf-manual-reader--switch-language session code)))
                               nil)
                    (unless compact
-                     (etaf-node 'etaf-switch
-                                (list :checked (eq theme 'dark)
-                                      :label "深色"
-                                      :on-change (lambda (on)
+                     (etaf-node 'etaf-segmented
+                                (list :value theme
+                                      :options (etaf-manual-reader--theme-options)
+                                      :on-change (lambda (value)
                                                    (etaf-manual-reader-set-theme
-                                                    session (if on 'dark 'light))))
+                                                    session value)))
                                 nil))))))
-    ;; A 1px border would push the page one pixel past the viewport and
-    ;; clip the last chrome row, so chrome bars separate by surface color.
     (etaf-node 'box
                (list :ref 'etaf-manual-header
                      :width 'stretch
@@ -154,59 +184,87 @@ frame height in lines."
 
 (defun etaf-manual-reader--sidebar-row (session env row)
   "Return one clickable navigation ROW of SESSION in ENV.
-ROW is a plist with `:label', `:chapter', `:node', `:level', `:current' and
-`:current-node'."
-  (let ((label (plist-get row :label))
-        (chapter (plist-get row :chapter))
-        (node (plist-get row :node))
-        (level (plist-get row :level))
-        (current (plist-get row :current))
-        (current-node (plist-get row :current-node)))
-    (etaf-node 'box
-               (list :width 'stretch
+ROW is a plist with `:number', `:label', `:chapter', `:node', `:level',
+`:current' and `:current-node'.  The number sits in a fixed gutter and the
+label wraps beside it, so a long title keeps its hanging indent; a
+level-3 section widens the gutter and marks it with a dot."
+  (let* ((label (plist-get row :label))
+         (chapter (plist-get row :chapter))
+         (node (plist-get row :node))
+         (level (plist-get row :level))
+         (current (plist-get row :current))
+         (current-node (plist-get row :current-node))
+         (chapter-row (eql level 0))
+         (selected (if chapter-row
+                       (and current (null (etaf-manual-reader--read session :node)))
+                     current-node))
+         (color (cond (selected (etaf-manual-reader--color env :accent))
+                      ((and chapter-row current) (etaf-manual-reader--color env :heading))
+                      (chapter-row (etaf-manual-reader--color env :ink))
+                      (t (etaf-manual-reader--color env :muted)))))
+    (etaf-node 'row
+               (append
+                (when selected (list :ref etaf-manual-reader--nav-current-ref))
+                (list :width 'stretch
                      :box-sizing 'border-box
-                     :padding (list '(lh 0)
-                                    (list 'ch (pcase level
-                                                (0 1)
-                                                (3 4)
-                                                (_ 2))))
-                     :background-color (if current-node
-                                           (etaf-manual-reader--color env :sidebar-current)
-                                         nil)
-                     :color (cond (current-node (etaf-manual-reader--color env :accent))
-                                  (current (etaf-manual-reader--color env :accent))
-                                  (t (etaf-manual-reader--color env :ink)))
-                     :font-weight (if (or current current-node) 'bold nil)
+                     :padding '((lh 0) (ch 1))
+                     :item-gap '(ch 1)
+                     :background-color (cond (selected (etaf-manual-reader--color env :sidebar-current))
+                                             ((and chapter-row current)
+                                              (etaf-manual-reader--color env :panel))
+                                             (t nil))
+                     :border-left (list '(px 3) 'solid
+                                        (if (and chapter-row current)
+                                            (etaf-manual-reader--color env :accent)
+                                          (etaf-manual-reader--color env :sidebar)))
+                     :color color
+                     :font-weight (if (or selected (and chapter-row current)) 'bold nil)
                      :pointer 'hand
                      :role 'button
                      :tab-index 0
                      :help-echo label
                      :on-press (lambda ()
                                  (etaf-manual-reader-goto session chapter node)
-                                 (etaf-manual-reader--after-navigation session)))
-               (list (etaf-node 'text nil (list label))))))
+                                 (etaf-manual-reader--after-navigation session))))
+               (list (etaf-node 'box
+                                (list :width (if (eql level 3) '(ch 5) '(ch 3))
+                                      :flex-shrink 0
+                                      :text-align 'right
+                                      :color (if (or selected (and chapter-row current))
+                                                 (etaf-manual-reader--color env :accent)
+                                               (etaf-manual-reader--color env :faint)))
+                                (list (etaf-node 'text nil
+                                                 (list (if (eql level 3)
+                                                           "·"
+                                                         (format "%s" (or (plist-get row :number) "")))))))
+                     (etaf-node 'box
+                                (list :flex-grow 1 :flex-basis '(px 0)
+                                      :min-width '(px 0) :wrap-mode 'word)
+                                (list (etaf-node 'text nil (list label))))))))
 
 (defun etaf-manual-reader--sidebar-rows (session env)
   "Return the navigation rows of SESSION in ENV."
-  (let ((rows nil))
+  (let ((rows nil) (first t))
     (dolist (part (etaf-manual-reader-toc session))
+      (unless first
+        (push (etaf-manual-reader--spacer) rows))
+      (setq first nil)
       (push (etaf-node 'box
                        (list :width 'stretch
                              :box-sizing 'border-box
-                             :padding '((lh 0) (ch 1))
-                             :color (etaf-manual-reader--color env :muted))
+                             :padding '((lh 0) (ch 2))
+                             :color (etaf-manual-reader--color env :faint))
                        (list (etaf-node 'text
                                         (list :font-weight 'bold)
-                                        (list (format "%s · %s"
+                                        (list (format "%s  %s"
                                                       (plist-get part :number)
                                                       (plist-get part :title))))))
             rows)
       (dolist (chapter (plist-get part :chapters))
         (push (etaf-manual-reader--sidebar-row
                session env
-               (list :label (format "%s  %s"
-                                    (or (plist-get chapter :number) "·")
-                                    (plist-get chapter :title))
+               (list :number (plist-get chapter :number)
+                     :label (plist-get chapter :title)
                      :chapter (plist-get chapter :id)
                      :node nil
                      :level 0
@@ -216,7 +274,7 @@ ROW is a plist with `:label', `:chapter', `:node', `:level', `:current' and
           (dolist (node (plist-get chapter :nodes))
             (push (etaf-manual-reader--sidebar-row
                    session env
-                   (list :label (format "· %s" (plist-get node :title))
+                   (list :label (plist-get node :title)
                          :chapter (plist-get chapter :id)
                          :node (plist-get node :index)
                          :level (plist-get node :level)
@@ -234,7 +292,6 @@ ROW is a plist with `:label', `:chapter', `:node', `:level', `:current' and
                    :overflow 'scroll
                    :box-sizing 'border-box
                    :background-color (etaf-manual-reader--color env :sidebar)
-                   :border-right (etaf-manual-reader--border env)
                    :padding '((lh 1) (ch 1))
                    :item-gap '(lh 0)
                    :ref 'etaf-manual-nav-column)
@@ -276,40 +333,43 @@ ROW is a plist with `:label', `:chapter', `:node', `:level', `:current' and
   (let* ((state (etaf-manual-reader-state session))
          (node (plist-get state :node))
          (nodes (plist-get state :nodes)))
-    (format "%s/%s 章%s" (1+ (plist-get state :position)) (plist-get state :chapters)
-            (if node (format " · %s/%s 节" (1+ node) (length nodes)) ""))))
+    (format "第 %s/%s 章%s" (1+ (plist-get state :position)) (plist-get state :chapters)
+            (if node (format " · 第 %s/%s 节" (1+ node) (length nodes)) ""))))
+
+(defun etaf-manual-reader--footer-hints (env)
+  "Return the key hints the footer shows in ENV."
+  (if (etaf-manual-reader--compact-p env)
+      '(("n/p" . "节") ("i" . "索引") ("?" . "按键"))
+    '(("n/p" . "上下节") ("[ ]" . "上下章") ("u" . "上级")
+      ("i" . "索引") ("?" . "全部按键"))))
 
 (defun etaf-manual-reader--footer (session env)
-  "Return the footer View of SESSION in ENV."
-  (etaf-node 'box
-             (list :ref 'etaf-manual-footer
-                   :width 'stretch :box-sizing 'border-box
-                   :background-color (etaf-manual-reader--color env :panel))
-             (list
-              (etaf-manual-reader--chrome
-               env
+  "Return the footer View of SESSION in ENV: the reading position or the
+latest message on the left, the most useful keys on the right."
+  (let ((message (etaf-manual-reader--read session :message)))
+    (etaf-node 'box
+               (list :ref 'etaf-manual-footer
+                     :width 'stretch :box-sizing 'border-box
+                     :background-color (etaf-manual-reader--color env :panel))
                (list
-                (etaf-manual-reader--kbd-hint env '("n" "p") "节")
-                (etaf-manual-reader--kbd-hint env '("u") "上级")
-                (unless (etaf-manual-reader--compact-p env)
-                  (etaf-manual-reader--kbd-hint env '("l" "r") "历史"))
-                (etaf-manual-reader--kbd-hint env '("i") "索引")
-                (unless (etaf-manual-reader--compact-p env)
-                  (etaf-manual-reader--kbd-hint env '("t") "主题"))
-                (etaf-manual-reader--kbd-hint env '("q") "退出")
-                (etaf-node 'box
-                           (list :flex-grow 1 :flex-basis '(px 0) :min-width '(px 0))
-                           nil)
-                (let ((message (etaf-manual-reader--read session :message)))
+                (etaf-manual-reader--chrome
+                 env
+                 (list
                   (if (and message (not (string-empty-p message)))
-                      (etaf-manual-reader--state-line env message)
+                      (etaf-manual-reader--state-line env message :accent)
                     (etaf-manual-reader--state-line
-                     env (etaf-manual-reader--position-label session)))))))))
+                     env (etaf-manual-reader--position-label session)))
+                  (etaf-node 'box
+                             (list :flex-grow 1 :flex-basis '(px 0) :min-width '(px 0))
+                             nil)
+                  (etaf-manual-reader--key-hints
+                   env (etaf-manual-reader--footer-hints env))))))))
 
 ;;;; Shell
 
-(defun etaf-manual-reader--shell (session env)
-  "Return the complete application View of SESSION in ENV."
+(defun etaf-manual-reader--shell (session env &optional keys)
+  "Return the complete application View of SESSION in ENV.
+KEYS is the page Host's `:keys' table, so `?' lists the reader's keys."
   (let* ((wide (etaf-manual-reader--wide-p env))
          (toc (and (not wide) (etaf-manual-reader--read session :toc)))
          (article (etaf-manual-reader--article-column session env))
@@ -348,7 +408,8 @@ ROW is a plist with `:label', `:chapter', `:node', `:level', `:current' and
      ;; instead of a window-sized slice, which keeps batch tests complete.
      (list 'lh (if (plist-get env :rows)
                    (max 12 (1- (plist-get env :rows)))
-                 500)))))
+                 500))
+     keys)))
 
 (provide 'etaf-manual-reader-views)
 ;;; etaf-manual-reader-views.el ends here

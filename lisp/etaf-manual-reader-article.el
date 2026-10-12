@@ -75,28 +75,33 @@ document order, where INDEX counts the chapter's section nodes."
         :features (plist-get env :markdown-features)
         :open-link (plist-get env :open-link)
         :footnote-jump (plist-get env :footnote-jump)
-        :render-code-block (plist-get env :render-code-block)))
+        :render-code-block (plist-get env :render-code-block)
+        :line-grid t))
 
 (defun etaf-manual-reader--code-pane (env text &optional language)
-  "Return the source pane for TEXT with optional LANGUAGE tag."
+  "Return the source pane for TEXT with optional LANGUAGE tag.
+The tag sits on the pane's first line, right-aligned, so the pane needs no
+caption row of its own."
   (etaf-node 'column
-             (list :width 'stretch :item-gap '(lh 0))
-             (list
-              (etaf-node 'box
-                         (list :width 'stretch
-                               :background-color (etaf-manual-reader--color env :panel2)
-                               :border (etaf-manual-reader--border env)
-                               :box-sizing 'border-box
-                               :padding '((lh 1) (ch 2))
-                               :wrap-mode 'char)
-                         (list (etaf-node 'text
-                                          (list :font-family (etaf-manual-reader--mono-family)
-                                                :color (etaf-manual-reader--color env :ink))
-                                          (list text))))
+             (list :width 'stretch
+                   :item-gap '(lh 0)
+                   :background-color (etaf-manual-reader--color env :panel2)
+                   :box-sizing 'border-box
+                   :padding-top (if language '(lh 0) '(lh 1))
+                   :padding-bottom '(lh 1)
+                   :padding-left '(ch 2)
+                   :padding-right '(ch 2))
+             (append
               (when language
-                (etaf-node 'row
-                           (list :padding '((lh 0) (ch 1)))
-                           (list (etaf-manual-reader--label env language)))))))
+                (list (etaf-node 'flex
+                                 (list :width 'stretch :justify-content 'flex-end)
+                                 (list (etaf-manual-reader--label env language)))))
+              (list (etaf-node 'box
+                               (list :width 'stretch :wrap-mode 'char)
+                               (list (etaf-node 'text
+                                                (list :font-family (etaf-manual-reader--mono-family)
+                                                      :color (etaf-manual-reader--color env :ink))
+                                                (list text))))))))
 
 ;;;; Example viewer
 
@@ -147,19 +152,18 @@ document order, where INDEX counts the chapter's section nodes."
          (preview (etaf-manual-reader--example-preview example result))
          (running (etaf-value result))
          (toolbar
-          (etaf-node 'row
+          (etaf-node 'flex
                      (list :width 'stretch
+                           :flex-direction 'row
                            :background-color (etaf-manual-reader--color env :panel2)
                            :border-bottom (etaf-manual-reader--border env)
                            :box-sizing 'border-box
                            :padding '((lh 0) (ch 1))
-                           :item-gap '(ch 2)
-                           :cross-align 'center)
+                           :column-gap '(ch 2)
+                           :align-items 'center)
                      (list
-                      (etaf-node 'text
-                                 (list :color (etaf-manual-reader--color env :muted)
-                                       :font-size (round (* (etaf-manual-reader--base-pixels) 0.85)))
-                                 (list (format "可运行示例 · %s" (plist-get example :id))))
+                      (etaf-manual-reader--label
+                       env (format "可运行示例 · %s" (plist-get example :id)))
                       (etaf-node 'etaf-tabs
                                  (list :items (list (list :key "source" :label "源码"
                                                           :ref (intern (format "etaf-manual-example-source-%s" id)))
@@ -177,7 +181,7 @@ document order, where INDEX counts the chapter's section nodes."
                                  nil)
                       (etaf-node 'etaf-button
                                  (list :ref run-ref
-                                       :label (if running "↻ 重跑" "▶ 运行")
+                                       :label (if running "重新运行" "▶ 运行")
                                        :variant 'primary
                                        :on-press (lambda ()
                                                    (etaf-manual-reader--run-example
@@ -259,7 +263,8 @@ DEFINITION-HEADING is the level-4 heading block and BLOCKS its body blocks."
                (list :ref ref
                      :width 'stretch
                      :background-color (etaf-manual-reader--color env :panel)
-                     :border (etaf-manual-reader--border env)
+                     :border-left (list '(px 3) 'solid
+                                        (etaf-manual-reader--color env :accent))
                      :box-sizing 'border-box
                      :padding etaf-manual-reader--card-pad)
                (append
@@ -282,13 +287,10 @@ DEFINITION-HEADING is the level-4 heading block and BLOCKS its body blocks."
                                          :color (etaf-manual-reader--color env :muted))
                                    (list signature))))
                 (when blocks
-                  (list (etaf-node 'box
-                                   (list :height '(lh 1))
-                                   nil)))
+                  (list (etaf-manual-reader--spacer)))
                 (etaf-ui-markdown-view-blocks
                  blocks
-                 (etaf-manual-reader--doc-env env)
-                 t)))))
+                 (etaf-manual-reader--doc-env env))))))
 
 ;;;; Article flow
 
@@ -337,12 +339,14 @@ bring it to the top of the article scroller."
          (anchor (plist-get heading :id))
          (ref (and anchor (intern (format "etaf-manual-node-%s" anchor)))))
     (etaf-node 'column
-               (append (list :width 'stretch :item-gap '(lh 0))
+               (append (list :width 'stretch :item-gap '(lh 1))
                        (when ref (list :ref ref)))
                (etaf-manual-reader--render-blocks blocks env examples state))))
 
-(defun etaf-manual-reader--chapter-head-view (blocks env)
-  "Render the chapter title and lead BLOCKS in ENV."
+(defun etaf-manual-reader--chapter-head-view (blocks env number)
+  "Render the chapter title and lead BLOCKS in ENV.
+NUMBER is the chapter number shown before the title.  The lead blocks
+follow as separate Views so the article's one-line rhythm spaces them."
   (let ((nodes nil) (title nil))
     (dolist (block blocks)
       (if (and (eq (plist-get block :type) 'heading)
@@ -351,13 +355,11 @@ bring it to the top of the article scroller."
         (push block nodes)))
     (append
      (when title
-       (list (etaf-manual-reader--section-title env title)
-             (etaf-node 'box
-                        (list :height '(lh 1))
-                        nil)))
-     (etaf-ui-markdown-view-blocks
-      (nreverse nodes)
-      (etaf-manual-reader--doc-env env)))))
+       (list (etaf-manual-reader--chapter-heading env number title)))
+     (delq nil (mapcar (lambda (block)
+                         (etaf-ui-markdown-view-block
+                          block (etaf-manual-reader--doc-env env)))
+                       (nreverse nodes))))))
 
 (cl-defun etaf-manual-reader--article (&key session env)
   "Return the article column View of SESSION's current chapter in ENV."
@@ -369,7 +371,9 @@ bring it to the top of the article scroller."
          (head (car split))
          (sections (cdr split))
          (env (append env (list :markdown-features (plist-get document :features))))
-         (lead (etaf-manual-reader--chapter-head-view head env))
+         (part (etaf-manual-reader--part session))
+         (number (plist-get (etaf-manual-reader--chapter session) :number))
+         (lead (etaf-manual-reader--chapter-head-view head env number))
          (body nil))
     (dolist (section sections)
       (push (etaf-manual-reader--section-view
@@ -382,24 +386,18 @@ bring it to the top of the article scroller."
     (etaf-node 'column
                (list :width 'stretch
                      :max-width (list 'ch (etaf-manual-reader--measure env))
-                     :padding '((lh 2) (ch 2))
+                     :padding '((lh 1) (ch 3))
                      :item-gap '(lh 1)
                      :color (etaf-manual-reader--color env :ink))
                (append
-                (list (etaf-node 'row
-                                 (list :item-gap '(ch 2) :cross-align 'center)
-                                 (list
-                                  (etaf-node 'text
-                                             (list :color (etaf-manual-reader--color env :muted)
-                                                   :font-size (round (* (etaf-manual-reader--base-pixels) 0.85)))
-                                             (list (format "%s · %s"
-                                                           (or (plist-get (etaf-manual-reader--part session) :number) "")
-                                                           (or (plist-get (etaf-manual-reader--part session) :title)
-                                                               "")))))))
+                (when part
+                  (list (etaf-manual-reader--label
+                         env (format "%s · %s"
+                                     (or (plist-get part :number) "")
+                                     (or (plist-get part :title) "")))))
                 lead
-                (list (etaf-node 'box (list :height '(lh 1)) nil))
                 (list (etaf-node 'column
-                                 (list :width 'stretch :item-gap '(lh 1))
+                                 (list :width 'stretch :item-gap '(lh 2))
                                  (nreverse body)))))))
 
 (provide 'etaf-manual-reader-article)

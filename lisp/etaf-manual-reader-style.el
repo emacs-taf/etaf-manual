@@ -15,6 +15,15 @@
 ;; or nil when unknown) and `:reader' (the session).  The markdown renderer
 ;; receives the same environment, so document text and application chrome
 ;; read the same colors.
+;;
+;; Line grid: every row the reader publishes has the frame's standard line
+;; height.  The header, the navigation column and the article share buffer
+;; lines, so one taller row (a scaled heading, a smaller label, a fallback
+;; glyph from another font) would push the navigation column out of rhythm
+;; and change the article's pixel height as it scrolls, which shifts the
+;; footer.  Hierarchy therefore uses weight, color, surfaces and spacing,
+;; never font size, and icons come from `etaf-ui-icon', whose metrics never
+;; exceed the standard row.
 
 ;;; Code:
 
@@ -29,7 +38,7 @@
 (defconst etaf-manual-reader--measure-min 44
   "Narrowest reading measure that still keeps prose readable.")
 
-(defconst etaf-manual-reader--sidebar-width 34
+(defconst etaf-manual-reader--sidebar-width 38
   "Width of the navigation column in character cells.")
 
 (defconst etaf-manual-reader--wide-threshold 104
@@ -64,13 +73,14 @@ so nothing is truncated on a narrow frame.")
   "Return ENV's one-pixel rule."
   (list '(px 1) 'solid (etaf-manual-reader--color env :border)))
 
-(defun etaf-manual-reader--page (env children &optional height)
+(defun etaf-manual-reader--page (env children &optional height keys)
   "Wrap CHILDREN in the reader page surface: full size, page colors.
 The page is a flex column so the body owns the space left between the header
 and the footer; a plain column would not distribute that remainder.  HEIGHT
 overrides the page height; the reader passes one row less than the reported
 viewport, because a graphical frame can reserve its last text row for the
-window chrome while the runtime still counts it."
+window chrome while the runtime still counts it.  KEYS is the page Host's
+`:keys' table, which makes the reader keys visible to the ETAF key help."
   (etaf-node 'flex
              (list :flex-direction 'column
                    :align-items 'stretch
@@ -79,6 +89,8 @@ window chrome while the runtime still counts it."
                    :height (or height '(vh 100))
                    :background-color (etaf-manual-reader--color env :bg)
                    :color (etaf-manual-reader--color env :ink)
+                   :aria-label "手册阅读器"
+                   :keys keys
                    :overflow 'hidden)
              children))
 
@@ -96,21 +108,15 @@ PROPS override the panel's own style."
 
 (defun etaf-manual-reader--chrome (env children &optional props)
   "Return a chrome bar (header or footer) containing CHILDREN."
-  (etaf-node 'row
+  (etaf-node 'flex
              (append (list :width 'stretch
+                           :flex-direction 'row
                            :padding etaf-manual-reader--inline-pad
-                           :item-gap '(ch 2)
-                           :cross-align 'center
+                           :column-gap '(ch 2)
+                           :align-items 'center
                            :background-color (etaf-manual-reader--color env :panel))
                      props)
              children))
-
-(defun etaf-manual-reader--rule (env)
-  "Return a one-line divider in ENV's border color."
-  (etaf-node 'box
-             (list :width 'stretch :height '(px 1)
-                   :background-color (etaf-manual-reader--color env :border))
-             nil))
 
 (defun etaf-manual-reader--spacer (&optional lines)
   "Return an empty spacer LINES lines tall."
@@ -118,26 +124,47 @@ PROPS override the panel's own style."
 
 ;;;; Text ranks
 
-(defun etaf-manual-reader--brand (env text)
-  "Return the application brand TEXT."
-  (etaf-node 'text
-             (list :font-weight 'bold
-                   :color (etaf-manual-reader--color env :ink))
-             (list text)))
+(defun etaf-manual-reader--icon (env name &optional color)
+  "Return the line-safe icon NAME in ENV's COLOR key (default `:muted')."
+  (etaf-node 'etaf-ui-icon
+             (list :name name :set 'svg
+                   :color (etaf-manual-reader--color env (or color :muted)))
+             nil))
 
-(defun etaf-manual-reader--section-title (env text)
-  "Return a section title above the article."
-  (etaf-node 'text
-             (list :font-weight 'bold
-                   :font-size (round (* (etaf-manual-reader--base-pixels) 1.4))
-                   :color (etaf-manual-reader--color env :heading))
-             (list text)))
+(defun etaf-manual-reader--brand (env text)
+  "Return the application brand: the book icon and TEXT."
+  (etaf-node 'row
+             (list :item-gap '(ch 1) :cross-align 'center)
+             (list (etaf-manual-reader--icon env 'file :accent)
+                   (etaf-node 'text
+                              (list :font-weight 'bold
+                                    :color (etaf-manual-reader--color env :ink))
+                              (list text)))))
+
+(defun etaf-manual-reader--chapter-heading (env number title)
+  "Return the chapter title: NUMBER in the accent color, then TITLE.
+The title keeps the body font size; weight, color and the rule beneath it
+carry its rank, so it stays on the line grid."
+  (etaf-node 'row
+             (list :width 'stretch :item-gap '(ch 2)
+                   :box-sizing 'border-box
+                   :border-bottom (list '(px 1) 'solid
+                                        (etaf-manual-reader--color env :heading-rule)))
+             (append
+              (when number
+                (list (etaf-node 'text
+                                 (list :font-weight 'bold
+                                       :color (etaf-manual-reader--color env :accent))
+                                 (list (format "%s" number)))))
+              (list (etaf-node 'text
+                               (list :font-weight 'bold
+                                     :color (etaf-manual-reader--color env :heading))
+                               (list title))))))
 
 (defun etaf-manual-reader--label (env text)
-  "Return small-caps-like secondary label TEXT."
+  "Return secondary label TEXT in the muted color."
   (etaf-node 'text
-             (list :color (etaf-manual-reader--color env :muted)
-                   :font-size (round (* (etaf-manual-reader--base-pixels) 0.85)))
+             (list :color (etaf-manual-reader--color env :muted))
              (list text)))
 
 (defun etaf-manual-reader--mono (env text &optional props)
@@ -152,13 +179,6 @@ PROPS override the panel's own style."
   "Return the family of the frame's fixed-pitch font, or nil."
   (let ((family (face-attribute 'fixed-pitch :family nil t)))
     (and (stringp family) (not (string-empty-p family)) family)))
-
-(defun etaf-manual-reader--base-pixels ()
-  "Return the frame's default font size in CSS reference pixels."
-  (let ((height (face-attribute 'default :height nil t)))
-    (if (numberp height)
-        (max 8 (round (/ (* height 4.0) 30.0)))
-      16.0)))
 
 ;;;; Measurement
 
@@ -191,12 +211,20 @@ PROPS override the panel's own style."
 
 ;;;; Shared small pieces
 
-(defun etaf-manual-reader--kbd-hint (env keys label)
-  "Return a key hint cell: KEYS in a kbd chip, then LABEL."
+(defun etaf-manual-reader--key-hints (env hints)
+  "Return one line of key HINTS: each key in ink, its label muted.
+HINTS is a list of (KEYS . LABEL) where KEYS is the text of the key."
   (etaf-node 'row
-             (list :item-gap '(ch 1) :cross-align 'center)
-             (list (etaf-node 'etaf-kbd (list :keys keys) nil)
-                   (etaf-manual-reader--label env label))))
+             (list :item-gap '(ch 2) :cross-align 'center)
+             (mapcar (lambda (hint)
+                       (etaf-node 'row
+                                  (list :item-gap '(ch 1))
+                                  (list (etaf-node 'text
+                                                   (list :font-weight 'bold
+                                                         :color (etaf-manual-reader--color env :ink))
+                                                   (list (car hint)))
+                                        (etaf-manual-reader--label env (cdr hint)))))
+                     hints)))
 
 (defun etaf-manual-reader--state-line (env text &optional tone)
   "Return a one-line state TEXT tinted with semantic TONE."

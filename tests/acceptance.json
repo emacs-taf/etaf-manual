@@ -100,6 +100,16 @@
       "name": "etaf-manual-reader-shows-definition-cards",
       "file": "tests/etaf-manual-reader-tests.el",
       "purpose": "A chapter with definition entries renders their cards."
+    },
+    {
+      "name": "etaf-manual-reader-key-help-lists-reader-keys",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "The framework key help lists the reader's own keys with their labels."
+    },
+    {
+      "name": "etaf-manual-reader-page-keys-drive-navigation",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "The page Host's :keys dispatch the reader keys in the mounted runtime."
     }
   ]
 }

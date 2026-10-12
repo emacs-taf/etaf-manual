@@ -85,7 +85,7 @@ Examples use four marks:
 | `error→` | Evaluating the form signals the condition that follows, with its data. |
 | `-\|` | Evaluating the form writes the text that follows to `*Messages*`. |
 
-Every `;; ⇒` line states the value of the form above it, and the book gate evaluates that form and compares the value. When the outcome is an object without a stable printed form, the line describes it and ends with a `; display` comment instead.
+Every `;; ⇒` line states the value of the form above it, and the book gate evaluates that form and compares the value. A bare `⇒` line illustrates the outcome of the form above it, usually a buffer or window state, so the gate checks that it follows a complete form and reads as a value, or ends with `; display`, without evaluating anything. When the outcome is an object without a stable printed form, the line describes it and ends with a `; display` comment instead.
 
 ```elisp
 (etaf-value (etaf-ref 3))

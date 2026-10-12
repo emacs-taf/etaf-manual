@@ -68,6 +68,13 @@
 | --- | --- |
 | [`etaf-ui-icon-default-set`](ui-icons.md#variable-etaf-ui-icon-default-set) | 注册的回退风格，初始为 `nerd`；在渲染前绑定或设置它。 |
 
+## Markdown
+
+| 变量 | 用途 |
+| --- | --- |
+| [`etaf-ui-markdown-flavor`](ui-composite-components.md#variable-etaf-ui-markdown-flavor) | `etaf-ui-markdown-parse` 的默认 markdown 方言。 |
+| [`etaf-ui-markdown-flavors`](ui-composite-components.md#variable-etaf-ui-markdown-flavors) | 具名方言及其启用的扩展开关。 |
+
 ## 参数参考
 
 | 变量 | 用途 |

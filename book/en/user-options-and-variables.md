@@ -68,6 +68,13 @@ Every documented variable, grouped by the chapter that defines it. Each row link
 | --- | --- |
 | [`etaf-ui-icon-default-set`](ui-icons.md#variable-etaf-ui-icon-default-set) | The registered fallback style, initially `nerd`; bind or set it before rendering. |
 
+## Markdown
+
+| Variable | Purpose |
+| --- | --- |
+| [`etaf-ui-markdown-flavor`](ui-composite-components.md#variable-etaf-ui-markdown-flavor) | Default markdown dialect of `etaf-ui-markdown-parse`. |
+| [`etaf-ui-markdown-flavors`](ui-composite-components.md#variable-etaf-ui-markdown-flavors) | Named dialects and the extension flags they enable. |
+
 ## Parameter Reference
 
 | Variable | Purpose |

@@ -152,7 +152,8 @@
 | `PACKAGE is version X, not Y` | 版本号片段与包不一致 |
 | `link to unknown chapter: TARGET`、`link to unknown heading: TARGET` | 链接目标不存在 |
 | `hard-wrapped line: write each paragraph on one line` | 段落或列表项在下一行继续 |
-| `result line claims X but the form returns Y`、`result line is no readable value: TEXT`、`result line has no preceding form`、`result form signals ERROR` | `;; ⇒` 结果行与它前面形式的求值结果不一致 |
+| `result line claims X but the form returns Y`、`result line is no readable value: TEXT`、`result line has no preceding form`、`result form signals ERROR` | `;; ⇒` 结果行与它前面形式的求值结果不一致，或裸 `⇒` 行前面不是完整形式、行内文本不能读作值 |
+| `appendix does not list KIND NAME` | 附录 A、B 或 D 漏掉了核心包的某个公共错误条件、钩子或变量 |
 | `definition entries differ from LANGUAGE`、`section structure differs from LANGUAGE`、`runnable examples differ from LANGUAGE`、`index terms differ from LANGUAGE` | 译本与基准语言不一致 |
 | `generated NAME does not link KIND NAME`、`generated concept index does not link TARGET`／`does not list TERM` | 生成内容缺少它承诺包含的接口或索引词 |
 | `Unknown generated content` | `generate` 没有对应已实现的生成器 |

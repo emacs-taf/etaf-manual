@@ -394,6 +394,45 @@ give the version in that package's entry header."
       (unless (member file read)
         (etaf-manual-check--problem file 1 "chapter is not listed in book.json")))))
 
+(defconst etaf-manual-check--appendix-kinds
+  '((error . "standard-errors")
+    (hook . "standard-hooks")
+    (variable . "user-options-and-variables"))
+  "Record kinds whose hand-written appendix must list every record.")
+
+(defun etaf-manual-check--chapter-text (chapter)
+  "Return CHAPTER's Markdown text, or nil when it has no source file."
+  (when-let* ((file (etaf-manual-check--chapter-file chapter)))
+    (when (file-exists-p file)
+      (with-temp-buffer
+        (insert-file-contents file)
+        (buffer-substring-no-properties (point-min) (point-max))))))
+
+(defun etaf-manual-check--appendices (book facts)
+  "Report provider records missing from BOOK's hand-written appendices.
+Appendix A lists every error condition, B every hook and D every documented
+variable.  A record of one of those kinds that its appendix does not name is
+a gap; the appendix has no other way to notice it."
+  (let ((records (plist-get facts :records))
+        (packages (plist-get book :packages)))
+    (dolist (pair etaf-manual-check--appendix-kinds)
+      (let* ((kind (car pair))
+             (id (cdr pair))
+             (chapter (cl-find-if
+                       (lambda (chapter)
+                         (equal id (symbol-name (or (plist-get chapter :id) ""))))
+                       (plist-get book :chapters)))
+             (text (and chapter (etaf-manual-check--chapter-text chapter))))
+        (when text
+          (dolist (record records)
+            (when (and (eq (car record) kind)
+                       (or (null packages) (member (nth 3 record) packages)))
+              (let ((name (symbol-name (nth 1 record))))
+                (unless (string-match-p (concat "\\_<" (regexp-quote name) "\\_>") text)
+                  (etaf-manual-check--problem
+                   (etaf-manual-check--chapter-file chapter) 1
+                   "appendix does not list %s %s" kind name))))))))))
+
 (defun etaf-manual-check--line-breaks (book)
   "Report hard-wrapped paragraphs and list items in BOOK's chapters.
 Each paragraph and list item is one source line, so every renderer and the
@@ -419,8 +458,8 @@ paragraph would otherwise render as a space."
 ;;;; Printed results
 
 (defconst etaf-manual-check--result-re
-  "\\`[ \t]*;;[ \t]*⇒[ \t]*\\(.*\\)\\'"
-  "A code-block result line: `;; ⇒ value' as the Introduction documents it.")
+  "\\`[ \t]*\\(?:;;[ \t]*\\)?⇒[ \t]*\\(.*\\)\\'"
+  "A code-block result line: `;; ⇒ value' or `⇒ value', as documented.")
 
 (defconst etaf-manual-check--display-re
   ";[ \t]*display[ \t]*\\'"
@@ -457,29 +496,35 @@ paragraph would otherwise render as a space."
 (defun etaf-manual-check--block-claims (block)
   "Return (CODE . CLAIMS) for the result lines of BLOCK.
 CODE is the block source without its result lines, so the form before a
-claim can be read directly.  Each claim is (LINE EXPECTED OFFSET) with
-OFFSET the length of CODE up to that line.  A comment line following an
+claim can be read directly.  Each claim is (LINE EXPECTED OFFSET BARE)
+with OFFSET the length of CODE up to that line and BARE non-nil for a
+result line without the `;;' prefix.  A comment line following an
 incomplete value continues that value, which is how a result wrapped over
-several lines stays readable."
+several lines stays readable; a bare value continues on the next line the
+same way."
   (let ((code "") (claims nil) (pending nil))
     (cl-labels ((finish () (when pending (push pending claims) (setq pending nil))))
       (dolist (entry block)
         (let ((line (car entry)) (text (cdr entry)))
           (when pending
-            (if (and (string-match-p "\\`[ \t]*;;" text)
-                     (not (string-match-p "⇒" text))
-                     (etaf-manual-check--incomplete (nth 1 pending)))
-                (progn
-                  (setf (nth 1 pending)
-                        (concat (nth 1 pending) " "
-                                (replace-regexp-in-string "\\`[ \t]*;;[ \t]*" "" text)))
-                  (setq text nil))
-              (finish)))
+            (let ((comment (and (string-match-p "\\`[ \t]*;;" text)
+                                (not (string-match-p "⇒" text)))))
+              (if (and (etaf-manual-check--incomplete (nth 1 pending))
+                       (or comment (nth 3 pending)))
+                  (progn
+                    (setf (nth 1 pending)
+                          (concat (nth 1 pending) " "
+                                  (if comment
+                                      (replace-regexp-in-string "\\`[ \t]*;;[ \t]*" "" text)
+                                    (string-trim text))))
+                    (setq text nil))
+                (finish))))
           (when text
             (cond
              ((string-match etaf-manual-check--result-re text)
-              (setq pending (list line (match-string 1 text) (length code))))
-             ((string-match-p "\\`[ \t]*\\(?:⇒\\|error→\\|▷\\|-|\\)" text))
+              (setq pending (list line (match-string 1 text) (length code)
+                                  (not (string-prefix-p ";;" (string-trim-left text))))))
+             ((string-match-p "\\`[ \t]*\\(?:error→\\|▷\\|-|\\)" text))
              (t (setq code (concat code text "\n")))))))
       (finish))
     (cons code (nreverse claims))))
@@ -524,7 +569,9 @@ several lines stays readable."
 (defun etaf-manual-check--results (book)
   "Check BOOK's `;; ⇒' result lines by evaluating the form before each.
 The Introduction documents the notation; a line marked `; display'
-describes an object without a stable printed form and is not compared."
+describes an object without a stable printed form and is not compared.
+Bare `⇒' lines are illustrative outcomes and are checked without
+evaluation by `etaf-manual-check--bare-results'."
   (dolist (chapter (plist-get book :chapters))
     (let ((file (etaf-manual-check--chapter-file chapter)))
       (when (and file (file-exists-p file))
@@ -532,20 +579,52 @@ describes an object without a stable printed form and is not compared."
           (pcase-let* ((`(,code . ,claims) (etaf-manual-check--block-claims block))
                        (forms (etaf-manual-check--forms code)))
             (dolist (claim claims)
-              (pcase-let ((`(,line ,expected ,offset) claim))
-                (let ((form (cl-find-if (lambda (entry) (<= (cdr entry) offset))
-                                        (reverse forms))))
-                  (cond
-                   ((null form)
-                    (etaf-manual-check--problem file line "result line has no preceding form"))
-                   ((string-match-p etaf-manual-check--display-re (string-trim-right expected)))
-                   (t
-                    (condition-case error
-                        (etaf-manual-check--check-claim file line expected
-                                                        (eval (car form) t))
-                      (error
-                       (etaf-manual-check--problem
-                        file line "result form signals %s" (error-message-string error)))))))))))))))
+              (pcase-let ((`(,line ,expected ,offset ,bare) claim))
+                (unless bare
+                  (let ((form (cl-find-if (lambda (entry) (<= (cdr entry) offset))
+                                          (reverse forms))))
+                    (cond
+                     ((null form)
+                      (etaf-manual-check--problem file line "result line has no preceding form"))
+                     ((string-match-p etaf-manual-check--display-re (string-trim-right expected)))
+                     (t
+                      (condition-case error
+                          (etaf-manual-check--check-claim file line expected
+                                                          (eval (car form) t))
+                        (error
+                         (etaf-manual-check--problem
+                          file line "result form signals %s" (error-message-string error))))))))))))))))
+
+(defun etaf-manual-check--bare-results (book)
+  "Check BOOK's bare `⇒' result lines without evaluating their forms.
+A bare line illustrates the outcome of the form above it, often a buffer
+or window state, so evaluating the form would run the operation instead of
+checking a value.  The line must follow a complete top-level form, and its
+text must read as a value or end with a `; display' comment, exactly like
+a `;; ⇒' line whose result has no stable printed form."
+  (dolist (chapter (plist-get book :chapters))
+    (let ((file (etaf-manual-check--chapter-file chapter)))
+      (when (and file (file-exists-p file))
+        (dolist (block (etaf-manual-check--fenced-blocks file))
+          (pcase-let* ((`(,code . ,claims) (etaf-manual-check--block-claims block))
+                       (forms (etaf-manual-check--forms code)))
+            (dolist (claim claims)
+              (pcase-let ((`(,line ,expected ,offset ,bare) claim))
+                (when bare
+                  (let ((form (cl-find-if (lambda (entry) (<= (cdr entry) offset))
+                                          (reverse forms))))
+                    (cond
+                     ((null form)
+                      (etaf-manual-check--problem file line "result line has no preceding form"))
+                     ((string-match-p etaf-manual-check--display-re (string-trim-right expected)))
+                     ((condition-case nil
+                          (progn (ignore (read-from-string expected)) t)
+                        (error nil)))
+                     (t
+                      (etaf-manual-check--problem
+                       file line
+                       "result line is no readable value: %s (mark a described result `; display')"
+                       expected)))))))))))))
 
 (defun etaf-manual-check--load-providers (description providers)
   "Put the packages of DESCRIPTION in PROVIDERS on `load-path' and load them.
@@ -586,7 +665,9 @@ Return non-nil when every package loaded; each failure is reported."
         (etaf-manual-check--references book facts defined)
         (etaf-manual-check--generated book)
         (etaf-manual-check--orphans book)
+        (etaf-manual-check--appendices book facts)
         (etaf-manual-check--line-breaks book)
+        (etaf-manual-check--bare-results book)
         (when loaded (etaf-manual-check--results book))
         (let ((book-rows (etaf-manual-check--coverage book facts defined)))
           (unless rows (setq rows book-rows)))))

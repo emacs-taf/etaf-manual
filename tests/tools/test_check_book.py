@@ -327,6 +327,72 @@ class CheckBookTests(unittest.TestCase):
         """)
         self.assert_reported('result line has no preceding form')
 
+    def test_a_bare_result_line_is_not_evaluated(self):
+        self.append_hosts("""
+            ```elisp
+            (error "boom")
+            ⇒ 1
+            ```
+        """)
+        result = self.run_gate()
+        self.assertEqual(0, result.returncode, result.stderr)
+
+    def test_a_wrapped_bare_result_line_is_accepted(self):
+        self.append_hosts("""
+            ```elisp
+            (list 1 2)
+            ⇒ (1
+               2)
+            ```
+        """)
+        result = self.run_gate()
+        self.assertEqual(0, result.returncode, result.stderr)
+
+    def test_an_unreadable_bare_result_line_is_reported(self):
+        self.append_hosts("""
+            ```elisp
+            (list 1 2)
+            ⇒ (1
+            ```
+        """)
+        self.assert_reported('result line is no readable value: (1')
+
+    def test_a_bare_result_line_without_a_form_is_reported(self):
+        self.append_hosts("""
+            ```elisp
+            ⇒ 3
+            ```
+        """)
+        self.assert_reported('result line has no preceding form')
+
+    def write_appendix(self, text):
+        self.description['appendices'].append(
+            {'id': 'standard-errors',
+             'title': {'en': 'Standard Errors', 'zh-CN': '标准错误'}})
+        self.write_description()
+        self.write('book/en/standard-errors.md', text)
+        self.write('book/zh-CN/standard-errors.md', text)
+
+    def test_an_appendix_missing_a_record_is_reported(self):
+        self.write_appendix("""\
+            # Standard Errors
+
+            | Condition | Parent | Signaled when |
+            | --- | --- | --- |
+        """)
+        self.assert_reported('book/en/standard-errors.md:1: appendix does not list error etaf-error')
+
+    def test_an_appendix_listing_every_record_passes(self):
+        self.write_appendix("""\
+            # Standard Errors
+
+            | Condition | Parent | Signaled when |
+            | --- | --- | --- |
+            | `etaf-error` | `error` | A fixture error. |
+        """)
+        result = self.run_gate()
+        self.assertEqual(0, result.returncode, result.stderr)
+
 
 if __name__ == '__main__':
     unittest.main()

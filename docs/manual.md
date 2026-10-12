@@ -155,7 +155,8 @@ The gate reads the book and the sibling provider checkouts and reports each prob
 | `PACKAGE is version X, not Y` | A version span differs from the package |
 | `link to unknown chapter: TARGET`, `link to unknown heading: TARGET` | A link has no target |
 | `hard-wrapped line: write each paragraph on one line` | A paragraph or list item continues on the next line |
-| `result line claims X but the form returns Y`, `result line is no readable value: TEXT`, `result line has no preceding form`, `result form signals ERROR` | A `;; ⇒` result line does not match the value of the form before it |
+| `result line claims X but the form returns Y`, `result line is no readable value: TEXT`, `result line has no preceding form`, `result form signals ERROR` | A `;; ⇒` result line does not match the value of the form before it, or a bare `⇒` line does not follow a complete form or name a readable value |
+| `appendix does not list KIND NAME` | Appendix A, B or D misses a public error condition, hook or variable of a core package |
 | `definition entries differ from LANGUAGE`, `section structure differs from LANGUAGE`, `runnable examples differ from LANGUAGE`, `index terms differ from LANGUAGE` | A translation does not match the reference language |
 | `generated NAME does not link KIND NAME`, `generated concept index does not link TARGET` / `does not list TERM` | Generated content misses an interface or index term it promises |
 | `Unknown generated content` | `generate` names no implemented generator |

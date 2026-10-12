@@ -80,7 +80,7 @@ Return a semantic KP layout plan for STRING at LINE-PIXEL.
 
 **Semantics.** The plan records the paragraph's source offsets, its lines, each line's glue targets, indentation and stripped edges, and whether a line ends with a discretionary hyphen. The layout is complete but has no display representation: nothing in it says that a space is a space character or that a break is a newline. A plan whose paragraph the overlong-token policy leaves natural has no lines and its state is `natural`; otherwise its state is `planned`. Plans are cached per paragraph and layout context and a hit returns a consumer-owned copy, so mutating what you receive cannot affect later plans. Unlike the justifying calls, this function does not validate the width: a width too small to fit a box is accepted and produces one box per line.
 
-**Returns.** A layout plan record. The record's fields are the ones described above; in this version no public reader is exported for them, so the package's own renderers are the consumers of the individual decisions.
+**Returns.** A layout plan record. Read it through `ekp-layout-plan-string`, `ekp-layout-plan-lines` and `ekp-layout-plan-state`, then the line readers `ekp-layout-line-*` and the gap readers `ekp-layout-gap-*`.
 
 **Errors.** `error→ wrong-type-argument` naming `buffer-or-string-p` when STRING is neither a string nor a buffer. There is no width validation: any integer is accepted.
 
@@ -92,6 +92,150 @@ Return a semantic KP layout plan for STRING at LINE-PIXEL.
 ```
 
 **See also.** `ekp-pixel-justify`, `ekp-clear-caches`.
+
+#### Function: ekp-layout-plan-string (plan)
+
+Return the cleaned source text PLAN was planned from.
+
+**Semantics.** The plan's source offsets index this string, so a line's source range slices the exact text it renders.
+
+**Returns.** The source string.
+
+**Errors.** error→ `wrong-type-argument` `(ekp-layout-plan PLAN)` for another value.
+
+**See also.** `ekp-layout-plan`, `ekp-layout-line-source-start`.
+
+#### Function: ekp-layout-plan-lines (plan)
+
+Return PLAN's display lines as a vector of line records.
+
+**Semantics.** Each line carries the source range it renders, its leading and trailing pixels, its discretionary hyphen flag and its semantic gaps. A plan whose state is `natural` has an empty vector.
+
+**Returns.** A vector of line records.
+
+**Errors.** error→ `wrong-type-argument` `(ekp-layout-plan PLAN)` for another value.
+
+**See also.** `ekp-layout-plan-state`, `ekp-layout-line-source-start`.
+
+#### Function: ekp-layout-plan-state (plan)
+
+Return PLAN's state: `planned`, or `natural` when the overlong-token policy left it unbroken.
+
+**Semantics.** Read it before the lines: a `natural` plan keeps its string unbroken and has no lines, so a renderer shows the source outside the measure instead of planned breaks.
+
+**Returns.** The state symbol.
+
+**Errors.** error→ `wrong-type-argument` `(ekp-layout-plan PLAN)` for another value.
+
+**See also.** `ekp-layout-plan-lines`.
+
+#### Function: ekp-layout-line-index (line)
+
+Return LINE's zero-based index within its plan.
+
+**Semantics.** Lines are ordered as displayed, so the index is the line number a renderer would show.
+
+**Returns.** The line index as an integer.
+
+**Errors.** error→ `wrong-type-argument` `(ekp-layout-line LINE)` for another value.
+
+**See also.** `ekp-layout-line-source-start`.
+
+#### Function: ekp-layout-line-source-start (line)
+
+Return the source offset where LINE starts.
+
+**Semantics.** Offsets index `ekp-layout-plan-string`; together with `ekp-layout-line-source-end` the range is the exact text the line renders.
+
+**Returns.** The start offset as an integer.
+
+**Errors.** error→ `wrong-type-argument` `(ekp-layout-line LINE)` for another value.
+
+**See also.** `ekp-layout-line-source-end`.
+
+#### Function: ekp-layout-line-source-end (line)
+
+Return the source offset just past LINE's source range.
+
+**Semantics.** The end excludes the break itself, so consecutive lines do not overlap and the text between them is the whitespace or hyphen the break consumed.
+
+**Returns.** The end offset as an integer.
+
+**Errors.** error→ `wrong-type-argument` `(ekp-layout-line LINE)` for another value.
+
+**See also.** `ekp-layout-line-source-start`.
+
+#### Function: ekp-layout-line-leading-pixel (line)
+
+Return the pixel width LINE keeps before its first box.
+
+**Semantics.** The width covers the line's indentation and any stripped edge the layout decided, so a renderer adds it before the line's source text.
+
+**Returns.** The leading width in pixels.
+
+**Errors.** error→ `wrong-type-argument` `(ekp-layout-line LINE)` for another value.
+
+**See also.** `ekp-layout-line-trailing-pixel`.
+
+#### Function: ekp-layout-line-trailing-pixel (line)
+
+Return the trailing pixel width LINE carries after its last box.
+
+**Semantics.** The line's total is leading, content, its gaps and trailing; an unjustified line leaves the slack here.
+
+**Returns.** The trailing width in pixels.
+
+**Errors.** error→ `wrong-type-argument` `(ekp-layout-line LINE)` for another value.
+
+**See also.** `ekp-layout-line-leading-pixel`.
+
+#### Function: ekp-layout-line-hyphen-p (line)
+
+Return non-nil when LINE ends with a discretionary hyphen.
+
+**Semantics.** A hyphenated break inserts a hyphen the source does not contain, so a renderer adds it after the line's source range.
+
+**Returns.** Non-nil for a hyphenated line end, nil otherwise.
+
+**Errors.** error→ `wrong-type-argument` `(ekp-layout-line LINE)` for another value.
+
+**See also.** `ekp-layout-line-source-end`.
+
+#### Function: ekp-layout-line-gaps (line)
+
+Return LINE's semantic gaps as a vector of gap records.
+
+**Semantics.** Each gap sits between two boxes and carries the source range it covers, its natural width and the width the layout chose; a zero-width gap between adjacent boxes is absent. Render the gaps in order between the line's boxes.
+
+**Returns.** A vector of gap records.
+
+**Errors.** error→ `wrong-type-argument` `(ekp-layout-line LINE)` for another value.
+
+**See also.** `ekp-layout-gap-target-pixel`.
+
+#### Function: ekp-layout-gap-natural-pixel (gap)
+
+Return GAP's unstretched natural width in pixels.
+
+**Semantics.** Comparing it with `ekp-layout-gap-target-pixel` shows how far the layout stretched or shrank this gap.
+
+**Returns.** The natural width in pixels.
+
+**Errors.** error→ `wrong-type-argument` `(ekp-layout-gap GAP)` for another value.
+
+**See also.** `ekp-layout-gap-target-pixel`.
+
+#### Function: ekp-layout-gap-target-pixel (gap)
+
+Return GAP's target width in pixels chosen by the layout.
+
+**Semantics.** The target is the width a renderer gives the gap so the line reaches its measure; for an unjustified line it equals the natural width.
+
+**Returns.** The target width in pixels.
+
+**Errors.** error→ `wrong-type-argument` `(ekp-layout-gap GAP)` for another value.
+
+**See also.** `ekp-layout-gap-natural-pixel`.
 
 ## Caches
 

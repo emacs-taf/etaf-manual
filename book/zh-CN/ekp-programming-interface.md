@@ -80,7 +80,7 @@ EKP 可以完全脱离缓冲区使用。字符串接口把文本当作值来接�
 
 **语义。** 方案记录段落的源偏移、各行、每行的胶目标、缩进与剥掉的行缘，以及该行是否以可选连字符结尾。布局是完整的，但没有显示表示：方案里没有任何东西说明空格就是空格字符、断行就是换行。被超宽 token 策略判为自然的段落方案没有行，状态为 `natural`；否则状态为 `planned`。方案按段落与布局上下文缓存，命中时返回调用方拥有的副本，因此改动收到的东西不会影响之后的方案。与两个排版调用不同，本函数不校验宽度：小到放不下一个盒子的宽度也会被接受，并产生每个盒子一行的方案。
 
-**返回。** 一份布局方案记录。它的字段就是上面描述的那些；本版本未导出读取这些字段的公共读取器，因此这些具体决定的消费者是包自己的渲染器。
+**返回。** 一份布局方案记录。经 `ekp-layout-plan-string`、`ekp-layout-plan-lines` 与 `ekp-layout-plan-state` 读取它，再用 `ekp-layout-line-*` 行读取器与 `ekp-layout-gap-*` 胶读取器读取细节。
 
 **错误。** STRING 既不是字符串也不是缓冲区时 `error→ wrong-type-argument`，数据点名 `buffer-or-string-p`。不校验宽度：任何整数都会被接受。
 
@@ -92,6 +92,150 @@ EKP 可以完全脱离缓冲区使用。字符串接口把文本当作值来接�
 ```
 
 **参见。** `ekp-pixel-justify`、`ekp-clear-caches`。
+
+#### Function: ekp-layout-plan-string (plan)
+
+返回 PLAN 计划时所依据的清理后源文本。
+
+**语义。** 方案的源偏移索引这个字符串，所以某一行的源范围切出的就是它渲染的确切文本。
+
+**返回。** 源字符串。
+
+**错误。** error→ `wrong-type-argument` `(ekp-layout-plan PLAN)`：PLAN 是另一种值时。
+
+**参见。** `ekp-layout-plan`、`ekp-layout-line-source-start`。
+
+#### Function: ekp-layout-plan-lines (plan)
+
+把 PLAN 的显示行作为行记录向量返回。
+
+**语义。** 每行带它渲染的源范围、前后像素、可选连字符标志与语义胶。状态为 `natural` 的方案返回空向量。
+
+**返回。** 行记录向量。
+
+**错误。** error→ `wrong-type-argument` `(ekp-layout-plan PLAN)`：PLAN 是另一种值时。
+
+**参见。** `ekp-layout-plan-state`、`ekp-layout-line-source-start`。
+
+#### Function: ekp-layout-plan-state (plan)
+
+返回 PLAN 的状态：`planned`，或被超宽 token 策略判为不打断的 `natural`。
+
+**语义。** 读行之前先读它：`natural` 方案保持字符串不打断、没有行，渲染器应把源文本显示在测量宽度之外，而不是使用计划好的断点。
+
+**返回。** 状态符号。
+
+**错误。** error→ `wrong-type-argument` `(ekp-layout-plan PLAN)`：PLAN 是另一种值时。
+
+**参见。** `ekp-layout-plan-lines`。
+
+#### Function: ekp-layout-line-index (line)
+
+返回 LINE 在所属方案里的零基序号。
+
+**语义。** 行按显示顺序排列，所以序号也是渲染器会显示的行号。
+
+**返回。** 整数行号。
+
+**错误。** error→ `wrong-type-argument` `(ekp-layout-line LINE)`：LINE 是另一种值时。
+
+**参见。** `ekp-layout-line-source-start`。
+
+#### Function: ekp-layout-line-source-start (line)
+
+返回 LINE 起始的源偏移。
+
+**语义。** 偏移索引 `ekp-layout-plan-string`；与 `ekp-layout-line-source-end` 一起，这个范围就是该行渲染的确切文本。
+
+**返回。** 整数起始偏移。
+
+**错误。** error→ `wrong-type-argument` `(ekp-layout-line LINE)`：LINE 是另一种值时。
+
+**参见。** `ekp-layout-line-source-end`。
+
+#### Function: ekp-layout-line-source-end (line)
+
+返回 LINE 源范围之后的那个源偏移。
+
+**语义。** 终点不含断行本身，所以相邻行不重叠，两段之间的文本就是断行吃掉的那个空白或连字符。
+
+**返回。** 整数结束偏移。
+
+**错误。** error→ `wrong-type-argument` `(ekp-layout-line LINE)`：LINE 是另一种值时。
+
+**参见。** `ekp-layout-line-source-start`。
+
+#### Function: ekp-layout-line-leading-pixel (line)
+
+返回 LINE 在第一个盒子之前保留的像素宽。
+
+**语义。** 这个宽度覆盖行的缩进与布局剥掉的行缘，渲染器在行的源文本前加上它。
+
+**返回。** 前导像素宽。
+
+**错误。** error→ `wrong-type-argument` `(ekp-layout-line LINE)`：LINE 是另一种值时。
+
+**参见。** `ekp-layout-line-trailing-pixel`。
+
+#### Function: ekp-layout-line-trailing-pixel (line)
+
+返回 LINE 在最后一个盒子之后携带的尾随像素宽。
+
+**语义。** 行的总宽是前导、内容、各行内胶与尾随之和；不调节的行把余量留在这里。
+
+**返回。** 尾随像素宽。
+
+**错误。** error→ `wrong-type-argument` `(ekp-layout-line LINE)`：LINE 是另一种值时。
+
+**参见。** `ekp-layout-line-leading-pixel`。
+
+#### Function: ekp-layout-line-hyphen-p (line)
+
+LINE 以可选连字符结尾时返回非 nil。
+
+**语义。** 带连字符的断行会插入源文本里没有的连字符，渲染器要在行的源范围之后补上它。
+
+**返回。** 行尾带连字符时非 nil，否则 nil。
+
+**错误。** error→ `wrong-type-argument` `(ekp-layout-line LINE)`：LINE 是另一种值时。
+
+**参见。** `ekp-layout-line-source-end`。
+
+#### Function: ekp-layout-line-gaps (line)
+
+把 LINE 的语义胶作为胶记录向量返回。
+
+**语义。** 每条胶位于两个盒子之间，带它覆盖的源范围、自然宽与布局选定的目标宽；相邻盒子之间零宽的胶不出现。渲染时按顺序把胶插进行内盒子之间。
+
+**返回。** 胶记录向量。
+
+**错误。** error→ `wrong-type-argument` `(ekp-layout-line LINE)`：LINE 是另一种值时。
+
+**参见。** `ekp-layout-gap-target-pixel`。
+
+#### Function: ekp-layout-gap-natural-pixel (gap)
+
+返回 GAP 未经伸展的自然像素宽。
+
+**语义。** 与 `ekp-layout-gap-target-pixel` 比较，可以看出布局把这条胶拉伸或压缩了多少。
+
+**返回。** 自然像素宽。
+
+**错误。** error→ `wrong-type-argument` `(ekp-layout-gap GAP)`：GAP 是另一种值时。
+
+**参见。** `ekp-layout-gap-target-pixel`。
+
+#### Function: ekp-layout-gap-target-pixel (gap)
+
+返回布局为 GAP 选定的目标像素宽。
+
+**语义。** 目标宽是渲染器应给这条胶的宽度，好让该行到达测量宽；不调节的行里它等于自然宽。
+
+**返回。** 目标像素宽。
+
+**错误。** error→ `wrong-type-argument` `(ekp-layout-gap GAP)`：GAP 是另一种值时。
+
+**参见。** `ekp-layout-gap-natural-pixel`。
 
 ## 缓存
 

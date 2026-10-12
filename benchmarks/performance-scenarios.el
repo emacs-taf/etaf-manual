@@ -137,6 +137,13 @@ The example identifier is fixed by the introduction chapter."
  :setup (lambda (mode) (etaf-manual-benchmark--reader 'introduction "]" mode)))
 
 (taf-benchmark-register
+ "manual.reader.chapter-large"
+ :version 1 :modes '(batch gui) :isolation 'series :impact 'subtree
+ :budget-ms 100
+ :description "Next chapter into the largest chapter, the style property reference"
+ :setup (lambda (mode) (etaf-manual-benchmark--reader 'values "]" mode)))
+
+(taf-benchmark-register
  "manual.reader.example"
  :version 1 :modes '(batch gui) :isolation 'series :impact 'subtree
  :budget-ms 100

@@ -32,21 +32,46 @@
 
 ;;;; Environment and scrolling
 
+(defvar etaf-manual-reader--envs (make-hash-table :test 'eq :weakness 'key)
+  "SESSION to its last (INPUTS . ENVIRONMENT).")
+
 (defun etaf-manual-reader--env (session &optional viewport rows)
   "Return the rendering environment of SESSION.
 VIEWPORT, when known, is the frame width in character cells and ROWS the
 frame height in lines."
   (let* ((theme (etaf-manual-reader--read session :theme))
-         (palette (etaf-manual-reader-palette theme)))
-    (list :palette palette
-          :theme theme
-          :viewport viewport
-          :rows rows
-          :reader session
-          :open-link (lambda (url) (etaf-manual-reader-follow session url))
-          :footnote-jump (lambda (label)
-                           (etaf-manual-reader-message
-                            session (format "脚注 %s" label))))))
+         (key (list theme viewport rows))
+         (last (gethash session etaf-manual-reader--envs)))
+    ;; Components compare list props by identity, so an unchanged
+    ;; environment must be the same object for the article to skip renders.
+    (if (equal (car last) key)
+        (cdr last)
+      (cdr (puthash session
+                    (cons key
+                          (list :palette (etaf-manual-reader-palette theme)
+                                :theme theme
+                                :viewport viewport
+                                :rows rows
+                                :reader session
+                                :open-link (car (etaf-manual-reader--env-callbacks session))
+                                :footnote-jump (cdr (etaf-manual-reader--env-callbacks session))))
+                    etaf-manual-reader--envs)))))
+
+
+(defvar etaf-manual-reader--callbacks (make-hash-table :test 'eq :weakness 'key)
+  "SESSION to its (OPEN-LINK . FOOTNOTE-JUMP) environment callbacks.")
+
+(defun etaf-manual-reader--env-callbacks (session)
+  "Return SESSION's link callbacks, created once.
+Equal environments across renders let the article component skip renders
+that change nothing it shows."
+  (or (gethash session etaf-manual-reader--callbacks)
+      (puthash session
+               (cons (lambda (url) (etaf-manual-reader-follow session url))
+                     (lambda (label)
+                       (etaf-manual-reader-message
+                        session (format "脚注 %s" label))))
+               etaf-manual-reader--callbacks)))
 
 (defun etaf-manual-reader--runtime (session)
   "Return SESSION's mounted runtime, or nil."
@@ -83,6 +108,7 @@ the reading position."
 
 (defun etaf-manual-reader-scroll-to-definition (session name)
   "Scroll SESSION's article to the definition card of NAME, after rendering."
+  (etaf-manual-reader-reveal-definition session name)
   (run-at-time 0 nil #'etaf-manual-reader--scroll-to-definition session name))
 
 ;;;; Header
@@ -324,7 +350,9 @@ level-3 section widens the gutter and marks it with a dot."
                    :overflow 'scroll
                    :cross-align 'center
                    :background-color (etaf-manual-reader--color env :bg))
-             (list (etaf-manual-reader--article :session session :env env))))
+             (list (etaf-node 'etaf-manual-reader--article-view
+                              (list :session session :env env)
+                              nil))))
 
 ;;;; Footer
 

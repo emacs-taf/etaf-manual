@@ -55,6 +55,7 @@ no buffer, so it is a complete headless reader for scripts and tests."
      :forward (etaf-ref nil :name 'etaf-manual-reader-forward)
      :toc (etaf-ref nil :name 'etaf-manual-reader-toc-visible)
      :message (etaf-ref nil :name 'etaf-manual-reader-message)
+     :extent (etaf-ref nil :name 'etaf-manual-reader-extent)
      :documents (make-hash-table :test #'equal)
      :buffer nil)))
 
@@ -178,23 +179,134 @@ but callers read the chapter before asking, so a chapter change re-parses."
 
 (defun etaf-manual-reader--jump (session chapter &optional node)
   "Move SESSION to CHAPTER and NODE without recording history."
-  (etaf-manual-reader--write session :chapter chapter)
-  (etaf-manual-reader--write session :node node)
+  (etaf-batch
+    (let ((same (eq chapter (etaf-manual-reader--read session :chapter))))
+      (etaf-manual-reader--write session :chapter chapter)
+      (etaf-manual-reader--write session :node node)
+      (etaf-manual-reader--reveal session (or node 0) (not same))))
   session)
+
+;;;; Progressive rendering
+;;
+;; A displayed reader renders a chapter's sections up to its extent: the
+;; sections through the reading position and about one screen more.  Idle
+;; time then extends the extent a screenful at a time until the chapter is
+;; complete, so a jump into a long chapter shows its target at once and
+;; keystrokes never wait for the rest.  A session without a buffer renders
+;; every section, which keeps headless readers and tests complete.
+
+(defconst etaf-manual-reader--extent-step 60
+  "Section weight one extension adds: blocks, list items and table rows.")
+
+(defvar etaf-manual-reader--growth (make-hash-table :test 'eq :weakness 'key)
+  "SESSION to its pending idle extension timer.")
+
+(defun etaf-manual-reader--block-weight (block)
+  "Return BLOCK's rendering weight: its list items or table rows, else 1."
+  (max 1 (pcase (plist-get block :type)
+           ('list (length (plist-get block :items)))
+           ('table (length (plist-get block :rows)))
+           (_ 1))))
+
+(defun etaf-manual-reader--section-weights (session)
+  "Return the weights of SESSION's current chapter sections, in order.
+Sections begin at level-2 and level-3 headings, like the chapter's nodes."
+  (let* ((key (list 'weights (etaf-manual-reader--read session :language)
+                    (etaf-manual-reader--read session :chapter)))
+         (cache (plist-get session :documents)))
+    (or (gethash key cache)
+        (puthash key
+                 (let (weights)
+                   (dolist (block (plist-get (etaf-manual-reader-document session)
+                                             :children))
+                     (if (and (eq (plist-get block :type) 'heading)
+                              (memq (plist-get block :level) '(2 3)))
+                         (push 1 weights)
+                       (when weights
+                         (cl-incf (car weights)
+                                  (etaf-manual-reader--block-weight block)))))
+                   (vconcat (nreverse weights)))
+                 cache))))
+
+(defun etaf-manual-reader--extent-after (session start)
+  "Return the section count that covers START and one step of weight more.
+Nil means every section of SESSION's chapter."
+  (let* ((weights (etaf-manual-reader--section-weights session))
+         (count (length weights))
+         (end (min count (1+ start)))
+         (weight 0))
+    (while (and (< end count) (< weight etaf-manual-reader--extent-step))
+      (cl-incf weight (aref weights end))
+      (cl-incf end))
+    (and (< end count) end)))
+
+(defun etaf-manual-reader--reveal (session section &optional reset)
+  "Extend SESSION's rendered extent to cover SECTION and a screen more.
+RESET starts over for a new chapter.  Only a displayed session renders
+progressively; it then completes the rest when Emacs is idle."
+  (when (plist-get session :buffer)
+    (let ((current (etaf-manual-reader--read session :extent)))
+      (when (or reset current)
+        (let ((wanted (etaf-manual-reader--extent-after session section)))
+          (etaf-manual-reader--write
+           session :extent
+           (and wanted (if (and current (not reset)) (max current wanted) wanted)))
+          (etaf-manual-reader--schedule-growth session))))))
+
+(defun etaf-manual-reader--schedule-growth (session)
+  "Extend SESSION's extent once Emacs is idle, while it is partial."
+  (let ((timer (gethash session etaf-manual-reader--growth)))
+    (when timer (cancel-timer timer)))
+  (remhash session etaf-manual-reader--growth)
+  (when (etaf-manual-reader--read session :extent)
+    (puthash session
+             (run-with-idle-timer 0 nil #'etaf-manual-reader--grow session)
+             etaf-manual-reader--growth)))
+
+(defun etaf-manual-reader--grow (session)
+  "Render one more step of SESSION's chapter and schedule the next."
+  (remhash session etaf-manual-reader--growth)
+  (let ((buffer (plist-get session :buffer))
+        (extent (etaf-manual-reader--read session :extent)))
+    (when (and extent buffer (buffer-live-p buffer))
+      (etaf-batch
+        (etaf-manual-reader--write
+         session :extent
+         (etaf-manual-reader--extent-after session extent)))
+      (etaf-manual-reader--schedule-growth session))))
+
+(defun etaf-manual-reader-reveal-definition (session name)
+  "Render SESSION's current chapter through the definition entry of NAME."
+  (let ((pattern (concat "\\`[A-Za-z]+: " (regexp-quote (format "%s" name))
+                         "\\(?:[ \t]\\|\\'\\)"))
+        (section -1))
+    (catch 'found
+      (dolist (block (plist-get (etaf-manual-reader-document session) :children))
+        (when (eq (plist-get block :type) 'heading)
+          (pcase (plist-get block :level)
+            ((or 2 3) (cl-incf section))
+            (4 (when (string-match-p
+                      pattern
+                      (string-trim
+                       (mapconcat (lambda (node) (or (plist-get node :text) ""))
+                                  (plist-get block :children) "")))
+                 (throw 'found nil)))))))
+    (etaf-batch (etaf-manual-reader--reveal session (max section 0)))))
 
 (defun etaf-manual-reader-goto (session chapter &optional node)
   "Move SESSION to CHAPTER and NODE, recording the previous position.
 NODE is a zero-based index into the chapter's nodes, or nil for the chapter
 top.  Return SESSION."
   (let ((target (cons chapter node)))
-    (unless (equal (etaf-manual-reader--record session) target)
-      (etaf-manual-reader--write
-       session :back
-       (cons (etaf-manual-reader--record session)
-             (seq-take (etaf-manual-reader--read session :back)
-                       (1- etaf-manual-reader--history-limit))))
-      (etaf-manual-reader--write session :forward nil))
-    (etaf-manual-reader--jump session chapter node)))
+    (etaf-batch
+      (unless (equal (etaf-manual-reader--record session) target)
+        (etaf-manual-reader--write
+         session :back
+         (cons (etaf-manual-reader--record session)
+               (seq-take (etaf-manual-reader--read session :back)
+                         (1- etaf-manual-reader--history-limit))))
+        (etaf-manual-reader--write session :forward nil))
+      (etaf-manual-reader--jump session chapter node))))
 
 (defun etaf-manual-reader--chapter-index (session &optional id)
   "Return the reading-order index of chapter ID in SESSION's book."
@@ -297,22 +409,24 @@ anything else goes to the browser."
   (let ((back (etaf-manual-reader--read session :back)))
     (unless back
       (user-error "No earlier position"))
-    (etaf-manual-reader--write session :forward
-                               (cons (etaf-manual-reader--record session)
-                                     (etaf-manual-reader--read session :forward)))
-    (etaf-manual-reader--write session :back (cdr back))
-    (etaf-manual-reader--jump session (car (car back)) (cdr (car back)))))
+    (etaf-batch
+      (etaf-manual-reader--write session :forward
+                                 (cons (etaf-manual-reader--record session)
+                                       (etaf-manual-reader--read session :forward)))
+      (etaf-manual-reader--write session :back (cdr back))
+      (etaf-manual-reader--jump session (car (car back)) (cdr (car back))))))
 
 (defun etaf-manual-reader-forward (session)
   "Move SESSION to the next position in its history."
   (let ((forward (etaf-manual-reader--read session :forward)))
     (unless forward
       (user-error "No later position"))
-    (etaf-manual-reader--write session :back
-                               (cons (etaf-manual-reader--record session)
-                                     (etaf-manual-reader--read session :back)))
-    (etaf-manual-reader--write session :forward (cdr forward))
-    (etaf-manual-reader--jump session (car (car forward)) (cdr (car forward)))))
+    (etaf-batch
+      (etaf-manual-reader--write session :back
+                                 (cons (etaf-manual-reader--record session)
+                                       (etaf-manual-reader--read session :back)))
+      (etaf-manual-reader--write session :forward (cdr forward))
+      (etaf-manual-reader--jump session (car (car forward)) (cdr (car forward))))))
 
 (defun etaf-manual-reader-last-chapter-p (session)
   "Return non-nil when SESSION is at the last chapter."
@@ -329,12 +443,15 @@ anything else goes to the browser."
   "Read SESSION in LANGUAGE, keeping the chapter and the nearest section."
   (etaf-manual-book language)
   (let ((node (etaf-manual-reader--read session :node)))
-    (etaf-manual-reader--write session :language language)
-    (let ((nodes (etaf-manual-reader--nodes session)))
-      (etaf-manual-reader--write
-       session :node
-       (when (and node nodes)
-         (min node (1- (length nodes)))))))
+    (etaf-batch
+      (etaf-manual-reader--write session :language language)
+      (let ((nodes (etaf-manual-reader--nodes session)))
+        (etaf-manual-reader--write
+         session :node
+         (when (and node nodes)
+           (min node (1- (length nodes))))))
+      (etaf-manual-reader--reveal
+       session (or (etaf-manual-reader--read session :node) 0) t)))
   session)
 
 (defun etaf-manual-reader-set-theme (session theme)

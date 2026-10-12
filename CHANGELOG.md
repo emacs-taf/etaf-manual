@@ -16,6 +16,8 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
   side-by-side modes.  Every line keeps the standard line height, so
   scrolling never shifts the layout.  The reader's keys are declared on the page Host as
   `:keys', so `?' opens the ETAF key help listing them with their labels.
+  A long chapter shows its first sections at once and appends the rest while
+  Emacs is idle; a lookup renders through its entry immediately.
 - The generated concept index groups terms under symbols and A–Z, filing
   Chinese terms by the Pinyin of their first character; the symbol index
   groups functions, macros, variables, hooks and errors by package and the

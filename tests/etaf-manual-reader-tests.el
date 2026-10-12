@@ -222,5 +222,44 @@
       (when (buffer-live-p buffer)
         (with-current-buffer buffer (etaf-manual-close))))))
 
+(ert-deftest etaf-manual-reader-examples-follow-run-blocks ()
+  "Only `:run' blocks become viewers, including those inside definitions."
+  (let ((session (etaf-manual-reader-create :language "zh-CN" :chapter 'introduction)))
+    (etaf-manual-reader-test--with-reader session
+      ;; The notation block before the first runnable example stays code.
+      (should (string-match-p (regexp-quote "(etaf-value (etaf-ref 3))")
+                              (etaf-manual-reader-test--text)))))
+  (let ((session (etaf-manual-reader-create :language "zh-CN" :chapter 'components))
+        (run-ref 'etaf-manual-example-run-components-1))
+    (etaf-manual-reader-test--with-reader session
+      (let ((runtime (etaf-runtime-for-buffer etaf-manual-reader-test--buffer))
+            (idle (lambda ()
+                    (let ((text (etaf-manual-reader-test--text)) (start 0) (count 0))
+                      (while (string-match "尚未运行" text start)
+                        (setq start (match-end 0) count (1+ count)))
+                      count))))
+        (let ((before (funcall idle)))
+          (etaf-dispatch-event runtime run-ref 'press)
+          (etaf-runtime-flush runtime)
+          (should (= (funcall idle) (1- before))))))))
+
+(ert-deftest etaf-manual-lookup-reaches-the-end-of-a-long-chapter ()
+  "Looking up the last entry of a long chapter shows its card at once."
+  (let ((etaf-manual-language "zh-CN")
+        (buffer nil))
+    (unwind-protect
+        (progn
+          (etaf-manual-lookup :outer 'style)
+          (setq buffer (get-buffer "*ETAF 手册*"))
+          (should buffer)
+          (dotimes (_ 3) (accept-process-output nil 0.02))
+          (with-current-buffer buffer
+            (etaf-runtime-flush (etaf-runtime-for-buffer buffer))
+            (let ((text (substring-no-properties (buffer-string))))
+              (should (string-match-p "Style" text))
+              (should (string-match-p ":outer" text)))))
+      (when (buffer-live-p buffer)
+        (with-current-buffer buffer (etaf-manual-close))))))
+
 (provide 'etaf-manual-reader-tests)
 ;;; etaf-manual-reader-tests.el ends here

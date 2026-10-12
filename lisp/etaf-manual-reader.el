@@ -75,6 +75,8 @@ Use it to embed the reader in your own `etaf-mount' call; prefer
   "Mount SESSION in the buffer NAME and return that buffer."
   (let ((buffer (get-buffer-create name)))
     (plist-put session :buffer buffer)
+    (etaf-manual-reader--reveal
+     session (or (etaf-manual-reader--read session :node) 0) t)
     (with-current-buffer buffer
       (etaf-manual-reader-mode)
       (setq-local etaf-manual-reader--session session)

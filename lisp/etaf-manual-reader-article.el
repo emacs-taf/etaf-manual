@@ -288,32 +288,67 @@ DEFINITION-HEADING is the level-4 heading block and BLOCKS its body blocks."
                                    (list signature))))
                 (when blocks
                   (list (etaf-manual-reader--spacer)))
-                (etaf-ui-markdown-view-blocks
-                 blocks
-                 (etaf-manual-reader--doc-env env))))))
+                (etaf-manual-reader--body-views blocks env)))))
+
+(defun etaf-manual-reader--body-views (blocks env)
+  "Return the Views of a definition's body BLOCKS in ENV.
+Static blocks keep the markdown rhythm; a runnable example becomes its
+viewer, separated from its neighbors by one blank line."
+  (let (views static)
+    (cl-flet ((flush ()
+                (when static
+                  (when views (push (etaf-manual-reader--spacer) views))
+                  (dolist (view (etaf-ui-markdown-view-blocks
+                                 (nreverse static)
+                                 (etaf-manual-reader--doc-env env)))
+                    (push view views))
+                  (setq static nil))))
+      (dolist (block blocks)
+        (if-let* ((example (etaf-manual-reader--block-example block env)))
+            (progn
+              (flush)
+              (when views (push (etaf-manual-reader--spacer) views))
+              (push (etaf-manual-reader--example-viewer example env) views))
+          (push block static)))
+      (flush))
+    (nreverse views)))
 
 ;;;; Article flow
 
-(defun etaf-manual-reader--ordinary-view (block env examples state)
-  "Return the View for an ordinary BLOCK, or an example viewer.
-EXAMPLES and STATE track the chapter's runnable examples in document order."
-  (if (and examples
-           (eq (plist-get block :type) 'code-block)
-           (equal (plist-get block :lang) "elisp")
-           (< (car state) (length examples)))
-      (let ((example (nth (car state) examples)))
-        (setcar state (1+ (car state)))
-        (etaf-manual-reader--example-viewer example env))
+(defun etaf-manual-reader--run-block-p (block)
+  "Return non-nil when BLOCK is a runnable `elisp :run' code block."
+  (and (eq (plist-get block :type) 'code-block)
+       (equal (plist-get block :lang) "elisp")
+       (member ":run" (split-string (or (plist-get block :info) "")))))
+
+(defun etaf-manual-reader--example-table (session)
+  "Return SESSION's current chapter table from run blocks to examples.
+The Nth runnable block of the document is the chapter's Nth example; the
+table is built once per chapter and language and compared by identity."
+  (etaf-manual-reader--chapter-cache
+   session 'examples
+   (lambda ()
+     (let ((table (make-hash-table :test 'eq))
+           (examples (etaf-manual-reader--chapter-examples session)))
+       (dolist (block (plist-get (etaf-manual-reader-document session) :children))
+         (when (and examples (etaf-manual-reader--run-block-p block))
+           (puthash block (pop examples) table)))
+       table))))
+
+(defun etaf-manual-reader--block-example (block env)
+  "Return the runnable example BLOCK presents in ENV, or nil."
+  (when-let* ((table (plist-get env :examples)))
+    (gethash block table)))
+
+(defun etaf-manual-reader--ordinary-view (block env)
+  "Return the View for an ordinary BLOCK in ENV, or its example viewer."
+  (if-let* ((example (etaf-manual-reader--block-example block env)))
+      (etaf-manual-reader--example-viewer example env)
     (etaf-ui-markdown-view-block block (etaf-manual-reader--doc-env env))))
 
-(defun etaf-manual-reader--render-blocks (blocks env &optional examples state)
-  "Render BLOCKS in ENV with definition cards and example viewers.
-EXAMPLES is the chapter's runnable example list; STATE is a mutable list
-whose car counts consumed examples, so a chapter renders one continuous flow
-across its sections."
-  (let ((examples (or examples nil))
-        (state (or state (list 0)))
-        nodes)
+(defun etaf-manual-reader--render-blocks (blocks env)
+  "Render BLOCKS in ENV with definition cards and example viewers."
+  (let (nodes)
     (while blocks
       (let ((block (pop blocks)))
         (if (and (eq (plist-get block :type) 'heading)
@@ -326,12 +361,11 @@ across its sections."
               (push (etaf-manual-reader--definition-card
                      block (nreverse body) env)
                     nodes))
-          (let ((view (etaf-manual-reader--ordinary-view
-                       block env examples state)))
+          (let ((view (etaf-manual-reader--ordinary-view block env)))
             (when view (push view nodes))))))
     (nreverse nodes)))
 
-(defun etaf-manual-reader--section-view (blocks env examples state)
+(defun etaf-manual-reader--section-view (blocks env)
   "Return the section View for BLOCKS.
 The View carries the scroll anchor of its first heading so navigation can
 bring it to the top of the article scroller."
@@ -341,7 +375,15 @@ bring it to the top of the article scroller."
     (etaf-node 'column
                (append (list :width 'stretch :item-gap '(lh 1))
                        (when ref (list :ref ref)))
-               (etaf-manual-reader--render-blocks blocks env examples state))))
+               (etaf-manual-reader--render-blocks blocks env))))
+
+(etaf-define-component etaf-manual-reader--section
+    (&key blocks env)
+  "Render one section's BLOCKS in ENV as its own update boundary.
+Extending a progressively rendered chapter adds sections without
+rebuilding the ones already shown."
+  :render
+  (etaf-manual-reader--section-view blocks env))
 
 (defun etaf-manual-reader--chapter-head-view (blocks env number)
   "Render the chapter title and lead BLOCKS in ENV.
@@ -357,32 +399,50 @@ follow as separate Views so the article's one-line rhythm spaces them."
      (when title
        (list (etaf-manual-reader--chapter-heading env number title)))
      (delq nil (mapcar (lambda (block)
-                         (etaf-ui-markdown-view-block
-                          block (etaf-manual-reader--doc-env env)))
+                         (etaf-manual-reader--ordinary-view block env))
                        (nreverse nodes))))))
+
+(defun etaf-manual-reader--chapter-cache (session kind build)
+  "Return SESSION's KIND value for the current chapter, made by BUILD once.
+Section components compare list props by identity, so chapter data passed
+to them is built once per chapter and language."
+  (let ((key (list kind (etaf-manual-reader--read session :language)
+                   (etaf-manual-reader--read session :chapter)))
+        (cache (plist-get session :documents)))
+    (or (gethash key cache)
+        (puthash key (funcall build) cache))))
+
+(defun etaf-manual-reader--article-env (session env document)
+  "Return ENV extended with DOCUMENT's markdown features and examples.
+The extension is the same object while ENV is, so unchanged sections keep
+their props."
+  (let ((last (etaf-manual-reader--chapter-cache session 'env (lambda () (list nil)))))
+    (if (eq (car last) env)
+        (cdr last)
+      (setcar last env)
+      (setcdr last (append env (list :markdown-features (plist-get document :features)
+                                     :examples (etaf-manual-reader--example-table session)))))))
 
 (cl-defun etaf-manual-reader--article (&key session env)
   "Return the article column View of SESSION's current chapter in ENV."
   (let* ((document (etaf-manual-reader-document session))
          (blocks (plist-get document :children))
-         (examples (etaf-manual-reader--chapter-examples session))
-         (state (list 0))
-         (split (etaf-manual-reader--sections blocks))
+         (split (etaf-manual-reader--chapter-cache
+                 session 'sections
+                 (lambda () (etaf-manual-reader--sections blocks))))
          (head (car split))
-         (sections (cdr split))
-         (env (append env (list :markdown-features (plist-get document :features))))
+         (extent (etaf-manual-reader--read session :extent))
+         (sections (if extent (seq-take (cdr split) extent) (cdr split)))
+         (env (etaf-manual-reader--article-env session env document))
          (part (etaf-manual-reader--part session))
          (number (plist-get (etaf-manual-reader--chapter session) :number))
          (lead (etaf-manual-reader--chapter-head-view head env number))
          (body nil))
     (dolist (section sections)
-      (push (etaf-manual-reader--section-view
-             (cdr section) env examples state)
+      (push (etaf-node 'etaf-manual-reader--section
+                       (list :blocks (cdr section) :env env)
+                       nil)
             body))
-    (when (null sections)
-      (dolist (view (etaf-manual-reader--render-blocks
-                     blocks env examples state))
-        (push view body)))
     (etaf-node 'column
                (list :width 'stretch
                      :max-width (list 'ch (etaf-manual-reader--measure env))
@@ -399,6 +459,15 @@ follow as separate Views so the article's one-line rhythm spaces them."
                 (list (etaf-node 'column
                                  (list :width 'stretch :item-gap '(lh 2))
                                  (nreverse body)))))))
+
+(etaf-define-component etaf-manual-reader--article-view
+    (&key session env)
+  "Render SESSION's current chapter in ENV as its own update boundary.
+The render reads only the chapter, language, theme and extent sources, so
+moving between sections or recording history leaves the chapter View
+untouched."
+  :render
+  (etaf-manual-reader--article :session session :env env))
 
 (provide 'etaf-manual-reader-article)
 ;;; etaf-manual-reader-article.el ends here

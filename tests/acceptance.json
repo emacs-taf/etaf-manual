@@ -120,6 +120,16 @@
       "name": "etaf-manual-symbol-index-groups-symbols-by-package",
       "file": "tests/etaf-manual-tests.el",
       "purpose": "The symbol index opens with the packages in manual order and lists each prefixed symbol under its own package."
+    },
+    {
+      "name": "etaf-manual-reader-examples-follow-run-blocks",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "Only runnable blocks become example viewers, including runnable examples inside definition entries."
+    },
+    {
+      "name": "etaf-manual-lookup-reaches-the-end-of-a-long-chapter",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "Looking up the last entry of a long chapter shows its card immediately in the opened reader."
     }
   ]
 }

@@ -30,6 +30,29 @@
 
 **示例。** 列宽为 4、6、2 像素、列间隙 1 像素的网格里，`:grid-column (1 :span 2)` 的项宽 11 像素——4 加间隙加 6——下一个自动项从第三列开始，位于 x 12。
 
+```elisp :run
+(etaf-define-component demo-grid-lab ()
+  :bindings ((span (etaf-ref 2)))
+  :view
+  (column :width '(ch 44) :item-gap '(lh 1)
+          (etaf-segmented :value 2
+                          :options '((1 . "跨 1") (2 . "跨 2") (3 . "跨 3"))
+                          :on-change (lambda (key) (etaf-set-value span key)))
+          (grid :width '(ch 44)
+                :grid-template-columns '((fr 1) (fr 1) (fr 1))
+                :gap '((lh 1) (ch 1))
+                (box :padding '((lh 1) (ch 1)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+                     (text "A"))
+                (box :grid-column-span (etaf-value span) :padding '((lh 1) (ch 1))
+                     :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+                     (text :color (etaf-theme-token :ui-accent "#0969da") "B"))
+                (box :padding '((lh 1) (ch 1)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+                     (text "C"))
+                (box :padding '((lh 1) (ch 1)) :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+                     (text "D")))))
+(etaf-view (demo-grid-lab))
+```
+
 ```elisp :figure 三列网格，其中一个盒子跨两列
 (etaf-view
  (grid :width '(ch 40)

@@ -22,6 +22,33 @@
 
 **示例。** 基础尺寸 4 像素的两项，第一个增长因子 1、第二个 3，在 20 像素的行里填成 7 与 13 像素。同样两项基础尺寸 10、收缩因子 1，在 12 像素的行里解成 6 与 6；基础尺寸 8、收缩因子 3 与 1 时解成 5 与 7；而一对增长的项中若第一项有 `:min-width (px 15)`，它冻结在 15，另一项取走剩下的 9。
 
+```elisp :run
+(etaf-define-component demo-flex-lab ()
+  :bindings ((a (etaf-ref 1))
+             (b (etaf-ref 2))
+             (c (etaf-ref 1)))
+  :view
+  (column :width '(ch 44) :item-gap '(lh 1)
+          (row :item-gap '(ch 2)
+               (etaf-number-input :label "A" :value 1 :min 0 :max 4
+                                  :on-change (lambda (v) (etaf-set-value a v)))
+               (etaf-number-input :label "B" :value 2 :min 0 :max 4
+                                  :on-change (lambda (v) (etaf-set-value b v)))
+               (etaf-number-input :label "C" :value 1 :min 0 :max 4
+                                  :on-change (lambda (v) (etaf-set-value c v))))
+          (flex :flex-direction 'row :width '(ch 44) :column-gap '(ch 1)
+                (box :flex-grow (etaf-value a) :padding '((lh 1) (ch 1))
+                     :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+                     (text :color (etaf-theme-token :ui-accent "#0969da") "A"))
+                (box :flex-grow (etaf-value b) :padding '((lh 1) (ch 1))
+                     :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+                     (text "B"))
+                (box :flex-grow (etaf-value c) :padding '((lh 1) (ch 1))
+                     :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+                     (text :color (etaf-theme-token :ui-accent "#0969da") "C")))))
+(etaf-view (demo-flex-lab))
+```
+
 ```elisp :figure 一行 flex 里长 1 : 2 : 3 的三个盒子
 (etaf-view
  (flex :flex-direction 'row :width '(ch 40) :column-gap '(ch 1)

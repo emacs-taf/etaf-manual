@@ -284,6 +284,27 @@ cache 把 key 映射到由 `:rows`、`:total`、`:at` 与可选 `:version` 组�
 
 **错误。** 无。
 
+```elisp :run
+(etaf-define-component demo-paged-rows ()
+  :bindings ((controller
+              (etaf-data-controller
+               (etaf-data-memory-source
+                (cl-loop for i from 1 to 10000
+                         collect (list :id i :name (format "第 %d 行" i)))
+                :id-key :id)
+               :page-size 8 :auto-load t)))
+  :view
+  (column :width '(ch 44) :item-gap '(lh 1)
+          (text :color (etaf-theme-token :ui-muted-fg "#526174")
+                (expr (format "共 %s 行；一次只渲染当前 8 行"
+                              (etaf-value (etaf-data-total controller)))))
+          (text :for (item (etaf-value (etaf-data-items controller)))
+                :key (plist-get item :id)
+                (expr (plist-get item :name)))
+          (etaf-pagination :controller controller)))
+(etaf-view (demo-paged-rows))
+```
+
 ## 错误与恢复
 
 | 失败 | 会发生什么 |

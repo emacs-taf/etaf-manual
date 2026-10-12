@@ -196,6 +196,28 @@ Move point to the previous keymap owner COUNT times; return the position.
 
 **See also.** `ebox-next-interaction`, `ebox-activate`.
 
+```elisp :run
+(etaf-define-component demo-event-log ()
+  :bindings ((last (etaf-ref "（还没有事件）"))
+             (focus (etaf-ref "（无焦点）")))
+  :view
+  (column :width '(ch 44) :item-gap '(lh 1)
+          (row :item-gap '(ch 1)
+               (box :role 'button :tab-index 0 :padding '((lh 1) (ch 2))
+                    :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa") :pointer 'hand
+                    :on-focus-enter (lambda () (etaf-set-value focus "按钮 A"))
+                    :on-press (lambda () (etaf-set-value last "press：按钮 A"))
+                    (text "按钮 A"))
+               (box :role 'button :tab-index 0 :padding '((lh 1) (ch 2))
+                    :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff") :pointer 'hand
+                    :on-focus-enter (lambda () (etaf-set-value focus "按钮 B"))
+                    :on-press (lambda () (etaf-set-value last "press：按钮 B"))
+                    (text :color (etaf-theme-token :ui-accent "#0969da") "按钮 B")))
+          (text :color (etaf-theme-token :ui-muted-fg "#526174") (expr (format "最近事件：%s" (etaf-value last))))
+          (text :color (etaf-theme-token :ui-muted-fg "#526174") (expr (format "当前焦点：%s" (etaf-value focus))))))
+(etaf-view (demo-event-log))
+```
+
 ## Programmatic dispatch
 
 <!-- index: event dispatch; payload; event kind -->

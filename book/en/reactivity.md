@@ -307,6 +307,34 @@ A cleanup returned by a watcher callback or an effect function releases what tha
 
 A watcher or effect created during Component setup, or during another Runtime operation, captures that operation's environment: the Component instance, its Context and its Runtime. Every later run re-enters the environment as a lifecycle operation, so `etaf-inject` and `etaf-current-runtime` keep working after the first run, and the callback is not treated as rendering. A watcher created outside any Runtime operation runs in the dynamic environment of the drain.
 
+```elisp :run
+(etaf-define-component demo-reactivity-lab ()
+  :bindings ((n (etaf-ref 2))
+             (factor (etaf-ref 3))
+             (runs (etaf-ref 0))
+             (log (etaf-ref nil)))
+  :setup
+  (let ((total (etaf-computed (lambda () (* (etaf-value n) (etaf-value factor)))
+                              :name 'demo-total)))
+    (etaf-watch-effect
+     (lambda ()
+       (let ((line (format "n=%d × %d = %d" (etaf-value n)
+                           (etaf-value factor) (etaf-value total))))
+         (etaf-set-value runs (1+ (etaf-value runs)))
+         (etaf-set-value log (append (etaf-value log) (list line)))))))
+  :view
+  (column :width '(ch 44) :item-gap '(lh 1)
+          (row :item-gap '(ch 2)
+               (etaf-number-input :label "n" :value 2 :min 0 :max 9
+                                  :on-change (lambda (v) (etaf-set-value n v)))
+               (etaf-number-input :label "倍数" :value 3 :min 1 :max 4
+                                  :on-change (lambda (v) (etaf-set-value factor v))))
+          (text (expr (format "结算次数：%d" (etaf-value runs))))
+          (text :color (etaf-theme-token :ui-muted-fg "#526174") (expr (format "最近一次：%s"
+                                               (or (car (last (etaf-value log))) "—"))))))
+(etaf-view (demo-reactivity-lab))
+```
+
 ## Selectors
 
 <!-- index: selector; selection -->

@@ -38,6 +38,32 @@
 
 上边框与下边框不是字符。它们用边框色给边框盒第一行或最后一行的每个字符加上 overline 或 underline 装饰，于是上边框在字符上方画线、下边框在字符下方画线，宽度正好等于盒子的像素宽。一个 face 只有一条这样的线，所以宽于一个像素的上/下边框没有诚实的画法；Ebox 报 `ebox-error`，而不是画近似。边框只在其样式为 `solid` 且宽度大于零时存在：初值样式 `none` 把边框解为零宽，因此既不占几何也不绘制。
 
+```elisp :run
+(etaf-define-component demo-box-lab ()
+  :bindings ((pad (etaf-ref 2))
+             (edge (etaf-ref 1))
+             (gap (etaf-ref 1)))
+  :view
+  (column :width '(ch 44) :item-gap '(lh 1)
+          (row :item-gap '(ch 2)
+               (etaf-number-input :label "内边距" :value 2 :min 0 :max 6
+                                  :on-change (lambda (v) (etaf-set-value pad v)))
+               (etaf-number-input :label "边框" :value 1 :min 0 :max 4
+                                  :on-change (lambda (v) (etaf-set-value edge v)))
+               (etaf-number-input :label "外边距" :value 1 :min 0 :max 4
+                                  :on-change (lambda (v) (etaf-set-value gap v))))
+          (box :width '(ch 44)
+               :padding (list (list 'lh (etaf-value gap)) (list 'ch (etaf-value gap)))
+               :background-color (etaf-theme-token :ui-disabled-bg "#e5e7eb")
+            (box :padding (list (list 'lh (etaf-value pad)) (list 'ch (etaf-value pad)))
+                 :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+                 :border-width (list 'px (etaf-value edge))
+                 :border-style 'solid
+                 :border-color (etaf-theme-token :ui-accent "#0969da")
+              (text "内容")))))
+(etaf-view (demo-box-lab))
+```
+
 ```elisp :figure 一个盒子的内容、内边距、边框与外边距
 (etaf-view
  (box :width '(ch 40) :padding '((lh 1) (ch 2))

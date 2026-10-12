@@ -307,6 +307,34 @@ X 是 `etaf-computed` 创建的计算值时返回非 nil。
 
 在组件 setup 或其他 Runtime 操作期间创建的侦听器和副作用，会捕获这次操作的环境：组件实例、它的 Context 和它的 Runtime。之后每次运行都以生命周期操作的身份重新进入这个环境，所以第一次运行之后 `etaf-inject` 和 `etaf-current-runtime` 仍然可用，回调也不会被当作渲染。在任何 Runtime 操作之外创建的侦听器，运行在排空时的动态环境里。
 
+```elisp :run
+(etaf-define-component demo-reactivity-lab ()
+  :bindings ((n (etaf-ref 2))
+             (factor (etaf-ref 3))
+             (runs (etaf-ref 0))
+             (log (etaf-ref nil)))
+  :setup
+  (let ((total (etaf-computed (lambda () (* (etaf-value n) (etaf-value factor)))
+                              :name 'demo-total)))
+    (etaf-watch-effect
+     (lambda ()
+       (let ((line (format "n=%d × %d = %d" (etaf-value n)
+                           (etaf-value factor) (etaf-value total))))
+         (etaf-set-value runs (1+ (etaf-value runs)))
+         (etaf-set-value log (append (etaf-value log) (list line)))))))
+  :view
+  (column :width '(ch 44) :item-gap '(lh 1)
+          (row :item-gap '(ch 2)
+               (etaf-number-input :label "n" :value 2 :min 0 :max 9
+                                  :on-change (lambda (v) (etaf-set-value n v)))
+               (etaf-number-input :label "倍数" :value 3 :min 1 :max 4
+                                  :on-change (lambda (v) (etaf-set-value factor v))))
+          (text (expr (format "结算次数：%d" (etaf-value runs))))
+          (text :color (etaf-theme-token :ui-muted-fg "#526174") (expr (format "最近一次：%s"
+                                               (or (car (last (etaf-value log))) "—"))))))
+(etaf-view (demo-reactivity-lab))
+```
+
 ## 选择器
 
 <!-- index: 选择器; 选中 -->

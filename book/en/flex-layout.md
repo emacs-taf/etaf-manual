@@ -22,6 +22,33 @@ Growth and shrink may push an item past its own minimum or maximum. When that ha
 
 **Example.** Two items of base 4 pixels, the first growing at 1 and the second at 3, fill a 20-pixel row as 7 and 13 pixels. The same two items at base 10 and shrink 1 in a 12-pixel row resolve to 6 and 6; with shrink 3 and 1 at base 8 they resolve to 5 and 7; and when the first item of a growing pair has `:min-width (px 15)`, it freezes at 15 and the other takes the remaining 9.
 
+```elisp :run
+(etaf-define-component demo-flex-lab ()
+  :bindings ((a (etaf-ref 1))
+             (b (etaf-ref 2))
+             (c (etaf-ref 1)))
+  :view
+  (column :width '(ch 44) :item-gap '(lh 1)
+          (row :item-gap '(ch 2)
+               (etaf-number-input :label "A" :value 1 :min 0 :max 4
+                                  :on-change (lambda (v) (etaf-set-value a v)))
+               (etaf-number-input :label "B" :value 2 :min 0 :max 4
+                                  :on-change (lambda (v) (etaf-set-value b v)))
+               (etaf-number-input :label "C" :value 1 :min 0 :max 4
+                                  :on-change (lambda (v) (etaf-set-value c v))))
+          (flex :flex-direction 'row :width '(ch 44) :column-gap '(ch 1)
+                (box :flex-grow (etaf-value a) :padding '((lh 1) (ch 1))
+                     :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+                     (text :color (etaf-theme-token :ui-accent "#0969da") "A"))
+                (box :flex-grow (etaf-value b) :padding '((lh 1) (ch 1))
+                     :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+                     (text "B"))
+                (box :flex-grow (etaf-value c) :padding '((lh 1) (ch 1))
+                     :background-color (etaf-theme-token :ui-accent-soft-bg "#ddf4ff")
+                     (text :color (etaf-theme-token :ui-accent "#0969da") "C")))))
+(etaf-view (demo-flex-lab))
+```
+
 ```elisp :figure Three boxes growing 1 : 2 : 3 in one flex row
 (etaf-view
  (flex :flex-direction 'row :width '(ch 40) :column-gap '(ch 1)

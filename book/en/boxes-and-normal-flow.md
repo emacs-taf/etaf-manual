@@ -38,6 +38,32 @@ A border is painted with the tools a text buffer has. The left and right borders
 
 The top and bottom borders are not characters. They decorate every character of the border-box's first or last line with an overline or underline in the border color, so a top border draws its line above the line's characters and a bottom border draws its line below them, spanning exactly the box's pixel width. A face has one such stroke, so a top or bottom border wider than one pixel has no honest rendering; Ebox signals `ebox-error` instead of drawing an approximation. A border exists only when its style is `solid` and its width is greater than zero: the initial style `none` resolves the border to zero width, so it neither reserves geometry nor paints.
 
+```elisp :run
+(etaf-define-component demo-box-lab ()
+  :bindings ((pad (etaf-ref 2))
+             (edge (etaf-ref 1))
+             (gap (etaf-ref 1)))
+  :view
+  (column :width '(ch 44) :item-gap '(lh 1)
+          (row :item-gap '(ch 2)
+               (etaf-number-input :label "内边距" :value 2 :min 0 :max 6
+                                  :on-change (lambda (v) (etaf-set-value pad v)))
+               (etaf-number-input :label "边框" :value 1 :min 0 :max 4
+                                  :on-change (lambda (v) (etaf-set-value edge v)))
+               (etaf-number-input :label "外边距" :value 1 :min 0 :max 4
+                                  :on-change (lambda (v) (etaf-set-value gap v))))
+          (box :width '(ch 44)
+               :padding (list (list 'lh (etaf-value gap)) (list 'ch (etaf-value gap)))
+               :background-color (etaf-theme-token :ui-disabled-bg "#e5e7eb")
+            (box :padding (list (list 'lh (etaf-value pad)) (list 'ch (etaf-value pad)))
+                 :background-color (etaf-theme-token :ui-panel-bg "#f6f8fa")
+                 :border-width (list 'px (etaf-value edge))
+                 :border-style 'solid
+                 :border-color (etaf-theme-token :ui-accent "#0969da")
+              (text "内容")))))
+(etaf-view (demo-box-lab))
+```
+
 ```elisp :figure Content, padding, border and margin around one box
 (etaf-view
  (box :width '(ch 40) :padding '((lh 1) (ch 2))

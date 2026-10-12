@@ -82,6 +82,20 @@ ETAF 函数按 Host 引用寻址会话，与应用其余 API 一致，并把会�
 
 **参见。** `etaf-input-begin`、`ebox-input-active-p`。
 
+```elisp :run
+(etaf-define-component demo-input-mirror ()
+  :bindings ((value (etaf-ref "")))
+  :view
+  (column :width '(ch 44) :item-gap '(lh 1)
+          (etaf-text-input :bind value
+                           :label "姓名"
+                           :placeholder "在这里输入…"
+                           :rows 2)
+          (text :color (etaf-theme-token :ui-muted-fg "#526174")
+                (expr (format "受控值：%S" (etaf-value value))))))
+(etaf-view (demo-input-mirror))
+```
+
 ## Ebox 接口
 
 <!-- index: Ebox 输入; 会话节点 -->

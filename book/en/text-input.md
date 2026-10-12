@@ -82,6 +82,20 @@ Return a mounted Runtime's active input session, or nil.
 
 **See also.** `etaf-input-begin`, `ebox-input-active-p`.
 
+```elisp :run
+(etaf-define-component demo-input-mirror ()
+  :bindings ((value (etaf-ref "")))
+  :view
+  (column :width '(ch 44) :item-gap '(lh 1)
+          (etaf-text-input :bind value
+                           :label "姓名"
+                           :placeholder "在这里输入…"
+                           :rows 2)
+          (text :color (etaf-theme-token :ui-muted-fg "#526174")
+                (expr (format "受控值：%S" (etaf-value value))))))
+(etaf-view (demo-input-mirror))
+```
+
 ## The Ebox interface
 
 <!-- index: Ebox input; session node -->

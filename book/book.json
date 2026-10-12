@@ -231,6 +231,14 @@
       ]
     }
   ],
-  "appendices": [],
+  "appendices": [
+    {
+      "id": "standard-errors",
+      "title": {
+        "en": "Standard Errors",
+        "zh-CN": "标准错误"
+      }
+    }
+  ],
   "indices": []
 }

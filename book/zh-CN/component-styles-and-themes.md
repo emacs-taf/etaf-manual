@@ -149,7 +149,7 @@ token 在包含它的声明被降级时解析：内联 Host 属性在 Host 提�
 
 <!-- index: ui-fg; ui-bg; ui-border; ui-muted-fg; 状态色 -->
 
-本节的 token 是官方组件目录读取的语义颜色表面。使用某个 token 的组件自带内置回退值，因此没有提供 Theme 时目录也能绘制；在 Theme 里提供该键会覆盖整棵子树的回退值。其余组件族 token 属于 [UI 组件库总论](ui-overview.md)；完整的 token 词表见「主题 token 表」附录。
+本节的 token 是官方组件目录读取的语义颜色表面。使用某个 token 的组件自带内置回退值，因此没有提供 Theme 时目录也能绘制；在 Theme 里提供该键会覆盖整棵子树的回退值。其余组件族 token 属于 [UI 组件库总论](ui-overview.md)；完整的 token 词表见[主题 token 表](theme-token-table.md)。
 
 每个条目给出一个角色。Theme 可以把键设成消费声明接受的任何值；基础词表用的是颜色。
 

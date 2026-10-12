@@ -259,6 +259,38 @@
         "en": "User Options and Variables",
         "zh-CN": "用户选项与变量"
       }
+    },
+    {
+      "id": "theme-token-table",
+      "generate": "token-table",
+      "title": {
+        "en": "Theme Token Table",
+        "zh-CN": "主题 token 表"
+      }
+    },
+    {
+      "id": "style-quick-reference",
+      "generate": "style-quick-reference",
+      "title": {
+        "en": "Style Property Quick Reference",
+        "zh-CN": "样式属性速查"
+      }
+    },
+    {
+      "id": "host-and-property-quick-reference",
+      "generate": "host-and-property-quick-reference",
+      "title": {
+        "en": "Host and Semantic Property Quick Reference",
+        "zh-CN": "Host 与语义属性速查"
+      }
+    },
+    {
+      "id": "component-quick-reference",
+      "generate": "component-quick-reference",
+      "title": {
+        "en": "Component Quick Reference",
+        "zh-CN": "组件速查"
+      }
     }
   ],
   "indices": []

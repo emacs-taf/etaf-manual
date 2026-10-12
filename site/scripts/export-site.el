@@ -144,8 +144,7 @@ template: splash
 hero:
   tagline: >-
     Build complete text applications in Emacs with a web-style model:
-    declarative components, reactive state, CSS cascade styling, Box/Flex/Grid
-    layout, and incremental buffer updates instead of full redraws.
+    declarative components, cascade styling and incremental updates.
   image:
     html: <img src='/etaf-icon.svg' alt='' class='etaf-hero-icon' width='512' height='512' />
   actions:
@@ -258,8 +257,7 @@ description: 用 Web 的方式在 Emacs 里构建完整的文本应用。
 template: splash
 hero:
   tagline: >-
-    在 Emacs 里构建完整的文本应用：声明式组件、响应式状态、CSS 级联样式、
-    Box/Flex/Grid 布局，用增量更新代替整屏重绘。
+    在 Emacs 里构建完整的文本应用：声明式组件、级联样式与增量更新。
   image:
     html: <img src='/etaf-icon.svg' alt='' class='etaf-hero-icon' width='512' height='512' />
   actions:

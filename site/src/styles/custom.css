@@ -108,6 +108,8 @@ html[data-has-hero] .hero .tagline {
   font-size: clamp(1.05rem, 1.8vw, 1.3rem);
   line-height: 1.65;
   max-width: 34rem;
+  /* Keep the hero to two balanced lines with no orphan on phone widths. */
+  text-wrap: pretty;
 }
 
 .etaf-hero-icon {

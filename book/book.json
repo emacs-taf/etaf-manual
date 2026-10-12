@@ -224,7 +224,8 @@
         "core-records",
         "invariants",
         "extending-the-framework",
-        "performance-engineering"
+        "performance-engineering",
+        "testing-and-validation"
       ]
     }
   ],

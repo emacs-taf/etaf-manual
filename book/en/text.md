@@ -38,7 +38,7 @@ Soft breaks respect punctuation rules. A closing bracket or sentence mark (`。`
 
 <!-- index: kp wrap mode; Knuth-Plass -->
 
-`kp` is accepted as a `:wrap-mode` value, but Ebox does not implement Knuth–Plass breaking yet: the layout falls through to the `word` rules, so a paragraph under `kp` breaks exactly like one under `word`, including its split of over-wide words. The mode is reserved for the paragraph-optimal breaking that the EKP typesetting package implements separately; Ebox does not link EKP, and no Ebox build turns `kp` into the optimal algorithm. Applications that need that behavior today typeset the paragraph with EKP and mount the result elsewhere.
+`kp` is accepted as a `:wrap-mode` value, but Ebox does not implement Knuth–Plass breaking yet: the layout falls through to the `word` rules, so a paragraph under `kp` breaks exactly like one under `word`, including its split of over-wide words. The mode is reserved for the paragraph-optimal breaking that the [EKP typesetting package](ekp-principles.md) implements separately; Ebox does not link EKP, and no Ebox build turns `kp` into the optimal algorithm. Applications that need that behavior today typeset the paragraph with EKP and mount the result elsewhere.
 
 ## CJK, clusters and emoji
 

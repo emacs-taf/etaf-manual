@@ -38,7 +38,7 @@
 
 <!-- index: kp 断行模式; Knuth-Plass -->
 
-`kp` 是 `:wrap-mode` 的合法取值，但 Ebox 尚未实现 Knuth–Plass 断行：布局落到 `word` 规则，所以 `kp` 段落与 `word` 段落断得完全一样，包括超宽单词的切法。这个模式预留给 EKP 排版包单独实现的段落最优断行；Ebox 不链接 EKP，也没有任何 Ebox 构建会把 `kp` 变成最优算法。如今需要该行为的应用要用 EKP 排好段落，再把结果挂到别处。
+`kp` 是 `:wrap-mode` 的合法取值，但 Ebox 尚未实现 Knuth–Plass 断行：布局落到 `word` 规则，所以 `kp` 段落与 `word` 段落断得完全一样，包括超宽单词的切法。这个模式预留给 [EKP 排版包](ekp-principles.md) 单独实现的段落最优断行；Ebox 不链接 EKP，也没有任何 Ebox 构建会把 `kp` 变成最优算法。如今需要该行为的应用要用 EKP 排好段落，再把结果挂到别处。
 
 ## CJK、字符簇与 emoji
 

@@ -151,6 +151,18 @@ Access slot "id" of `etaf-performance-operation' struct X.
 
 **参见。** `etaf-performance-operation-kind`、`etaf-performance-operation-label`。
 
+#### Function: etaf-performance-operation-runtime-id (x)
+
+读取 `etaf-performance-operation' 结构 X 的 "runtime-id" 槽。
+
+**语义。** 值是产生这条记录的 Runtime 的整数观察者报告身份，也就是 `etaf-performance-records` 用来过滤的身份、可携带报告以 `:runtime-id` 携带的身份。Runtime 存活期间它保持稳定；缓冲区名被复用或 Runtime 卸载之后，它仍能标识历史记录。
+
+**返回。** 整数报告身份。
+
+**错误。** error→ `wrong-type-argument` `(etaf-performance-operation X)`：其它值时。
+
+**参见。** `etaf-performance-records`、`etaf-performance-operation-id`。
+
 #### Function: etaf-performance-operation-kind (x)
 
 Access slot "kind" of `etaf-performance-operation' struct X.

@@ -151,6 +151,18 @@ Access slot "id" of `etaf-performance-operation' struct X.
 
 **See also.** `etaf-performance-operation-kind`, `etaf-performance-operation-label`.
 
+#### Function: etaf-performance-operation-runtime-id (x)
+
+Access slot "runtime-id" of `etaf-performance-operation' struct X.
+
+**Semantics.** The value is the integer observer report identity of the Runtime that produced the record, the identity `etaf-performance-records` filters by and a portable report carries as `:runtime-id`. It stays stable while the Runtime lives and still identifies historical records after its buffer name is reused or the Runtime is unmounted.
+
+**Returns.** The integer report identity.
+
+**Errors.** error→ `wrong-type-argument` `(etaf-performance-operation X)` for another value.
+
+**See also.** `etaf-performance-records`, `etaf-performance-operation-id`.
+
 #### Function: etaf-performance-operation-kind (x)
 
 Access slot "kind" of `etaf-performance-operation' struct X.
@@ -331,7 +343,7 @@ Access slot "metadata" of `etaf-performance-stage' struct X.
 
 #### Function: etaf-performance-records (&optional runtime-id)
 
-Return newest-first immutable snapshots of completed records. When RUNTIME-ID is non-nil, select only that integer observer report identity, available as the `:runtime-id` of a portable report. This also selects historical records after unmount or reuse of a buffer name. Omitted or nil RUNTIME-ID selects all retained records.
+Return newest-first immutable snapshots of completed records. When RUNTIME-ID is non-nil, select only that integer observer report identity, available as `etaf-performance-operation-runtime-id` and as the `:runtime-id` of a portable report. This also selects historical records after unmount or reuse of a buffer name. Omitted or nil RUNTIME-ID selects all retained records.
 
 **Arguments.** RUNTIME-ID is an integer identity or nil.
 

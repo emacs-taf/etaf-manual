@@ -99,7 +99,7 @@ caption row of its own."
   (etaf-node 'column
              (list :width 'stretch
                    :item-gap '(lh 0)
-                   :background-color (etaf-manual-reader--color env :panel2)
+                   :background-color (etaf-manual-reader--color env :code-bg)
                    :box-sizing 'border-box
                    :padding-top (if language '(lh 0) '(lh 1))
                    :padding-bottom '(lh 1)
@@ -337,7 +337,7 @@ button beside the language tag."
     (etaf-node 'box
                (list :width 'stretch
                      :box-sizing 'border-box
-                     :background-color (etaf-manual-reader--color env :panel)
+                     :background-color (etaf-manual-reader--color env :code-bg)
                      :border (etaf-manual-reader--border env)
                      :padding '((lh 1) (ch 2))
                      :tab-index 0
@@ -626,12 +626,19 @@ their props."
          (part (etaf-manual-reader--part session))
          (number (plist-get (etaf-manual-reader--chapter session) :number))
          (lead (etaf-manual-reader--chapter-head-view head env number))
-         (body nil))
+         (body nil)
+         (previous-empty nil))
     (dolist (section sections)
+      (when body
+        ;; An empty section (a heading with no body before the next
+        ;; heading) keeps its following heading close instead of a full
+        ;; section gap.
+        (push (etaf-manual-reader--spacer (if previous-empty 1 2)) body))
       (push (etaf-node 'etaf-manual-reader--section
                        (list :blocks (cdr section) :env env)
                        nil)
-            body))
+            body)
+      (setq previous-empty (null (cdr (cdr section)))))
     (etaf-node 'column
                (list :width 'stretch
                      :max-width (list 'ch (etaf-manual-reader--measure env))
@@ -646,7 +653,7 @@ their props."
                                      (or (plist-get part :title) "")))))
                 lead
                 (list (etaf-node 'column
-                                 (list :width 'stretch :item-gap '(lh 2))
+                                 (list :width 'stretch :item-gap '(lh 0))
                                  (nreverse body)))
                 (when cards
                   (list (etaf-manual-reader--spacer) cards))))))

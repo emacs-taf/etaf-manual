@@ -604,6 +604,16 @@ Paints the node's box behind its content.
 
 **Semantics.** The value is a color string handed to the face without parsing. The property does not inherit, but a node without a background of its own paints the background of its nearest ancestor that has one, so a panel's background shows through its descendants. On graphical frames `:border-radius` rounds the painted background.
 
+#### Style: :backdrop-filter
+
+| Value | Initial | Applies to | Inherited | Impact |
+| --- | --- | --- | --- | --- |
+| `nil` or `(brightness AMOUNT)` | `nil` | Every non-`text` node | No | Paint |
+
+Dims the cells an overlay covers while keeping their text and images visible.
+
+**Semantics.** AMOUNT is a non-negative number: values below 1 dim every covered pixel, 1 keeps it unchanged, and values above 1 brighten with each color channel clamped at its maximum. The foreground and background colors of covered text cells multiply by AMOUNT; image pixels are kept as they are, because a text composite cannot recolor an image and blanking it would hide content. A blank cell of the filtered node shows the dimmed pixel behind it, so a full-screen box with `:backdrop-filter` and no background dims the page without hiding it, while cells the node paints itself hide the dimmed pixels. A modal backdrop that only covers, such as an opaque `:background-color`, still hides what is behind it.
+
 #### Style: :visibility
 
 | Value | Initial | Applies to | Inherited | Impact |

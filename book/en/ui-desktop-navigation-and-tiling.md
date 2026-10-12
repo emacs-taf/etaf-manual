@@ -70,7 +70,7 @@ Render a controlled modal application launcher from item plists.
 
 **Arguments.** OPEN is a value, ref or computed; the launcher renders nothing while it is nil. TITLE defaults to `"Applications"`. ITEMS use `:key`/`:label` with optional `:description`, `:state` and `:disabled`. ON-SELECT receives the selected key and ON-CLOSE is required; CLOSE-LABEL (default `"Close"`) names the dialog's footer button. BACKDROP defaults to t.
 
-**Semantics.** The launcher is a modal dialog of `(ch 56)` whose body is the picker list; items show their caption with an optional muted description below it. The launcher owns no registry and no open state: the caller normally closes OPEN after handling a selection, and a BACKDROP nil keeps the underlying surface painted so a desktop can dim it through its own Theme while the launcher is open.
+**Semantics.** The launcher is a modal dialog of `(ch 56)` whose body is the picker list; items show their caption with an optional muted description below it. The launcher owns no registry and no open state: the caller normally closes OPEN after handling a selection, and a BACKDROP nil paints no backdrop at all, leaving the desktop fully visible instead of dimmed.
 
 **Returns.** A View.
 

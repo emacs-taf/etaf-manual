@@ -70,7 +70,7 @@
 
 **参数。** OPEN 是值、ref 或 computed；为 nil 时启动器不渲染。TITLE 默认 `"Applications"`。ITEMS 用 `:key`/`:label` 与可选 `:description`、`:state`、`:disabled`。ON-SELECT 接收选中的键，ON-CLOSE 必需；CLOSE-LABEL（默认 `"Close"`）命名对话框 footer 的按钮。BACKDROP 默认 t。
 
-**语义。** 启动器是宽 `(ch 56)` 的模态对话框，正文是选择列表；item 显示 caption，可选 muted 描述在其下。启动器不拥有注册表也不拥有打开状态：调用方通常在处理选择后关闭 OPEN；BACKDROP 为 nil 保留下层绘制，让桌面用自己 Theme 调暗它而启动器仍打开。
+**语义。** 启动器是宽 `(ch 56)` 的模态对话框，正文是选择列表；item 显示 caption，可选 muted 描述在其下。启动器不拥有注册表也不拥有打开状态：调用方通常在处理选择后关闭 OPEN；BACKDROP 为 nil 时完全不绘制遮罩，桌面保持完整可见而不被调暗。
 
 **返回。** 一个 View。
 

@@ -227,22 +227,39 @@ chapters share one parser."
   (mapcar (lambda (file) (file-attribute-modification-time (file-attributes file)))
           files))
 
+(defconst etaf-manual--revalidate-seconds 1.0
+  "Longest time a validated book is reused without checking its sources.")
+
+(defun etaf-manual--fresh-p (entry)
+  "Return non-nil when cache ENTRY was validated during the current input.
+Within one input event and `etaf-manual--revalidate-seconds' the sources
+cannot have changed under the reader, so the many lookups of one redisplay
+or command share a single check."
+  (and entry
+       (eql (nth 2 entry) num-nonmacro-input-events)
+       (< (- (float-time) (nth 3 entry)) etaf-manual--revalidate-seconds)))
+
 (defun etaf-manual--read-book (directory language)
   "Parse the book below DIRECTORY in LANGUAGE, reusing an unchanged result."
   (let* ((directory (file-name-as-directory (expand-file-name directory)))
-         (description (etaf-manual--read-json (expand-file-name "book.json" directory)))
-         (languages (plist-get description :languages)))
-    (unless (member language languages)
-      (signal 'etaf-manual-error (list "Unsupported manual language" language languages)))
-    (let* ((files (cons (expand-file-name "book.json" directory)
-                        (etaf-manual--book-files directory language description)))
-           (key (cons directory language))
-           (stamp (etaf-manual--stamp files))
-           (cached (gethash key etaf-manual--cache)))
-      (if (and cached (equal (car cached) stamp))
-          (cdr cached)
-        (let ((book (etaf-manual--build-book directory language description)))
-          (puthash key (cons stamp book) etaf-manual--cache)
+         (key (cons directory language))
+         (cached (gethash key etaf-manual--cache)))
+    (if (etaf-manual--fresh-p cached)
+        (cadr cached)
+      (let* ((description (etaf-manual--read-json
+                           (expand-file-name "book.json" directory)))
+             (languages (plist-get description :languages)))
+        (unless (member language languages)
+          (signal 'etaf-manual-error
+                  (list "Unsupported manual language" language languages)))
+        (let* ((files (cons (expand-file-name "book.json" directory)
+                            (etaf-manual--book-files directory language description)))
+               (stamp (etaf-manual--stamp files))
+               (book (if (and cached (equal (car cached) stamp))
+                         (cadr cached)
+                       (etaf-manual--build-book directory language description))))
+          (puthash key (list stamp book num-nonmacro-input-events (float-time))
+                   etaf-manual--cache)
           book)))))
 
 (declare-function etaf-manual-generate "etaf-manual-generate" (name language title chapters))

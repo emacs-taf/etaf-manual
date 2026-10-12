@@ -44,7 +44,9 @@
 ;; where :body is the entry's Markdown text; consecutive entry headings share
 ;; one body.  An example is (:id STRING :chapter ID :line N :code STRING).
 ;; An index term is (:term STRING :line N :anchor STRING).  The result is
-;; cached until a source file changes; treat it as read-only.  Signals
+;; cached until a source file changes; the sources are checked again at
+;; most once per input event and second, so the lookups of one command
+;; share one check.  Treat the result as read-only.  Signals
 ;; `etaf-manual-error' when book/book.json or a chapter is missing or
 ;; malformed, or LANGUAGE is not provided.
 ;;

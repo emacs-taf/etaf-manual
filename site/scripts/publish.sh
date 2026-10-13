@@ -67,6 +67,42 @@ tarball="$(mktemp -t etaf-top).tgz"
 trap 'rm -f "$tarball"' EXIT
 # --no-xattrs keeps macOS metadata out of the archive sent to Linux.
 tar czf "$tarball" --no-xattrs -C "$site_dir/dist" .
+# The web host serves stable names (pages, screenshots, font stylesheets), so
+# responses must revalidate; without this a browser can keep showing a cached
+# page after a release.  Content-hashed build output is cached instead.  The
+# configuration is installed only when it differs.
+log "Syncing the web host configuration ..."
+run_root "sh -s" <<'REMOTE'
+set -eu
+cat > /tmp/etaf-top.caddy <<'CONFIG'
+etaf.top {
+	encode zstd gzip
+	root * /srv/etaf.top/current
+
+	# Build output under /_astro/ carries a content hash in its name; the two
+	# matchers stay mutually exclusive so neither rule can shadow the other.
+	@hashed path /_astro/*
+	header @hashed Cache-Control "public, max-age=31536000, immutable"
+
+	# Pages, screenshots and font stylesheets keep stable names: a browser must
+	# ask again, so a cached copy never hides a new release.
+	@stable not path /_astro/*
+	header @stable Cache-Control "no-cache"
+
+	file_server
+}
+CONFIG
+if cmp -s /tmp/etaf-top.caddy /etc/caddy/etaf.top.caddy; then
+  echo "web host configuration unchanged"
+  exit 0
+fi
+cp /etc/caddy/etaf.top.caddy "/etc/caddy/etaf.top.caddy.bak-$(date +%Y%m%d-%H%M%S)"
+cp /tmp/etaf-top.caddy /etc/caddy/etaf.top.caddy
+caddy validate --config /etc/caddy/Caddyfile >/dev/null
+systemctl reload caddy
+echo "web host configuration installed and Caddy reloaded"
+REMOTE
+
 log "Uploading $(( $(wc -c < "$tarball") / 1024 )) KiB to $top_host ..."
 run_root "'cat > /tmp/etaf-top-$stamp.tgz'" < "$tarball"
 

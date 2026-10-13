@@ -1,6 +1,6 @@
 # 标准钩子
 
-钩子是框架在确定时刻运行的观察点。四个钩子都是 abnormal hook：值是一列函数；设置了缓冲区局部值时，该值在这个缓冲区里替代全局列表。每行链接到记录参数、时机与错误处理的条目。
+钩子是框架在确定时刻运行的观察点。这些钩子都是 abnormal hook：值是一列函数；设置了缓冲区局部值时，该值在这个缓冲区里替代全局列表。每行链接到记录参数、时机与错误处理的条目。
 
 <!-- index: 钩子; abnormal hook; 观察点 -->
 
@@ -10,6 +10,7 @@
 | [`ebox-focus-change-functions`](focus.md#hook-ebox-focus-change-functions) | `ebox-focus` 移动了挂载的焦点；焦点未变时不运行，且在焦点操作内部运行，因此挂载已经报告新焦点。 | 之前的焦点节点（或 nil）与新的焦点节点（或 nil） | 错误从运行该钩子的焦点操作向外传播。 |
 | [`ebox-after-flush-functions`](incremental-updates-and-publication.md#hook-ebox-after-flush-functions) | 一次 flush 真正发布之后，在观察者与后台同步之后；缓冲区已显示新输出，几何已确定。 | 缓冲区 | 一个函数出错不影响其余函数运行。 |
 | [`ebox-viewport-change-functions`](viewport.md#hook-ebox-viewport-change-functions) | 视口尺寸变化后——窗口缩放或 `ebox-mount-set-viewport`——新尺寸的重排完成时。 | 缓冲区 | 一个函数出错不阻止其余函数。 |
+| [`ebox-display-change-functions`](viewport.md#hook-ebox-display-change-functions) | 缓冲区文本缩放稳定且保留树完成重新测量后，固定尺寸视口也会收到通知。 | 缓冲区 | 回调错误由视口任务报告；中断后未开始的工作留在队列里。 |
 
 ## 说明
 

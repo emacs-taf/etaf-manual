@@ -1,6 +1,6 @@
 # Standard Hooks
 
-Hooks are the observation points the framework runs at defined moments. All four are abnormal hooks: the value is a list of functions, and a buffer-local value, when set, replaces the global list for that buffer. Each row links to the entry that documents the arguments, timing and recovery.
+Hooks are the observation points the framework runs at defined moments. All are abnormal hooks: the value is a list of functions, and a buffer-local value, when set, replaces the global list for that buffer. Each row links to the entry that documents the arguments, timing and recovery.
 
 <!-- index: hook; abnormal hook; observation point -->
 
@@ -10,6 +10,7 @@ Hooks are the observation points the framework runs at defined moments. All four
 | [`ebox-focus-change-functions`](focus.md#hook-ebox-focus-change-functions) | `ebox-focus` moved the mount's focus; it does not run when the focused node is unchanged, and it runs inside the focus operation, so the mount already reports the new focus. | the previously focused node, or nil, and the newly focused node, or nil | An error propagates from the focus operation that ran the hook. |
 | [`ebox-after-flush-functions`](incremental-updates-and-publication.md#hook-ebox-after-flush-functions) | A flush actually published, after the observer and the background sync; the buffer shows the new output and geometry is settled. | the buffer | An error in one function does not prevent the others from running. |
 | [`ebox-viewport-change-functions`](viewport.md#hook-ebox-viewport-change-functions) | The viewport size changed, whether by a window resize or `ebox-mount-set-viewport`, once the relayout for the new size has settled. | the buffer | An error in one function does not stop the others. |
+| [`ebox-display-change-functions`](viewport.md#hook-ebox-display-change-functions) | Buffer text scaling has settled and the retained tree has been remeasured, including fixed-size viewports. | the buffer | A callback error is reported by the viewport task; unstarted work remains queued after a quit. |
 
 ## Notes
 

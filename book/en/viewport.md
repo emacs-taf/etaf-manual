@@ -80,6 +80,44 @@ Seconds of quiet after the last size change before Ebox reflows.
 
 Transient UI does not count as a resize. While an active minibuffer, a completion popup or an echo-area message borrows lines from a displayed window, the frame itself is unchanged; a mount keeps its committed viewport until that UI releases the lines, and the minibuffer exit schedules a recheck. A frame change or a taller window is real geometry and refits as usual.
 
+### Buffer text scale
+
+<!-- index: text scale; zoom; metric refresh -->
+
+Changing a buffer's text scale changes the metrics every measured glyph was computed with, but it produces no window-size notification, so the size bridge never hears about it. Ebox treats a scaled mounted buffer as a viewport intent of its own: `text-scale-mode-hook` records the buffer, the same settle delay waits for the zoom to go quiet, the shared glyph caches are cleared once for the batch, and the whole mount is laid out again. Measured widths, line heights and intrinsic sizes then follow the buffer's new faces, so wheel zooming a mounted application paints aligned rows instead of cutting rows to the metrics of the previous scale. A burst of zoom steps settles into one relayout, and returning to the default size is another.
+
+Rendering outside a mount reads the same measuring context: `ebox-render` measures under the current buffer's faces. Pixel images prepared by an application do not grow with the font: their producer reads the effective metrics and repartitions the pixels into rows. This keeps intrinsic graphics intact instead of stretching them or leaving gaps between strips.
+
+#### Function: ebox-display-metrics (&optional buffer-or-name)
+
+Return a fresh plist describing BUFFER-OR-NAME's effective default-face metrics.
+
+**Arguments.** BUFFER-OR-NAME defaults to the current buffer. Its displaying frame supplies the base font; a hidden buffer uses the selected frame.
+
+**Semantics.** `:char-width` and `:line-height` are positive pixel dimensions and `:ascent` is the image ascent percentage that aligns the baseline. Buffer-local text scaling is included. Text displays return unit cells and 100 percent ascent. The caller owns the result and may modify it without changing later reads.
+
+**Errors.** An unknown buffer signals error→ `error`.
+
+**Example.** `(plist-get (ebox-display-metrics) :line-height)` supplies the logical height of one strip for a native image producer.
+
+#### Hook: ebox-display-change-functions
+
+Report a mounted buffer after its display metrics settle.
+
+**Semantics.** Each function receives the mounted buffer after its retained tree has been remeasured. A burst of text-scale changes shares the viewport settle delay. The callback reads `ebox-display-metrics` to rebuild externally prepared rows; the mount and application state are not recreated. Released mounts receive no notification. This hook also runs for fixed-size viewports, unlike the viewport-size hook which reports only changed dimensions.
+
+#### Function: etaf-display-metrics (&optional runtime)
+
+Read a mounted Runtime's effective default-face metrics reactively.
+
+**Arguments.** RUNTIME defaults to the active Component's Runtime or the current buffer's Runtime.
+
+**Semantics.** The fresh plist has the same `:char-width`, `:line-height` and `:ascent` keys as `ebox-display-metrics`. A render, computed or effect that reads it reruns after settled buffer text scaling, even with a fixed viewport. ETAF publishes metrics and viewport changes in one reactive batch; native image producers can adapt their rows without remounting components or resetting state.
+
+**Errors.** A missing or unmounted Runtime signals error→ `etaf-runtime-error`.
+
+**Example.** `(etaf-computed (lambda () (plist-get (etaf-display-metrics) :line-height)))` tracks the row height for an image-producing application.
+
 ## Refit across both layers
 
 <!-- index: refit; relayout; fixed viewport; adaptive viewport -->

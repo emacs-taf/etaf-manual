@@ -80,6 +80,44 @@
 
 临时 UI 不算缩放。活跃的 minibuffer、补全弹窗或 echo area 消息从显示窗口借走行时，frame 本身没变；挂载保持已提交的视口，直到这些 UI 归还这些行，minibuffer 退出时会再安排一次检查。frame 变化或窗口变高是真实几何，照常 refit。
 
+### Buffer 文本缩放
+
+<!-- index: 文本缩放; 滚轮缩放; 度量刷新 -->
+
+更改 buffer 的 text scale 会改变每个已测量字形所用的字号度量，但不产生 window-size notification，尺寸桥接因此听不到它。Ebox 把被缩放的 mounted buffer 当作一种独立的 viewport intent：`text-scale-mode-hook` 记录该缓冲区，等待与窗口缩放相同的稳定延迟，整批只清空一次共享字形缓存，然后整棵重新布局。测得的宽度、行高与内在尺寸于是跟随缓冲区的新 face，对已挂载应用做滚轮缩放会画出对齐的行，而不是按上一档度量切开。连续缩放会合并成一次重排，缩回默认大小也同样重排一次。
+
+挂载之外的渲染读同一套测量上下文：`ebox-render` 按当前缓冲区的 face 测量。应用预先生成的像素图像不随字体放大：图像提供者读取有效度量，按新行高重新切分像素。这样既保持图形的固有尺寸，也不会在条带之间留下空隙。
+
+#### Function: ebox-display-metrics (&optional buffer-or-name)
+
+返回描述 BUFFER-OR-NAME 有效默认 face 度量的新 plist。
+
+**参数。** BUFFER-OR-NAME 默认当前缓冲区。显示它的 frame 提供基准字体；隐藏缓冲区使用选中 frame。
+
+**语义。** `:char-width` 和 `:line-height` 是正数像素尺寸，`:ascent` 是对齐基线所需的图像 ascent 百分比。度量包含缓冲区局部文本缩放。文本显示返回单位格子和 100% ascent。结果归调用方所有，修改它不会影响之后的读取。
+
+**错误。** 缓冲区不存在时触发 error→ `error`。
+
+**示例。** `(plist-get (ebox-display-metrics) :line-height)` 给出原生图像提供者的一条图像条带的逻辑高度。
+
+#### Hook: ebox-display-change-functions
+
+报告显示度量已稳定的挂载缓冲区。
+
+**语义。** 每个函数接收已重新测量保留树的挂载缓冲区。连续文本缩放共享视口的稳定延迟。回调读取 `ebox-display-metrics`，重新生成外部准备的图像行；挂载与应用状态不重建。已释放的挂载不再收到通知。固定尺寸视口也会运行此钩子；视口尺寸钩子则只报告尺寸变化。
+
+#### Function: etaf-display-metrics (&optional runtime)
+
+响应式地读取已挂载 Runtime 的有效默认 face 度量。
+
+**参数。** RUNTIME 默认为活动组件的 Runtime 或当前缓冲区的 Runtime。
+
+**语义。** 返回新的 plist，键与 `ebox-display-metrics` 一样，包含 `:char-width`、`:line-height` 和 `:ascent`。读取它的渲染、computed 或 effect 会在缓冲区文本缩放稳定后重新运行，即使视口尺寸固定也如此。ETAF 把度量与视口变化放在同一个响应式 batch 中发布，原生图像提供者可调整图像行而不重建组件或重置状态。
+
+**错误。** 缺少 Runtime 或 Runtime 未挂载时触发 error→ `etaf-runtime-error`。
+
+**示例。** `(etaf-computed (lambda () (plist-get (etaf-display-metrics) :line-height)))` 为生成图像的应用跟踪行高。
+
 ## 两层的 refit
 
 <!-- index: refit; 重排; 固定视口; 自适应视口 -->

@@ -1,0 +1,52 @@
+/* Brand typography and palette, shared by the landing page and the manual.
+
+   Latin text is set in Source Serif 4 (variable weight and optical size, so
+   headings take its display cut and body text its text cut).  Chinese body
+   text uses LXGW WenKai, loaded as a subset webfont from the page head;
+   Chinese headings use Noto Serif SC.  Code and small labels use IBM Plex
+   Mono, with WenKai Mono for Chinese inside code.  Every face is split by
+   unicode-range, so a page downloads only the glyphs it shows.
+
+   The palette is warm paper and ink rather than neutral grey, with the
+   violet of the ETAF mark kept for links and small accents. */
+
+@import '@fontsource-variable/source-serif-4/opsz.css';
+@import '@fontsource-variable/source-serif-4/opsz-italic.css';
+@import '@fontsource-variable/noto-serif-sc/wght.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+@import '@fontsource/ibm-plex-mono/600.css';
+
+:root {
+  --etaf-font-text: "Source Serif 4 Variable", "LXGW WenKai", "霞鹜文楷",
+    "Noto Serif SC Variable", "Songti SC", Georgia, serif;
+  --etaf-font-display: "Source Serif 4 Variable", "Noto Serif SC Variable",
+    "Songti SC", Georgia, serif;
+  --etaf-font-mono: "IBM Plex Mono", "LXGW WenKai Mono", "霞鹜文楷等宽",
+    ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Dark (default) */
+  --etaf-paper: #151412;
+  --etaf-paper-2: #1c1b18;
+  --etaf-paper-3: #24221e;
+  --etaf-rule: #34312b;
+  --etaf-rule-strong: #4a463e;
+  --etaf-ink: #eeeae2;
+  --etaf-ink-2: #c9c3b7;
+  --etaf-ink-3: #948e82;
+  --etaf-accent: #b9a6ee;
+  --etaf-accent-soft: #2b2540;
+}
+
+:root[data-theme='light'] {
+  --etaf-paper: #faf8f3;
+  --etaf-paper-2: #f3f0e8;
+  --etaf-paper-3: #ebe7dd;
+  --etaf-rule: #e2ddd1;
+  --etaf-rule-strong: #c9c3b5;
+  --etaf-ink: #1c1a16;
+  --etaf-ink-2: #45413a;
+  --etaf-ink-3: #7a7468;
+  --etaf-accent: #5b3ea8;
+  --etaf-accent-soft: #ece6f8;
+}

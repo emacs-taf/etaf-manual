@@ -1,76 +1,128 @@
-/* Typography.
+/* Manual typography and colour.
 
-   English and digits use Pragmata Pro when it is installed locally (it is a
-   commercial font, so it cannot be served); Chinese uses LXGW WenKai, which
-   the site loads as a subset webfont in astro.config.mjs, and code uses the
-   matching WenKai Mono.  The system stack comes after these names through
-   Starlight's own variables.
+   The faces and palette come from brand.css, shared with the landing page.
+   Reading comfort sets the sizes: body text is 18px with a 1.75 line height
+   (1.85 for Chinese, whose glyphs fill the em square) in a column of about
+   70 Latin or 40 Chinese characters; the navigation stays at 15-16px so it
+   reads as secondary.  Headings use the display cut of the serif with a
+   modest scale, so a long chapter keeps a calm rhythm. */
 
-   The manual is a reference, not a landing page: the base size is 15px, so
-   every rem-based size in the theme scales down with it, and the headings
-   are sized to read as sections rather than posters.  WenKai draws thin
-   strokes next to Pragmata Pro's wide Latin, so body text sits darker and
-   takes a hairline of text stroke; code keeps none, because the mono face
-   is already even. */
-
-html {
-  font-size: 93.75%; /* 15px base */
-}
+@import './brand.css';
 
 :root {
-  --sl-font: "PragmataPro", "LXGW WenKai", "霞鹜文楷", "PingFang SC",
-    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  --sl-font-mono: "PragmataPro", "LXGW WenKai Mono", "霞鹜文楷等宽",
-    ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  --sl-font: var(--etaf-font-text);
+  --sl-font-mono: var(--etaf-font-mono);
 
-  --sl-text-h1: 1.7333rem;  /* 26px */
-  --sl-text-h2: 1.4rem;     /* 21px */
-  --sl-text-h3: 1.1667rem;  /* 17.5px */
-  --sl-text-h4: 1.0667rem;  /* 16px */
-  --sl-text-h5: 1rem;       /* 15px */
-  --sl-text-code: 0.875rem;
-  --sl-line-height: 1.7;
-}
+  --sl-text-body: 1.125rem;      /* 18px */
+  --sl-text-body-sm: 0.9375rem;  /* 15px */
+  --sl-text-code: 0.875em;
+  --sl-text-code-sm: 0.875rem;
+  --sl-text-h1: 2.5rem;          /* 40px */
+  --sl-text-h2: 1.75rem;         /* 28px */
+  --sl-text-h3: 1.375rem;        /* 22px */
+  --sl-text-h4: 1.1875rem;       /* 19px */
+  --sl-text-h5: 1.125rem;
+  --sl-line-height: 1.75;
+  --sl-line-height-headings: 1.25;
+  --sl-content-width: 44rem;
 
-/* Use the bold WenKai face for headings instead of letting the browser
-   synthesize weight from the regular face, which smears the strokes. */
-.sl-markdown-content h1,
-.sl-markdown-content h2,
-.sl-markdown-content h3,
-.sl-markdown-content h4,
-.sl-markdown-content h5,
-.sl-markdown-content h6,
-.content-panel h1 {
-  font-weight: 700;
-}
-
-.sl-markdown-content :is(p, li, td, th, dd, dt),
-.sidebar-content a {
-  -webkit-text-stroke: 0.015em currentColor;
-}
-
-.sl-markdown-content :is(code, pre, kbd, samp) {
-  -webkit-text-stroke: 0;
-}
-
-/* The manual header carries the ETAF mark beside its title. */
-.site-title { gap: 0.6rem; }
-.site-title img { border-radius: 6px; height: 1.75rem; width: 1.75rem; }
-
-/* The violet of the ETAF mark, shared with the landing page. */
-:root {
-  --sl-color-accent-low: #2a1d4f;
-  --sl-color-accent: #8b5cf6;
-  --sl-color-accent-high: #d9ccff;
+  --sl-color-white: var(--etaf-ink);
+  --sl-color-gray-1: var(--etaf-ink);
+  --sl-color-gray-2: var(--etaf-ink-2);
+  --sl-color-gray-3: var(--etaf-ink-3);
+  --sl-color-gray-4: #6f6a60;
+  --sl-color-gray-5: var(--etaf-rule-strong);
+  --sl-color-gray-6: var(--etaf-paper-2);
+  --sl-color-black: var(--etaf-paper);
+  --sl-color-accent-low: var(--etaf-accent-soft);
+  --sl-color-accent: #8f76d8;
+  --sl-color-accent-high: var(--etaf-accent);
+  --sl-color-text-accent: var(--etaf-accent);
+  --sl-color-bg-nav: var(--etaf-paper);
+  --sl-color-bg-sidebar: var(--etaf-paper);
+  --sl-color-bg-inline-code: var(--etaf-paper-3);
+  --sl-color-hairline: var(--etaf-rule);
+  --sl-color-hairline-light: var(--etaf-rule);
+  --sl-color-hairline-shade: var(--etaf-rule);
 }
 
 :root[data-theme='light'] {
-  --sl-color-text: hsl(224, 16%, 15%);
-  --sl-color-accent-low: #ede7fe;
-  --sl-color-accent: #6d28d9;
-  --sl-color-accent-high: #3b1580;
-  --sl-color-text-accent: #6d28d9;
+  --sl-color-gray-4: #a29c90;
+  --sl-color-gray-7: var(--etaf-paper-2);
+  --sl-color-accent: #6d50c0;
+  --sl-color-text: var(--etaf-ink-2);
 }
+
+.sl-markdown-content {
+  color: var(--etaf-ink-2);
+  font-size: var(--sl-text-body);
+  font-optical-sizing: auto;
+  hanging-punctuation: first;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+:lang(zh-CN) .sl-markdown-content {
+  line-height: 1.85;
+  text-align: justify;
+  text-justify: inter-character;
+}
+
+.sl-markdown-content :is(h1, h2, h3, h4, h5, h6),
+.content-panel h1 {
+  color: var(--etaf-ink);
+  font-family: var(--etaf-font-display);
+  font-weight: 600;
+  letter-spacing: -0.012em;
+}
+
+:lang(zh-CN) :is(.sl-markdown-content :is(h1, h2, h3, h4, h5, h6), .content-panel h1) {
+  letter-spacing: 0.01em;
+}
+
+.sl-markdown-content :is(h2, h3) { margin-top: 2.2em; }
+.sl-markdown-content strong { color: var(--etaf-ink); font-weight: 650; }
+
+.sl-markdown-content a:not(:where(.not-content *)) {
+  color: var(--etaf-accent);
+  text-decoration-color: color-mix(in srgb, var(--etaf-accent) 35%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.sl-markdown-content a:not(:where(.not-content *)):hover {
+  text-decoration-color: currentColor;
+}
+
+.sl-markdown-content :not(pre) > code {
+  border-radius: 4px;
+  font-size: 0.84em;
+  padding: 0.12em 0.36em;
+}
+
+.sl-markdown-content table { font-size: 0.94em; }
+.sl-markdown-content th { color: var(--etaf-ink); font-weight: 600; }
+
+/* Navigation, search and page outline stay smaller than the text. */
+.sidebar-content { font-size: 0.9375rem; }
+.sidebar-content a[aria-current='page'],
+.sidebar-content a[aria-current='page']:is(:hover, :focus) {
+  background: var(--etaf-accent-soft);
+  color: var(--etaf-accent);
+  font-weight: 600;
+}
+.right-sidebar-panel { font-size: 0.875rem; }
+
+/* The manual header carries the ETAF mark beside its title. */
+.site-title {
+  color: var(--etaf-ink);
+  font-family: var(--etaf-font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  gap: 0.6rem;
+  letter-spacing: -0.01em;
+}
+.site-title img { border-radius: 6px; height: 1.75rem; width: 1.75rem; }
 
 /* Nothing on the site scrolls sideways.  Starlight lets code blocks and
    tables scroll horizontally; here they reflow instead, so a narrow window

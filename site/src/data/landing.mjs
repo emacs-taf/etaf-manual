@@ -8,23 +8,23 @@ const repo = (name) => `${github}/${name}`;
 
 const features = {
   en: [
-    ['blocks', 'Declarative components',
+    ['Declarative components',
      'Compose reusable Components with named bindings and reactive state; the runtime owns re-rendering, identity and lifecycle.'],
-    ['cascade', 'Cascade and computed styles',
+    ['Cascade and computed styles',
      'Style subjects through selectors, specificity and cascade, and read the computed result back instead of setting faces by hand.'],
-    ['layout', 'Box, Flex and Grid layout',
+    ['Box, Flex and Grid layout',
      'Lay text out with the box model, normal flow, flex and grid, measured down to the pixel.'],
-    ['bolt', 'Incremental updates',
+    ['Incremental updates',
      'Retained rendering publishes only what changed, so an update costs what it changed instead of a full redraw.'],
   ],
   zh: [
-    ['blocks', '声明式组件',
+    ['声明式组件',
      '用命名绑定与响应式状态组合可复用组件，重渲染、身份和生命周期由运行时负责。'],
-    ['cascade', '级联与计算样式',
+    ['级联与计算样式',
      '用选择器、优先级和级联给主体写样式，再读回计算样式，而不是手工设置 face。'],
-    ['layout', 'Box、Flex 与 Grid 布局',
+    ['Box、Flex 与 Grid 布局',
      '用盒模型、常规流、Flex 与 Grid 排布文本，精确到像素。'],
-    ['bolt', '增量更新',
+    ['增量更新',
      '保留式渲染只发布变化的部分，更新的代价取决于改动的大小，而不是整屏重绘。'],
   ],
 };
@@ -136,7 +136,7 @@ export function landing(language) {
   return {
     ...t,
     github,
-    features: features[language].map(([icon, title, body]) => ({ icon, title, body })),
+    features: features[language].map(([title, body]) => ({ title, body })),
     apps: shots(apps, zh),
     games: shots(games, zh),
     guide: guide[language].map(([label, slug]) => ({ label, href: `${t.base}${slug}/` })),

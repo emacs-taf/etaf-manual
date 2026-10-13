@@ -17,6 +17,7 @@ export default defineConfig({
     starlight({
       title: 'ETAF Reference Manual',
       favicon: '/favicon.svg',
+      logo: { src: './src/assets/etaf-icon.svg' },
       customCss: ['./src/styles/custom.css'],
       // Chinese text and code render in LXGW WenKai, subset by unicode-range,
       // so a page fetches only the glyph files it uses.
@@ -24,8 +25,6 @@ export default defineConfig({
         { tag: 'link', attrs: { rel: 'stylesheet', href: `${wenkai}/lxgwwenkai-regular.css` } },
         { tag: 'link', attrs: { rel: 'stylesheet', href: `${wenkai}/lxgwwenkai-bold.css` } },
         { tag: 'link', attrs: { rel: 'stylesheet', href: `${wenkai}/lxgwwenkaimono-regular.css` } },
-        // Opens landing screenshots in a full-screen overlay.
-        { tag: 'script', attrs: { src: '/lightbox.js', defer: true } },
       ],
       locales: {
         root: { label: 'English', lang: 'en' },

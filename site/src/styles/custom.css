@@ -13,11 +13,6 @@
    takes a hairline of text stroke; code keeps none, because the mono face
    is already even. */
 
-/* Webfonts for the landing page only; browsers fetch a face when a page
-   actually uses the family. */
-@import '@fontsource-variable/inter/wght.css';
-@import '@fontsource-variable/space-grotesk/wght.css';
-
 html {
   font-size: 93.75%; /* 15px base */
 }
@@ -58,255 +53,23 @@ html {
   -webkit-text-stroke: 0;
 }
 
+/* The manual header carries the ETAF mark beside its title. */
+.site-title { gap: 0.6rem; }
+.site-title img { border-radius: 6px; height: 1.75rem; width: 1.75rem; }
+
+/* The violet of the ETAF mark, shared with the landing page. */
+:root {
+  --sl-color-accent-low: #2a1d4f;
+  --sl-color-accent: #8b5cf6;
+  --sl-color-accent-high: #d9ccff;
+}
+
 :root[data-theme='light'] {
   --sl-color-text: hsl(224, 16%, 15%);
-  --sl-color-text-accent: hsl(234, 80%, 36%);
-}
-
-/* Landing page.  Starlight marks splash pages with `data-has-hero`; the
-   manual's Pragmata Pro and WenKai stay for reading pages, while the landing
-   gets a modern sans pairing, a tinted hero wash and a screenshot wall. */
-html[data-has-hero] {
-  /* Native faces first: they are always present, crisp at every size and
-     never depend on a font file a cached page could miss. */
-  --sl-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Noto Sans", "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB",
-    "Microsoft YaHei", sans-serif;
-  --sl-font-mono: "PragmataPro", ui-monospace, SFMono-Regular, "SF Mono",
-    Menlo, monospace;
-}
-
-html[data-has-hero] .hero h1,
-html[data-has-hero] .sl-markdown-content h2,
-html[data-has-hero] .card .title {
-  font-family: inherit;
-  letter-spacing: -0.025em;
-}
-
-html[data-has-hero] .hero {
-  isolation: isolate;
-  /* The showcase belongs on the first screen: the hero stays short enough
-     for the feature cards to follow it. */
-  padding-block: 2.25rem 1.25rem;
-  position: relative;
-}
-
-html[data-has-hero] {
-  /* The hero card below must never widen the document on narrow screens. */
-  overflow-x: clip;
-}
-
-html[data-has-hero] .hero h1 {
-  font-size: clamp(2.4rem, 5.4vw, 3.4rem);
-  line-height: 1.05;
-}
-
-html[data-has-hero] .hero .tagline {
-  color: var(--sl-color-gray-3);
-  font-size: clamp(1rem, 1.5vw, 1.15rem);
-  line-height: 1.6;
-  margin-block: 0.9rem 0;
-  max-width: 34rem;
-  /* Keep the hero to two balanced lines with no orphan on phone widths. */
-  text-wrap: pretty;
-}
-
-html[data-has-hero] .hero .actions {
-  gap: 0.75rem;
-  margin-top: 1.35rem;
-}
-
-.etaf-hero-icon {
-  filter: drop-shadow(0 14px 28px rgb(124 92 224 / 0.32));
-  height: auto;
-  width: 6.5rem;
-}
-
-.etaf-shots {
-  display: grid;
-  gap: 1.5rem 1.25rem;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-  margin-block: 1.25rem 2rem;
-}
-
-/* Starlight puts a vertical gap between every two markdown elements; the
-   landing's own grids arrange their children, so the gap is dropped inside
-   them and the cards and tiles line up. */
-html[data-has-hero] :is(.etaf-features, .etaf-shots, .etaf-shots figure) > * {
-  margin-top: 0;
-}
-
-.etaf-shot-link {
-  display: block;
-}
-
-.etaf-shots figure {
-  margin: 0;
-  transition: transform 0.2s ease;
-}
-
-.etaf-shots figure:hover {
-  transform: translateY(-3px);
-}
-
-.etaf-shots .etaf-shot {
-  /* Every capture comes from the same frame, so one ratio gives the wall
-     even rows, captions on one line and no ragged column. */
-  aspect-ratio: 3100 / 1980;
-  background: var(--sl-color-bg-nav);
-  border: 1px solid var(--sl-color-hairline);
-  border-radius: 0.6rem;
-  display: block;
-  height: auto;
-  object-fit: contain;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  width: 100%;
-}
-
-.etaf-shots figure:hover .etaf-shot {
-  border-color: var(--sl-color-accent);
-  box-shadow: 0 14px 34px rgb(0 0 0 / 0.18);
-}
-
-.etaf-shots figcaption {
-  color: var(--sl-color-gray-3);
-  font-size: var(--sl-text-sm);
-  margin-top: 0.45rem;
-}
-
-/* Landing page: feature cards, screenshot links and the lightbox.
-
-   The feature cards replace Starlight's staggered CardGrid, whose offset
-   reads as misalignment; the cards below share one grid and one height. */
-.etaf-features {
-  display: grid;
-  gap: 1rem;
-  grid-auto-rows: 1fr;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
-  margin-block: 1.25rem 2.5rem;
-}
-
-/* Section headings read as dividers instead of running text. */
-html[data-has-hero] .sl-markdown-content h2 {
-  border-top: 1px solid var(--sl-color-hairline);
-  font-size: clamp(1.5rem, 2.4vw, 1.85rem);
-  margin-top: 3.25rem;
-  padding-top: 2.25rem;
-}
-
-/* Only the section labels ("Applications", "Games"); card titles keep their
-   own case and size. */
-html[data-has-hero] .sl-markdown-content .sl-heading-wrapper.level-h3 h3 {
-  color: var(--sl-color-gray-2);
-  font-size: 0.95rem;
-  letter-spacing: 0.06em;
-  margin-block: 2rem 1rem;
-  text-transform: uppercase;
-}
-
-.etaf-feature {
-  background: var(--sl-color-bg-nav);
-  border: 1px solid var(--sl-color-hairline);
-  border-radius: 0.85rem;
-  height: 100%;
-  padding: 1.05rem 1.15rem;
-  transition: border-color 0.2s ease, transform 0.2s ease;
-}
-
-.etaf-feature:hover {
-  border-color: var(--sl-color-accent);
-  transform: translateY(-2px);
-}
-
-.etaf-feature h3 {
-  align-items: center;
-  display: flex;
-  font-size: var(--sl-text-base);
-  gap: 0.5rem;
-  margin: 0 0 0.45rem;
-}
-
-.etaf-feature-icon {
-  color: var(--sl-color-accent);
-  flex: none;
-}
-
-.etaf-feature p {
-  color: var(--sl-color-gray-3);
-  font-size: var(--sl-text-sm);
-  line-height: 1.6;
-  margin: 0;
-}
-
-.etaf-shot-link {
-  display: block;
-  border-radius: 0.4rem;
-}
-
-.etaf-lightbox {
-  align-items: center;
-  background: rgb(8 10 16 / 0.94);
-  cursor: zoom-out;
-  display: flex;
-  inset: 0;
-  justify-content: center;
-  padding: 2vmin;
-  position: fixed;
-  z-index: 9999;
-}
-
-.etaf-lightbox img {
-  border-radius: 0.5rem;
-  box-shadow: 0 30px 90px rgb(0 0 0 / 0.55);
-  height: auto;
-  max-height: 96vh;
-  max-width: 100%;
-  width: auto;
-}
-
-@media (max-width: 640px) {
-  html[data-has-hero] .hero {
-    padding-block: 1rem 0.25rem;
-  }
-
-  html[data-has-hero] .hero h1 {
-    font-size: 2.1rem;
-  }
-
-  html[data-has-hero] .hero .tagline {
-    font-size: 1rem;
-    /* A phone keeps the tagline tight so the cards stay on the first screen. */
-    margin-block: 0.7rem 0;
-  }
-
-  html[data-has-hero] .hero .actions {
-    gap: 0.6rem;
-    margin-top: 1rem;
-  }
-
-  /* The brand mark shrinks with the hero and centres above the title; the
-     extra selector keeps it ahead of Starlight's own hero image rule. */
-  html[data-has-hero] .hero .hero-html {
-    justify-content: center;
-    margin-inline: auto;
-  }
-
-  html[data-has-hero] .hero .etaf-hero-icon {
-    width: 4.25rem;
-  }
-
-  .etaf-shots {
-    gap: 0.9rem;
-  }
-
-  .etaf-lightbox {
-    padding: 0;
-  }
-
-  .etaf-lightbox img {
-    border-radius: 0;
-    max-height: 100vh;
-  }
+  --sl-color-accent-low: #ede7fe;
+  --sl-color-accent: #6d28d9;
+  --sl-color-accent-high: #3b1580;
+  --sl-color-text-accent: #6d28d9;
 }
 
 /* Nothing on the site scrolls sideways.  Starlight lets code blocks and

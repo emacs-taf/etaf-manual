@@ -284,8 +284,13 @@ html[data-has-hero] .sl-markdown-content .sl-heading-wrapper.level-h3 h3 {
     margin-top: 1rem;
   }
 
-  /* The brand mark shrinks with the hero instead of pushing the cards down;
-     the extra selector keeps it ahead of Starlight's own hero image rule. */
+  /* The brand mark shrinks with the hero and centres above the title; the
+     extra selector keeps it ahead of Starlight's own hero image rule. */
+  html[data-has-hero] .hero .hero-html {
+    justify-content: center;
+    margin-inline: auto;
+  }
+
   html[data-has-hero] .hero .etaf-hero-icon {
     width: 4.25rem;
   }

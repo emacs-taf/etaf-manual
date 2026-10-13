@@ -29,6 +29,26 @@
 构建站点并把新版本部署到 `current` 软链之后。页面内的章间链接会改写成站点路由，
 `elisp :run` 与 `:figure` 代码块会变成带标签的普通 `elisp` 块，因为静态页面无法挂载 View。
 
+首页是独立的 Astro 页面，不是 Starlight splash：`site/src/components/Landing.astro`
+按 `site/src/data/landing.mjs` 里的文案、截图和仓库链接渲染，
+`site/src/pages/index.astro` 与 `site/src/pages/zh-cn/index.astro` 选择语言。
+Starlight 的内容流、标题包装和栏宽会和自由布局冲突，所以它只负责阅读页。
+两者共用 `site/src/styles/brand.css`，其中定义字体和浅色、深色两套配色；
+`site/src/styles/custom.css` 把它们映射到 Starlight 并设定阅读尺寸。
+配色主题存放在 `starlight-theme` 键下，在任一侧切换都会同步到另一侧。
+
+站点保持书籍式的排版风格，修改时调整这些设定，不要另加局部样式：
+
+- 字体：拉丁文正文与标题用 Source Serif 4，中文正文用霞鹜文楷，中文标题用
+  Noto Serif SC，代码与小号标签用 IBM Plex Mono 加霞鹜文楷等宽。字体来自
+  fontsource 包，按 unicode-range 切片自托管；霞鹜文楷从其 webfont CDN 加载。
+- 阅读：正文 18px、行高 1.75（中文 1.85），栏宽 44rem；导航与页内目录保持
+  15px 和 14px。
+- 配色：暖色纸墨，ETAF 标志的紫色只用于链接和小处点缀。不用渐变、光晕、
+  毛玻璃和仿窗口外框。
+- 布局：任何宽度下都没有元素横向滚动，代码块与表格改为折行；改动后检查
+  390 与 360 CSS 像素。
+
 ## 全书描述
 
 `book/book.json` 是一个 JSON 对象，字段如下：

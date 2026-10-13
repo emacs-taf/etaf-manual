@@ -32,6 +32,32 @@ release behind the `current` symlink.  Chapter links inside the pages are
 rewritten to site routes, and `elisp :run` and `:figure` fences become plain
 `elisp` blocks with a label, because a static page cannot mount a view.
 
+The landing page is a standalone Astro page, not a Starlight splash:
+`site/src/components/Landing.astro` renders it from the copy, screenshots
+and repository links in `site/src/data/landing.mjs`, and
+`site/src/pages/index.astro` and `site/src/pages/zh-cn/index.astro` select
+the language.  Starlight's content flow, heading wrappers and column width
+fight a free layout, so Starlight keeps only the reading pages.  Both share
+`site/src/styles/brand.css`, which holds the faces and the light and dark
+palettes; `site/src/styles/custom.css` maps them onto Starlight and sets the
+reading sizes.  The colour theme is stored under the `starlight-theme` key,
+so a choice on either side carries over.
+
+The site keeps an editorial look, so change these tokens rather than adding
+local styles:
+
+- Faces: Source Serif 4 for Latin text and headings, LXGW WenKai for Chinese
+  text, Noto Serif SC for Chinese headings, and IBM Plex Mono with WenKai
+  Mono for code and small labels.  Fonts are self-hosted from fontsource
+  packages split by unicode-range; WenKai comes from its webfont CDN.
+- Reading: 18px body text with a 1.75 line height (1.85 for Chinese) in a
+  44rem column; navigation and the page outline stay at 15px and 14px.
+- Colour: warm paper and ink, with the violet of the ETAF mark only for
+  links and small accents.  No gradients, glows, glass blur or imitation
+  window frames.
+- Layout: no element scrolls sideways at any width, including code blocks
+  and tables, which wrap; check 390 and 360 CSS pixels after a change.
+
 ## The book description
 
 `book/book.json` is a JSON object with these fields:

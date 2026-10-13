@@ -92,20 +92,8 @@ html[data-has-hero] .hero {
 }
 
 html[data-has-hero] {
-  /* The hero wash below must never widen the document on narrow screens. */
+  /* The hero card below must never widen the document on narrow screens. */
   overflow-x: clip;
-}
-
-html[data-has-hero] .hero::before {
-  background:
-    radial-gradient(55% 60% at 22% 12%, rgb(124 92 224 / 0.16), transparent 72%),
-    radial-gradient(45% 55% at 82% 6%, rgb(56 148 255 / 0.12), transparent 72%);
-  content: '';
-  inset: -6rem 0 auto;
-  height: 34rem;
-  pointer-events: none;
-  position: absolute;
-  z-index: -1;
 }
 
 html[data-has-hero] .hero h1 {
@@ -136,9 +124,20 @@ html[data-has-hero] .hero .actions {
 
 .etaf-shots {
   display: grid;
-  gap: 1rem 1.25rem;
+  gap: 1.5rem 1.25rem;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
   margin-block: 1.25rem 2rem;
+}
+
+/* Starlight puts a vertical gap between every two markdown elements; the
+   landing's own grids arrange their children, so the gap is dropped inside
+   them and the cards and tiles line up. */
+html[data-has-hero] :is(.etaf-features, .etaf-shots, .etaf-shots figure) > * {
+  margin-top: 0;
+}
+
+.etaf-shot-link {
+  display: block;
 }
 
 .etaf-shots figure {
@@ -151,10 +150,15 @@ html[data-has-hero] .hero .actions {
 }
 
 .etaf-shots .etaf-shot {
+  /* Every capture comes from the same frame, so one ratio gives the wall
+     even rows, captions on one line and no ragged column. */
+  aspect-ratio: 3100 / 1980;
+  background: var(--sl-color-bg-nav);
   border: 1px solid var(--sl-color-hairline);
-  border-radius: 0.4rem;
+  border-radius: 0.6rem;
   display: block;
   height: auto;
+  object-fit: contain;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   width: 100%;
 }
@@ -180,6 +184,24 @@ html[data-has-hero] .hero .actions {
   grid-auto-rows: 1fr;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
   margin-block: 1.25rem 2.5rem;
+}
+
+/* Section headings read as dividers instead of running text. */
+html[data-has-hero] .sl-markdown-content h2 {
+  border-top: 1px solid var(--sl-color-hairline);
+  font-size: clamp(1.5rem, 2.4vw, 1.85rem);
+  margin-top: 3.25rem;
+  padding-top: 2.25rem;
+}
+
+/* Only the section labels ("Applications", "Games"); card titles keep their
+   own case and size. */
+html[data-has-hero] .sl-markdown-content .sl-heading-wrapper.level-h3 h3 {
+  color: var(--sl-color-gray-2);
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  margin-block: 2rem 1rem;
+  text-transform: uppercase;
 }
 
 .etaf-feature {

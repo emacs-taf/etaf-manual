@@ -24,12 +24,12 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{t.title} · {t.manualTitle}</title>
+  <title>{t.title} — {t.gloss || t.fullName}</title>
   <meta name="description" content={t.description} />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="alternate" hreflang="en" href="https://etaf.top/" />
   <link rel="alternate" hreflang="zh-CN" href="https://etaf.top/zh-cn/" />
-  <meta property="og:title" content={t.title} />
+  <meta property="og:title" content={`${t.title} — ${t.fullName}`} />
   <meta property="og:description" content={t.description} />
   <meta property="og:image" content={`https://etaf.top${hero.image}`} />
   {t.lang === 'zh-CN' && <link rel="stylesheet" href={`${wenkai}/lxgwwenkai-regular.css`} />}
@@ -67,7 +67,13 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
 
   <main>
     <section class="wrap hero">
-      <img class="hero-mark" src={mark.src} alt="ETAF" width="52" height="52" />
+      <div class="hero-id">
+        <img src={mark.src} alt="" width="52" height="52" />
+        <p>
+          <span class="acronym">ETAF</span>
+          <span class="full-name">{t.fullName}{t.gloss && <span class="gloss">{t.gloss}</span>}</span>
+        </p>
+      </div>
       <h1>{t.headline}</h1>
       <div class="hero-side">
       <p class="tagline">{t.tagline}</p>
@@ -266,7 +272,18 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
   .hero > h1 { grid-column: 1; grid-row: 2; }
   .hero-side { align-self: end; grid-column: 2; grid-row: 2; padding-bottom: 0.6rem; }
   .hero-side .tagline { margin-top: 0; }
-  .hero-mark { border-radius: 12px; margin-bottom: 2.25rem; }
+  .hero-id { align-items: center; display: flex; gap: 1rem; margin-bottom: 2.5rem; }
+  .hero-id img { border-radius: 12px; }
+  .hero-id p { display: grid; gap: 0.2rem; margin: 0; }
+  .acronym {
+    color: var(--etaf-ink); font-family: var(--etaf-font-display); font-size: 1.35rem; font-weight: 600;
+    letter-spacing: 0.02em; line-height: 1.2;
+  }
+  .full-name {
+    color: var(--etaf-ink-3); display: grid; font-family: var(--etaf-font-mono);
+    font-size: 0.8125rem; letter-spacing: 0.04em; line-height: 1.5;
+  }
+  .gloss { font-family: var(--etaf-font-text); letter-spacing: 0.08em; }
   .hero h1 {
     color: var(--etaf-ink);
     font-family: var(--etaf-font-display);
@@ -416,7 +433,9 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
     .hide-sm { display: none; }
     .nav-row { height: 56px; }
     .nav-links { gap: 1.15rem; }
-    .hero-mark { height: 44px; margin-bottom: 1.75rem; width: 44px; }
+    .hero-id { gap: 0.85rem; margin-bottom: 2rem; }
+    .hero-id img { border-radius: 10px; height: 44px; width: 44px; }
+    .full-name { font-size: 0.75rem; letter-spacing: 0.02em; }
     .features { grid-template-columns: 1fr; gap: 1.75rem; }
     .gallery, .games { gap: 2.25rem; grid-template-columns: 1fr; }
     .game-row { gap: 2.25rem; grid-template-columns: 1fr !important; }

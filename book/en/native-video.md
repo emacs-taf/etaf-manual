@@ -35,26 +35,37 @@ Render a live video source in a fixed COLUMNS by ROWS canvas.
 
 <!-- index: etaf-video-source-info; source kinds; probe defaults; normalized metadata -->
 
-A source is described once and then used by value: probing returns a plist that the Component accepts directly, so an application that reads dimensions or duration before mounting does not probe twice.
+A source is described once and then used by value: probing returns a plist that the Component accepts directly, so an application that reads dimensions or duration before mounting does not probe twice. A video source may split its video and audio into two HTTP(S) streams, and carries request headers and a proxy for authenticated playback.
 
 #### Function: etaf-video-source-info (source)
 
 Return SOURCE's normalized playback metadata as a plist.
 
-**Arguments.** SOURCE is nil for the built-in demo, a local file name, an HTTP(S) URL string, or a plist with `:file`, `:url` or `:demo`. A plist that already carries `:kind` is treated as authoritative metadata, which is what this function returns.
+**Arguments.** SOURCE is nil for the built-in demo, a local file name, an HTTP(S) URL string, or a plist with `:file`, `:url` or `:demo`. A `:url` source may also name a separate audio stream with `:audio-url` and carry `:headers` (an alist, a hash table or one `Name: value' string) and `:proxy' for network access. A plist that already carries `:kind` is treated as authoritative metadata, which is what this function returns.
 
-**Semantics.** The result holds `:kind` (`file`, `url` or `demo`), `:file`, `:url`, `:target` (the file or URL to open), `:width`, `:height`, `:duration`, `:fps` (the source frame rate) and `:audio` (whether the source reports an audio stream). A file or URL is probed; a missing prober keeps the documented defaults of 640 by 360 at 25 frames per second with no duration and no audio. The demo needs no program and reports 640 by 360, 30 frames per second and 30 seconds. An authoritative plist is copied as given, so its missing keys stay nil rather than being filled with defaults. Each call probes; the result can be passed back later without another probe.
+**Semantics.** The result holds `:kind` (`file`, `url` or `demo`), `:file`, `:url`, `:target` (the video stream ffmpeg opens), `:audio-url`, `:audio-target` (the stream the audio sidecar opens, falling back to `:target`), `:headers`, `:proxy`, `:width`, `:height`, `:duration`, `:fps` (the source frame rate) and `:audio` (whether the source reports an audio stream; a present `:audio-url` implies one). Only the video stream is probed, never the audio URL, and the probe carries the same `:headers` and `:proxy`. A missing prober keeps the documented defaults of 640 by 360 at 25 frames per second with no duration and no audio. The demo needs no program and reports 640 by 360, 30 frames per second and 30 seconds. An authoritative plist is copied as given, so its missing keys stay nil rather than being filled with defaults, except `:audio-target` and the `:audio` a present `:audio-url` implies. Each call probes; the result can be passed back later without another probe.
 
 **Returns.** The metadata plist.
 
-**Errors.** `error→ user-error` with `"Unsupported etaf-video source kind: %S"` for a `:kind` other than the three, `"Unsupported etaf-video source: %S"` for a value that is not a string, a source plist or nil, `"Video file is not readable: %S"` when a file is missing or unreadable, and `"Video URL must be http or https: %S"` when a `:url` entry is not an HTTP(S) URL. A bare string that is neither an HTTP(S) URL nor a readable file is treated as a file name and reports the file error.
+**Errors.** `error→ user-error` with `"Unsupported etaf-video source kind: %S"` for a `:kind` other than the three, `"Unsupported etaf-video source: %S"` for a value that is not a string, a source plist or nil, `"Video file is not readable: %S"` when a file is missing or unreadable, `"Video URL must be http or https: %S"` when a `:url` entry is not an HTTP(S) URL, `"Video audio URL must be http or https: %S"` when `:audio-url` is not, `"Video proxy must be an http or https URL: %S"` when `:proxy` is not, and `"Video header line is malformed: %S"`, `"Video headers must be name and value strings: %S"` or `"Video header names and values must not contain control characters: %S"` for a malformed header entry. A bare string that is neither an HTTP(S) URL nor a readable file is treated as a file name and reports the file error.
 
 **Example.**
 
 ```elisp
 (etaf-video-source-info nil)
-;; ⇒ (:kind demo :file nil :url nil :target nil :width 640 :height 360
+;; ⇒ (:kind demo :file nil :url nil :target nil :audio-url nil
+;;    :audio-target nil :headers nil :proxy nil :width 640 :height 360
 ;;    :duration 30 :fps 30 :audio nil)
+```
+
+A source with separate streams that needs headers and a proxy:
+
+```elisp
+(etaf-video-source-info
+ '(:url "https://media.example/video.m4s"
+   :audio-url "https://media.example/audio.m4s"
+   :headers '(("User-Agent" . "MyApp/1.0"))
+   :proxy "http://127.0.0.1:7890"))
 ```
 
 **See also.** `etaf-video`, `etaf-video-state`, `etaf-video-seek`.
@@ -177,7 +188,7 @@ The state callback of a video playback session.
 
 <!-- index: etaf-video-audio; etaf-video-audio-volume; etaf-video-set-volume; etaf-video-set-audio; audio sidecar -->
 
-Audio plays through a separate player process, the *sidecar*, so decoding the picture and playing the sound stay independent. A session owns at most one sidecar; it starts with playback and is released by pause, seek, speed change or unmount. A source that reports no audio stream, the built-in demo and a missing player all stay silent without an error.
+Audio plays through a separate player process, the *sidecar*, so decoding the picture and playing the sound stay independent. A source that names a separate `:audio-url` plays that stream; otherwise the sidecar opens the video source itself. The sidecar receives the same `:headers` and `:proxy` as the video decoder, so an authenticated source takes its picture and sound from one access description. A session owns at most one sidecar; it starts with playback and is released by pause, seek, speed change or unmount. A source that reports no audio stream, the built-in demo and a missing player all stay silent without an error.
 
 #### Variable: etaf-video-audio
 
@@ -298,7 +309,7 @@ Video playback can fail in four places: reading the source, validating the Compo
 | Failure | What happens |
 | --- | --- |
 | A Component prop is outside its contract | `etaf-component-call-error` at the call, naming the property and the expected value; nothing is mounted |
-| SRC is unsupported, unreadable, or its URL scheme is not HTTP(S) | `user-error` before any decoder starts |
+| SRC is unsupported, unreadable, its URL scheme is not HTTP(S), or `:audio-url`, `:proxy` or `:headers` is malformed | `user-error` before any decoder starts |
 | A handle names no mounted video or is not a symbol | `user-error` from every control function |
 | The same handle is mounted twice | `user-error`; the second video does not mount |
 | ffmpeg is missing or cannot start | `user-error` before any process exists; nothing plays |

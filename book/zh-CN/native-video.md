@@ -35,26 +35,37 @@
 
 <!-- index: etaf-video-source-info; 源类型; 探测默认值; 规范化元数据 -->
 
-源描述一次后即按值使用：探测返回的 plist 可直接交给 Component，所以挂载前读取尺寸或时长的应用不会探测两次。
+源描述一次后即按值使用：探测返回的 plist 可直接交给 Component，所以挂载前读取尺寸或时长的应用不会探测两次。视频与音频可以是两个独立的 HTTP(S) 流，请求头与代理也由同一份源描述携带。
 
 #### Function: etaf-video-source-info (source)
 
 返回 SOURCE 规范化后的播放元数据 plist。
 
-**参数。** SOURCE 为 nil 时是内置 demo，也可以是本地文件名、HTTP 或 HTTPS URL 字符串，或带 `:file`、`:url` 或 `:demo` 的 plist。已经带 `:kind` 的 plist 被当作权威元数据，也就是本函数返回的那种结果。
+**参数。** SOURCE 为 nil 时是内置 demo，也可以是本地文件名、HTTP 或 HTTPS URL 字符串，或带 `:file`、`:url` 或 `:demo` 的 plist。`:url` 源可以再用 `:audio-url` 指定独立音频流，并用 `:headers`（alist、hash table 或一条 `Name: value` 字符串）与 `:proxy` 携带网络选项。已经带 `:kind` 的 plist 被当作权威元数据，也就是本函数返回的那种结果。
 
-**语义。** 结果的键有 `:kind`（`file`、`url` 或 `demo`）、`:file`、`:url`、`:target`（要打开的文件或 URL）、`:width`、`:height`、`:duration`、`:fps`（源帧率）与 `:audio`（源是否报告有音轨）。文件或 URL 会被探测；探测程序缺失时保留文档默认值——640 × 360、每秒 25 帧、无时长、无音频。demo 不需要任何程序，报告 640 × 360、每秒 30 帧、30 秒。权威 plist 原样复制，所以它缺失的键保持 nil，而不会被默认值补上。每次调用都会探测；结果可以之后再传回来，而不再探测。
+**语义。** 结果的键有 `:kind`（`file`、`url` 或 `demo`）、`:file`、`:url`、`:target`（ffmpeg 打开的视频流）、`:audio-url`、`:audio-target`（音频旁路打开的流，缺省回退到 `:target`）、`:headers`、`:proxy`、`:width`、`:height`、`:duration`、`:fps`（源帧率）与 `:audio`（源是否报告有音轨；存在 `:audio-url` 即视为有音频）。只探测视频流，音频 URL 不探测，探测同样带上 `:headers` 与 `:proxy`。探测程序缺失时保留文档默认值——640 × 360、每秒 25 帧、无时长、无音频。demo 不需要任何程序，报告 640 × 360、每秒 30 帧、30 秒。权威 plist 原样复制，所以它缺失的键保持 nil，而不会被默认值补上，但 `:audio-target` 与由 `:audio-url` 推出的 `:audio` 除外。每次调用都会探测；结果可以之后再传回来，而不再探测。
 
 **返回。** 元数据 plist。
 
-**错误。** `:kind` 不是三个合法值时 `error→ user-error`，消息 `"Unsupported etaf-video source kind: %S"`；值不是字符串、源 plist 或 nil 时 `error→ user-error`，消息 `"Unsupported etaf-video source: %S"`；文件缺失或不可读时 `error→ user-error`，消息 `"Video file is not readable: %S"`；`:url` 条目不是 HTTP 或 HTTPS URL 时 `error→ user-error`，消息 `"Video URL must be http or https: %S"`。既不是 HTTP 或 HTTPS URL 也不是可读文件的裸字符串按文件名处理，报文件错误。
+**错误。** `:kind` 不是三个合法值时 `error→ user-error`，消息 `"Unsupported etaf-video source kind: %S"`；值不是字符串、源 plist 或 nil 时 `error→ user-error`，消息 `"Unsupported etaf-video source: %S"`；文件缺失或不可读时 `error→ user-error`，消息 `"Video file is not readable: %S"`；`:url` 条目不是 HTTP 或 HTTPS URL 时 `error→ user-error`，消息 `"Video URL must be http or https: %S"`；`:audio-url` 不是时消息 `"Video audio URL must be http or https: %S"`；`:proxy` 不是时消息 `"Video proxy must be an http or https URL: %S"`；头条目格式非法时报 `"Video header line is malformed: %S"`、`"Video headers must be name and value strings: %S"` 或 `"Video header names and values must not contain control characters: %S"`。既不是 HTTP 或 HTTPS URL 也不是可读文件的裸字符串按文件名处理，报文件错误。
 
 **示例。**
 
 ```elisp
 (etaf-video-source-info nil)
-;; ⇒ (:kind demo :file nil :url nil :target nil :width 640 :height 360
+;; ⇒ (:kind demo :file nil :url nil :target nil :audio-url nil
+;;    :audio-target nil :headers nil :proxy nil :width 640 :height 360
 ;;    :duration 30 :fps 30 :audio nil)
+```
+
+视频与音频分离、需要请求头与代理的源：
+
+```elisp
+(etaf-video-source-info
+ '(:url "https://media.example/video.m4s"
+   :audio-url "https://media.example/audio.m4s"
+   :headers '(("User-Agent" . "MyApp/1.0"))
+   :proxy "http://127.0.0.1:7890"))
 ```
 
 **参见。** `etaf-video`、`etaf-video-state`、`etaf-video-seek`。
@@ -177,7 +188,7 @@
 
 <!-- index: etaf-video-audio; etaf-video-audio-volume; etaf-video-set-volume; etaf-video-set-audio; 音频旁路 -->
 
-音频经独立的播放器进程——*旁路*——播放，所以画面解码与声音播放互不牵制。一个会话至多拥有一个旁路；它随播放启动，随暂停、定位、变速或卸载释放。没有音轨的源、内置 demo 和缺失的播放器都保持静音，且不报错。
+音频经独立的播放器进程——*旁路*——播放，所以画面解码与声音播放互不牵制。源用 `:audio-url` 描述独立音频流时，旁路打开该流；否则打开视频源本身。旁路使用与视频解码器相同的 `:headers` 与 `:proxy`，因此鉴权源的画面与声音共用同一份权限描述。一个会话至多拥有一个旁路；它随播放启动，随暂停、定位、变速或卸载释放。没有音轨的源、内置 demo 和缺失的播放器都保持静音，且不报错。
 
 #### Variable: etaf-video-audio
 
@@ -298,7 +309,7 @@
 | 失败 | 会发生什么 |
 | --- | --- |
 | Component 属性超出约定 | 调用时报 `etaf-component-call-error`，点名属性与期望值；什么都不挂载 |
-| SRC 不支持、不可读，或 URL 协议不是 HTTP 或 HTTPS | 在任何解码器启动之前报 `user-error` |
+| SRC 不支持、不可读，协议不是 HTTP(S)，或 `:audio-url`、`:proxy`、`:headers` 非法 | 在任何解码器启动之前报 `user-error` |
 | handle 没有对应已挂载视频或不是符号 | 每个控制函数都报 `user-error` |
 | 同一个 handle 被挂载两次 | `user-error`；第二个视频不挂载 |
 | ffmpeg 缺失或无法启动 | 在任何进程存在之前报 `user-error`；什么都不播放 |

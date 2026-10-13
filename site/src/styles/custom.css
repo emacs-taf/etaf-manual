@@ -67,8 +67,11 @@ html {
    manual's Pragmata Pro and WenKai stay for reading pages, while the landing
    gets a modern sans pairing, a tinted hero wash and a screenshot wall. */
 html[data-has-hero] {
-  --sl-font: "Inter Variable", "PingFang SC", "Hiragino Sans GB",
-    "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  /* Native faces first: they are always present, crisp at every size and
+     never depend on a font file a cached page could miss. */
+  --sl-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Noto Sans", "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", sans-serif;
   --sl-font-mono: "PragmataPro", ui-monospace, SFMono-Regular, "SF Mono",
     Menlo, monospace;
 }
@@ -76,13 +79,15 @@ html[data-has-hero] {
 html[data-has-hero] .hero h1,
 html[data-has-hero] .sl-markdown-content h2,
 html[data-has-hero] .card .title {
-  font-family: "Space Grotesk Variable", "Inter Variable", "PingFang SC",
-    "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  letter-spacing: -0.02em;
+  font-family: inherit;
+  letter-spacing: -0.025em;
 }
 
 html[data-has-hero] .hero {
   isolation: isolate;
+  /* The showcase belongs on the first screen: the hero stays short enough
+     for the feature cards to follow it. */
+  padding-block: 2.25rem 1.25rem;
   position: relative;
 }
 
@@ -104,17 +109,23 @@ html[data-has-hero] .hero::before {
 }
 
 html[data-has-hero] .hero h1 {
-  font-size: clamp(2.75rem, 7vw, 4.5rem);
+  font-size: clamp(2.4rem, 5.4vw, 3.4rem);
   line-height: 1.05;
 }
 
 html[data-has-hero] .hero .tagline {
   color: var(--sl-color-gray-3);
-  font-size: clamp(1.05rem, 1.8vw, 1.3rem);
-  line-height: 1.65;
+  font-size: clamp(1rem, 1.5vw, 1.15rem);
+  line-height: 1.6;
+  margin-block: 0.9rem 0;
   max-width: 34rem;
   /* Keep the hero to two balanced lines with no orphan on phone widths. */
   text-wrap: pretty;
+}
+
+html[data-has-hero] .hero .actions {
+  gap: 0.75rem;
+  margin-top: 1.35rem;
 }
 
 .etaf-hero-icon {
@@ -168,7 +179,7 @@ html[data-has-hero] .hero .tagline {
   gap: 1rem;
   grid-auto-rows: 1fr;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
-  margin-block: 1.75rem 2.5rem;
+  margin-block: 1.25rem 2.5rem;
 }
 
 .etaf-feature {
@@ -233,11 +244,28 @@ html[data-has-hero] .hero .tagline {
 
 @media (max-width: 640px) {
   html[data-has-hero] .hero {
-    padding-block: 1.25rem 0.5rem;
+    padding-block: 1rem 0.25rem;
   }
 
   html[data-has-hero] .hero h1 {
-    font-size: 2.3rem;
+    font-size: 2.1rem;
+  }
+
+  html[data-has-hero] .hero .tagline {
+    font-size: 1rem;
+    /* A phone keeps the tagline tight so the cards stay on the first screen. */
+    margin-block: 0.7rem 0;
+  }
+
+  html[data-has-hero] .hero .actions {
+    gap: 0.6rem;
+    margin-top: 1rem;
+  }
+
+  /* The brand mark shrinks with the hero instead of pushing the cards down;
+     the extra selector keeps it ahead of Starlight's own hero image rule. */
+  html[data-has-hero] .hero .etaf-hero-icon {
+    width: 4.25rem;
   }
 
   .etaf-shots {

@@ -115,13 +115,14 @@ Terminals and batch sessions have no fonts to measure, so nothing is fitted ther
 
 <!-- index: graphical frame; terminal; batch session; capability -->
 
-The same tree renders on a graphical frame and on a terminal; the model above does not change, but the capabilities it rests on do.
+The same tree renders on a graphical frame and on a terminal; the model above does not change, but the capabilities it rests on do. Rounded outlines reuse cached corner images keyed by geometry, palette and display metrics, not by nodes or callbacks. Only the first and last lines need those slices; ordinary middle lines retain native text and border faces. Original display units are checked before cutting so a partial glyph cannot be mistaken for blank padding. See [Style Properties](style-properties.md#style-border-radius) for radius limits and square fallback.
 
 | Aspect | Graphical frame | Terminal |
 | --- | --- | --- |
 | Measurement | real font metrics; character widths are font pixels | one text line per row; widths follow the terminal's character grid |
 | Fitting | fallback glyphs are fitted and colour emoji can be image-based | nothing is fitted; a row is a text line |
 | Backgrounds | rounded corners and fractional block padding are painted as shapes | a background fills the whole border box |
+| Outlines | complete same-color 1 px solid frames use corner slices when blank padding permits; text stays native | square border faces |
 | Images | drawn at the frame's cell metrics | approximated with characters |
 
 A batch session has no window and no display: a mount still renders, with a viewport that falls back to the displaying window when there is one and to the fixed dimensions otherwise, and measurements use the default font's nominal metrics. Tests, previews and command-line tools rely on this, but it also means a pixel width measured in batch need not equal the width on a graphical frame, and layout that must be exact should be checked graphically.

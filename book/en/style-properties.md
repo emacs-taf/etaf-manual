@@ -391,7 +391,7 @@ Adds space outside the border box on the inline-start edge, the logical name of 
 
 Border widths take stroke units — `px`, `ch`, `lh`, `vw` and `vh`, without percentages — and a side paints only when its style is `solid`; `none` and `solid` are the only border styles. The left and right borders paint as pixel-wide spaces at their resolved width. The top and bottom borders become the line's overline and underline, so they are limited to one pixel: a wider top or bottom border signals `ebox-error` when the node is built or updated.
 
-Border colors are strings or `currentColor`, and `currentColor` uses the node's text color. `:border-radius` rounds the painted box background on graphical frames; terminals paint square corners.
+Border colors are strings or `currentColor`, and `currentColor` uses the node's text color. `:border-radius` rounds the painted box background and supported complete outlines on graphical frames; terminals paint square corners.
 
 #### Style: :border
 
@@ -585,9 +585,10 @@ Sets the left border color.
 | --- | --- | --- | --- | --- |
 | A non-negative inline-axis length | `(px 0)` | Every non-`text` node | No | Paint |
 
-Rounds the painted box background on graphical frames.
+Rounds the painted box background and complete one-pixel outlines on graphical frames.
 
-**Semantics.** The radius applies to the node's background; terminals still paint square, full-line backgrounds.
+**Semantics.** With SVG support, a complete same-color 1 px solid border rounds its first and last lines when both corners contain only blank padding. The outline radius is limited to one standard line and half the box width and height. Provide enough padding to keep text or media outside the corners; otherwise that line keeps its square outline rather than covering content. The middle stays native text, a header band keeps its own background, and geometry, focus and activation do not change. Unequal or incomplete borders, unavailable SVG support and terminals retain square outlines. Background rounding without an outline retains its existing behavior; terminals paint square, full-line backgrounds.
+
 ## Background and visibility
 
 <!-- index: background color; visibility -->

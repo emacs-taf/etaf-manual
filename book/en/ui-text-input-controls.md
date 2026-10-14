@@ -121,6 +121,34 @@ Render a controlled stepper NumberInput: a muted LABEL, a − stepper, the value
 
 **See also.** `etaf-text-input`, `etaf-slider`.
 
+## Outlined field tokens
+
+These tokens apply only to the outlined variant of `etaf-text-input`. A reactive Theme updates the retained field without ending native editing; focus changes the reserved frame's color, not its size. The plain variant keeps zero padding and no background or border of its own.
+
+#### Token: :ui-input-padding
+
+The outlined field's padding, using the `:padding` value syntax and falling back to `((lh 0) (ch 1))`.
+
+**Semantics.** For example, `((lh 1) (ch 2))` surrounds the value with standard-row padding while preserving the text's font metrics.
+
+#### Token: :ui-input-radius
+
+The outlined field's corner radius, using the `:border-radius` value syntax and falling back to `(px 0)`.
+
+**Semantics.** Rounded frame support and padding requirements follow [Style Properties](style-properties.md#style-border-radius).
+
+#### Token: :ui-input-bg
+
+The outlined field's background color.
+
+**Semantics.** If omitted, the field reads the current Theme's `:ui-panel-bg`, including its built-in fallback; supplying only a dark panel palette therefore keeps fields dark.
+
+#### Token: :ui-input-border
+
+The outlined field's idle one-pixel border color.
+
+**Semantics.** Use a hexadecimal color string. If omitted, the field reads `:ui-panel-border` from the current Theme. While editing it reads `:ui-accent` instead, keeping the one-pixel frame reserved in both states.
+
 ## Search tokens
 
 <!-- index: ui-search-bg; ui-search-fg; search pill paint -->

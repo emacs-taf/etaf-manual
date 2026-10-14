@@ -121,6 +121,34 @@
 
 **参见。** `etaf-text-input`、`etaf-slider`。
 
+## 描边输入框 token
+
+这些 token 只作用于 `etaf-text-input` 的 outlined 变体。响应式 Theme 更新保留的输入框而不结束原生编辑；焦点只改变预留边框的颜色，不改变尺寸。plain 变体保持零内边距且没有自己的背景或边框。
+
+#### Token: :ui-input-padding
+
+描边输入框的内边距，使用 `:padding` 的值语法，回退为 `((lh 0) (ch 1))`。
+
+**语义。** 例如 `((lh 1) (ch 2))` 在值周围留出标准行内边距，保持文字的字体度量。
+
+#### Token: :ui-input-radius
+
+描边输入框的圆角半径，使用 `:border-radius` 的值语法，回退为 `(px 0)`。
+
+**语义。** 圆角边框支持范围与 padding 要求见[样式属性](style-properties.md#style-border-radius)。
+
+#### Token: :ui-input-bg
+
+描边输入框的背景颜色。
+
+**语义。** 未提供时读取当前 Theme 的 `:ui-panel-bg`，包括其内置回退值；因此只提供暗色面板配色仍能使输入框保持暗色。
+
+#### Token: :ui-input-border
+
+描边输入框空闲时的单像素边框颜色。
+
+**语义。** 使用十六进制颜色字符串。未提供时读取当前 Theme 的 `:ui-panel-border`。编辑时改读 `:ui-accent`，两种状态都预留单像素边框。
+
 ## 搜索 token
 
 <!-- index: ui-search-bg; ui-search-fg; search pill paint -->

@@ -20,9 +20,9 @@
 
 渲染带提交回调的标准可按压按钮。
 
-**参数。** LABEL 命名按钮，除非 default slot 取而代之。ON-PRESS 是零参回调。DISABLED 移除回调与默认 Tab 序号。VARIANT 是 `primary`（accent 填充、加粗；默认）、`secondary`（accent 浅色）或 `ghost`（继承表面、内边距更窄）；每个变体都是无边框的单行药丸，variant 名进入第二个类名。呈现类 prop COLOR、BGCOLOR、BORDER、PADDING、FONT-SIZE 与 FONT-WEIGHT 覆盖变体默认值。ID 到达渲染出的 Host，使基于锚点的表面能按身份引用该按钮；CLASS、REF、TAB-INDEX、ARIA-LABEL、ARIA-SELECTED、HELP-ECHO、HOVER-CONTENT、HOVER-GROUP、POINTER 与 USE 是普通 Host 能力。
+**参数。** LABEL 命名按钮，除非 default slot 取而代之。ON-PRESS 是零参回调。DISABLED 移除回调与默认 Tab 序号。VARIANT 是 `primary`（accent 填充、加粗；默认）、`secondary`（accent 浅色）或 `ghost`（继承表面、内边距更窄）；默认每个变体都是无边框的单行药丸，variant 名进入第二个类名。可选的 `:ui-button-padding`、`:ui-button-radius` 与 `:ui-button-border` Theme token 改变共享几何；显式呈现属性优先。呈现类 prop COLOR、BGCOLOR、BORDER、PADDING、FONT-SIZE 与 FONT-WEIGHT 覆盖变体默认值。ID 到达渲染出的 Host，使基于锚点的表面能按身份引用该按钮；CLASS、REF、TAB-INDEX、ARIA-LABEL、ARIA-SELECTED、HELP-ECHO、HOVER-CONTENT、HOVER-GROUP、POINTER 与 USE 是普通 Host 能力。
 
-**语义。** Runtime 把 ON-PRESS 与可见按钮一起发布，因此渲染失败时保留此前的回调及它捕获的值。按钮是一行的：它不会缩到标签以下，也不会拆开标签文字，因此空间不足的 Flex 行会整体移动按钮，而不是拆开它的文字。启用且未选中的按钮在指针悬停时画变体的 hover 填充；若调用方提供 `:bgcolor`，则填充改由该底色派生。tab 与 segmented 这类 ARIA-SELECTED 控件保持选中表现，不叠加悬停高亮。键盘焦点给标签加下划线，并给自身没有底色的按钮补上填充。default slot 用普通的非交互内容（比如标题与描述）取代可见标签；LABEL 或 ARIA-LABEL 仍命名单一的焦点与激活目标，按钮内部嵌套控件是不合适的。原生根属性 `:pointer`、`:help-echo`、`:hover-style` 与 `:hover-content` 请求 Ebox 的文本属性能力，显式 nil 阻断继承来的能力。
+**语义。** Runtime 把 ON-PRESS 与可见按钮一起发布，因此渲染失败时保留此前的回调及它捕获的值。即使 padding 使控件变高，按钮标签仍保持一行：它不会缩到标签以下，也不会拆开标签文字，因此空间不足的 Flex 行会整体移动按钮，而不是拆开它的文字。启用且未选中的按钮在指针悬停时画变体的 hover 填充；若调用方提供 `:bgcolor`，则填充改由该底色派生。tab 与 segmented 这类 ARIA-SELECTED 控件保持选中表现，不叠加悬停高亮。键盘焦点给标签加下划线，并给自身没有底色的按钮补上填充。default slot 用普通的非交互内容（比如标题与描述）取代可见标签；LABEL 或 ARIA-LABEL 仍命名单一的焦点与激活目标，按钮内部嵌套控件是不合适的。原生根属性 `:pointer`、`:help-echo`、`:hover-style` 与 `:hover-content` 请求 Ebox 的文本属性能力，显式 nil 阻断继承来的能力。
 
 **返回。** 一个 View。
 
@@ -178,6 +178,24 @@
 ## 选择 token
 
 <!-- index: ui-button-primary-fg; ui-button-secondary-fg; ui-checkbox-enabled-fg; ui-range-fill -->
+
+#### Token: :ui-button-padding
+
+按钮的默认内边距，使用 `:padding` 的值语法。
+
+**语义。** 缺少此 token 时，各变体保持原有内边距。显式 PADDING prop 优先。例如 `((lh 1) (ch 2))` 在标签上下各留一标准行，不改变字体度量。
+
+#### Token: :ui-button-radius
+
+按钮的默认圆角半径，使用 `:border-radius` 的值语法，回退为 `(px 0)`。
+
+**语义。** 显式 `:border-radius` Host 属性优先。圆角描边支持范围与 padding 要求见[样式属性](style-properties.md#style-border-radius)。
+
+#### Token: :ui-button-border
+
+按钮的默认边框，使用 `:border` 的值语法，回退为无边框。
+
+**语义。** 显式非 nil BORDER prop 优先。完整描边可用 `((px 1) solid "#8798ae")`；控件布局预算应包含其水平宽度。
 
 #### Token: :ui-button-primary-fg
 

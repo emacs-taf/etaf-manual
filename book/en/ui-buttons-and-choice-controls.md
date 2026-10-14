@@ -20,9 +20,9 @@ Each control reads its input through the same contract. An explicit `:value` or 
 
 Render a standard pressable Button with a committed callback.
 
-**Arguments.** LABEL names the button and is shown unless a default slot replaces it. ON-PRESS is the zero-argument callback. DISABLED removes the callback and the default Tab index. VARIANT is `primary` (accent fill, bold; the default), `secondary` (soft accent tint) or `ghost` (inherits its surface, narrower padding); every variant is a borderless single-row pill whose second class name carries the variant. The presentation props COLOR, BGCOLOR, BORDER, PADDING, FONT-SIZE and FONT-WEIGHT override the variant's defaults. ID reaches the rendered Host so anchor-based surfaces can reference the Button by identity; CLASS, REF, TAB-INDEX, ARIA-LABEL, ARIA-SELECTED, HELP-ECHO, HOVER-CONTENT, HOVER-GROUP, POINTER and USE are the ordinary Host capabilities.
+**Arguments.** LABEL names the button and is shown unless a default slot replaces it. ON-PRESS is the zero-argument callback. DISABLED removes the callback and the default Tab index. VARIANT is `primary` (accent fill, bold; the default), `secondary` (soft accent tint) or `ghost` (inherits its surface, narrower padding); by default every variant is a borderless single-row pill whose second class name carries the variant. The optional `:ui-button-padding`, `:ui-button-radius` and `:ui-button-border` Theme tokens change the shared geometry; explicit presentation props take precedence. The presentation props COLOR, BGCOLOR, BORDER, PADDING, FONT-SIZE and FONT-WEIGHT override the variant's defaults. ID reaches the rendered Host so anchor-based surfaces can reference the Button by identity; CLASS, REF, TAB-INDEX, ARIA-LABEL, ARIA-SELECTED, HELP-ECHO, HOVER-CONTENT, HOVER-GROUP, POINTER and USE are the ordinary Host capabilities.
 
-**Semantics.** The Runtime publishes ON-PRESS together with the visible Button, so a render that fails to publish keeps the previous callback and the values it captured. A Button is one row: it never shrinks below its label or wraps the label's text, so a Flex line that runs out of room moves the whole Button instead of splitting its text.  An enabled, unselected Button paints its variant's hover fill while the pointer is over it, or a fill derived from its own `:bgcolor` when the caller supplied one; ARIA-SELECTED controls such as tabs and segments keep their selected presentation instead.  Keyboard focus underlines the label and fills a Button that carries no surface of its own.  A default slot replaces the visible label with ordinary non-interactive content, such as a title and description; LABEL or ARIA-LABEL still names the single focus and activation target, and nested controls inside a button are inappropriate. The native root attributes `:pointer`, `:help-echo`, `:hover-style` and `:hover-content` request Ebox's text-property capabilities, and an explicit nil blocks an inherited capability.
+**Semantics.** The Runtime publishes ON-PRESS together with the visible Button, so a render that fails to publish keeps the previous callback and the values it captured. A Button's label stays on one row even when padding makes the control taller: it never shrinks below its label or wraps the label's text, so a Flex line that runs out of room moves the whole Button instead of splitting its text.  An enabled, unselected Button paints its variant's hover fill while the pointer is over it, or a fill derived from its own `:bgcolor` when the caller supplied one; ARIA-SELECTED controls such as tabs and segments keep their selected presentation instead.  Keyboard focus underlines the label and fills a Button that carries no surface of its own.  A default slot replaces the visible label with ordinary non-interactive content, such as a title and description; LABEL or ARIA-LABEL still names the single focus and activation target, and nested controls inside a button are inappropriate. The native root attributes `:pointer`, `:help-echo`, `:hover-style` and `:hover-content` request Ebox's text-property capabilities, and an explicit nil blocks an inherited capability.
 
 **Returns.** A View.
 
@@ -178,6 +178,24 @@ Render a controlled interactive Range (progress, seek, volume) within MIN..MAX.
 ## Choice tokens
 
 <!-- index: ui-button-primary-fg; ui-button-secondary-fg; ui-checkbox-enabled-fg; ui-range-fill -->
+
+#### Token: :ui-button-padding
+
+The default padding of a Button, using the `:padding` value syntax.
+
+**Semantics.** Without this token, each variant keeps its existing padding. An explicit PADDING prop overrides it. For example, `((lh 1) (ch 2))` reserves one standard row above and below the label without changing font metrics.
+
+#### Token: :ui-button-radius
+
+The default Button corner radius, using the `:border-radius` value syntax and falling back to `(px 0)`.
+
+**Semantics.** An explicit `:border-radius` Host attribute overrides it. Rounded outline support and padding requirements follow [Style Properties](style-properties.md#style-border-radius).
+
+#### Token: :ui-button-border
+
+The default Button border, using the `:border` value syntax and falling back to no border.
+
+**Semantics.** An explicit non-nil BORDER prop overrides it. A complete outline can use `((px 1) solid "#8798ae")`; include its horizontal width in the control's layout budget.
 
 #### Token: :ui-button-primary-fg
 

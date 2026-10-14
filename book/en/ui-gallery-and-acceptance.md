@@ -30,7 +30,11 @@ Mount the integrated catalog Gallery and return its buffer.
 
 **Arguments.** BUFFER-OR-NAME defaults to `*ETAF UI Gallery*`; an explicit name allows independent mounts.
 
-**Semantics.** The Gallery exercises layout, feedback, navigation, input, data and floating Components in one composed workspace whose actions share caller-owned state and one Theme. Interactive calls display it. Unmounting the Runtime or killing the buffer disposes it; reopening resets its demonstration state.
+**Semantics.** The Gallery presents all 62 catalog components in eight categories, each with a live specimen and a complete runnable example. Search matches public symbols, Chinese titles and purpose text across categories, without case sensitivity; clearing the query returns to the current category or overview. Expand a specimen's usage and copy it to the kill ring to run it in a lexical-binding `.el` file. The source is generated from the same bindings and View as the live specimen, rather than maintained separately.
+
+Specimen values belong to this mount and survive category and light/dark Theme changes. Reset restores all specimens and collapses their usage panels without changing the category or query. Overview previews are independent small compositions and restart when revisited. All data is local; actions do not start external applications or network requests. Interactive calls display the buffer; a Lisp call only mounts and returns it. Unmounting or killing the buffer stops its owned data controllers, and reopening starts a fresh Gallery. A nonempty unrelated buffer or another application's Runtime raises `user-error` and remains untouched.
+
+At 160 character widths the category sidebar is visible; smaller widths use a dropdown. The overview uses two columns when its content region has at least 96 character widths, otherwise one scrolling column. Specimens use a scrolling detail column, with header and footer kept outside the scrolling region. The minimum usable viewport is 72 character widths by 24 rows; smaller viewports deliberately clip rather than squeeze the controls. Native font metrics determine the pixel sizes.
 
 **Returns.** The example buffer.
 

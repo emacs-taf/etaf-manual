@@ -433,7 +433,7 @@ Host 的鼠标指针形状。
 
 **参数。** 由着色属性组成的偶 plist：`:color`、`:background-color`、`:font-weight`、`:font-style`、`:text-decoration-line`、`:text-decoration-style` 和 `:text-decoration-color`。Theme token 按普通样式值解析。
 
-**语义。** Ebox 把 plist 变成一个 mouse face，指针在 Host 上期间覆盖它；指针离开后 face 消失。不支持的键或奇 plist 在节点绘制时报错。显式 nil 会去掉继承来的 hover face。
+**语义。** 指针停在 Host 上期间，Ebox 把这些声明合并到节点的计算样式上重绘整个节点，因此填充色会跟随 Host 自身的 `:border-radius` 并覆盖每一行内边距；未挂载的渲染文本则把同样的声明作为原生 mouse face 携带。指针离开后恢复静止样式。不支持的键或奇 plist 在节点绘制时报错。显式 nil 会为子树挡住悬停。
 
 **示例。** `(row :hover-style (list :background-color "gray25") ...menu item...)`
 

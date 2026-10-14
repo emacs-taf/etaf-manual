@@ -47,9 +47,9 @@ Component 通过一份静态规则列表拥有自己的默认外观，并通过�
 
 状态样式就是选择器样式：`&.selected` 或 `&:disabled` 这样的规则匹配根的派生状态或作者状态，见[选择器](selectors.md)。组件通常携带一个作者状态类（`selected`、`disabled`、`active`）并由 prop 切换它，这样样式保持静态，状态留在保留 Host 上。
 
-悬停不一样：它是 Emacs 原生的文本属性效果，不是保留的视觉状态。Host 用 `:hover-style` 声明一个绘制属性 plist，指针位于节点上时由 Ebox 作为 mouse face 应用；`:hover-content` 能以同样方式替换一行文本。两者都是 Host 的语义属性，定义见 [Host](hosts.md)。`:hover-style` 的值可以包含延迟的 Theme token：ETAF 把它们与实例的其余样式一起解析，因为未解析的 token 是无效的 face 属性。
+悬停是瞬态绘制，不是保留的视觉状态：Host 用 `:hover-style` 声明一个绘制属性 plist，指针位于节点上时由 Ebox 把这些声明合并到节点的计算样式上重绘，因此填充会保留 Host 的圆角与内边距，文字也保持对比度；渲染文本把同样的声明作为原生 mouse face 携带。`:hover-content` 能以同样方式替换一行文本。两者都是 Host 的语义属性，定义见 [Host](hosts.md)。`:hover-style` 的值可以包含延迟的 Theme token：ETAF 把它们与实例的其余样式一起解析，因为未解析的 token 是无效的 face 属性。
 
-Theme 没有给出悬停色时，目录组件会自行派生。Button 与菜单行优先读取应用提供的 `:ui-button-primary-hover-bg`、`:ui-button-secondary-hover-bg`、`:ui-button-ghost-hover-bg` 或 `:ui-accent-soft-bg`，否则把底色向文字色混合，这样深色调色板下浅色文字依然清楚，不会从回退调色板里继承一层浅色。应用自己写的悬停样式遵循同一条规则：填充色从 Theme 读取或由 Theme 自身的颜色派生，并用指针在两种调色板下各查一遍。
+Theme 没有给出悬停色时，目录组件会自行派生。Button 与菜单行优先读取应用提供的 `:ui-button-primary-hover-bg`、`:ui-button-secondary-hover-bg`、`:ui-button-ghost-hover-bg` 或 `:ui-accent-soft-bg`；调用方给了 `:bgcolor` 的 Button 改由该底色派生悬停填充，自定义 chip 因此不会用静止色悬停。否则目录把深色底提亮、浅色底压暗，这样深色调色板下浅色文字依然清楚，不会从回退调色板里继承一层浅色。应用自己写的悬停样式遵循同一条规则：填充色从 Theme 读取或由 Theme 自身的颜色派生，并用指针在两种调色板下各查一遍。
 
 ```elisp :figure 组件规则读取 Theme：提供的 token 给标签上色，state class 把其中一个切到禁用色
 (etaf-define-component demo-theme-states ()

@@ -433,7 +433,7 @@ The paint a Host shows while the pointer is over it.
 
 **Arguments.** An even plist of paint properties: `:color`, `:background-color`, `:font-weight`, `:font-style`, `:text-decoration-line`, `:text-decoration-style` and `:text-decoration-color`. Theme tokens are resolved like any other style value.
 
-**Semantics.** Ebox turns the plist into a mouse face that covers the Host while the pointer is over it; the face disappears when the pointer leaves. An unsupported key or an odd plist is an error when the node paints. A present nil removes an inherited hover face.
+**Semantics.** While the pointer rests over the Host, Ebox repaints it with these declarations merged over its computed paint, so the fill follows the Host's own `:border-radius` and covers every padding row; rendered output carries the same declarations as a native mouse face instead. Leaving restores the resting paint. An unsupported key or an odd plist is an error when the node paints. A present nil blocks the hover for that subtree.
 
 **Example.** `(row :hover-style (list :background-color "gray25") ...menu item...)`
 

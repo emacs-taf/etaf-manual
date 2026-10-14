@@ -215,7 +215,7 @@ ref、计算值和侦听器给了 TEST 函数时用它判断值是否变化，�
 - 新结果在 TEST 或默认相等性下与旧结果相同时，计算值的观察者不会再次运行。
 - 有活动 Scope 时，由它拥有这个计算值；活动 Scope 已停止时创建的计算值没有归属。所属 Scope 停止后，计算值释放全部依赖，之后每次读取都不追踪地重新对 GETTER 求值，不再缓存。
 - 把 GETTER 当作渲染代码对待：只读源、返回值。不要在里面写 ref，也不要创建响应式对象。它在渲染期间被求值时，这些操作会报 `etaf-render-side-effect-error`。
-- 已挂载的使用方在全部响应式输入都判定未变时，保留已发布的输出。读取环境 Context 的 getter（例如经由 `etaf-inject`）走普通渲染路径，这样 Context 读取才会被追踪。如果计算只依赖某个注入源的响应式值，就在组件 setup 阶段注入这个源，再在 GETTER 里读取它。
+- 已挂载的使用方在全部响应式输入都判定未变时，保留已发布的输出。在组件 setup 或其他 Runtime 操作期间创建的计算值，之后每次运行都在那次操作的环境里执行 GETTER，所以第一次运行之后 `etaf-inject`、`etaf-current-runtime` 和 `etaf-viewport` 仍然可用；见[创建环境](#创建环境)。
 
 **返回。** 一个计算值记录，`etaf-computed-p` 对它返回非 nil。
 
@@ -305,7 +305,7 @@ X 是 `etaf-computed` 创建的计算值时返回非 nil。
 
 <!-- index: 创建环境; 组件环境 -->
 
-在组件 setup 或其他 Runtime 操作期间创建的侦听器和副作用，会捕获这次操作的环境：组件实例、它的 Context 和它的 Runtime。之后每次运行都以生命周期操作的身份重新进入这个环境，所以第一次运行之后 `etaf-inject` 和 `etaf-current-runtime` 仍然可用，回调也不会被当作渲染。在任何 Runtime 操作之外创建的侦听器，运行在排空时的动态环境里。
+在组件 setup 或其他 Runtime 操作期间创建的侦听器、副作用和计算值，会捕获这次操作的环境：组件实例、它的 Context 和它的 Runtime（计算值用这个环境执行 GETTER）。之后每次运行都以生命周期操作的身份重新进入这个环境，所以第一次运行之后 `etaf-inject`、`etaf-current-runtime` 和 `etaf-viewport` 仍然可用，回调也不会被当作渲染。在任何 Runtime 操作之外创建的响应式回调，运行在排空时的动态环境里。
 
 ```elisp :run
 (etaf-define-component demo-reactivity-lab ()

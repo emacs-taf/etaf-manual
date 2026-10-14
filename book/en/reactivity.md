@@ -215,7 +215,7 @@ Create a computed value derived by the zero-argument function GETTER and return 
 - When the new result is the same as the old one under TEST or the default equality, observers of the computed are not run again.
 - When a Scope is active, it owns the computed; a computed created while the active Scope has stopped has no owner. After its Scope stops, the computed releases its dependencies; each later read evaluates GETTER again untracked and caches nothing.
 - Treat GETTER as rendering code: read sources and return a value. Do not write refs or create reactive objects in it. When it is evaluated during rendering, those operations signal `etaf-render-side-effect-error`.
-- Mounted consumers keep their published output when all their reactive inputs compare unchanged. A getter that reads ambient Context, for example through `etaf-inject`, follows the ordinary render path so that the Context read is tracked. When the computation depends only on the reactive value of an injected source, inject the source during Component setup and read it inside GETTER.
+- Mounted consumers keep their published output when all their reactive inputs compare unchanged. A computed created during Component setup, or during another Runtime operation, runs its getter in that operation's environment on every later run, so `etaf-inject`, `etaf-current-runtime` and `etaf-viewport` keep working after the first run; see [Creation environment](#creation-environment).
 
 **Returns.** A computed record, for which `etaf-computed-p` is non-nil.
 
@@ -305,7 +305,7 @@ A cleanup returned by a watcher callback or an effect function releases what tha
 
 <!-- index: creation environment; Component environment -->
 
-A watcher or effect created during Component setup, or during another Runtime operation, captures that operation's environment: the Component instance, its Context and its Runtime. Every later run re-enters the environment as a lifecycle operation, so `etaf-inject` and `etaf-current-runtime` keep working after the first run, and the callback is not treated as rendering. A watcher created outside any Runtime operation runs in the dynamic environment of the drain.
+A watcher or effect created during Component setup, or during another Runtime operation, captures that operation's environment: the Component instance, its Context and its Runtime. A computed created in the same way captures it for its getter. Every later run re-enters the environment as a lifecycle operation, so `etaf-inject`, `etaf-current-runtime` and `etaf-viewport` keep working after the first run, and the callback is not treated as rendering. A reactive callback created outside any Runtime operation runs in the dynamic environment of the drain.
 
 ```elisp :run
 (etaf-define-component demo-reactivity-lab ()

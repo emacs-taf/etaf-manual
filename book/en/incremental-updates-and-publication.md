@@ -106,7 +106,7 @@ Insert detached CHILD into PARENT at INDEX (default last) and return CHILD.
 
 Detach NODE from its parent and return it.
 
-**Semantics.** The node's subtree forgets its layout facts, so the same node can be inserted again later, and a laid-out flow node records a structural removal with its position and height, letting the flush close the gap incrementally. Overlays inside the subtree that were hosted outside it vacate their lines.
+**Semantics.** The node's subtree forgets its mounted layout and computed-style context, so the same node can be inserted again later, and a laid-out flow node records a structural removal with its position and height, letting the flush close the gap incrementally. Overlays inside the subtree that were hosted outside it vacate their lines. Reattachment rebuilds style context and overlay hosting throughout the subtree, even when the inherited values have not changed; node identity, author properties and scroll offsets survive.
 
 **Returns.** NODE.
 
@@ -132,7 +132,7 @@ Replace PARENT's children with CHILDREN, reusing nodes already present.
 
 **Arguments.** CHILDREN is a list of nodes and strings; strings become text nodes.
 
-**Semantics.** Nodes already among the parent's children keep their identity and layout state, new ones are marked fresh, and removed ones forget their layout. This is the primitive behind list reconciliation: identity is what lets a row keep its state across a re-render. The parent is relayouted as a whole.
+**Semantics.** Nodes already among the parent's children keep their identity and layout state, new ones are marked fresh, and removed ones forget their mounted layout and style context. This is the primitive behind list reconciliation: identity is what lets a row keep its state across a re-render. The parent is relayouted as a whole.
 
 **Returns.** PARENT.
 

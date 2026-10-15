@@ -31,6 +31,7 @@
 | 变量 | 用途 |
 | --- | --- |
 | [`etaf-direction-scheme`](keyboard.md#variable-etaf-direction-scheme) | 键层的方向方案：`arrows`（默认）或 `vim`。 |
+| [`etaf-help-view-function`](keyboard.md#variable-etaf-help-view-function) | 可选的 buffer 内模态帮助呈现器；nil 使用核心呈现。 |
 | [`ebox-buffer-mode-map`](keyboard.md#variable-ebox-buffer-mode-map) | 已挂载 Ebox buffer 的键表：滚动、焦点导航与激活。 |
 
 ## 文本输入

@@ -42,13 +42,13 @@
 
 <!-- index: etaf-dialog; modal panel; backdrop; fixed height -->
 
-#### Component: etaf-dialog (&key open title width height compact close-label on-close backdrop)
+#### Component: etaf-dialog (&key open title width height compact close-label on-close backdrop keys on-direction)
 
 用与 Popover 相同的浮动表面显示受控模态面板。
 
-**参数。** OPEN 是值、ref 或 computed。TITLE 默认 `"Dialog"`。WIDTH 默认 `(ch 48)`。HEIGHT 为 nil 或 `(lh N)`（N 为正），把面板限制在可见窗口内的若干文本行。COMPACT 去掉正文的纵向留白，让短表单保持紧凑。CLOSE-LABEL 默认 `"Close"`；nil 时省略默认 footer 按钮，让 footer slot 决定全部动作。BACKDROP 默认 t。ON-CLOSE 必需。
+**参数。** OPEN 是值、ref 或 computed。TITLE 默认 `"Dialog"`。WIDTH 默认 `(ch 48)`。HEIGHT 为 nil 或 `(lh N)`（N 为正），把面板限制在可见窗口内的若干文本行。COMPACT 去掉正文的纵向留白，让短表单保持紧凑。CLOSE-LABEL 默认 `"Close"`；nil 时省略默认 footer 按钮，让 footer slot 决定全部动作。BACKDROP 默认 t。ON-CLOSE 必需。KEYS 与 ON-DIRECTION 声明面板 Host 的作用域 `:keys` 和 `:on-direction`，不绑定遮罩。
 
-**语义。** 显示 buffer 的窗口是图形窗口时，对话框在窗口内居中，且永不移动应用的几何或全局焦点策略。header 显示 TITLE 与一个仅指针可用的 `x`，它请求 ON-CLOSE，Escape 同样如此，所以模态总有一条键盘出口。带 BACKDROP（默认）时，遮罩调暗 root 画布，同时让被盖住的应用（包括文字与图片）保持可见；被覆盖的控件及其焦点目标仍被挡住。BACKDROP 为 nil 时完全不绘制遮罩，外部按压策略归调用方。固定 HEIGHT 需要正文行数再加五（header、正文留白与 footer）；窗口太矮时裁剪对话框正文，而不溢出 frame。对话框不拥有表单数据。
+**语义。** 显示 buffer 的窗口是图形窗口时，对话框在窗口内居中，且永不移动应用的几何或全局焦点策略。header 显示 TITLE 与一个仅指针可用的 `x`，它请求 ON-CLOSE，Escape 同样如此，所以模态总有一条键盘出口。带 BACKDROP（默认）时，遮罩调暗 root 画布，同时让被盖住的应用（包括文字与图片）保持可见；被覆盖的控件及其焦点目标仍被挡住。点击遮罩请求 ON-CLOSE，不会穿透并点击背景；点击面板内部不会关闭。嵌套模态遮罩只关闭自己所属的最上层界面，不关闭被覆盖的父界面。BACKDROP 为 nil 时完全不绘制遮罩，外部按压策略归调用方。固定 HEIGHT 需要正文行数再加五（header、正文留白与 footer）；窗口太矮时裁剪对话框正文，而不溢出 frame。对话框不拥有表单数据。
 
 **返回。** 一个 View。
 
@@ -65,6 +65,28 @@
 ```
 
 **参见。** `etaf-popover`、`etaf-confirm-dialog`。
+
+## 快捷键帮助
+
+<!-- index: etaf-key-help; 只读帮助; 帮助搜索 -->
+
+#### Component: etaf-key-help (&key data on-close)
+
+在可搜索的只读模态框中呈现有效快捷键快照。
+
+**参数。** DATA 是 `etaf-help-data` 返回的快照。ON-CLOSE 是零参数回调。
+
+**语义。** 按来源分组：宽窗中应用和区域键与通用导航并列，紧凑窗口改为可滚动单栏。面板跟随继承的 Theme，并调暗背景。`/` 开始原生搜索，对按键、标签、来源与说明做不区分大小写的字面匹配。未编辑时方向键滚动，C-v/M-v 或 Page Down/Page Up 翻页。条目从不执行业务命令。Escape 先退出搜索编辑，再关闭帮助；点击遮罩则关闭帮助，不激活被覆盖的控件。关闭后恢复仍有效的入口。最小可用视口为 48 字符宽、18 行；更小的视口有意裁剪，不缩小字体。
+
+**语义。** 加载 etaf-ui 时会把此组件安装为 `etaf-help` 的呈现器，但已有非 nil 的 `etaf-help-view-function` 时不覆盖。普通应用调用 `etaf-help` 即可，不另持打开状态、buffer 或 Runtime。直接组合适用于已有受控对话框生命周期的调用方；应在打开前捕获 DATA，并像其他浮层一样预留根画布。
+
+**返回。** 一个 View。
+
+**错误。** DATA 不是包含字符串 `:title` 的列表，或 ON-CLOSE 不是函数时报 `error→ etaf-component-call-error`。
+
+**示例。** `(etaf-key-help :data snapshot :on-close close)`
+
+**参见。** `etaf-help`、`etaf-help-data`、`etaf-dialog`、`etaf-kbd`。
 
 ## 工具提示与通知
 

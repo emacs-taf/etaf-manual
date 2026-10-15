@@ -125,19 +125,51 @@ Two surfaces expose the keyboard state. Help is for reading: it lists what the c
 
 #### Function: etaf-help (&optional runtime)
 
-Show the effective ETAF keys of mounted RUNTIME in a read-only buffer.
+Open read-only keyboard help as a modal inside mounted RUNTIME's existing buffer.
 
-**Arguments.** RUNTIME defaults to the active Runtime.
+**Arguments.** RUNTIME defaults to the active or current-buffer Runtime.
 
-**Semantics.** The buffer is created as `*ETAF Help*` in special mode and shows, in sections: the current scope's regions with their hint keys, the labelled `:keys` the current focus reaches with the Host that contributes each binding, the framework keys with the active direction scheme, and the focusable controls of the modal scope. It is a description, not an execution surface, so pressing `?` can never change application state. The buffer is reused on every call.
+**Semantics.** Capture the effective scope before the modal takes focus: labelled Host keys, effective application-local keymaps, framework navigation, region entries, scoped `:help` notes and readable control names. The existing buffer, Emacs window and application Runtime are reused; no help buffer or split is created. Repeated calls reuse the opening snapshot. Native editing ends with accepted input preserved before help opens. The core presentation scrolls; loading etaf-ui supplies the searchable `etaf-key-help` presentation. Descriptions never execute their commands. Escape leaves an active search edit first, then closes help; a pointer click on the backdrop also closes it without activating the background. Closing restores a surviving opener and the original window position. Background application updates remain live without changing the captured scope.
 
-**Returns.** The help buffer.
+**Returns.** The application buffer.
 
 **Errors.** `error→ etaf-runtime-error` when the Runtime is not mounted.
 
 **Example.** `(etaf-help runtime)`
 
-**See also.** `etaf-palette`, `:keys`.
+**See also.** `etaf-help-close`, `etaf-help-data`, `etaf-help-view-function`, `etaf-palette`, `:keys`.
+
+#### Function: etaf-help-close (&optional runtime)
+
+Close in-buffer help and restore its surviving focus and window start.
+
+**Arguments.** RUNTIME defaults to the active or current-buffer Runtime.
+
+**Semantics.** Dispose only the help surface and its editing session. The retained application, its state and node scroll offsets survive. A removed opener is not focused. C-g remains Emacs's native interrupt, not a close command. Unmounting also disposes help and its snapshot.
+
+**Returns.** Non-nil when help was open; nil otherwise.
+
+**Errors.** `error→ etaf-runtime-error` when RUNTIME is not mounted.
+
+#### Function: etaf-help-data (&optional runtime)
+
+Return a defensive, callback-free snapshot of the effective keyboard scope.
+
+**Arguments.** RUNTIME defaults to the active or current-buffer Runtime.
+
+**Semantics.** The plist contains string `:title` and `:scope`, plus `:groups`, `:notes` and `:controls`. A group has `:title`, `:source`, `:kind` (`application`, `framework` or `regions`) and `:entries`; each entry has `:key`, `:label`, `:source` and an optional key vector `:events`. Notes come from scoped Host `:help` strings; controls are readable names, never callbacks. Nearer Host keys shadow outer bindings even when unlabelled. Effective local maps supplement them, using a native menu-item label when available or the command's first documentation line otherwise; unrelated global minor modes are not application help. While help is open, return its opening snapshot. Mutable strings, vectors and lists are detached, so modifying the result cannot change the application or future snapshots.
+
+**Returns.** The snapshot plist.
+
+**Errors.** `error→ etaf-runtime-error` when RUNTIME is not mounted.
+
+#### Variable: etaf-help-view-function
+
+Select the help renderer without making core depend on the component catalog.
+
+**Semantics.** Nil (the default) uses the core scrollable modal. Otherwise the value is a function of DATA and CLOSE returning a root-layer modal View. DATA follows `etaf-help-data`; CLOSE is a zero-argument dismissal callback. The View inherits the opening Host's Context and mounted lifetime. It must not create buffers or windows or execute listed business commands. Loading etaf-ui installs its renderer only when this value is nil, preserving an existing custom renderer. A renderer failure leaves the application usable and permits retrying.
+
+**See also.** `etaf-help`, `etaf-key-help`.
 
 #### Function: etaf-palette (&optional runtime)
 

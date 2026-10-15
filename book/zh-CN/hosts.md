@@ -528,6 +528,18 @@ sticky 是行级 affordance：让 Host 保持单行，如工具栏或小节标�
 
 **参见。** [键盘](keyboard.md)，以及区域级导航的 `:region`。
 
+#### Property: :help
+
+为当前作用域的只读快捷键帮助补充非绑定说明。
+
+**参数。** nil、字符串或字符串的正规列表。
+
+**语义。** `etaf-help-data` 从打开位置的 Host 作用域由近及远收集这些说明，并在模态边界停止。说明用于工作流建议与限制；按键及其标签来自实际有效绑定，不应再手写一张重复键表。这不是原生悬停提示；悬停文字使用 `:help-echo`。
+
+**错误。** 值不是 nil、字符串或字符串的正规列表时报 `error→ etaf-renderer-error`。
+
+**示例。** `(column :help "Changes are kept when you leave the editor." ...)`
+
 ## 选择器主体
 
 Host 的身份与无障碍元数据就是 Ebox 选择器查询匹配的事实：

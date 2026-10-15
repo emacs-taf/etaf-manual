@@ -42,13 +42,13 @@ Show controlled OPEN content on Ebox's root layer, anchored to a unique semantic
 
 <!-- index: etaf-dialog; modal panel; backdrop; fixed height -->
 
-#### Component: etaf-dialog (&key open title width height compact close-label on-close backdrop)
+#### Component: etaf-dialog (&key open title width height compact close-label on-close backdrop keys on-direction)
 
 Show a controlled modal panel using the same floating surface as Popover.
 
-**Arguments.** OPEN is a value, ref or computed. TITLE defaults to `"Dialog"`. WIDTH defaults to `(ch 48)`. HEIGHT is nil or `(lh N)` with positive N, bounding the panel to text rows within the visible window. COMPACT removes the body's vertical air so short forms stay dense. CLOSE-LABEL defaults to `"Close"`; nil omits the default footer button so the footer slot orders every action. BACKDROP defaults to t. ON-CLOSE is required.
+**Arguments.** OPEN is a value, ref or computed. TITLE defaults to `"Dialog"`. WIDTH defaults to `(ch 48)`. HEIGHT is nil or `(lh N)` with positive N, bounding the panel to text rows within the visible window. COMPACT removes the body's vertical air so short forms stay dense. CLOSE-LABEL defaults to `"Close"`; nil omits the default footer button so the footer slot orders every action. BACKDROP defaults to t. ON-CLOSE is required. KEYS and ON-DIRECTION declare the panel Host's scoped `:keys` and `:on-direction`, never those of its backdrop.
 
-**Semantics.** The dialog centers itself in the window that displays its buffer when that window is graphical, and it never moves the application's geometry or global focus policy. The header shows TITLE and a pointer-only `x` that requests ON-CLOSE, and Escape does the same, so a modal always has a keyboard exit. With BACKDROP (the default) the backdrop dims the root canvas while keeping the covered application, text and images included, visible; covered controls and their focus targets stay blocked. With BACKDROP nil no backdrop is painted at all and the caller owns any outside-click policy. A fixed HEIGHT needs the body rows plus five for the header, body air and footer; a too-short window clips the dialog body instead of overflowing the frame. Dialogs own no form data.
+**Semantics.** The dialog centers itself in the window that displays its buffer when that window is graphical, and it never moves the application's geometry or global focus policy. The header shows TITLE and a pointer-only `x` that requests ON-CLOSE, and Escape does the same, so a modal always has a keyboard exit. With BACKDROP (the default) the backdrop dims the root canvas while keeping the covered application, text and images included, visible; covered controls and their focus targets stay blocked. A pointer press on the backdrop requests ON-CLOSE without clicking through to the background; a press inside the panel does not dismiss it. Nested modal backdrops dismiss their own topmost surface, not the covered parent. With BACKDROP nil no backdrop is painted at all and the caller owns any outside-click policy. A fixed HEIGHT needs the body rows plus five for the header, body air and footer; a too-short window clips the dialog body instead of overflowing the frame. Dialogs own no form data.
 
 **Returns.** A View.
 
@@ -65,6 +65,28 @@ Show a controlled modal panel using the same floating surface as Popover.
 ```
 
 **See also.** `etaf-popover`, `etaf-confirm-dialog`.
+
+## Keyboard help
+
+<!-- index: etaf-key-help; read-only help; help search -->
+
+#### Component: etaf-key-help (&key data on-close)
+
+Present an effective keyboard snapshot in a searchable, read-only modal.
+
+**Arguments.** DATA is a snapshot from `etaf-help-data`. ON-CLOSE is a zero-argument callback.
+
+**Semantics.** Group descriptions by their source, with application and region keys beside common navigation in wide windows and a scrolling single column in compact ones. The panel follows its inherited Theme and dims the background. `/` starts native search; matching is literal and case-insensitive over keys, labels, sources and notes. Arrow keys scroll and C-v/M-v or Page Down/Page Up page the list when not editing. Entries never execute business commands. Escape exits a search edit before closing help; clicking the backdrop closes it without activating covered controls. Dismissal restores the surviving opener. The minimum usable viewport is 48 character widths by 18 rows; smaller viewports deliberately clip rather than shrink the font.
+
+**Semantics.** Loading etaf-ui installs this renderer for `etaf-help` unless `etaf-help-view-function` is already non-nil. Ordinary applications call `etaf-help` and own no separate open state, buffer or Runtime. Direct composition is for callers that already own a controlled dialog lifecycle; they capture DATA before opening and reserve the root canvas like other overlays.
+
+**Returns.** A View.
+
+**Errors.** `error→ etaf-component-call-error` when DATA is not a list with a string `:title` or ON-CLOSE is not a function.
+
+**Example.** `(etaf-key-help :data snapshot :on-close close)`
+
+**See also.** `etaf-help`, `etaf-help-data`, `etaf-dialog`, `etaf-kbd`.
 
 ## Tooltips and toasts
 

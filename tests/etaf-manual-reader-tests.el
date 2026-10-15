@@ -208,14 +208,21 @@
   "The ETAF key help of the mounted reader lists the reader's own keys."
   (let ((session (etaf-manual-reader-create :language "zh-CN" :chapter 'introduction)))
     (etaf-manual-reader-test--with-reader session
-      (let ((help (etaf-help)))
+      (let ((original (current-buffer)) (windows (window-list))
+            (help (etaf-help)))
         (unwind-protect
-            (with-current-buffer help
-              (let ((text (buffer-string)))
-                (should (string-match-p "下一节" text))
-                (should (string-match-p "中英文切换" text))
-                (should (string-match-p "手册阅读器" text))))
-          (kill-buffer help))))))
+            (progn
+              (should (eq help original))
+              (should (equal windows (window-list)))
+              (let* ((data (etaf-help-data))
+                     (labels (mapcan (lambda (group)
+                                       (mapcar (lambda (entry) (plist-get entry :label))
+                                               (plist-get group :entries)))
+                                     (plist-get data :groups))))
+                (should (member "下一节" labels))
+                (should (member "中英文切换" labels))
+                (should (equal (plist-get data :title) "手册阅读器"))))
+          (etaf-help-close))))))
 
 (ert-deftest etaf-manual-reader-page-keys-drive-navigation ()
   "The page Host's `:keys' dispatch the reader keys in the runtime."

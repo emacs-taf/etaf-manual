@@ -528,6 +528,18 @@ Declare Host key bindings that run while the Host has focus or contains point.
 
 **See also.** [Keyboard](keyboard.md), and `:region` for region-level navigation.
 
+#### Property: :help
+
+Contribute non-binding guidance to the current scope's read-only keyboard help.
+
+**Arguments.** Nil, a string, or a proper list of strings.
+
+**Semantics.** `etaf-help-data` collects these notes from the opening Host scope, nearest first, stopping at the modal boundary. Use notes for workflow advice and limitations; keys and their labels come from the effective bindings and must not be repeated as a hand-written key table. These notes are not native hover text; use `:help-echo` for that.
+
+**Errors.** `error→ etaf-renderer-error` when the value is neither nil, a string nor a proper list of strings.
+
+**Example.** `(column :help "Changes are kept when you leave the editor." ...)`
+
 ## Selector subjects
 
 A Host's identity and accessible metadata are the facts Ebox selector queries match:

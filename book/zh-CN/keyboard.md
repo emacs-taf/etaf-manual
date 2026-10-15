@@ -125,19 +125,51 @@ Escape 是框架键，用来关闭最近的可以关闭的东西。这一层从�
 
 #### Function: etaf-help (&optional runtime)
 
-在只读缓冲里显示已挂载 RUNTIME 的有效 ETAF 键。
+在已挂载 RUNTIME 的原有 buffer 内打开只读快捷键模态框。
 
-**参数。** RUNTIME 默认为活动 Runtime。
+**参数。** RUNTIME 默认为活动或当前 buffer 的 Runtime。
 
-**语义。** 缓冲以 special mode 建为 `*ETAF Help*`，分段显示：当前作用域的区域与提示键；当前焦点可达的带 LABEL `:keys` 及贡献绑定的 Host；带当前方向方案的框架键；模态作用域里的可聚焦控件。它是描述而不是执行面，因此按 `?` 永远不会改变应用状态。每次调用复用同一个缓冲。
+**语义。** 在模态框取得焦点前捕获有效作用域：带标签的 Host 键、实际生效的应用本地 keymap、框架导航、区域入口、作用域内的 `:help` 说明以及可读的控件名称。复用原有 buffer、Emacs window 和应用 Runtime，不创建帮助 buffer 或拆窗。重复调用复用打开时的快照。打开前结束原生编辑并保留已接受的输入。核心呈现支持滚动；加载 etaf-ui 后使用可搜索的 `etaf-key-help` 呈现。查看说明不会执行对应命令。Escape 先退出正在进行的搜索编辑，再关闭帮助；点击遮罩也会关闭，且不会激活背景。关闭后恢复仍有效的入口与原窗口位置。应用后台更新继续进行，但不改变已捕获的作用域。
 
-**返回。** 帮助缓冲。
+**返回。** 应用 buffer。
 
 **错误。** Runtime 未挂载时报 `error→ etaf-runtime-error`。
 
 **示例。** `(etaf-help runtime)`
 
-**参见。** `etaf-palette`、`:keys`。
+**参见。** `etaf-help-close`、`etaf-help-data`、`etaf-help-view-function`、`etaf-palette`、`:keys`。
+
+#### Function: etaf-help-close (&optional runtime)
+
+关闭 buffer 内的帮助，恢复仍有效的焦点与窗口起始位置。
+
+**参数。** RUNTIME 默认为活动或当前 buffer 的 Runtime。
+
+**语义。** 只释放帮助界面及其编辑会话，保留应用、业务状态和节点滚动位置。不重新聚焦已删除的入口。C-g 保持 Emacs 原生中断语义，不是关闭命令。卸载应用也会释放帮助及其快照。
+
+**返回。** 帮助原本打开时返回非 nil，否则为 nil。
+
+**错误。** RUNTIME 未挂载时报 `error→ etaf-runtime-error`。
+
+#### Function: etaf-help-data (&optional runtime)
+
+返回有效键盘作用域的防御性快照，其中不含可执行回调。
+
+**参数。** RUNTIME 默认为活动或当前 buffer 的 Runtime。
+
+**语义。** plist 包含字符串 `:title` 和 `:scope`，以及 `:groups`、`:notes` 和 `:controls`。每组包含 `:title`、`:source`、`:kind`（`application`、`framework` 或 `regions`）与 `:entries`；每个条目包含 `:key`、`:label`、`:source`，以及可选的按键向量 `:events`。说明取自作用域内 Host 的 `:help` 字符串；控件仅为可读名称，不含回调。近层 Host 键即使没有标签也会遮蔽外层绑定。本地实际生效的 keymap 补充其余条目，优先使用原生 menu-item 标签，否则取命令文档首行；无关的全局 minor mode 不属于应用帮助。帮助打开时返回打开时的快照。可变字符串、向量和列表均已复制，修改返回值不会影响应用或后续快照。
+
+**返回。** 快照 plist。
+
+**错误。** RUNTIME 未挂载时报 `error→ etaf-runtime-error`。
+
+#### Variable: etaf-help-view-function
+
+选择帮助呈现器，而不让核心反向依赖组件目录。
+
+**语义。** nil（默认）使用核心的可滚动模态框；非 nil 时为接收 DATA 和 CLOSE、返回根浮层模态 View 的函数。DATA 遵循 `etaf-help-data`，CLOSE 是零参数关闭回调。View 继承打开位置 Host 的 Context 和挂载生命周期，不得创建 buffer 或 window，也不得执行列表中的业务命令。加载 etaf-ui 时仅在此值为 nil 时安装目录呈现器，保留既有自定义呈现器。呈现失败后应用保持可用，并可重试。
+
+**参见。** `etaf-help`、`etaf-key-help`。
 
 #### Function: etaf-palette (&optional runtime)
 

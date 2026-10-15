@@ -42,13 +42,13 @@ Render INPUT, a node or author form, and return its lines as a string.
 
 Mount INPUT, a root node or author form, in BUFFER-OR-NAME and return the root.
 
-**Arguments.** BUFFER-OR-NAME is a live buffer or a name; a missing buffer is created. INPUT is a detached root node or an author form. OPTIONS may contain `:width` and `:height`, which fix that dimension of the viewport instead of following the display window ([Viewport](viewport.md)).
+**Arguments.** BUFFER-OR-NAME is a live buffer or a name; a missing buffer is created. INPUT is a detached root node or an author form. OPTIONS may contain `:width` and `:height`, which fix that dimension of the viewport instead of following the display window ([Viewport](viewport.md)), and `:observer`, a function of buffer and report or nil. The observer is installed before the first flush and uses the same reports as `ebox-buffer-set-observer`; nil disables observation.
 
 **Semantics.** Mounting replaces the buffer's text with the rendered tree, enables `ebox-buffer-mode` ([Keyboard](keyboard.md)) and writes the first version before returning, so the buffer is current the moment the call ends. The root's computed background becomes the buffer's default background, so window space beyond the laid-out rows matches the surface. When the buffer already has a mount, that mount is released first, exactly as `ebox-unmount-buffer` would release it. Nothing about the tree's identity changes: the same nodes remain the model, and mutations flow to the buffer through the flush pipeline. Mount a root once — a second mount of the same root does not copy the tree and takes over as the mount mutations reach.
 
 **Returns.** The mounted root node.
 
-**Errors.** `error→ ebox-error` when INPUT is a node with a parent ("Cannot mount a non-root node") and the construction errors of [Node Construction](ebox-node-construction.md) for a malformed form. A mount that fails while building its input leaves an existing mount and the buffer text untouched.
+**Errors.** `error→ ebox-error` when INPUT is a node with a parent ("Cannot mount a non-root node") and the construction errors of [Node Construction](ebox-node-construction.md) for a malformed form. An invalid non-function, non-nil `:observer` signals `error→ wrong-type-argument` before replacing the old mount. A mount that fails while building its input leaves an existing mount and the buffer text untouched.
 
 **Example.**
 

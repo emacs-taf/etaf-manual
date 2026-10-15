@@ -42,13 +42,13 @@
 
 把 INPUT——根节点或作者表单——挂载到 BUFFER-OR-NAME，返回根节点。
 
-**参数。** BUFFER-OR-NAME 是活着的缓冲区或缓冲区名；缓冲区不存在时会创建。INPUT 是 detached 的根节点或作者表单。OPTIONS 可以含 `:width` 与 `:height`，用于固定视口的相应维度，而不是跟随显示窗口（[视口](viewport.md)）。
+**参数。** BUFFER-OR-NAME 是活着的缓冲区或缓冲区名；缓冲区不存在时会创建。INPUT 是 detached 的根节点或作者表单。OPTIONS 可以含 `:width` 与 `:height`，用于固定视口的相应维度，而不是跟随显示窗口（[视口](viewport.md)），还可含 `:observer`，其值为接收 buffer 与报告的函数或 nil。观察器在首次 flush 前安装，使用与 `ebox-buffer-set-observer` 相同的报告；nil 关闭观察。
 
 **语义。** 挂载用渲染出的树替换缓冲区文本、开启 `ebox-buffer-mode`（[键盘](keyboard.md)），并在返回之前写出第一版，所以调用结束的那一刻缓冲区就是最新的。root 的计算背景成为缓冲区默认背景，最后一行之后的窗口空间因此与表面一致。缓冲区已有挂载时，先释放旧挂载，与 `ebox-unmount-buffer` 的释放完全相同。树的身份不变：还是同一批节点在做模型，修改继续通过 flush 流水线流向缓冲区。一个 root 只挂一次——同一 root 的第二次挂载不复制树，并接管修改所到达的挂载位置。
 
 **返回。** 被挂载的根节点。
 
-**错误。** INPUT 是有父节点的节点时报 `error→ ebox-error`（"Cannot mount a non-root node"）；畸形表单报[节点构造](ebox-node-construction.md)的构造错误。构建输入期间失败的挂载不会改动已有的挂载与缓冲区文本。
+**错误。** INPUT 是有父节点的节点时报 `error→ ebox-error`（"Cannot mount a non-root node"）；畸形表单报[节点构造](ebox-node-construction.md)的构造错误。`:observer` 既不是函数也不是 nil 时，在替换旧挂载前报 `error→ wrong-type-argument`。构建输入期间失败的挂载不会改动已有的挂载与缓冲区文本。
 
 **示例。**
 

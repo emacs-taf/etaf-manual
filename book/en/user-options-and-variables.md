@@ -31,6 +31,7 @@ Every documented variable, grouped by the chapter that defines it. Each row link
 | Variable | Purpose |
 | --- | --- |
 | [`etaf-direction-scheme`](keyboard.md#variable-etaf-direction-scheme) | Direction scheme of the key layer: `arrows` (default) or `vim`. |
+| [`etaf-help-view-function`](keyboard.md#variable-etaf-help-view-function) | Optional in-buffer modal help renderer; nil uses the core presentation. |
 | [`ebox-buffer-mode-map`](keyboard.md#variable-ebox-buffer-mode-map) | Keymap of mounted Ebox buffers: scrolling, focus navigation and activation. |
 
 ## Text Input

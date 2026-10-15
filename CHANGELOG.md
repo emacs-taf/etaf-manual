@@ -6,6 +6,10 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
 
 ### Added
 
+- The keyboard and overlay chapters document in-application modal help,
+  effective-key snapshots, scoped notes, search and backdrop-click dismissal
+  in both languages. The reader's `?` help stays in its original window.
+
 - The manual is published as a website at <https://etaf.top> (`/` for English,
   `/zh-cn/` for Simplified Chinese).  It is built from the same book sources by
   `make site` and deployed by `make site-publish`; the other repositories now

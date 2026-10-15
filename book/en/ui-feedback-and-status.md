@@ -70,7 +70,7 @@ Render a keyboard shortcut as accessible keycaps from a nonempty string list.
 
 **Arguments.** KEYS is a nonempty list of nonempty strings; each entry is one keycap.
 
-**Semantics.** Each key is a bordered, padded box and the group is a `max-content` row with one column between keycaps, so a shortcut such as `C-c C-k` reads as two physical keys.
+**Semantics.** Each key is a compact rounded, bordered box with horizontal padding and the normal line height. Its subtle fill and edge derive from the inherited panel foreground and background, so keycaps remain readable in light and dark Themes. The group is a `max-content` row with one column between keycaps; `("C-c" "C-k")` therefore reads as two physical keys.
 
 **Returns.** A View.
 

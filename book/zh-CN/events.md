@@ -8,7 +8,7 @@
 
 Host 为每种事件种类声明一个回调，属性名为 `:on-KIND`，其中 KIND 是小写词以连字符连接，例如 `:on-press` 里的 `press`。值必须是函数或 nil；其他值在 Host 提交时报 `error→ etaf-renderer-error`。值为 nil 表示声明了该属性却不处理事件，在下面的合并规则里这仍算一次声明。
 
-有一种回调没有 Host 属性：拖拽手势以 `:on-start`、`:on-move`、`:on-end`、`:on-cancel`、`:on-resize`、`:on-change` 六种属性到达拖拽与缩放 Behavior，见 [Action、Behavior 与错误边界](actions-behaviors-and-error-boundaries.md)。`:on-direction` 是键盘属性，属于[键盘](keyboard.md)；`:on-leave` 是[文本输入](text-input.md)章的输入会话选项。下面七个属性是 ETAF Runtime 的事件回调。
+有一种回调没有 Host 属性：拖拽手势以 `:on-start`、`:on-move`、`:on-end`、`:on-cancel`、`:on-resize`、`:on-change` 六种属性到达拖拽与缩放 Behavior，见 [Action、Behavior 与错误边界](actions-behaviors-and-error-boundaries.md)。`:on-direction` 是键盘属性，属于[键盘](keyboard.md)；`:on-leave` 是[文本输入](text-input.md)章的输入会话选项。下面的属性是 ETAF Runtime 的事件回调。
 
 #### Property: :on-press
 
@@ -96,7 +96,7 @@ Host 为每种事件种类声明一个回调，属性名为 `:on-KIND`，其中 
 
 **参数。** 无参函数或 nil。
 
-**语义。** Escape 运行当前键链里最近的、声明了该回调的启用 Host；它是键层唯一向外搜索的回调。对话框、popover 或查看器因此无需自己绑定按键就能关闭，而且不依赖键盘焦点工作，因为键链先跟焦点、再跟 point。禁用的 Host 被跳过，因此内层控件被禁用不会让它背后的对话框变得无法关闭。
+**语义。** Escape 运行当前键链里最近的、声明了该回调的启用 Host，并在模态边界停止搜索。对话框、popover 或查看器因此无需自己绑定按键就能关闭，而且不依赖键盘焦点工作，因为键链先跟焦点、再跟 point。禁用的 Host 被跳过，因此内层控件被禁用不会让它背后的对话框变得无法关闭。
 
 **返回。** 返回值被忽略。
 
@@ -105,6 +105,22 @@ Host 为每种事件种类声明一个回调，属性名为 `:on-KIND`，其中 
 **示例。** `(column :focus-scope 'modal :on-dismiss close-dialog ...)`
 
 **参见。** 模态作用域见 [Host](hosts.md#property-focus-scope)、键层见[键盘](keyboard.md)。
+
+#### Property: :on-help-open
+
+在新一次快捷键帮助打开前准备当前应用作用域。
+
+**参数。** 无参函数或 nil。
+
+**语义。** 结束原生编辑后，`etaf-help` 在当前按键作用域内派发最近启用 Host 的回调，搜索止于模态边界。回调可以暂停应用的持续活动，而不重新绑定框架帮助键。回调的修改发布后才捕获帮助快照。重复打开复用既有帮助，不再次派发；关闭帮助既不派发，也不撤销应用修改。回调须保持 Runtime 挂载，且不能递归打开帮助。
+
+**返回。** 返回值被忽略。
+
+**错误。** 回调的错误或 quit 中止打开并向调用者传播；已接受的应用状态修改保留。后续打开可以重试。
+
+**示例。** `(column :on-help-open (lambda () (etaf-set-value running nil)) ...)`
+
+**参见。** `etaf-help`、`etaf-help-close`、`:focus-scope`。
 
 #### Property: :on-focus-enter
 

@@ -6,6 +6,9 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
 
 ### Added
 
+- Scoped `:on-help-open` preparation is documented in both languages, including
+  modal boundaries, failure propagation and retained application state on close.
+
 - The keyboard and overlay chapters document in-application modal help,
   effective-key snapshots, scoped notes, search and backdrop-click dismissal
   in both languages. The reader's `?` help stays in its original window.

@@ -129,7 +129,7 @@ Open read-only keyboard help as a modal inside mounted RUNTIME's existing buffer
 
 **Arguments.** RUNTIME defaults to the active or current-buffer Runtime.
 
-**Semantics.** Calls inside an event or reactive batch wait for its pending work to publish. Capture the effective scope before the modal takes focus: labelled Host keys, effective application-local keymaps, framework navigation, region entries, scoped `:help` notes and readable control names. The existing buffer, Emacs window and application Runtime are reused; no help buffer or split is created. Repeated calls reuse the opening snapshot. Native editing ends with accepted input preserved, then the nearest enabled `:on-help-open` callback prepares the application before the snapshot is captured; a callback error or quit aborts opening. The core presentation scrolls; loading etaf-ui supplies the searchable `etaf-key-help` presentation. Descriptions never execute their commands. Escape leaves an active search edit first, then closes help; a pointer click on the backdrop also closes it without activating the background. Closing restores a surviving opener and the original window position. Background application updates remain live without changing the captured scope.
+**Semantics.** Calls inside an event or reactive batch wait for its pending work to publish. Capture the effective scope before the modal takes focus: labelled Host keys, effective application-local keymaps, framework navigation, region entries, scoped `:help` notes and readable control names. The existing buffer, Emacs window and application Runtime are reused; no help buffer or split is created. Repeated calls reuse the opening snapshot. Native editing ends with accepted input preserved, then the nearest enabled `:on-help-open` callback prepares the application before the snapshot is captured; a callback error or quit aborts opening. The core presentation scrolls; loading etaf-ui supplies the searchable `etaf-key-help` presentation. Descriptions never execute their commands. Escape leaves an active search edit first, then closes help; a pointer click on the backdrop also closes it without activating the background. While help is open, native window scrolling starts at the canvas top so the root-layer modal stays visible. Closing restores a surviving opener and the original window position; a rejected renderer also restores that position. Background application updates remain live without changing the captured scope.
 
 **Returns.** The application buffer.
 
@@ -145,7 +145,7 @@ Close in-buffer help and restore its surviving focus and window start.
 
 **Arguments.** RUNTIME defaults to the active or current-buffer Runtime.
 
-**Semantics.** Dispose only the help surface and its editing session. The retained application, its state and node scroll offsets survive. A removed opener is not focused. C-g remains Emacs's native interrupt, not a close command. Unmounting also disposes help and its snapshot.
+**Semantics.** Dispose only the help surface and its editing session. The retained application, its state and node scroll offsets survive. Inside an event or reactive batch, restore focus and the native window start after modal removal is published; this restoration never overrides a newer help opening or a Runtime unmounted in the same batch. A removed opener is not focused. C-g remains Emacs's native interrupt, not a close command. Unmounting also disposes help and its snapshot.
 
 **Returns.** Non-nil when help was open; nil otherwise.
 

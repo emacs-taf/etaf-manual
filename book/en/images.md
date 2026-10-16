@@ -1,6 +1,6 @@
 # Images
 
-An image reaches the screen only after it has been prepared. Preparation reads the source, runs a converter or builds an Emacs image descriptor, and returns an immutable character grid; layout and buffer writes then only copy that grid, so no decoder, subprocess or image constructor ever runs on the render path. This chapter describes the preparation step, the converter protocol applications can extend, the difference between a graphical frame and a character-cell fallback, the cache that makes repeated preparation cheap, and the one-line-one-glyph invariant the graphical adapter is built around. [Text](text.md) describes the character content an image node sits beside; the image Host in [Hosts](hosts.md) wraps this model for applications, and `ebox-node-set-image` replaces a prepared image in place.
+An image reaches the screen only after it has been prepared. Preparation reads the source, runs a converter or builds and decodes an Emacs image descriptor, and returns an immutable character grid. Layout and buffer writes reuse that grid without source I/O or subprocesses; painting may derive cached native background or brightness composites from the bytes already in memory. This chapter describes the preparation step, the converter protocol applications can extend, the difference between a graphical frame and a character-cell fallback, the cache that makes repeated preparation cheap, and the one-line-one-glyph invariant the graphical adapter is built around. [Text](text.md) describes the character content an image node sits beside; the image Host in [Hosts](hosts.md) wraps this model for applications, and `ebox-node-set-image` replaces a prepared image in place.
 
 ## Preparation
 
@@ -48,7 +48,7 @@ On a graphical frame the `graphics` adapter creates one Emacs image descriptor s
 
 In a terminal, or under `:adapter text`, the same prepare call produces a character grid: every cell is a `▀` half block whose face carries the averaged colors of the two source rows it stands for. The grid is plain text from the layout's point of view — the paragraph or image node treats it as columns of characters — so a terminal gets a readable, if coarse, rendering. The placeholder adapter produces the same shape of grid with `.` characters and no faces, which is what a layout or a test sees when neither graphics nor converters are available.
 
-A graphical image's transparent pixels show the background of the box that holds it, composed during paint. This is why the same source can sit on a tinted row without showing frame-colored corners.
+A graphical image's transparent pixels show the background of the box that holds it, composed during paint. This is why the same source can sit on a tinted row without showing frame-colored corners. Filtered overlays use the shared [`:backdrop-filter`](style-properties.md#style-backdrop-filter) image path; they never re-prepare the source, replace the picture with a flat cover or change its slice geometry.
 
 **Example.** On a frame whose cells are 7 by 14 pixels with a 79% ascent, preparing a 4-by-2 PNG yields `(:adapter graphics :converter nil :columns 4 :rows 2)`, two rows of one glyph each, the first with display `(slice 0 0 28 14)` and the second `(slice 0 14 28 14)` — 28 pixels being four cells wide. The fallback grid for the same call without a graphical frame is four characters per row.
 
@@ -57,6 +57,8 @@ A graphical image's transparent pixels show the background of the box that holds
 <!-- index: image cache; prepared value; cache eviction -->
 
 Preparation results are cached by source identity, size, adapter, frame metrics, inset and the converter list. The cache is bounded and drops its least recently used entries when it grows past 256, so a screen with many images does not evict every unrelated preparation at once. A live prepared value keeps working after eviction — it is detached and immutable — but the next prepare for the same source rebuilds the grid.
+
+Brightness composites have a separate weak identity cache, with at most eight recent variants per live image or display. The key includes the amount, native foreground, filtered background and frame. The first variant builds an in-memory SVG descriptor and native redisplay decodes it; subsequent paints share that descriptor across all row slices. A new source, palette or amount gets its own variant, while an identity filter uses the original descriptor. The cache never owns input callbacks or mounted trees.
 
 #### Function: ebox-image-content (prepared)
 
@@ -88,9 +90,9 @@ Return PREPARED's adapter, converter, columns and rows as a fresh plist.
 
 #### Function: ebox-image-cache-clear ()
 
-Release cached preparations without changing live image content.
+Release cached preparations and paint composites without changing live images.
 
-**Semantics.** Clearing the cache does not touch any prepared value already held by a node, but the next `ebox-image-prepare` for the same arguments prepares again. Call it after installing or reconfiguring converters, or when a font or display capability change makes the cached metrics stale.
+**Semantics.** Clearing the cache does not touch any prepared value or painted descriptor already held by a node, but the next `ebox-image-prepare` for the same arguments prepares again and later filtering rebuilds its composites. Call it after installing or reconfiguring converters, or when a font or display capability change makes the cached metrics stale.
 
 **Returns.** The reset access counter, 0; the clearing itself is the effect callers rely on.
 

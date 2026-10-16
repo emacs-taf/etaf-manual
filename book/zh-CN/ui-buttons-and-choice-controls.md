@@ -140,7 +140,7 @@
 
 **参数。** VALUE 必须是介于 MIN 与 MAX 之间、对齐 STEP 的整数。MIN 与 MAX 是满足 `min <= max` 的整数（默认 0 与 100）；STEP 是正整数（默认 1）。LABEL 默认为 `"Value"`。ON-CHANGE 接收下一个整数；BIND 与 `etaf-checkbox` 相同。
 
-**语义。** slider 是带标签的 column：strong 说明与 muted 当前值，然后是一个显示 `"◀  N  ▶"` 的 secondary 按钮。按钮聚焦时，Left 与 Right 经方向通道报告移动一个 STEP 后的 VALUE，Home 与 End 不绑定；激活按钮会打开布局之外的原生 `read-number`，之后恢复焦点，并且只在结果通过同样的整数、范围与 STEP 对齐检查后才写入。取消提示保持值不变。
+**语义。** slider 是带标签的 column：strong 说明与 muted 当前值，然后是一个显示 `"◀  N  ▶"` 的 secondary 按钮。按钮聚焦时，Left 与 Right 经方向通道报告移动一个 STEP 后的 VALUE，并限制在 MIN 与不大于 MAX 的最大对齐值之间；MAX 本身不必对齐。例如 MIN 为 0、MAX 为 5、STEP 为 2 时，可达值为 0、2、4，在 4 处按 Right 报告 4 而不是 5。Home 与 End 不绑定；激活按钮会打开布局之外的原生 `read-number`，之后恢复焦点，并且只在结果通过同样的整数、范围与 STEP 对齐检查后才写入。取消提示保持值不变。
 
 **返回。** 一个 View。
 
@@ -149,7 +149,7 @@
 **示例。**
 
 ```elisp
-(etaf-slider :value 4 :min 0 :max 10 :step 2 :label "Level")
+(etaf-slider :value 4 :min 0 :max 5 :step 2 :label "Level")
 ```
 
 ## range

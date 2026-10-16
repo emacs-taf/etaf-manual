@@ -140,7 +140,7 @@ Render a controlled numeric slider.
 
 **Arguments.** VALUE must be an integer between MIN and MAX aligned to STEP. MIN and MAX are integers with `min <= max` (defaults 0 and 100); STEP is a positive integer (default 1). LABEL defaults to `"Value"`. ON-CHANGE receives the next integer; BIND follows `etaf-checkbox`.
 
-**Semantics.** The slider is a labelled column: a strong caption and a muted current value, then a secondary button reading `"◀  N  ▶"`. With the button focused, Left and Right report VALUE moved by one STEP through the direction channel and Home and End are not bound; the native number prompt is reachable by activating the button, which opens `read-number` outside the layout, restores focus afterwards, and writes the result only after it passes the same integer, range and STEP-alignment checks. Cancelling the prompt leaves the value unchanged.
+**Semantics.** The slider is a labelled column: a strong caption and a muted current value, then a secondary button reading `"◀  N  ▶"`. With the button focused, Left and Right report VALUE moved by one STEP through the direction channel, clamped to MIN and the largest STEP-aligned value not greater than MAX; MAX need not itself align. For MIN 0, MAX 5 and STEP 2 the reachable values are 0, 2 and 4, so Right at 4 reports 4 rather than 5. Home and End are not bound; the native number prompt is reachable by activating the button, which opens `read-number` outside the layout, restores focus afterwards, and writes the result only after it passes the same integer, range and STEP-alignment checks. Cancelling the prompt leaves the value unchanged.
 
 **Returns.** A View.
 
@@ -149,7 +149,7 @@ Render a controlled numeric slider.
 **Example.**
 
 ```elisp
-(etaf-slider :value 4 :min 0 :max 10 :step 2 :label "Level")
+(etaf-slider :value 4 :min 0 :max 5 :step 2 :label "Level")
 ```
 
 ## Range

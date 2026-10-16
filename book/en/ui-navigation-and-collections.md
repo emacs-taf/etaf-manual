@@ -1,10 +1,10 @@
 # Navigation and Collections
 
-The catalog's navigation components keep the user oriented inside an application: tabs switch between views, a breadcrumb shows the path back, steps show progress through a flow, and an accordion or tree discloses nested content. A list presents a selectable collection, and a pagination bar drives a Data Controller's pages. All of them compose ordinary buttons and flow layout, keep their state in caller-owned values or refs, and create no second focus or event system: the keyboard behavior is the catalog's baseline, and a selected item is shown by its variant, never by a prefix that would shift the row. [UI Overview](ui-overview.md) defines the controlled contract, [Buttons and Choice Controls](ui-buttons-and-choice-controls.md) the buttons and selection tint they compose, [Data Controllers](data-controllers.md) the controller the pagination follows, and [Keyboard](keyboard.md) focus groups.
+The catalog's navigation components keep the user oriented inside an application: tabs switch between views, a breadcrumb shows the path back, steps show progress through a flow, and an accordion or tree discloses nested content. A list presents a selectable collection, and a pagination bar drives a Data Controller's pages. All of them compose ordinary buttons and flow layout, keep their state in caller-owned values or refs, and create no second focus or event system: the keyboard behavior is the catalog's baseline, and a selected item is shown by its paint, never by changing its padding, typeface or a prefix that would shift the row. [UI Overview](ui-overview.md) defines the controlled contract, [Buttons and Choice Controls](ui-buttons-and-choice-controls.md) the buttons and selection tint they compose, [Data Controllers](data-controllers.md) the controller the pagination follows, and [Keyboard](keyboard.md) focus groups.
 
 ## Items and state
 
-<!-- index: navigation items; item key; selected variant; caller-owned state -->
+<!-- index: navigation items; item key; selected state; caller-owned state -->
 
 The navigation components share one item shape: a plist with a unique non-nil `:key`, a nonempty string `:label`, and optional extras — a scalar `:count` shown next to the label, a symbol `:ref` that lets a caller address that control directly, or, for the tree, nested `:children`. The list component uses the same idea with `:title` and an optional `:description`, and the tree's items may carry children of the same shape. Validation is strict about uniqueness: duplicate keys or labels are rejected, because a callback that receives only the key must be unambiguous.
 
@@ -20,7 +20,7 @@ Render controlled tabs from unique scalar keys and labels.
 
 **Arguments.** ITEMS is the item list described above; an item may carry a scalar `:count` and a symbol `:ref`. ACTIVE is the selected key and must be present in ITEMS; it may be a value or a ref. ON-CHANGE receives the selected key and is required. VARIANT is the tab strip's class variant and defaults to `underline`.
 
-**Semantics.** Each tab is a button whose selected state uses the secondary variant; a count renders after the label in the muted color, so a tab can show how many items it holds. The strip is a horizontal focus group with the `tablist` role, and the selected tab carries `:aria-selected`. An item's `:ref`, when supplied, names its button so a caller can focus it directly.
+**Semantics.** Each tab is a ghost button whose selected state uses the secondary Theme colors without changing its geometry or typeface; a count renders after the label in the muted color, so a tab can show how many items it holds. The strip is a horizontal focus group with the `tablist` role, and the selected tab carries `:aria-selected`. An item's `:ref`, when supplied, names its button so a caller can focus it directly.
 
 **Returns.** A View.
 
@@ -55,7 +55,7 @@ Render ordered step buttons. ITEMS contain `:key` and `:label`; CURRENT and the 
 
 **Arguments.** CURRENT is a key in ITEMS, as a value or a ref. ON-CHANGE is optional and receives a selected key.
 
-**Semantics.** Each step is a button reading `"N  LABEL"` with a muted `→` between steps; the current one uses the secondary variant. The row wraps when the window is narrow, so a long flow reflows instead of overflowing, and it is one horizontal focus group with a row of gap between wrapped lines.
+**Semantics.** Each step is a button reading `"N  LABEL"` with a muted `→` between steps; the current one uses the ghost Button's selected tint with unchanged padding and typeface. The row wraps when the window is narrow, so a long flow reflows instead of overflowing, and it is one horizontal focus group with a row of gap between wrapped lines.
 
 **Returns.** A View.
 

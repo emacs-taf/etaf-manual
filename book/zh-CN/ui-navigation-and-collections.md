@@ -1,10 +1,10 @@
 # 导航与集合
 
-目录的导航组件让用户在应用里保持方向感：tabs 在视图间切换，breadcrumb 显示回去的路径，steps 显示流程进度，accordion 与 tree 披露嵌套内容。list 呈现可选择的集合，pagination 条驱动 Data Controller 的分页。它们都组合普通按钮与流式布局，把状态放在调用方拥有的值或 ref 里，也不建立第二套焦点或事件系统：键盘行为就是目录的基线，选中项用变体表示，绝不用会让整行位移的前缀。受控契约见 [UI 组件库总论](ui-overview.md)，按钮与选中色调见[按钮与选择控件](ui-buttons-and-choice-controls.md)，分页跟随的控制器见[数据控制器](data-controllers.md)，焦点组见[键盘](keyboard.md)。
+目录的导航组件让用户在应用里保持方向感：tabs 在视图间切换，breadcrumb 显示回去的路径，steps 显示流程进度，accordion 与 tree 披露嵌套内容。list 呈现可选择的集合，pagination 条驱动 Data Controller 的分页。它们都组合普通按钮与流式布局，把状态放在调用方拥有的值或 ref 里，也不建立第二套焦点或事件系统：键盘行为就是目录的基线，选中项只改变绘制颜色，内边距与字体保持不变，也不用会让整行位移的前缀。受控契约见 [UI 组件库总论](ui-overview.md)，按钮与选中色调见[按钮与选择控件](ui-buttons-and-choice-controls.md)，分页跟随的控制器见[数据控制器](data-controllers.md)，焦点组见[键盘](keyboard.md)。
 
 ## item 与状态
 
-<!-- index: navigation items; item key; selected variant; caller-owned state -->
+<!-- index: navigation items; item key; selected state; caller-owned state -->
 
 导航组件共用一种 item 形状：带唯一非 nil `:key`、非空字符串 `:label` 的 plist，可选的附加项——标量 `:count` 显示在标签旁，符号 `:ref` 让调用方直接寻址那个控件，tree 还有嵌套的 `:children`。list 组件用同样的思路，配 `:title` 与可选 `:description`；tree 的 item 可以携带同样形状的子项。校验对唯一性很严格：重复的键或标签会被拒绝，因为只收到键的回调必须无歧义。
 
@@ -20,7 +20,7 @@
 
 **参数。** ITEMS 是上面描述的 item 列表；item 可带标量 `:count` 与符号 `:ref`。ACTIVE 是选中的键，必须在 ITEMS 中；可以是值或 ref。ON-CHANGE 接收选中的键，必需。VARIANT 是 tab 条的类变体，默认 `underline`。
 
-**语义。** 每个 tab 是按钮，选中态用 secondary 变体；计数以 muted 颜色渲染在标签之后，因此 tab 可以显示它含有多少条目。tab 条是水平焦点组，role 为 `tablist`，选中的 tab 带 `:aria-selected`。item 提供 `:ref` 时它命名对应的按钮，调用方可以直接聚焦它。
+**语义。** 每个 tab 是 ghost 按钮，选中态使用 secondary 的 Theme 颜色，几何与字体保持不变；计数以 muted 颜色渲染在标签之后，因此 tab 可以显示它含有多少条目。tab 条是水平焦点组，role 为 `tablist`，选中的 tab 带 `:aria-selected`。item 提供 `:ref` 时它命名对应的按钮，调用方可以直接聚焦它。
 
 **返回。** 一个 View。
 
@@ -55,7 +55,7 @@
 
 **参数。** CURRENT 是 ITEMS 中的键，可以是值或 ref。ON-CHANGE 可选，接收选中的键。
 
-**语义。** 每个步骤是显示 `"N  LABEL"` 的按钮，步骤之间是 muted 的 `→`；当前项用 secondary 变体。窗口窄时整行换行，因此长流程重排而不是溢出；它是一个水平焦点组，换行后的各行之间留一行间隙。
+**语义。** 每个步骤是显示 `"N  LABEL"` 的按钮，步骤之间是 muted 的 `→`；当前项使用 ghost 按钮的选中色调，内边距与字体保持不变。窗口窄时整行换行，因此长流程重排而不是溢出；它是一个水平焦点组，换行后的各行之间留一行间隙。
 
 **返回。** 一个 View。
 

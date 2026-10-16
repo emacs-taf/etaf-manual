@@ -198,6 +198,8 @@ The damage collected during layout is then pruned — a whole-node change absorb
 
 Layout tries to change only what the change can reach. A vertical stack absorbs a child's height change by shifting the later items and damages only the child's lines and a bounded tail; horizontal containers, flex and grid containers, overlay hosts and anything whose children's participation changed relay out their children completely, because one item's size can move every other. A node that gains or loses absolute positioning moves between hosts. Untouched subtrees reuse their layout records, intrinsic sizes, wrapped paragraphs and composed lines, so a change at the bottom of a long list does not touch the top.
 
+A stationary overlay can also keep its inner line replacements when its position, size and stacking order are unchanged and the host's flow has not shifted. This applies only to equal-height replacements within the overlay and root bounds. Internal insertions or deletions, escaping ranges, movement and reordering retain the bounded whole-coverage path: changing overlay content must not insert or delete rows in the surrounding buffer. Full host layout still repaints its overlays.
+
 The boundary is what makes increments incremental: the pipeline visits dirty paths, and each container decides whether it can absorb the change or must lay its children out again.
 
 ## Painting, caches and display twins

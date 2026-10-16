@@ -75,7 +75,7 @@ Render DATA CONTROLLER state through the public Component DSL.
 
 Render a compact avatar with semantic color and accessible name.
 
-**Arguments.** NAME is the accessible name and the default source of initials. INITIALS overrides the derived initials. SRC is an optional photo: a local image file or an Emacs image descriptor. SIZE is the width — an integer column count or `(ch N)`; when omitted the width follows LINES (default 3, a positive integer). VARIANT selects the semantic color pair. BACKGROUND replaces the variant with white initials on that color, for per-person colors. SHAPE is `circle` (default) or `square`.
+**Arguments.** NAME is the accessible name and the default source of initials. INITIALS overrides the derived initials. SRC is an optional photo: a local image file or an Emacs image descriptor. SIZE is the width, default `(ch 5)`; round avatars also accept an integer column count. LINES is the positive integer height in text rows, default 3. VARIANT selects the semantic color pair. BACKGROUND replaces the variant with white initials on that color, for per-person colors. SHAPE is `circle` (default) or `square`.
 
 **Semantics.** Without INITIALS, the first two characters of NAME are used uppercased; without NAME and INITIALS the avatar shows `?`. On graphical frames with SVG, a circular avatar draws the photo clipped to a disc, or the initials on a colored disc when there is no readable photo; `square` and text frames use an initials box whose text sits on the upper middle line of its height. Round images are cached by source and cell size, so callers should pass `equal`-stable sources. The whole box carries the `img` role and NAME as its accessible label.
 
@@ -120,7 +120,7 @@ Render chronological item plists containing `:title`, `:content` and `:status`.
 
 Render a controlled month grid; MONTH is `(YEAR MONTH)` and ON-CHANGE gets `(YEAR MONTH DAY)`.
 
-**Arguments.** MONTH is a `(YEAR MONTH)` list with a month from 1 to 12 and defaults to `(2026 1)`. VALUE is the selected day as an integer or nil. ON-CHANGE is optional and receives the full date. LABEL defaults to `"Calendar"` and precedes the month name in the header.
+**Arguments.** MONTH is a `(YEAR MONTH)` list with a month from 1 to 12 and defaults to `(2026 1)`, not the current month; pass the intended month explicitly. VALUE is the selected integer day-of-month or nil (default), not a full date or a ref. ON-CHANGE is optional, defaults to nil and receives one `(YEAR MONTH DAY)` list; the caller extracts its day to update VALUE and may separately update MONTH. LABEL defaults to `"Calendar"` and precedes the month name in the header.
 
 **Semantics.** The grid shows Monday through Sunday as muted labels and every day of the month as a button formatted to two columns; the selected day uses the ghost Button's selected tint and carries `:aria-selected`. Weekday headings, date buttons and blank leading cells each occupy four character widths, so every date remains under its weekday and selection changes neither column positions nor typeface. The calendar is one focus group with the `grid` role, so the arrows move across days and the buttons keep their accessible date labels. The component owns no month navigation: the caller changes MONTH and VALUE.
 

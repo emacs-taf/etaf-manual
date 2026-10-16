@@ -75,7 +75,7 @@
 
 渲染带语义颜色与可访问名的紧凑头像。
 
-**参数。** NAME 是可访问名与首字母的默认来源。INITIALS 覆盖推导出的首字母。SRC 是可选照片：本地图片文件或 Emacs 图像描述符。SIZE 是宽度——整数列数或 `(ch N)`；省略时宽度跟随 LINES（默认 3，正整数）。VARIANT 选择语义色对。BACKGROUND 用该底色的白字替代 VARIANT，用于按人上色。SHAPE 是 `circle`（默认）或 `square`。
+**参数。** NAME 是可访问名与首字母的默认来源。INITIALS 覆盖推导出的首字母。SRC 是可选照片：本地图片文件或 Emacs 图像描述符。SIZE 是宽度，默认 `(ch 5)`；圆形头像也接受整数列数。LINES 是以文本行为单位的正整数高度，默认 3。VARIANT 选择语义色对。BACKGROUND 用该底色的白字替代 VARIANT，用于按人上色。SHAPE 是 `circle`（默认）或 `square`。
 
 **语义。** 没有 INITIALS 时取 NAME 前两字符并大写；NAME 与 INITIALS 都没有时显示 `?`。有 SVG 的图形 frame 上，圆形头像把照片裁剪成圆盘，没有可读照片时把首字母画在彩色圆盘上；`square` 与文本 frame 用首字母盒子，文本落在其高度的上中线上。圆形图像按来源与格子尺寸缓存，因此调用方应传 `equal` 稳定的来源。整个盒子带 `img` role，并用 NAME 作为可访问标签。
 
@@ -120,7 +120,7 @@
 
 渲染受控的月网格；MONTH 是 `(YEAR MONTH)`，ON-CHANGE 收到 `(YEAR MONTH DAY)`。
 
-**参数。** MONTH 是 `(YEAR MONTH)` 列表，月从 1 到 12，默认 `(2026 1)`。VALUE 是选中的天，整数或 nil。ON-CHANGE 可选，接收完整日期。LABEL 默认 `"Calendar"`，在表头里位于月份名之前。
+**参数。** MONTH 是 `(YEAR MONTH)` 列表，月从 1 到 12，默认 `(2026 1)`，不是当前月份；应显式传入所需月份。VALUE 是选中的整数日号或 nil（默认），不是完整日期或 ref。ON-CHANGE 可选，默认 nil，接收一个 `(YEAR MONTH DAY)` 列表；调用方取其日号更新 VALUE，也可单独更新 MONTH。LABEL 默认 `"Calendar"`，在表头里位于月份名之前。
 
 **语义。** 网格以 muted 标签显示周一到周日，并把当月每一天渲染为两位宽按钮；选中的天用 ghost 按钮的选中色调并带 `:aria-selected`。星期标题、日期按钮与前导空格都占四个字符宽度，每个日期始终位于对应的星期下，选择变化不会改变列位置或字体。日历是一个 `grid` role 的焦点组，方向键在日期间移动，按钮保留可访问的日期标签。组件不拥有月份导航：由调用方修改 MONTH 与 VALUE。
 

@@ -1,6 +1,6 @@
 # Buttons and Choice Controls
 
-The catalog's action and selection controls all follow one controlled contract: a value prop plus a change callback, or a writable ref through `:bind`, with the application owning the value and the component only rendering it and reporting what the user did. Buttons commit an action, checkbox and switch own a boolean, radio and segmented pick from a fixed list, and slider and range report a number that the caller stores. This chapter defines the seven controls, their keyboard behavior and their shared color tokens. [UI Overview](ui-overview.md) defines the controlled contract, [Events](events.md) how a press reaches a callback, [Focus](focus.md) and [Keyboard](keyboard.md) the Tab and arrow behavior the controls inherit, and [Component Styles and Themes](component-styles-and-themes.md) the token mechanism.
+The catalog's action and selection controls follow a controlled contract: the application owns the value and the component renders it and reports what the user did. Where a control declares `:bind`, a writable ref can replace its explicit value/change-callback pair; Range instead keeps separate change and commit callbacks and has no `:bind` prop. Buttons commit an action, checkbox and switch own a boolean, radio and segmented pick from a fixed list, and slider and range report a number that the caller stores. This chapter defines the seven controls, their keyboard behavior and their shared color tokens. [UI Overview](ui-overview.md) defines the controlled contract, [Events](events.md) how a press reaches a callback, [Focus](focus.md) and [Keyboard](keyboard.md) the Tab and arrow behavior the controls inherit, and [Component Styles and Themes](component-styles-and-themes.md) the token mechanism.
 
 ## The shared selection contract
 
@@ -8,7 +8,7 @@ The catalog's action and selection controls all follow one controlled contract: 
 
 Selection controls are *tonal pills* rather than boxed fields: a selected control paints the secondary button tint, an unselected one inherits its surface, and none carries an outline. Because the secondary tints are dialog tokens, a selected control stays crisp inside a modal above a dimmed shell. Geometry never changes with selection — state is paint, not layout — so switching a segment or checking a box never moves a neighbour.
 
-Each control reads its input through the same contract. An explicit `:value` or `:checked` prop and an `:on-change` callback form the controlled pair; a writable ref passed as `:bind` replaces both, and its current value supplies the displayed state. A non-nil bind together with an explicit value or callback is rejected, and the conflict names the offending property. The ref belongs to the caller: a rejected publication keeps the previous binding target, and unmounting releases the control's handlers and subscriptions without touching the ref.
+Choice controls read input through the same contract. An explicit `:value` or `:checked` prop and an `:on-change` callback form the controlled pair; where supported, a writable ref passed as `:bind` replaces both, and its current value supplies the displayed state. A non-nil bind together with an explicit value or callback is rejected, and the conflict names the offending property. The ref belongs to the caller: a rejected publication keeps the previous binding target, and unmounting releases the control's handlers and subscriptions without touching the ref.
 
 `DISABLED` removes the control's callback and its Tab stop while keeping its footprint, so toggling availability never shifts the layout. An additive `:on-press` observer may be supplied alongside the controlled interface; it observes activation without becoming the value path.
 
@@ -115,7 +115,7 @@ Render a compact mutually-exclusive selector from an options alist.
 
 **Arguments.** OPTIONS, VALUE, ON-CHANGE and BIND follow `etaf-radio`; there is no caption label.
 
-**Semantics.** The segments are buttons in one horizontal focus group with a two-column gap and the `tablist` role. Selection is carried purely by the button variant — the selected segment uses the secondary variant and the others are ghosts — so no prefix changes the caption width and the row never jumps when the selection moves.
+**Semantics.** The segments are ghost buttons in one horizontal focus group with a two-column gap and the `tablist` role. Selection changes only the secondary Theme paint through `:aria-selected`, never the variant, padding or font weight, so moving selection preserves every caption's position and width.
 
 **Returns.** A View.
 
@@ -129,6 +129,8 @@ Render a compact mutually-exclusive selector from an options alist.
 ```
 
 ## Slider
+
+Use `etaf-number-input` for in-place integer entry with unit steppers and an optional empty value, `etaf-slider` for a required step-aligned integer with keyboard increments and a native number prompt, and `etaf-range` for pointer scrubbing with intermediate versus committed numeric values. They share caller-owned values but not the same editing or callback contract.
 
 <!-- index: etaf-slider; integer slider; native prompt; step alignment -->
 

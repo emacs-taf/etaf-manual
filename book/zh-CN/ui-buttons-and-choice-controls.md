@@ -1,6 +1,6 @@
 # 按钮与选择控件
 
-目录的动作与选择控件都遵循同一份受控契约：值 prop 加变更回调，或经 `:bind` 传一个可写 ref；应用拥有值，组件只负责渲染并报告用户做了什么。按钮提交动作，checkbox 与 switch 拥有一个布尔量，radio 与 segmented 从固定列表里挑选，slider 与 range 报告一个由调用方保存的数字。本章定义这七个控件、它们的键盘行为以及共用的颜色 token。[UI 组件库总论](ui-overview.md)定义受控契约，[事件](events.md)定义一次按压如何到达回调，[焦点](focus.md)与[键盘](keyboard.md)定义控件继承的 Tab 与方向键行为，[组件样式与主题](component-styles-and-themes.md)定义 token 机制。
+目录的动作与选择控件遵循受控契约：应用拥有值，组件负责渲染并报告用户做了什么。声明了 `:bind` 的控件可用可写 ref 替代显式的值/变更回调对；Range 则保留独立的变更与提交回调，不提供 `:bind` prop。按钮提交动作，checkbox 与 switch 拥有一个布尔量，radio 与 segmented 从固定列表里挑选，slider 与 range 报告一个由调用方保存的数字。本章定义这七个控件、它们的键盘行为以及共用的颜色 token。[UI 组件库总论](ui-overview.md)定义受控契约，[事件](events.md)定义一次按压如何到达回调，[焦点](focus.md)与[键盘](keyboard.md)定义控件继承的 Tab 与方向键行为，[组件样式与主题](component-styles-and-themes.md)定义 token 机制。
 
 ## 共用的选择契约
 
@@ -8,7 +8,7 @@
 
 选择控件是*色调药丸*而不是带框输入框：选中控件绘制 secondary 按钮的浅色，未选中继承自己的表面，两者都没有描边。因为 secondary 浅色是对话框 token，选中控件在变暗 shell 之上的模态里依然清晰。几何不随选择变化——状态是绘制而不是布局——所以切换分段或勾选盒子永远不会移动邻项。
 
-每个控件都经同一份契约读取输入。显式的 `:value` 或 `:checked` prop 与 `:on-change` 回调构成受控对；作为 `:bind` 传入的可写 ref 替代两者，其当前值提供显示状态。非 nil 的 bind 与显式的值或回调同时出现会被拒绝，冲突消息点名出问题的属性。ref 归调用方所有：被拒绝的发布保留此前的绑定目标，卸载时释放控件的处理器与订阅而不触碰 ref。
+选择控件经同一份契约读取输入。显式的 `:value` 或 `:checked` prop 与 `:on-change` 回调构成受控对；支持 `:bind` 时，传入的可写 ref 替代两者，其当前值提供显示状态。非 nil 的 bind 与显式的值或回调同时出现会被拒绝，冲突消息点名出问题的属性。ref 归调用方所有：被拒绝的发布保留此前的绑定目标，卸载时释放控件的处理器与订阅而不触碰 ref。
 
 `DISABLED` 移除控件的回调与 Tab 停靠点，同时保留它的占位，所以切换可用性永不移动布局。受控接口之外还可以提供加性的 `:on-press` 观察者；它观察激活而不进入值路径。
 
@@ -115,7 +115,7 @@
 
 **参数。** OPTIONS、VALUE、ON-CHANGE 与 BIND 与 `etaf-radio` 相同；没有说明标签。
 
-**语义。** 各分段是同一水平焦点组里的按钮，间隔两列，带 `tablist` role。选择完全由按钮变体承载——选中的分段用 secondary、其余是 ghost——因此没有前缀改变标题宽度，选择移动时整行永不跳动。
+**语义。** 各分段是同一水平焦点组里的 ghost 按钮，间隔两列，带 `tablist` role。选择只经 `:aria-selected` 改变 secondary Theme 绘制，不改变变体、padding 或字重，因此切换选择时所有标题的位置与宽度保持不变。
 
 **返回。** 一个 View。
 
@@ -129,6 +129,8 @@
 ```
 
 ## slider
+
+需要原位输入整数、单位步进器和可空值时使用 `etaf-number-input`；需要必填、按步长对齐的整数、键盘增减及原生数字提示时使用 `etaf-slider`；需要指针连续拖动，并区分中间数值和提交数值时使用 `etaf-range`。它们都由调用方持有值，但编辑方式与回调契约并不相同。
 
 <!-- index: etaf-slider; integer slider; native prompt; step alignment -->
 

@@ -160,9 +160,9 @@
 
 在 MIN..MAX 内渲染受控的交互式 range（进度、拖动定位、音量）。
 
-**参数。** VALUE 是 MIN..MAX 内的数字或响应式源，STEP 非 nil 时对齐 STEP。MIN 与 MAX 接受数字或响应式源。KEY-STEP 是方向键步长，默认 STEP，否则为跨度的二十分之一。ON-CHANGE 报告中间值，ON-COMMIT 报告释放值。BAR-HEIGHT 是绘制厚度占行的百分比（默认 40）。COLOR 与 TRACK-COLOR 覆盖填充与轨道 token。LABEL 是可访问名。REF 命名轨道 Host，FILL-REF 命名填充 Host。
+**参数。** VALUE 是 MIN..MAX 内的数字或响应式源，STEP 非 nil 时对齐 STEP。MIN 与 MAX 接受数字或响应式源。KEY-STEP 是方向键步长，默认 STEP，否则为跨度的二十分之一。ON-CHANGE 报告中间值，ON-COMMIT 报告释放值。BAR-HEIGHT 是绘制厚度占一个标准行的百分比（1..100 的整数，默认 40）。支持 SVG 的图形 frame 将它居中并舍入到像素，最少一个像素；纯文本 frame 保留细线。行高与整行命中区域均不改变。COLOR 与 TRACK-COLOR 覆盖填充与轨道 token。LABEL 是可访问名。REF 命名轨道 Host，FILL-REF 命名填充 Host。
 
-**语义。** 进度条由普通流里承载规则字符串的轨道、以及绘制在其上方、宽度为百分比的绝对定位填充 Host 组成。指针点击把所指的值经 ON-CHANGE 与 ON-COMMIT 报告；拖拽把中间值经 ON-CHANGE、释放值经 ON-COMMIT 报告。按压或拖拽在调用方的值到达之前就通过保留 Host 几何重新分配两部分的比例，因此在后端回复未到时手势仍跟随指针。range 聚焦时，Left 与 Right 报告移动 KEY-STEP 后的值，Home 与 End 报告 MIN 与 MAX。调用方可以用 `etaf-runtime-update-host-geometries` 加 `:width` 百分比就地移动填充而不重新发布 View，播放位置就是这样推进的。经响应式源变化的边界在保留填充处读取，未就绪的 nil 边界画空跨度而不是失败。
+**语义。** 进度条由普通流里承载单行线条的轨道、以及绘制在其上方、宽度为百分比的绝对定位填充 Host 组成。两部分裁剪同一份居中图形（或文本回退），因此填充移动时厚度保持一致。指针点击把所指的值经 ON-CHANGE 与 ON-COMMIT 报告；拖拽把中间值经 ON-CHANGE、释放值经 ON-COMMIT 报告。按压或拖拽在调用方的值到达之前就通过保留 Host 几何重新分配两部分的比例，因此在后端回复未到时手势仍跟随指针。range 聚焦时，Left 与 Right 报告移动 KEY-STEP 后的值，Home 与 End 报告 MIN 与 MAX。调用方可以用 `etaf-runtime-update-host-geometries` 加 `:width` 百分比就地移动填充而不重新发布 View，播放位置就是这样推进的。经响应式源变化的边界在保留填充处读取，未就绪的 nil 边界画空跨度而不是失败。
 
 **返回。** 一个 View。
 

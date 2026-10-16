@@ -122,7 +122,7 @@ Render a controlled month grid; MONTH is `(YEAR MONTH)` and ON-CHANGE gets `(YEA
 
 **Arguments.** MONTH is a `(YEAR MONTH)` list with a month from 1 to 12 and defaults to `(2026 1)`. VALUE is the selected day as an integer or nil. ON-CHANGE is optional and receives the full date. LABEL defaults to `"Calendar"` and precedes the month name in the header.
 
-**Semantics.** The grid shows Monday through Sunday as muted labels and every day of the month as a button formatted to two columns; the selected day uses the secondary variant and carries `:aria-selected`, and an empty leading cell is a blank label so the weeks stay aligned. The calendar is one focus group with the `grid` role, so the arrows move across days and the buttons keep their accessible date labels. The component owns no month navigation: the caller changes MONTH and VALUE.
+**Semantics.** The grid shows Monday through Sunday as muted labels and every day of the month as a button formatted to two columns; the selected day uses the ghost Button's selected tint and carries `:aria-selected`. Weekday headings, date buttons and blank leading cells each occupy four character widths, so every date remains under its weekday and selection changes neither column positions nor typeface. The calendar is one focus group with the `grid` role, so the arrows move across days and the buttons keep their accessible date labels. The component owns no month navigation: the caller changes MONTH and VALUE.
 
 **Returns.** A View.
 

@@ -8,6 +8,8 @@ The catalog answers "choose one of these values" in two shapes: a *picker* that 
 
 The picker takes an *option alist*: each entry maps a value to its caption. Values must be unique scalars (symbols, numbers or strings), captions unique nonempty strings, and the current value is either nil or one of the values — a nil value absent from the list shows the placeholder, while any other absent value is an error, because the caller asked to display something the list cannot explain. The menus take an *item plist list* instead, because a menu item carries more than a caption: a unique non-nil `:key`, a unique nonempty `:label`, and an optional `:disabled` flag. The key is what a callback receives; the label is what the user reads.
 
+A text menu trigger has a trailing disclosure arrow from the shared icon catalog. It indicates a menu, not a keyboard binding, and is not part of the accessible control name.
+
 A disabled item stays visible and cannot be activated or reached by focus. A control whose menu has no enabled item left, or whose callback is missing, disables its own trigger instead of opening an empty surface: an empty list is a disabled control, not an error, because an application that has no actions right now still renders a coherent toolbar.
 
 ## The select component
@@ -20,7 +22,7 @@ Choose a controlled value from OPTIONS without leaving the UI.
 
 **Arguments.** VALUE is the current value, a ref or a computed. OPTIONS is the alist described above. LABEL defaults to `"Select"` and PLACEHOLDER to `"—"`. ON-CHANGE receives the accepted value; BIND is a writable ref replacing VALUE and ON-CHANGE, following `etaf-checkbox`. PRESENTATION is `chips`, `dropdown` or `auto` (default). HIDE-LABEL omits the caption for grid forms. WIDTH is the dropdown's popover width and defaults to `(ch 28)`. REF names the dropdown anchor, or the whole field when chips are shown.
 
-**Semantics.** With chips, every option is an inline pill, the current one filled with the selection tint; with `dropdown`, one anchor pill reads `"CAPTION v"` and opens a popover of ghost option buttons; `auto` shows chips for up to four options and a dropdown beyond that. Choosing a dropdown option closes the surface and calls ON-CHANGE once; Escape closes it without a choice. The dropdown's open state and its anchor belong to the retained instance, so the caller stores no open flag. Selection never opens the minibuffer.
+**Semantics.** With chips, every option is an inline pill, the current one filled with the selection tint; with `dropdown`, one anchor pill shows the current caption followed by a disclosure arrow and opens a popover of ghost option buttons; `auto` shows chips for up to four options and a dropdown beyond that. Choosing a dropdown option closes the surface and calls ON-CHANGE once; Escape closes it without a choice. The dropdown's open state and its anchor belong to the retained instance, so the caller stores no open flag. Selection never opens the minibuffer.
 
 **Returns.** A View.
 

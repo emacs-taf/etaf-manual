@@ -88,7 +88,7 @@ Render controlled disclosure sections. Items contain `:key`, `:label` and string
 
 **Arguments.** OPEN is a list of keys present in ITEMS. ON-TOGGLE receives the next list of open keys and is required. MULTIPLE (default t) permits more than one open section.
 
-**Semantics.** Each section is a ghost button prefixed `v ` when open and `> ` when closed, followed by its content. With MULTIPLE nil the next list contains at most one key; OPEN is validated against the item keys and the single-open rule, so a caller cannot leave the component in an inconsistent state.
+**Semantics.** Each section is a ghost button with a downward disclosure icon when open and a rightward icon when closed, followed by its content. Its accessible name stays equal to the item label; `:aria-expanded` carries the expansion state. With MULTIPLE nil the next list contains at most one key; OPEN is validated against the item keys and the single-open rule, so a caller cannot leave the component in an inconsistent state.
 
 **Returns.** A View.
 
@@ -107,7 +107,7 @@ Render nested items with caller-owned expanded keys and selection callbacks.
 
 **Arguments.** ITEMS is a nonempty list of tree items; each may carry `:children` of the same shape. EXPANDED is a list of open keys, as a value or a ref. ON-TOGGLE receives a key or the next expanded list; ON-SELECT receives a key. Either callback may be nil.
 
-**Semantics.** The tree flattens the visible items into rows with two spaces of indentation per depth and a `v `/`> ` prefix on branches. A branch row carries `:aria-expanded` and toggles on press; a leaf row selects on press. Right opens and Left closes the focused branch in place through the direction channel, so the keyboard can walk the hierarchy without activating a row. Expanded branches use the selection tint, and the tree is one vertical focus group.
+**Semantics.** The tree flattens the visible items into rows with two spaces of indentation per depth and a downward or rightward disclosure icon on branches. A branch row carries `:aria-expanded` and toggles on press; a leaf row selects on press. Right opens and Left closes the focused branch in place through the direction channel, so the keyboard can walk the hierarchy without activating a row. Expanded branches use the selection tint, and the tree is one vertical focus group.
 
 **Returns.** A View.
 

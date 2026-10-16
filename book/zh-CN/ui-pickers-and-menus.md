@@ -22,7 +22,7 @@
 
 **参数。** VALUE 是当前值、ref 或 computed。OPTIONS 是上面描述的 alist。LABEL 默认 `"Select"`，PLACEHOLDER 默认 `"—"`。ON-CHANGE 接收被接受的值；BIND 是替代 VALUE 与 ON-CHANGE 的可写 ref，契约同 `etaf-checkbox`。PRESENTATION 是 `chips`、`dropdown` 或 `auto`（默认）。HIDE-LABEL 为网格表单省略说明。WIDTH 是下拉浮层的宽度，默认 `(ch 28)`。REF 命名下拉锚点；显示 chips 时命名整个字段。
 
-**语义。** chips 形态下每个选项是一个行内药丸，当前项用选中色调填充；`dropdown` 形态下一个锚点药丸显示当前标签和展开箭头 并打开选项 ghost 按钮组成的浮层；`auto` 在四项以内用 chips，超过则用下拉。选择下拉项会关闭浮层并调用 ON-CHANGE 一次；Escape 关闭而不选择。下拉的打开状态与锚点属于保留实例，所以调用方不需要保存打开标志。选择永不打开 minibuffer。
+**语义。** chips 形态下每个选项是一个行内药丸，当前项用选中色调填充；`dropdown` 形态下一个锚点药丸显示当前标签和展开箭头 并打开选项 ghost 按钮组成的浮层；`auto` 在四项以内用 chips，超过则用下拉。Chips 与下拉选项在选中时保持内边距和字体不变，只改变 Theme 绘制颜色，不叠加悬停高亮。选择下拉项会关闭浮层并调用 ON-CHANGE 一次；Escape 关闭而不选择。下拉的打开状态与锚点属于保留实例，所以调用方不需要保存打开标志。选择永不打开 minibuffer。
 
 **返回。** 一个 View。
 

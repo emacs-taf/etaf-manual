@@ -6,7 +6,7 @@ The desktop components are the shells a window manager is built from: a taskbar 
 
 <!-- index: desktop item; item state; item tone; shell tokens -->
 
-Desktop items are item plists: a unique scalar `:key`, a nonempty `:label`, and optionally a `:description`, a `:state` of `active`, `minimized` or `error` (or a ref or computed of one), a `:disabled` flag, and a `:ref`. Captions never carry marker glyphs: state is communicated by the button's tone, which keeps the text width stable as windows focus and minimize, and avoids a noisy taskbar.
+Desktop items are item plists: a unique scalar `:key`, a nonempty `:label`, and optionally a `:description`, a `:state` of `active`, `minimized` or `error` (or a ref or computed of one), a `:disabled` flag, and a `:ref`. Captions never carry marker glyphs: state is communicated by the button's tone without changing padding or font weight, which keeps the text width stable as windows focus and minimize, and avoids a noisy taskbar.
 
 The bars and their items paint from the shell token set — `:ui-shell-bg`, `:ui-shell-fg`, `:ui-shell-muted-fg`, `:ui-shell-item-fg` and `:ui-shell-item-minimized-fg` — while selection uses the accent tokens and picker rows the picker tokens. Because every key resolves through a deferred token, providing a Theme restyles the whole shell, its items, the pickers and the dividers together without re-rendering.
 

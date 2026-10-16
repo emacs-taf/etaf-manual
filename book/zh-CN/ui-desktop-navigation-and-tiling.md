@@ -6,7 +6,7 @@
 
 <!-- index: desktop item; item state; item tone; shell tokens -->
 
-桌面 item 是 item plist：唯一标量 `:key`、非空 `:label`，以及可选的 `:description`、`active`/`minimized`/`error` 的 `:state`（或它们的 ref/computed）、`:disabled` 标志与 `:ref`。caption 从不携带标记字形：状态由按钮的 tone 表达，这让文本宽度在窗口聚焦与最小化时保持稳定，也避免任务栏变吵。
+桌面 item 是 item plist：唯一标量 `:key`、非空 `:label`，以及可选的 `:description`、`active`/`minimized`/`error` 的 `:state`（或它们的 ref/computed）、`:disabled` 标志与 `:ref`。caption 从不携带标记字形：状态由按钮的 tone 表达，不改变内边距与字重，这让文本宽度在窗口聚焦与最小化时保持稳定，也避免任务栏变吵。
 
 栏与它们的 item 用 shell token 集绘制——`:ui-shell-bg`、`:ui-shell-fg`、`:ui-shell-muted-fg`、`:ui-shell-item-fg` 与 `:ui-shell-item-minimized-fg`——选择用 accent token，选择器行用 picker token。因为每个键都经延迟 token 解析，提供一次 Theme 就能把整个 shell、它的 item、选择器与分隔线一起换装而不重渲染。
 

@@ -114,7 +114,7 @@
 
 **参数。** ORIENTATION 是 `horizontal`（左右）或 `vertical`（上下）。RATIO 是第一栏比例，归调用方所有，受 MIN-RATIO（默认 0.1）与 MAX-RATIO（默认 0.9）约束。ON-CHANGE 接收原始分隔条手势，USE 可安装把该手势换算成新比例的 ETAF Behavior。`first` 与 `second` slot 装两栏。OVERLAY 只渲染分隔条，供调用方拥有定位宿主；DIVIDER-CONTENT 提供该分隔条的绘制范围——垂直分隔条是一行字符，水平分隔条是每行一个字符——因为定位盒子只绘制它拥有的内容。OVERLAY-RECT 可提供精确的 `:left`/`:top`/`:width`/`:height` 分配；没有它时分隔条相对定位父级按 RATIO 摆放。OVERLAY-RECT 条目、DIVIDER-CONTENT、Z-INDEX 与 VISIBLE 可以是 ref 或 computed，只在 Host 绑定里读取，因此布局策略可以移动、隐藏或显示分隔条而不重渲染它。
 
-**语义。** 分隔条从不保存比例或窗口/布局策略：它渲染两栏并报告分隔条手势，聚焦的分隔条按跨过它的方向键像一格拖动那样步进。拥有分配方案的调用方可以让分隔条跑在 overlay 模式，并在平铺移动时经 ref 更新其矩形。
+**语义。** 分隔条从不保存比例或窗口/布局策略：它渲染两栏并报告分隔条手势，聚焦的分隔条按跨过它的方向键像一格拖动那样步进。比例策略在 `start` 保存初始比例和已分配的像素长度，在 `move`/`end` 加上累计像素位移除以该长度的结果并夹到指定边界，在 `cancel` 恢复初始比例。应测量当前分配，例如对没有额外内边距的具名水平分栏调用 `etaf-host-ref-size`，而不是假定固定视口宽度。MIN-RATIO 与 MAX-RATIO 校验传入比例，不代替回调进行换算。拥有分配方案的调用方可以让分隔条跑在 overlay 模式，并在平铺移动时经 ref 更新其矩形。
 
 **返回。** 一个 View。
 

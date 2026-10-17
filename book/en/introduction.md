@@ -4,6 +4,26 @@ This is the reference manual of ETAF, a framework for building text applications
 
 The manual is organized by subsystem, not by package. A subsystem that spans several packages, such as styles or focus, is described in one place, and each definition entry identifies the package that owns it. It is not a tutorial: it assumes that you know Emacs Lisp and want precise answers.
 
+## Installation
+
+The packages require Emacs 29.1 or newer. The official package.el archive is `https://etaf.top/packages/`. Source-only packages are compiled locally by Emacs; using the framework and catalog does not require Git, Python, a system compiler or Pi, and installation does not replace the user's configuration. Native compilation is optional. SQLite additionally requires an Emacs build for which `sqlite-available-p` returns non-nil; the sqlite3 executable alone is not sufficient. Graphical media require a graphical frame and the relevant Emacs image support.
+
+Evaluate the following once, then select the component gallery or another supported target:
+
+```elisp
+;;; -*- lexical-binding: t; -*-
+(require 'package)
+(add-to-list 'package-archives '("etaf" . "https://etaf.top/packages/"))
+(package-initialize)
+(package-refresh-contents)
+(package-install 'etaf-install)
+(call-interactively #'etaf-install)
+```
+
+Thereafter, `M-x etaf-install` reopens installed targets without downloading again. `M-x etaf-install-doctor` checks required and optional capabilities without accessing the network or writing configuration. The [workspace README](https://github.com/emacs-taf/emacs-taf#install-in-an-existing-emacs) lists the available targets and the boundary around external backends. Package.el remains the package manager; use `M-x list-packages` for updates and removal, and restart Emacs after updating loaded code.
+
+The installer rejects conflicting source load paths and already loaded source dependencies rather than silently replacing them. On an installation or entry-loading failure, it removes only packages added by that attempt, keeps older installations and unrelated packages, reports any cleanup failure, and requires a restart before retrying: deleting package files cannot undo Lisp already loaded into the process. Keep source checkouts for development in a separate profile instead of mixing both installations of the same dependency.
+
 ## Scope
 
 The manual covers six packages:

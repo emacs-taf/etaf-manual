@@ -72,6 +72,31 @@ class CheckReferencesTests(unittest.TestCase):
         result = self.run_check()
         self.assertEqual(0, result.returncode, result.stderr)
 
+    def test_configuration_literals_are_not_manual_navigation_links(self):
+        self.write_references('''\
+            The package archive is `https://etaf.top/packages/`.
+            ```elisp
+            (add-to-list 'package-archives '("etaf" . "https://etaf.top/packages/"))
+            ```
+            [Read the chapter](https://etaf.top/chapter/)
+        ''')
+        result = self.run_check()
+        self.assertEqual(0, result.returncode, result.stderr)
+
+    def test_code_link_labels_do_not_hide_invalid_destinations(self):
+        self.write_references('''\
+            [`chapter`](https://etaf.top/chapter/#missing)
+            ```text
+            https://etaf.top/literal-value/
+            ```
+            https://etaf.top/real-missing-chapter/
+        ''')
+        result = self.run_check()
+        self.assertEqual(1, result.returncode)
+        self.assertIn('target heading does not exist', result.stderr)
+        self.assertIn('book/en/real-missing-chapter.md', result.stderr)
+        self.assertNotIn('literal-value', result.stderr)
+
     def test_missing_chapter_is_reported(self):
         self.write_references('https://etaf.top/missing/\n')
         result = self.run_check()

@@ -4,6 +4,26 @@
 
 本书按子系统组织，不按包组织。样式、焦点这类横跨多个包的子系统只在一处讲，每个定义条目标明它属于哪个包。本书不是教程：它假定你熟悉 Emacs Lisp，需要的是精确的答案。
 
+## 安装
+
+这些包要求 Emacs 29.1 或更新版本。官方 package.el 包源是 `https://etaf.top/packages/`。源码包由 Emacs 在本地编译；使用框架和组件库不需要 Git、Python、系统编译器或 Pi，安装也不替换用户配置。原生编译是可选能力。SQLite 另需 Emacs 本身具备支持，即 `sqlite-available-p` 返回非 nil；仅安装 sqlite3 可执行程序并不够。图形媒体需要图形 frame 及对应的 Emacs 图像支持。
+
+以下代码只需执行一次，然后选择组件画廊或其他受支持目标：
+
+```elisp
+;;; -*- lexical-binding: t; -*-
+(require 'package)
+(add-to-list 'package-archives '("etaf" . "https://etaf.top/packages/"))
+(package-initialize)
+(package-refresh-contents)
+(package-install 'etaf-install)
+(call-interactively #'etaf-install)
+```
+
+以后运行 `M-x etaf-install` 重开已安装的目标，不必再次下载。`M-x etaf-install-doctor` 只检查必需和可选能力，不访问网络，也不写配置。[工作区 README](https://github.com/emacs-taf/emacs-taf/blob/main/README.zh-CN.md#在已有-emacs-中安装) 列出可选目标及外部后端边界。包管理仍由 package.el 负责；通过 `M-x list-packages` 更新或卸载，更新已加载代码后重启 Emacs。
+
+安装入口会拒绝冲突的源码加载路径和已加载的源码依赖，不会静默覆盖它们。安装或包入口加载失败时，只移除本次新增的包，保留旧安装和无关包，报告任何清理失败，并要求重启后再试：删除包文件无法撤销进程中已经加载的 Lisp。源码检出用于开发时应放在独立配置中，不要混用同一依赖的两种安装方式。
+
 ## 范围
 
 本书涵盖六个包：

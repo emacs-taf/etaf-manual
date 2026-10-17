@@ -3,8 +3,11 @@
 
 The manual is published at https://etaf.top; repository files reference its
 chapters with site URLs such as https://etaf.top/zh-cn/ebox-node-construction/.
-This check resolves every such link against the book sources: the chapter must
-exist and a section anchor must name a heading of that chapter.  It also rejects
+This check resolves prose URLs and Markdown links against the book sources:
+the chapter must exist and a section anchor must name a heading of that chapter.
+Fenced and inline code are literal data, not navigation links; for example a
+package.el archive URL in a configuration example is not a book chapter.
+It also rejects
 the retired repository paths (…/etaf-manual/src/branch/main/book/…) so the site
 stays the single link target."""
 from __future__ import annotations
@@ -131,7 +134,19 @@ def check(root, manuscript):
             lines = source.read_text().splitlines()
         except OSError:
             continue
+        fence = None
         for number, line in enumerate(lines, start=1):
+            if fence:
+                if re.match(r'^[ ]{0,3}' + re.escape(fence) + r'[`~]*[ \t]*$', line):
+                    fence = None
+                continue
+            opening = FENCE.match(line)
+            if opening:
+                fence = opening.group(1)
+                continue
+            # Backtick-delimited literals are not Markdown autolinks. Keep any
+            # surrounding link destination, including links with code labels.
+            line = re.sub(r'(`+)(.*?)\1', '', line)
             for retired in OLD_REFERENCE.finditer(line):
                 problems.append((source_name(source, root), number,
                                  'retired repository path, use '

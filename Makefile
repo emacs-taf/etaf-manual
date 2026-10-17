@@ -49,7 +49,7 @@ site:
 # Build and publish the manual site to https://etaf.top.
 .PHONY: site-publish
 site-publish:
-	site/scripts/publish.sh
+	$(PYTHON) site/scripts/publish.py $(PUBLISH_ARGS)
 
 .PHONY: acceptance
 acceptance:

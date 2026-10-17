@@ -25,7 +25,7 @@
 
 `site/` 是发布全书的 Astro 工程。`site/scripts/export-site.el` 读取解析好的书，
 把页面和侧栏写到 `site/src/content/` 下（生成内容不进版本库）；`site/astro.config.mjs`
-配置 Starlight，英文在根路径、简体中文在 `/zh-cn/` 下；`site/scripts/publish.sh`
+配置 Starlight，英文在根路径、简体中文在 `/zh-cn/` 下；`site/scripts/publish.py`
 构建站点并把新版本部署到 `current` 软链之后。页面内的章间链接会改写成站点路由，
 `elisp :run` 与 `:figure` 代码块会变成带标签的普通 `elisp` 块，因为静态页面无法挂载 View。
 
@@ -48,6 +48,22 @@ Starlight 的内容流、标题包装和栏宽会和自由布局冲突，所以�
   毛玻璃和仿窗口外框。
 - 布局：任何宽度下都没有元素横向滚动，代码块与表格改为折行；改动后检查
   390 与 360 CSS 像素。
+
+## 发布站点和包归档
+
+`make site-publish` 重新构建站点，通过非交互 SSH 上传普通文件，并部署到 `current` 之后；现有 `packages/` 目录保持不变。`PUBLISH_ARGS=--build-only` 只做本机构建，`--no-build` 发布已有构建。主机必须已通过 HTTPS 提供 `/srv/etaf.top/current`；发布过程不修改 Caddy 或 SSH 配置。
+
+同时发布站点和已验证的工作区包归档：
+
+```sh
+make site-publish PUBLISH_ARGS='--packages /path/to/release'
+```
+
+`PUBLISH_ARGS='--packages-only /path/to/release'` 只更新包归档，不重新构建或改变当前页面。两种包发布模式都调用相邻工作区的 `scripts/package-release.py stage`：必须有封口检查点、匹配的验证摘要，以及每个受支持目标的两条安装路径证据；局部诊断报告会被拒绝。只上传索引、公开清单和其中列出的源码 tar 包，安装报告和日志保持私有。构建与安装检查流程以工作区工具手册为准。
+
+默认 SSH 路径经 `lightos` 到 `root@aliyun-hk`。`ETAF_TOP_ROOT=direct` 使用直连；`ETAF_TOP_HOST` 更换主机，`ETAF_TOP_KEEP` 控制保留的站点版本数（默认 5，最少 2）。服务端需要 Python 3.10+。部署锁串行化站点与包发布；原子切换前检查 tar 路径、文件类型、摘要和公开文件白名单。已有包文件名不能被不同字节替换，包版本不能倒退。即使旧站点版本被清理，历史 tar 包也会带入新版本继续提供下载。
+
+切换后，部署器经 HTTPS 回读页面入口和包文件字节。检查失败则恢复上一条 `current`，再检查恢复后的服务；恢复检查遇到网络错误会明确标记为未验证，不声称回滚验证成功。客户端也回读 `current`。传输中断后应先查看该软链，再决定是否重试；SSH 响应丢失不等于发布没有发生。
 
 ## 全书描述
 

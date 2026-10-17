@@ -27,7 +27,7 @@ English is the primary language. Every chapter exists in every language, with th
 reads the parsed book and writes the pages and the sidebar under
 `site/src/content/` (generated content is untracked); `site/astro.config.mjs`
 configures Starlight with English at the root and Simplified Chinese under
-`/zh-cn/`; `site/scripts/publish.sh` builds the site and deploys it as a new
+`/zh-cn/`; `site/scripts/publish.py` builds the site and deploys it as a new
 release behind the `current` symlink.  Chapter links inside the pages are
 rewritten to site routes, and `elisp :run` and `:figure` fences become plain
 `elisp` blocks with a label, because a static page cannot mount a view.
@@ -57,6 +57,43 @@ local styles:
   window frames.
 - Layout: no element scrolls sideways at any width, including code blocks
   and tables, which wrap; check 390 and 360 CSS pixels after a change.
+
+## Publishing the site and packages
+
+`make site-publish` rebuilds the site, uploads regular files over noninteractive
+SSH and deploys them behind `current`. It preserves the existing `packages/`
+directory. Use `PUBLISH_ARGS=--build-only` for a local build, or `--no-build` for
+an already built site. The host must already serve `/srv/etaf.top/current` over
+HTTPS; publication does not change Caddy or SSH configuration.
+
+To publish a site and a validated workspace package release together:
+
+```sh
+make site-publish PUBLISH_ARGS='--packages /path/to/release'
+```
+
+`PUBLISH_ARGS='--packages-only /path/to/release'` updates only the package archive,
+without rebuilding or changing the current pages. Both package modes require the
+sibling workspace's `scripts/package-release.py stage` gate: a sealed checkpoint,
+matching validation hashes and every supported target through both installation
+paths. Partial diagnostics are rejected. Only the index, public manifest and
+listed source tarballs are uploaded; installation reports and logs stay private.
+The workspace tool manual owns the build and installation-check workflow.
+
+The default SSH route is through `lightos` to `root@aliyun-hk`.
+`ETAF_TOP_ROOT=direct` selects a direct connection; `ETAF_TOP_HOST` overrides the
+host and `ETAF_TOP_KEEP` controls retained site releases (default 5, minimum 2).
+The host needs Python 3.10+. A deployment lock serializes site and package
+publication. Tar paths, file types, checksums and the public allowlist are checked
+before the atomic switch. Existing package filenames cannot change bytes, and
+package versions cannot go backward. Historical tarballs are carried into each
+new release even when older site releases are pruned.
+
+After switching, the deployer reads the served index and package bytes over HTTPS.
+A failed check restores the previous `current`, then checks it again; a recovery
+network failure is reported as unverified rather than successful rollback.
+The client also reads back `current`. On transport interruption, inspect that link
+before retrying; a lost SSH response is not evidence that publication failed.
 
 ## The book description
 

@@ -51,24 +51,81 @@ REPOSITORIES = {"etaf-install": "emacs-taf/emacs-taf"}
 STYLE = """body { font: 16px/1.6 ui-sans-serif, system-ui, sans-serif; margin: 2rem auto;
   max-width: 62rem; padding: 0 1.2rem; color: #1d2330; }
 h1 { font-size: 1.6rem; margin-bottom: .3rem; }
+h2 { font-size: 1.1rem; margin: 1.8rem 0 .4rem; }
 p.lead { margin-top: 0; color: #55607a; }
 pre { background: #f4f6fb; border: 1px solid #dde3ee; border-radius: 8px; padding: .9rem 1rem; overflow-x: auto; }
-table { border-collapse: collapse; width: 100%; margin-top: 1.2rem; }
+table { border-collapse: collapse; width: 100%; margin-top: .6rem; }
 th, td { text-align: left; padding: .45rem .6rem; border-bottom: 1px solid #e4e9f2; vertical-align: top; }
 th { font-size: .85rem; text-transform: uppercase; letter-spacing: .04em; color: #55607a; }
 code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; }
 footer { margin-top: 2rem; color: #55607a; font-size: .9rem; }
-nav a { margin-right: 1rem; }"""
+nav { margin-bottom: 1rem; } nav a { margin-right: 1rem; }"""
+
+GROUPS = (
+    ("framework", {"etaf-install", "etaf-ui", "etaf", "ebox", "ecss", "ekp", "etaf-db", "etaf-manual"},
+     "Framework", "框架"),
+    ("applications", {"etaf-md-preview", "etaf-rss", "etaf-reader", "etaf-algo-lab", "etaf-screensaver",
+                      "etaf-desktop", "etaf-miniflux", "etaf-ncm", "etaf-weread", "etaf-bili",
+                      "etaf-youtube", "etaf-pi", "etaf-telega", "etaf-ascii-video",
+                      "etaf-video-player", "etaf-video-studio"}, "Applications", "应用"),
+    ("games", {"etaf-gamekit", "etaf-solitaire", "etaf-xiangqi", "etaf-tanks", "etaf-salvage"},
+     "Games", "游戏"),
+)
+
+TEXT = {
+    "en": {
+        "archive": "ETAF package archive",
+        "lead": ("This directory is the <code>package.el</code> archive for ETAF. "
+                 "One entry installs everything ETAF provides:"),
+        "steps": ("Evaluate this once (it only bootstraps the installer), then use "
+                  "<code>M-x etaf-install</code> and pick a target. Applications and games "
+                  "pull the framework they need automatically."),
+        "columns": ("Package", "Version", "Requires", "Summary", "Source"),
+        "footer": ("Manifest <a href=\"manifest.json\">manifest.json</a> records the sealed workspace "
+                   "and provider revisions; each package page shows its source commit. Older versions "
+                   "stay downloadable and a versioned file never changes bytes."),
+        "install": "Install / 安装",
+        "install_lead": ("One entry installs everything ETAF provides. Evaluate this once "
+                         "(it only bootstraps the installer), then use <code>M-x etaf-install</code> "
+                         "and pick <code>{name}</code>:"),
+        "install_note": ("<code>etaf-install</code> checks the required capabilities, installs the "
+                         "framework dependencies, opens the application and reopens it offline later. "
+                         "Upgrade or remove with <code>M-x list-packages</code> (package.el is what runs "
+                         "underneath), then restart Emacs."),
+        "fields": {"version": "Version", "requires": "Requires", "repo": "Repository",
+                   "commit": "Source commit", "sha": "SHA-256", "tar": "Source archive"},
+        "tar_note": ("the exact bytes <code>package.el</code> installs; byte-compiled locally on install"),
+        "page_footer": ("This page is generated from <a href=\"{manifest}\">manifest.json</a> on every "
+                        "release. The archive is built from the commit above; rebuild it from that commit "
+                        "to compare the checksum."),
+        "other": ("简体中文", "/zh-cn/packages/"),
+    },
+    "zh": {
+        "archive": "ETAF 包归档",
+        "lead": "本目录是 ETAF 的 <code>package.el</code> 归档。一个入口即可安装 ETAF 提供的全部内容：",
+        "steps": ("下面五行只需执行一次（只安装引导器），之后用 <code>M-x etaf-install</code> 选择目标。"
+                  "应用和游戏会自动带上所需的框架依赖。"),
+        "columns": ("包", "版本", "依赖", "简介", "源码包"),
+        "footer": ("<a href=\"manifest.json\">manifest.json</a> 记录封口工作区与各提供方提交，每个包的页面给出"
+                   "它对应的源码提交。旧版本始终可下载，同名版本的文件永不改变字节。"),
+        "install": "安装",
+        "install_lead": ("一个入口安装 ETAF 提供的全部内容。下面五行只需执行一次（只安装引导器），"
+                         "之后用 <code>M-x etaf-install</code> 选择 <code>{name}</code>："),
+        "install_note": ("<code>etaf-install</code> 会检查所需能力、安装框架依赖、打开应用，之后可离线重开。"
+                         "升级或删除用 <code>M-x list-packages</code>（底层就是 package.el），改完重启 Emacs。"),
+        "fields": {"version": "版本", "requires": "依赖", "repo": "源码仓库",
+                   "commit": "源码提交", "sha": "SHA-256", "tar": "源码包"},
+        "tar_note": "即 <code>package.el</code> 安装的同一份字节，安装时在本地编译",
+        "page_footer": ("本页每次发布由 <a href=\"{manifest}\">manifest.json</a> 生成。归档由上面的提交构建，"
+                        "可从该提交重建并比对校验和。"),
+        "other": ("English", "/packages/"),
+    },
+}
 
 
-def repository(name):
-    """Return the GitHub repository that owns package NAME."""
-    return REPOSITORIES.get(name, f"emacs-taf/{name}")
-
-
-def page(title, body):
+def page(lang, title, body):
     return f"""<!doctype html>
-<html lang="en">
+<html lang="{'zh-CN' if lang == 'zh' else 'en'}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -82,93 +139,105 @@ def page(title, body):
 """
 
 
-def package_page(item, sources):
-    """Write one package's detail page: what it is, where it comes from, how to install."""
-    import html
-
-    name = item["name"]
-    repo = repository(name)
-    requirements = ", ".join(f"{key} {value}" for key, value in item["requirements"]) or "Emacs only"
-    revision = sources.get(name, "")
-    source_line = (
-        f'<a href="https://github.com/{repo}/commit/{revision}"><code>{html.escape(revision[:12])}</code></a>'
-        if revision else "not recorded")
-    body = f"""<nav><a href="../">← ETAF package archive</a><a href="https://etaf.top/">Reference manual</a></nav>
-<h1>{html.escape(name)}</h1>
-<p class="lead">{html.escape(item.get("summary", ""))}</p>
-<h2>Install / 安装</h2>
-<p>In Emacs 29.1 or newer, either install it directly:</p>
-<pre><code>(require 'package)
-(add-to-list 'package-archives '("etaf" . "https://etaf.top/packages/"))
-(package-initialize)
-(package-refresh-contents)
-(package-install '{html.escape(name)})</code></pre>
-<p>or run <code>M-x etaf-install</code> after installing <code>etaf-install</code>, which lists the
-supported targets and opens the installed application. Remove or upgrade later with
-<code>M-x list-packages</code>, then restart Emacs.</p>
-<table>
-<tr><th>Version / 版本</th><td><code>{html.escape(item["version"])}</code></td></tr>
-<tr><th>Requires / 依赖</th><td>{html.escape(requirements)}</td></tr>
-<tr><th>Repository / 源码仓库</th><td><a href="https://github.com/{repo}">github.com/{repo}</a></td></tr>
-<tr><th>Source commit / 源码提交</th><td>{source_line}</td></tr>
-<tr><th>SHA-256</th><td><code>{html.escape(item["sha256"])}</code></td></tr>
-<tr><th>Source archive / 源码包</th><td><a href="../{html.escape(item["file"])}">{html.escape(item["file"])}</a>
-  — the exact bytes <code>package.el</code> installs; compiled locally on install.</td></tr>
-</table>
-<footer>This page is generated from <a href="../manifest.json">manifest.json</a> on every release.
-The archive is built from the Git commit above; rebuild it from that commit to compare the checksum.</footer>
-"""
-    target = item["_dir"] / "index.html"
-    target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(page(f'{name} — ETAF package', body))
-
-
 def archive_pages(package_dir):
-    """Write the archive index and one detail page per package.
+    """Write a bilingual archive: English at the root, Chinese under `zh-cn/`.
 
-    package.el only needs `archive-contents`, but a bare directory URL answers
-    404 and a link to a tarball answers the wrong question: visitors want to know
-    what the package is, where its source lives and how to install it. Both
-    pages are generated from the published manifest, never maintained by hand.
+    Package names link to a page, never straight to a download: visitors want to
+    know what a package is, where its source lives and how to install it. Both
+    languages are generated from the published manifest, so they cannot drift.
     """
     import html
     import json
 
     manifest = json.loads((package_dir / "manifest.json").read_text())
     sources = manifest.get("sources", {})
-    rows = []
-    for entry in sorted(manifest["packages"], key=lambda value: value["name"]):
-        item = dict(entry, _dir=package_dir / entry["name"])
-        package_page(item, sources)
-        requirements = ", ".join(f"{key} {value}" for key, value in entry["requirements"]) or "Emacs"
-        rows.append(
-            "<tr>"
-            f'<td><a href="{html.escape(entry["name"])}/"><strong>{html.escape(entry["name"])}</strong></a></td>'
-            f'<td>{html.escape(entry["version"])}</td>'
-            f'<td>{html.escape(requirements)}</td>'
-            f'<td>{html.escape(entry.get("summary", ""))}</td>'
-            f'<td><a href="{html.escape(entry["file"])}">tar</a></td>'
-            "</tr>")
-    body = f"""<h1>ETAF package archive</h1>
-<p class="lead">This directory is the <code>package.el</code> archive for ETAF. Workstation install:</p>
+    packages = sorted(manifest["packages"], key=lambda item: item["name"])
+    for lang in ("en", "zh"):
+        text = TEXT[lang]
+        base = package_dir if lang == "en" else package_dir / "zh-cn"
+        rows = []
+        for group, members, label_en, label_zh in GROUPS:
+            selected = [item for item in packages if item["name"] in members]
+            if not selected:
+                continue
+            label = label_en if lang == "en" else label_zh
+            rows.append(f'<h2>{label}</h2>\n<table>\n<thead><tr>' +
+                        "".join(f'<th>{html.escape(column)}</th>' for column in text["columns"]) +
+                        "</tr></thead>\n<tbody>")
+            for item in selected:
+                requirements = ", ".join(f"{key} {value}" for key, value in item["requirements"]) or "Emacs"
+                tar_prefix = "" if lang == "en" else "../"
+                rows.append(
+                    "<tr>"
+                    f'<td><a href="{html.escape(item["name"])}/"><strong>{html.escape(item["name"])}</strong></a></td>'
+                    f'<td>{html.escape(item["version"])}</td>'
+                    f'<td>{html.escape(requirements)}</td>'
+                    f'<td>{html.escape(item.get("summary", ""))}</td>'
+                    f'<td><a href="{tar_prefix}{html.escape(item["file"])}">tar</a></td>'
+                    "</tr>")
+            rows.append("</tbody>\n</table>")
+        body = f"""<nav><a href="{text['other'][1]}">{text['other'][0]}</a>
+<a href="https://etaf.top/{'' if lang == 'en' else 'zh-cn/'}">Reference manual</a></nav>
+<h1>{text['archive']}</h1>
+<p class="lead">{text['lead']}</p>
 <pre><code>(require 'package)
 (add-to-list 'package-archives '("etaf" . "https://etaf.top/packages/"))
 (package-initialize)
 (package-refresh-contents)
 (package-install 'etaf-install)
 (call-interactively #'etaf-install)</code></pre>
-<table>
-<thead><tr><th>Package</th><th>Version</th><th>Requires</th><th>Summary</th><th>Tar</th></tr></thead>
-<tbody>
+<p>{text['steps']}</p>
 {chr(10).join(rows)}
-</tbody>
-</table>
-<footer>Manifest <a href="manifest.json">manifest.json</a> records the sealed workspace and provider revisions;
-each package page shows its source commit. Older versions stay downloadable, and a versioned file never
-changes bytes. See the <a href="/introduction/#installation">installation reference</a> /
-<a href="/zh-cn/introduction/#安装">安装说明</a>.</footer>
+<footer>{text['footer']}</footer>
 """
-    (package_dir / "index.html").write_text(page("ETAF package archive", body))
+        target = base / "index.html"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(page(lang, text["archive"], body))
+        for item in packages:
+            package_page(item, sources, lang, base / item["name"])
+
+
+def package_page(item, sources, lang, directory):
+    """Write one package's detail page in LANG under DIRECTORY."""
+    import html
+
+    text = TEXT[lang]
+    fields = text["fields"]
+    name = item["name"]
+    repo = REPOSITORIES.get(name, f"emacs-taf/{name}")
+    requirements = ", ".join(f"{key} {value}" for key, value in item["requirements"]) or "Emacs"
+    revision = sources.get(name, "")
+    source_line = (
+        f'<a href="https://github.com/{repo}/commit/{revision}"><code>{html.escape(revision[:12])}</code></a>'
+        if revision else "not recorded")
+    up = "../" if lang == "en" else "../../"
+    switch = (f"/zh-cn/packages/{name}/" if lang == "en" else f"/packages/{name}/")
+    body = f"""<nav><a href="../">← {text['archive']}</a><a href="{switch}">{text['other'][0]}</a></nav>
+<h1>{html.escape(name)}</h1>
+<p class="lead">{html.escape(item.get("summary", ""))}</p>
+<h2>{text['install']}</h2>
+<p>{text['install_lead'].format(name=html.escape(name))}</p>
+<pre><code>(require 'package)
+(add-to-list 'package-archives '("etaf" . "https://etaf.top/packages/"))
+(package-initialize)
+(package-refresh-contents)
+(package-install 'etaf-install)
+(call-interactively #'etaf-install)</code></pre>
+<p>{text['install_note']}</p>
+<table>
+<tr><th>{fields['version']}</th><td><code>{html.escape(item["version"])}</code></td></tr>
+<tr><th>{fields['requires']}</th><td>{html.escape(requirements)}</td></tr>
+<tr><th>{fields['repo']}</th><td><a href="https://github.com/{repo}">github.com/{repo}</a></td></tr>
+<tr><th>{fields['commit']}</th><td>{source_line}</td></tr>
+<tr><th>{fields['sha']}</th><td><code>{html.escape(item["sha256"])}</code></td></tr>
+<tr><th>{fields['tar']}</th><td><a href="{up}{html.escape(item["file"])}">{html.escape(item["file"])}</a>
+  — {text['tar_note']}</td></tr>
+</table>
+<footer>{text['page_footer'].format(manifest=up + "manifest.json")}</footer>
+"""
+    target = directory / "index.html"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(page(lang, f"{name} — ETAF", body))
 
 
 def publish(args):

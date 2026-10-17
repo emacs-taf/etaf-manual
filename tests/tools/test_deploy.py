@@ -213,6 +213,32 @@ class DeploymentTests(unittest.TestCase):
         self.deploy(self.payload(page="site two"), "site")
         self.assertEqual(current.read_text(), "<html>example package</html>")
 
+    def test_bilingual_pages_publish_under_zh_cn(self):
+        archive = self.package()
+        (archive / "index.html").write_text("<html>archive index</html>")
+        (archive / "example").mkdir()
+        (archive / "example/index.html").write_text("<html>example en</html>")
+        (archive / "zh-cn").mkdir()
+        (archive / "zh-cn/index.html").write_text("<html>归档</html>")
+        (archive / "zh-cn/example").mkdir()
+        (archive / "zh-cn/example/index.html").write_text("<html>示例</html>")
+        self.deploy(self.payload(page="site", packages=archive), "combined")
+        root = self.base / "current/packages"
+        self.assertEqual((root / "zh-cn/index.html").read_text(), "<html>归档</html>")
+        self.assertEqual((root / "zh-cn/example/index.html").read_text(), "<html>示例</html>")
+        self.deploy(self.payload(page="site two"), "site")
+        self.assertEqual((root / "zh-cn/example/index.html").read_text(), "<html>示例</html>")
+
+    def test_localized_tree_cannot_smuggle_other_files(self):
+        self.deploy(self.payload(page="stable"), "site")
+        previous = (self.base / "current").readlink()
+        archive = self.package()
+        (archive / "zh-cn/example").mkdir(parents=True)
+        (archive / "zh-cn/example/index.html").write_text("<html>示例</html>")
+        (archive / "zh-cn/example/extra.txt").write_text("not public")
+        self.deploy(self.payload(packages=archive), "packages", success=False)
+        self.assertEqual((self.base / "current").readlink(), previous)
+
     def test_unindexed_detail_directory_or_extra_page_is_rejected(self):
         self.deploy(self.payload(page="stable"), "site")
         previous = (self.base / "current").readlink()

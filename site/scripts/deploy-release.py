@@ -68,21 +68,42 @@ def packages(directory, *, historical=False):
     """Validate the public allowlist; historical tarballs remain downloadable."""
     if directory.is_symlink() or not directory.is_dir():
         raise ValueError("Invalid public package directory")
+    manifest = package_archive.verify(directory)
+    names = {item["name"] for item in manifest["packages"]}
+
+    def only_pages(path, children=()):
+        """A generated directory holds index.html and, at one level, `children`."""
+        if path.is_symlink():
+            raise ValueError(f"Non-public package path: {path.name}")
+        entries = list(path.iterdir())
+        if any(entry.is_symlink() for entry in entries):
+            raise ValueError(f"Non-public package path: {path.name}")
+        top = {entry.name for entry in entries if not entry.is_dir()}
+        if top != {"index.html"}:
+            raise ValueError(f"Non-public package directory contents: {path.name}")
+        for entry in entries:
+            if entry.is_dir():
+                if entry.name not in children:
+                    raise ValueError(f"Non-public package directory: {entry.name}")
+                if {child.name for child in entry.iterdir()} != {"index.html"} \
+                        or any(child.is_symlink() for child in entry.iterdir()):
+                    raise ValueError(f"Non-public package directory: {entry.name}")
+
     for path in directory.iterdir():
         if path.is_symlink():
             raise ValueError(f"Non-public package file: {path.name}")
         if path.is_dir():
-            # One generated detail page per package; nothing else is published
-            # in a subdirectory.
-            if not NAME.fullmatch(path.name) or {child.name for child in path.iterdir()} != {"index.html"} \
-                    or any(child.is_symlink() for child in path.iterdir()):
+            if path.name == "zh-cn":
+                only_pages(path, children=names)
+            elif path.name in names:
+                only_pages(path)
+            else:
                 raise ValueError(f"Non-public package directory: {path.name}")
             continue
         if (not path.is_file()
                 or path.name not in ("manifest.json", "archive-contents", "index.html")
                 and not PACKAGE.fullmatch(path.name)):
             raise ValueError(f"Non-public package file: {path.name}")
-    manifest = package_archive.verify(directory)
     allowed = {"manifest.json", "archive-contents", "index.html",
                *(item["file"] for item in manifest["packages"])}
     required = {"manifest.json", "archive-contents",
@@ -93,7 +114,7 @@ def packages(directory, *, historical=False):
     pages = {path.name for path in directory.iterdir() if path.is_dir()}
     if not historical and not (
             required <= present and present <= required | optional
-            and pages <= {item["name"] for item in manifest["packages"]}):
+            and pages <= names | {"zh-cn"}):
         raise ValueError("A new package payload may contain only its indexed files")
     if set(manifest) - {"schema", "packages", "workspace", "sources"}:
         raise ValueError("Package manifest contains non-public fields")

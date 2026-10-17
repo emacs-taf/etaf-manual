@@ -41,7 +41,7 @@
 
 返回 SOURCE 规范化后的播放元数据 plist。
 
-**参数。** SOURCE 为 nil 时是内置 demo，也可以是本地文件名、HTTP 或 HTTPS URL 字符串，或带 `:file`、`:url` 或 `:demo` 的 plist。`:url` 源可以再用 `:audio-url` 指定独立音频流，并用 `:headers`（alist、hash table 或一条 `Name: value` 字符串）与 `:proxy` 携带网络选项。已经带 `:kind` 的 plist 被当作权威元数据，也就是本函数返回的那种结果。
+**参数。** SOURCE 为 nil 时是内置 demo，也可以是本地文件名、HTTP 或 HTTPS URL 字符串，或带 `:file`、`:url` 或 `:demo` 的 plist。本地文件名可以以 `~` 开头或相对 `default-directory`，探测前会先经 `expand-file-name` 展开。`:url` 源可以再用 `:audio-url` 指定独立音频流，并用 `:headers`（alist、hash table 或一条 `Name: value` 字符串）与 `:proxy` 携带网络选项。已经带 `:kind` 的 plist 被当作权威元数据，也就是本函数返回的那种结果。
 
 **语义。** 结果的键有 `:kind`（`file`、`url` 或 `demo`）、`:file`、`:url`、`:target`（ffmpeg 打开的视频流）、`:audio-url`、`:audio-target`（音频旁路打开的流，缺省回退到 `:target`）、`:headers`、`:proxy`、`:width`、`:height`、`:duration`、`:fps`（源帧率）与 `:audio`（源是否报告有音轨；存在 `:audio-url` 即视为有音频）。只探测视频流，音频 URL 不探测，探测同样带上 `:headers` 与 `:proxy`。探测程序缺失时保留文档默认值——640 × 360、每秒 25 帧、无时长、无音频。demo 不需要任何程序，报告 640 × 360、每秒 30 帧、30 秒。权威 plist 原样复制，所以它缺失的键保持 nil，而不会被默认值补上，但 `:audio-target` 与由 `:audio-url` 推出的 `:audio` 除外。每次调用都会探测；结果可以之后再传回来，而不再探测。
 

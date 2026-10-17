@@ -12,9 +12,9 @@
 | `ekp` | 1.0.1 | Emacs 29.1 |
 | `ebox` | 3.0.1 | Emacs 29.1、`ecss 0.1.0` |
 | `etaf` | 0.2.2 | Emacs 29.1、`ebox 3.0.1`、`ecss 0.1.0` |
-| `etaf-ui` | 0.1.2 | Emacs 29.1、`etaf 0.2.2`、`ebox 3.0.1` |
+| `etaf-ui` | 0.1.3 | Emacs 29.1、`etaf 0.2.2`、`ebox 3.0.1` |
 | `etaf-db` | 0.1.0 | Emacs 29.1、`etaf` ≥ 0.2.1 |
-| `etaf-manual` | 0.1.2 | Emacs 29.1、`etaf 0.2.2`、`etaf-ui 0.1.2` |
+| `etaf-manual` | 0.1.3 | Emacs 29.1、`etaf 0.2.2`、`etaf-ui 0.1.3` |
 
 ## 环境要求
 

@@ -10,7 +10,7 @@
 
 ## 环境要求
 
-Emacs 29.1 或更高版本、ETAF 0.2.2 和 etaf-ui 0.1.2。门禁还会读取 ecss、ekp、ebox、etaf、etaf-ui 和 etaf-db 的检出目录，它们应与本仓库相邻。
+Emacs 29.1 或更高版本、ETAF 0.2.2 和 etaf-ui 0.1.3。门禁还会读取 ecss、ekp、ebox、etaf、etaf-ui 和 etaf-db 的检出目录，它们应与本仓库相邻。
 
 ## 使用
 

@@ -93,9 +93,7 @@ def packages(directory, *, historical=False):
         if path.is_symlink():
             raise ValueError(f"Non-public package file: {path.name}")
         if path.is_dir():
-            if path.name == "zh-cn":
-                only_pages(path, children=names)
-            elif path.name in names:
+            if path.name in names:
                 only_pages(path)
             else:
                 raise ValueError(f"Non-public package directory: {path.name}")
@@ -114,7 +112,7 @@ def packages(directory, *, historical=False):
     pages = {path.name for path in directory.iterdir() if path.is_dir()}
     if not historical and not (
             required <= present and present <= required | optional
-            and pages <= names | {"zh-cn"}):
+            and pages <= names):
         raise ValueError("A new package payload may contain only its indexed files")
     if set(manifest) - {"schema", "packages", "workspace", "sources"}:
         raise ValueError("Package manifest contains non-public fields")

@@ -93,14 +93,15 @@ before the atomic switch. Existing package filenames cannot change bytes, and
 package versions cannot go backward. Historical tarballs are carried into each
 new release even when older site releases are pruned.
 
-Each package publication also writes a browsable archive: `packages/index.html`
-lists every package with its version, requirements and summary, and
-`packages/<name>/index.html` is that package's page — what it does, the install
-snippet, its GitHub repository, the source commit it was built from, its
-checksum and the source tarball. Package names link to the page, not straight to
-a download. `package.el` still reads only `archive-contents`, so a browser
-opening the bare directory sees the archive instead of a 404. Both pages are
-regenerated from the manifest on every release and are not part of it.
+Each package publication also writes a browsable archive. `packages/index.html`
+groups the served packages as Framework, Applications and Games, and
+`packages/<name>/index.html` is that package's page: what it does, the install
+snippet, its GitHub repository, the source commit it was built from, its checksum
+and the source tarball. Package names link to the page, never straight to a
+download; the manual links appear in the page text rather than as a header menu.
+`package.el` still reads only `archive-contents`, so a browser opening the bare
+directory sees the archive instead of a 404. Both pages are generated from the
+manifest on every release and are not part of it.
 
 After switching, the deployer reads the served index and package bytes over HTTPS.
 A failed check restores the previous `current`, then checks it again; a recovery

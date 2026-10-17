@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import { satteri } from '@astrojs/markdown-satteri';
 import sidebar from './src/sidebar.mjs';
 
 // The content under src/content/docs and the sidebar module are generated from
@@ -12,10 +13,13 @@ export default defineConfig({
   site: 'https://etaf.top',
   // Astro's smartypants rewrites -- and quotes in headings before ids are
   // generated, which would break anchors referenced by the book sources.
-  markdown: { smartypants: false },
+  markdown: { processor: satteri({ features: { smartPunctuation: false } }) },
   integrations: [
     starlight({
       title: 'ETAF Reference Manual',
+      // The exported recovery document owns /404; do not also inject a
+      // competing built-in route for the same page.
+      disable404Route: true,
       favicon: '/favicon.svg',
       logo: { src: './src/assets/etaf-icon.svg' },
       customCss: ['./src/styles/custom.css'],
@@ -28,7 +32,7 @@ export default defineConfig({
       ],
       locales: {
         root: { label: 'English', lang: 'en' },
-        'zh-cn': { label: '简体中文' },
+        'zh-cn': { label: '简体中文', lang: 'zh-CN' },
       },
       sidebar,
     }),

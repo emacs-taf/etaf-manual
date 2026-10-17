@@ -28,6 +28,7 @@
 配置 Starlight，英文在根路径、简体中文在 `/zh-cn/` 下；`site/scripts/publish.py`
 构建站点并把新版本部署到 `current` 软链之后。页面内的章间链接会改写成站点路由，
 `elisp :run` 与 `:figure` 代码块会变成带标签的普通 `elisp` 块，因为静态页面无法挂载 View。
+导出器还会重新生成含安装说明与手册链接的双语未找到页面。`site/src/content/i18n/` 维护本地化无障碍文案；Markdown 处理器保留原标点，使章节锚点与书稿一致。
 
 首页是独立的 Astro 页面，不是 Starlight splash：`site/src/components/Landing.astro`
 按 `site/src/data/landing.mjs` 里的文案、截图和仓库链接渲染，

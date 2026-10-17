@@ -7,14 +7,14 @@ SOURCES = lisp/etaf-manual-book.el lisp/etaf-manual-generate.el
 SOURCES += lisp/etaf-manual-reader-theme.el lisp/etaf-manual-reader-style.el
 SOURCES += lisp/etaf-manual-reader-model.el lisp/etaf-manual-reader-article.el
 SOURCES += lisp/etaf-manual-reader-views.el lisp/etaf-manual-reader.el
-SOURCES += etaf-manual.el scripts/check-book.el
+SOURCES += etaf-manual.el scripts/check-book.el site/scripts/export-site.el
 
 .PHONY: all compile book-check coverage tool-check check clean
 
 all: check
 
 compile:
-	rm -f *.elc lisp/*.elc scripts/*.elc tests/*.elc
+	rm -f *.elc lisp/*.elc scripts/*.elc tests/*.elc site/scripts/*.elc
 	$(EMACS) -Q --batch $(LOAD_PATH) \
 		--eval "(progn (require 'cl-lib) (setq load-prefer-newer t byte-compile-error-on-warn t))" \
 		--eval '(unless (cl-every (function byte-compile-file) (quote ($(foreach file,$(SOURCES),"$(file)")))) (kill-emacs 1))'
@@ -33,7 +33,7 @@ tool-check:
 check: structure-check compile book-check acceptance api-check tool-check
 
 clean:
-	rm -f *.elc lisp/*.elc scripts/*.elc tests/*.elc
+	rm -f *.elc lisp/*.elc scripts/*.elc tests/*.elc site/scripts/*.elc
 
 .PHONY: structure-check setup-hooks
 structure-check:

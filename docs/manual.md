@@ -31,6 +31,10 @@ configures Starlight with English at the root and Simplified Chinese under
 release behind the `current` symlink.  Chapter links inside the pages are
 rewritten to site routes, and `elisp :run` and `:figure` fences become plain
 `elisp` blocks with a label, because a static page cannot mount a view.
+The exporter also regenerates a bilingual not-found page with installation and
+manual links. `site/src/content/i18n/` owns the localized accessibility text.
+The Markdown processor preserves literal punctuation so chapter anchors stay
+aligned with the book.
 
 The landing page is a standalone Astro page, not a Starlight splash:
 `site/src/components/Landing.astro` renders it from the copy, screenshots

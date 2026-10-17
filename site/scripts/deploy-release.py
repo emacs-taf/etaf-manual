@@ -25,6 +25,7 @@ import package_archive
 
 RELEASE = re.compile(r"[0-9]{8}T[0-9]{6}Z(?:-[0-9a-f]{8})?\Z")
 PACKAGE = re.compile(r"[a-z][a-z0-9-]*-[0-9]+(?:\.[0-9]+)*\.tar\Z")
+NAME = re.compile(r"[a-z][a-z0-9-]*\Z")
 SITE_PAGES = ("index.html", "zh-cn/index.html", "introduction/index.html",
               "zh-cn/introduction/index.html", "symbol-index/index.html", "zh-cn/symbol-index/index.html")
 
@@ -68,7 +69,16 @@ def packages(directory, *, historical=False):
     if directory.is_symlink() or not directory.is_dir():
         raise ValueError("Invalid public package directory")
     for path in directory.iterdir():
-        if (path.is_symlink() or not path.is_file()
+        if path.is_symlink():
+            raise ValueError(f"Non-public package file: {path.name}")
+        if path.is_dir():
+            # One generated detail page per package; nothing else is published
+            # in a subdirectory.
+            if not NAME.fullmatch(path.name) or {child.name for child in path.iterdir()} != {"index.html"} \
+                    or any(child.is_symlink() for child in path.iterdir()):
+                raise ValueError(f"Non-public package directory: {path.name}")
+            continue
+        if (not path.is_file()
                 or path.name not in ("manifest.json", "archive-contents", "index.html")
                 and not PACKAGE.fullmatch(path.name)):
             raise ValueError(f"Non-public package file: {path.name}")
@@ -78,9 +88,12 @@ def packages(directory, *, historical=False):
     required = {"manifest.json", "archive-contents",
                 *(item["file"] for item in manifest["packages"])}
     optional = {"index.html"}
+    present = {path.name for path in directory.iterdir()
+               if not path.is_dir()}
+    pages = {path.name for path in directory.iterdir() if path.is_dir()}
     if not historical and not (
-            required <= {path.name for path in directory.iterdir()}
-            and {path.name for path in directory.iterdir()} <= required | optional):
+            required <= present and present <= required | optional
+            and pages <= {item["name"] for item in manifest["packages"]}):
         raise ValueError("A new package payload may contain only its indexed files")
     if set(manifest) - {"schema", "packages", "workspace", "sources"}:
         raise ValueError("Package manifest contains non-public fields")
@@ -126,10 +139,11 @@ def verify_http(release, url, stamp):
     """Check served bytes, not merely a successful HTTP status or a stale page."""
     paths = [Path(page) for page in SITE_PAGES]
     if (release / "packages").is_dir():
-        paths.extend(Path("packages") / path.name for path in sorted((release / "packages").iterdir()))
+        paths.extend(path.relative_to(release)
+                     for path in sorted((release / "packages").rglob("*")) if path.is_file())
     for path in paths:
         route = "/" + path.as_posix()
-        if path.as_posix() in SITE_PAGES:
+        if path.name == "index.html":
             route = route.removesuffix("index.html")
         request = Request(url.rstrip("/") + route + "?deployment=" + stamp,
                           headers={"Cache-Control": "no-cache"})

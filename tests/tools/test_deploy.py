@@ -202,6 +202,30 @@ class DeploymentTests(unittest.TestCase):
         self.assertEqual(current.read_text(), "<html>archive index</html>")
         self.assertEqual((self.base / "current/index.html").read_text(), "site two")
 
+    def test_package_detail_pages_are_published_and_survive_a_site_only_release(self):
+        archive = self.package()
+        (archive / "index.html").write_text("<html>archive index</html>")
+        (archive / "example").mkdir()
+        (archive / "example/index.html").write_text("<html>example package</html>")
+        self.deploy(self.payload(page="site one", packages=archive), "combined")
+        current = self.base / "current/packages/example/index.html"
+        self.assertEqual(current.read_text(), "<html>example package</html>")
+        self.deploy(self.payload(page="site two"), "site")
+        self.assertEqual(current.read_text(), "<html>example package</html>")
+
+    def test_unindexed_detail_directory_or_extra_page_is_rejected(self):
+        self.deploy(self.payload(page="stable"), "site")
+        previous = (self.base / "current").readlink()
+        for name in ("not-a-package", "example"):
+            with self.subTest(directory=name):
+                archive = self.package()
+                (archive / name).mkdir()
+                (archive / name / "index.html").write_text("<html>x</html>")
+                if name == "example":
+                    (archive / name / "extra.txt").write_text("not public")
+                self.deploy(self.payload(packages=archive), "packages", success=False)
+                self.assertEqual((self.base / "current").readlink(), previous)
+
     def test_site_only_cannot_replace_packages_and_package_only_needs_a_site(self):
         package = self.package()
         self.deploy(self.payload(packages=package), "packages", success=False)

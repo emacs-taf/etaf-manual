@@ -47,48 +47,109 @@ def add_tree(archive, directory, prefix=""):
             raise ValueError(f"Publication input is not a regular file: {path}")
 
 
-def archive_index(package_dir):
-    """Write a readable index for the archive directory.
+REPOSITORIES = {"etaf-install": "emacs-taf/emacs-taf"}
+STYLE = """body { font: 16px/1.6 ui-sans-serif, system-ui, sans-serif; margin: 2rem auto;
+  max-width: 62rem; padding: 0 1.2rem; color: #1d2330; }
+h1 { font-size: 1.6rem; margin-bottom: .3rem; }
+p.lead { margin-top: 0; color: #55607a; }
+pre { background: #f4f6fb; border: 1px solid #dde3ee; border-radius: 8px; padding: .9rem 1rem; overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; margin-top: 1.2rem; }
+th, td { text-align: left; padding: .45rem .6rem; border-bottom: 1px solid #e4e9f2; vertical-align: top; }
+th { font-size: .85rem; text-transform: uppercase; letter-spacing: .04em; color: #55607a; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; }
+footer { margin-top: 2rem; color: #55607a; font-size: .9rem; }
+nav a { margin-right: 1rem; }"""
+
+
+def repository(name):
+    """Return the GitHub repository that owns package NAME."""
+    return REPOSITORIES.get(name, f"emacs-taf/{name}")
+
+
+def page(title, body):
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<style>{STYLE}</style>
+</head>
+<body>
+{body}
+</body>
+</html>
+"""
+
+
+def package_page(item, sources):
+    """Write one package's detail page: what it is, where it comes from, how to install."""
+    import html
+
+    name = item["name"]
+    repo = repository(name)
+    requirements = ", ".join(f"{key} {value}" for key, value in item["requirements"]) or "Emacs only"
+    revision = sources.get(name, "")
+    source_line = (
+        f'<a href="https://github.com/{repo}/commit/{revision}"><code>{html.escape(revision[:12])}</code></a>'
+        if revision else "not recorded")
+    body = f"""<nav><a href="../">← ETAF package archive</a><a href="https://etaf.top/">Reference manual</a></nav>
+<h1>{html.escape(name)}</h1>
+<p class="lead">{html.escape(item.get("summary", ""))}</p>
+<h2>Install / 安装</h2>
+<p>In Emacs 29.1 or newer, either install it directly:</p>
+<pre><code>(require 'package)
+(add-to-list 'package-archives '("etaf" . "https://etaf.top/packages/"))
+(package-initialize)
+(package-refresh-contents)
+(package-install '{html.escape(name)})</code></pre>
+<p>or run <code>M-x etaf-install</code> after installing <code>etaf-install</code>, which lists the
+supported targets and opens the installed application. Remove or upgrade later with
+<code>M-x list-packages</code>, then restart Emacs.</p>
+<table>
+<tr><th>Version / 版本</th><td><code>{html.escape(item["version"])}</code></td></tr>
+<tr><th>Requires / 依赖</th><td>{html.escape(requirements)}</td></tr>
+<tr><th>Repository / 源码仓库</th><td><a href="https://github.com/{repo}">github.com/{repo}</a></td></tr>
+<tr><th>Source commit / 源码提交</th><td>{source_line}</td></tr>
+<tr><th>SHA-256</th><td><code>{html.escape(item["sha256"])}</code></td></tr>
+<tr><th>Source archive / 源码包</th><td><a href="../{html.escape(item["file"])}">{html.escape(item["file"])}</a>
+  — the exact bytes <code>package.el</code> installs; compiled locally on install.</td></tr>
+</table>
+<footer>This page is generated from <a href="../manifest.json">manifest.json</a> on every release.
+The archive is built from the Git commit above; rebuild it from that commit to compare the checksum.</footer>
+"""
+    target = item["_dir"] / "index.html"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(page(f'{name} — ETAF package', body))
+
+
+def archive_pages(package_dir):
+    """Write the archive index and one detail page per package.
 
     package.el only needs `archive-contents`, but a bare directory URL answers
-    404 without a page, so visitors conclude the archive is not public. The
-    listing is generated from the published manifest, not maintained by hand.
+    404 and a link to a tarball answers the wrong question: visitors want to know
+    what the package is, where its source lives and how to install it. Both
+    pages are generated from the published manifest, never maintained by hand.
     """
     import html
     import json
 
     manifest = json.loads((package_dir / "manifest.json").read_text())
+    sources = manifest.get("sources", {})
     rows = []
-    for item in sorted(manifest["packages"], key=lambda entry: entry["name"]):
-        requirements = ", ".join(f"{name} {version}" for name, version in item["requirements"]) or "Emacs"
+    for entry in sorted(manifest["packages"], key=lambda value: value["name"]):
+        item = dict(entry, _dir=package_dir / entry["name"])
+        package_page(item, sources)
+        requirements = ", ".join(f"{key} {value}" for key, value in entry["requirements"]) or "Emacs"
         rows.append(
             "<tr>"
-            f'<td><a href="{html.escape(item["file"])}">{html.escape(item["name"])}</a></td>'
-            f'<td>{html.escape(item["version"])}</td>'
+            f'<td><a href="{html.escape(entry["name"])}/"><strong>{html.escape(entry["name"])}</strong></a></td>'
+            f'<td>{html.escape(entry["version"])}</td>'
             f'<td>{html.escape(requirements)}</td>'
-            f'<td>{html.escape(item.get("summary", ""))}</td>'
-            f'<td><code>{html.escape(item["sha256"][:12])}</code></td>'
+            f'<td>{html.escape(entry.get("summary", ""))}</td>'
+            f'<td><a href="{html.escape(entry["file"])}">tar</a></td>'
             "</tr>")
-    page = f"""<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ETAF package archive</title>
-<style>
-body {{ font: 16px/1.6 ui-sans-serif, system-ui, sans-serif; margin: 2rem auto; max-width: 62rem; padding: 0 1.2rem; color: #1d2330; }}
-h1 {{ font-size: 1.6rem; margin-bottom: .3rem; }}
-p.lead {{ margin-top: 0; color: #55607a; }}
-pre {{ background: #f4f6fb; border: 1px solid #dde3ee; border-radius: 8px; padding: .9rem 1rem; overflow-x: auto; }}
-table {{ border-collapse: collapse; width: 100%; margin-top: 1.5rem; }}
-th, td {{ text-align: left; padding: .45rem .6rem; border-bottom: 1px solid #e4e9f2; vertical-align: top; }}
-th {{ font-size: .85rem; text-transform: uppercase; letter-spacing: .04em; color: #55607a; }}
-code {{ font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; }}
-footer {{ margin-top: 2rem; color: #55607a; font-size: .9rem; }}
-</style>
-</head>
-<body>
-<h1>ETAF package archive</h1>
+    body = f"""<h1>ETAF package archive</h1>
 <p class="lead">This directory is the <code>package.el</code> archive for ETAF. Workstation install:</p>
 <pre><code>(require 'package)
 (add-to-list 'package-archives '("etaf" . "https://etaf.top/packages/"))
@@ -97,19 +158,17 @@ footer {{ margin-top: 2rem; color: #55607a; font-size: .9rem; }}
 (package-install 'etaf-install)
 (call-interactively #'etaf-install)</code></pre>
 <table>
-<thead><tr><th>Package</th><th>Version</th><th>Requires</th><th>Summary</th><th>SHA-256</th></tr></thead>
+<thead><tr><th>Package</th><th>Version</th><th>Requires</th><th>Summary</th><th>Tar</th></tr></thead>
 <tbody>
 {chr(10).join(rows)}
 </tbody>
 </table>
-<footer>Manifest <a href="manifest.json">manifest.json</a> records the sealed workspace and provider revisions.
-Older versions stay downloadable; a versioned file never changes bytes.
-See the <a href="/introduction/#installation">installation reference</a> /
+<footer>Manifest <a href="manifest.json">manifest.json</a> records the sealed workspace and provider revisions;
+each package page shows its source commit. Older versions stay downloadable, and a versioned file never
+changes bytes. See the <a href="/introduction/#installation">installation reference</a> /
 <a href="/zh-cn/introduction/#安装">安装说明</a>.</footer>
-</body>
-</html>
 """
-    (package_dir / "index.html").write_text(page)
+    (package_dir / "index.html").write_text(page("ETAF package archive", body))
 
 
 def publish(args):
@@ -136,7 +195,7 @@ def publish(args):
         if mode != "packages" and (SITE / "dist/packages").exists():
             raise ValueError("dist/packages is reserved; supply a validated --packages release instead")
         if package_input:
-            archive_index(work / "packages")
+            archive_pages(work / "packages")
         payload = work / "payload.tgz"
         with tarfile.open(payload, "w:gz") as archive:
             if mode != "packages":

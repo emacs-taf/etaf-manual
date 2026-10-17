@@ -69,12 +69,18 @@ def packages(directory, *, historical=False):
         raise ValueError("Invalid public package directory")
     for path in directory.iterdir():
         if (path.is_symlink() or not path.is_file()
-                or path.name not in ("manifest.json", "archive-contents")
+                or path.name not in ("manifest.json", "archive-contents", "index.html")
                 and not PACKAGE.fullmatch(path.name)):
             raise ValueError(f"Non-public package file: {path.name}")
     manifest = package_archive.verify(directory)
-    allowed = {"manifest.json", "archive-contents", *(item["file"] for item in manifest["packages"])}
-    if not historical and {path.name for path in directory.iterdir()} != allowed:
+    allowed = {"manifest.json", "archive-contents", "index.html",
+               *(item["file"] for item in manifest["packages"])}
+    required = {"manifest.json", "archive-contents",
+                *(item["file"] for item in manifest["packages"])}
+    optional = {"index.html"}
+    if not historical and not (
+            required <= {path.name for path in directory.iterdir()}
+            and {path.name for path in directory.iterdir()} <= required | optional):
         raise ValueError("A new package payload may contain only its indexed files")
     if set(manifest) - {"schema", "packages", "workspace", "sources"}:
         raise ValueError("Package manifest contains non-public fields")

@@ -93,6 +93,13 @@ before the atomic switch. Existing package filenames cannot change bytes, and
 package versions cannot go backward. Historical tarballs are carried into each
 new release even when older site releases are pruned.
 
+Each package publication also writes `packages/index.html`, generated from the
+manifest: the install snippet, every package with its version, requirements and
+checksum, and links to the manual. `package.el` still reads only
+`archive-contents`, but a browser opening the bare directory then sees the
+archive instead of a 404. The page is regenerated on every release and is not
+part of the package manifest.
+
 After switching, the deployer reads the served index and package bytes over HTTPS.
 A failed check restores the previous `current`, then checks it again; a recovery
 network failure is reported as unverified rather than successful rollback.

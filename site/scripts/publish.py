@@ -47,6 +47,71 @@ def add_tree(archive, directory, prefix=""):
             raise ValueError(f"Publication input is not a regular file: {path}")
 
 
+def archive_index(package_dir):
+    """Write a readable index for the archive directory.
+
+    package.el only needs `archive-contents`, but a bare directory URL answers
+    404 without a page, so visitors conclude the archive is not public. The
+    listing is generated from the published manifest, not maintained by hand.
+    """
+    import html
+    import json
+
+    manifest = json.loads((package_dir / "manifest.json").read_text())
+    rows = []
+    for item in sorted(manifest["packages"], key=lambda entry: entry["name"]):
+        requirements = ", ".join(f"{name} {version}" for name, version in item["requirements"]) or "Emacs"
+        rows.append(
+            "<tr>"
+            f'<td><a href="{html.escape(item["file"])}">{html.escape(item["name"])}</a></td>'
+            f'<td>{html.escape(item["version"])}</td>'
+            f'<td>{html.escape(requirements)}</td>'
+            f'<td>{html.escape(item.get("summary", ""))}</td>'
+            f'<td><code>{html.escape(item["sha256"][:12])}</code></td>'
+            "</tr>")
+    page = f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ETAF package archive</title>
+<style>
+body {{ font: 16px/1.6 ui-sans-serif, system-ui, sans-serif; margin: 2rem auto; max-width: 62rem; padding: 0 1.2rem; color: #1d2330; }}
+h1 {{ font-size: 1.6rem; margin-bottom: .3rem; }}
+p.lead {{ margin-top: 0; color: #55607a; }}
+pre {{ background: #f4f6fb; border: 1px solid #dde3ee; border-radius: 8px; padding: .9rem 1rem; overflow-x: auto; }}
+table {{ border-collapse: collapse; width: 100%; margin-top: 1.5rem; }}
+th, td {{ text-align: left; padding: .45rem .6rem; border-bottom: 1px solid #e4e9f2; vertical-align: top; }}
+th {{ font-size: .85rem; text-transform: uppercase; letter-spacing: .04em; color: #55607a; }}
+code {{ font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .85em; }}
+footer {{ margin-top: 2rem; color: #55607a; font-size: .9rem; }}
+</style>
+</head>
+<body>
+<h1>ETAF package archive</h1>
+<p class="lead">This directory is the <code>package.el</code> archive for ETAF. Workstation install:</p>
+<pre><code>(require 'package)
+(add-to-list 'package-archives '("etaf" . "https://etaf.top/packages/"))
+(package-initialize)
+(package-refresh-contents)
+(package-install 'etaf-install)
+(call-interactively #'etaf-install)</code></pre>
+<table>
+<thead><tr><th>Package</th><th>Version</th><th>Requires</th><th>Summary</th><th>SHA-256</th></tr></thead>
+<tbody>
+{chr(10).join(rows)}
+</tbody>
+</table>
+<footer>Manifest <a href="manifest.json">manifest.json</a> records the sealed workspace and provider revisions.
+Older versions stay downloadable; a versioned file never changes bytes.
+See the <a href="/introduction/#installation">installation reference</a> /
+<a href="/zh-cn/introduction/#安装">安装说明</a>.</footer>
+</body>
+</html>
+"""
+    (package_dir / "index.html").write_text(page)
+
+
 def publish(args):
     package_input = args.packages_only or args.packages
     mode = "packages" if args.packages_only else "combined" if args.packages else "site"
@@ -70,6 +135,8 @@ def publish(args):
             raise ValueError("Site build is missing; run without --no-build")
         if mode != "packages" and (SITE / "dist/packages").exists():
             raise ValueError("dist/packages is reserved; supply a validated --packages release instead")
+        if package_input:
+            archive_index(work / "packages")
         payload = work / "payload.tgz"
         with tarfile.open(payload, "w:gz") as archive:
             if mode != "packages":

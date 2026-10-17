@@ -192,6 +192,16 @@ class DeploymentTests(unittest.TestCase):
         self.assertIn("reference page", result.stderr)
         self.assertEqual((self.base / "current").readlink(), previous)
 
+    def test_package_index_page_is_published_and_survives_a_site_only_release(self):
+        archive = self.package()
+        (archive / "index.html").write_text("<html>archive index</html>")
+        self.deploy(self.payload(page="site one", packages=archive), "combined")
+        current = self.base / "current/packages/index.html"
+        self.assertEqual(current.read_text(), "<html>archive index</html>")
+        self.deploy(self.payload(page="site two"), "site")
+        self.assertEqual(current.read_text(), "<html>archive index</html>")
+        self.assertEqual((self.base / "current/index.html").read_text(), "site two")
+
     def test_site_only_cannot_replace_packages_and_package_only_needs_a_site(self):
         package = self.package()
         self.deploy(self.payload(packages=package), "packages", success=False)

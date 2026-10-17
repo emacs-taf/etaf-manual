@@ -99,7 +99,7 @@ One paragraph per clause; each links to the section that defines its behavior.
 
 ### Registration and redefinition
 
-A definition is registered under its exact name. Defining the same name again is an error, because a silently replaced Component would leave mounted instances and compiled Views inconsistent. An authoring tool that reloads a Component disposes the old Runtime first and then replaces the definition inside `etaf-component-redefine-run`.
+A definition is registered under its exact name. Reloading an identical declaration from the same library, including loading bytecode after source during package.el installation, retains the original definition, its captured values and mounted instances. This is idempotent loading, not hot replacement: it does not reinitialize state or refresh values captured from the library's lexical environment. A changed declaration, a declaration in another library, or an ordinary evaluated duplicate still raises an error, because a silently replaced Component would leave mounted instances and compiled Views inconsistent. An authoring tool that replaces a Component or refreshes its captured values disposes the old Runtime first and then evaluates the definition inside `etaf-component-redefine-run`.
 
 #### Function: etaf-component-redefine-run (function)
 
@@ -107,7 +107,7 @@ Run FUNCTION while allowing intentional Component redefinition.
 
 **Arguments.** FUNCTION is a function of no arguments. Any other value signals `wrong-type-argument` with data `(functionp FUNCTION)`.
 
-**Semantics.** Inside the call, a `etaf-define-component` of an already defined name replaces its registry entry instead of signaling. The Component's compiled material is invalidated, as [Views](views.md) describes for the registry generation, so the next mount or render uses the new definition. Outside the call, duplicate definitions remain errors. Mounted instances of the old definition keep it until they are disposed with their Runtime; the function should therefore dispose the old Runtime before or shortly after the replacement.
+**Semantics.** Inside the call, a `etaf-define-component` of an already defined name replaces its registry entry instead of signaling. The Component's compiled material is invalidated, as [Views](views.md) describes for the registry generation, so the next mount or render uses the new definition. Outside the call, duplicate definitions remain errors except for the unchanged library reload described above. Mounted instances of the old definition keep it until they are disposed with their Runtime; the function should therefore dispose the old Runtime before or shortly after the replacement.
 
 **Returns.** FUNCTION's return value.
 

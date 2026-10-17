@@ -95,6 +95,10 @@ def packages(directory, *, historical=False):
         if path.is_dir():
             if path.name in names:
                 only_pages(path)
+            elif historical:
+                # An older release may carry presentation this release dropped;
+                # it is never republished, and only tarballs are carried forward.
+                continue
             else:
                 raise ValueError(f"Non-public package directory: {path.name}")
             continue

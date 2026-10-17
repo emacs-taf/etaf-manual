@@ -179,7 +179,7 @@ A mounted Runtime can update an addressed Host's published content or geometry d
 
 Replace HOST-REF's published content with CONTENT in mounted RUNTIME.
 
-**Arguments.** RUNTIME is a mounted Runtime. HOST-REF is a committed Host reference of a Text Host, such as the `:ref` of a `text` Host. CONTENT is a string, published as the Host's text, or an image object as returned by `create-image`, published as one image cell showing that image at its own size.
+**Arguments.** RUNTIME is a mounted Runtime. HOST-REF is a committed Host reference of a Text Host, such as the `:ref` of a `text` Host. CONTENT is a string, published as the Host's text, or an image object as returned by `create-image`, published as one image cell showing that image at its own size. Emacs builds without native image support accept strings only; a rejected value still signals `error→ etaf-runtime-error` before any content or revision changes.
 
 **Semantics.** The update replaces only the addressed Host and publishes once through Ebox, so a caller whose controlled state changed one value skips an ordinary ETAF publication. Strings retain caller-owned display properties, including image slices; a caller that keeps a fixed-size Host live with per-frame images passes a new image object per update. The View remains the authority: the update changes the Host's published content, not the View or the Component that rendered it, so the retained value must agree with what the View renders, as [Reconciling retained content](#reconciling-retained-content) explains. Use a Text Host for changing media; a Box Host's content is its child structure, and this call refuses it.
 

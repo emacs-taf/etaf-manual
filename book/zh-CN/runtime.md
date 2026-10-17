@@ -179,7 +179,7 @@ pre 或 render 副作用失败时，Runtime 丢弃整份未提交的工作：缓
 
 在已挂载 RUNTIME 里用 CONTENT 替换 HOST-REF 已发布的内容。
 
-**参数。** RUNTIME 是已挂载 Runtime。HOST-REF 是 Text Host 的已提交 Host 引用，例如 `text` Host 的 `:ref`。CONTENT 是字符串，作为 Host 的文本发布；或是 `create-image` 返回的 image 对象，作为一个 image cell 发布，按图像自身大小显示。
+**参数。** RUNTIME 是已挂载 Runtime。HOST-REF 是 Text Host 的已提交 Host 引用，例如 `text` Host 的 `:ref`。CONTENT 是字符串，作为 Host 的文本发布；或是 `create-image` 返回的 image 对象，作为一个 image cell 发布，按图像自身大小显示。没有原生图像支持的 Emacs 构建只接受字符串；被拒绝的值仍会在任何内容或修订号变化之前报告 `error→ etaf-runtime-error`。
 
 **语义。** 更新只替换被寻址的 Host，并通过 Ebox 发布一次，所以受控状态只变了一个值的调用方可以跳过普通的 ETAF 发布。字符串保留调用方自有的显示属性（包括 image slice）；用逐帧图像维持一个固定尺寸 Host 的调用方每次更新传新的 image 对象。View 仍是权威：更新改变的是 Host 已发布的内容，不是 View 或渲染它的组件，所以保留值必须与 View 渲染的内容一致，[保留内容的和解](#保留内容的和解)一节说明这一点。更换媒体请用 Text Host；Box Host 的内容是它的子结构，本调用拒绝它。
 

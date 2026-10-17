@@ -341,6 +341,22 @@ Host 在 Tab 顺序里的位置。
 
 **参见。** [焦点](focus.md)章。
 
+#### Property: :key-scope
+
+嵌套应用或窗格的非模态键盘边界。
+
+**参数。** `local` 启用边界；nil 使 Host 不截断键盘作用域解析。
+
+**语义。** 焦点位于 Host 内，或没有焦点而以 point 为回退起点时，最近的 local 或 modal 边界包含按键、关闭、方向与首尾导航、区域、帮助准备和命令面板控件。未绑定的可打印键与未处理的 Escape 不调用外层 Host 或缓冲区动作；原生编辑仍拥有自己的按键。子树仍持有焦点时，仅将 point 移到外面不会改变归属，真实焦点变化才会改变归属。指针操作和显式焦点、区域跳转可以离开 local 边界。关闭回调可以显式聚焦宿主应用而不销毁嵌套应用；同一 Host 上的区域会记住其合格入口控件。
+
+**返回。** 此属性配置解析，没有独立返回值或第二份焦点状态。
+
+**错误。** 不支持的值报告 `error→ etaf-renderer-error`。
+
+**示例。** `(column :key-scope 'local :on-dismiss (lambda () (etaf-focus nil 'toolbar)) ...)`
+
+**参见。** `:focus-scope`、`:region`、`:on-dismiss` 与[键盘交互](keyboard.md)。
+
 #### Property: :focus-scope
 
 把键盘操作限制在一棵子树内。

@@ -341,6 +341,22 @@ Make a container's focus stops one stop of the enclosing navigation.
 
 **See also.** the [Focus](focus.md) chapter.
 
+#### Property: :key-scope
+
+A non-modal keyboard boundary for a nested application or pane.
+
+**Arguments.** `local` enables the boundary; nil leaves the Host transparent to keyboard scope resolution.
+
+**Semantics.** While focus, or the point fallback when no focus exists, is inside the Host, the nearest local or modal boundary contains keys, dismissal, direction and edge navigation, regions, help preparation and palette controls. Unbound printing keys and unhandled Escape do not invoke enclosing Host or buffer actions. Native editing retains its keys. Moving point outside a still-focused local subtree does not change ownership; a real focus change does. Pointer actions and explicit focus or region jumps can leave a local boundary. A dismissal callback can explicitly focus the enclosing application without disposing the nested application; a region on the same Host remembers its eligible entry control.
+
+**Returns.** This property configures resolution; it has no separate result or focus state.
+
+**Errors.** Unsupported values signal `error→ etaf-renderer-error`.
+
+**Example.** `(column :key-scope 'local :on-dismiss (lambda () (etaf-focus nil 'toolbar)) ...)`
+
+**See also.** `:focus-scope`, `:region`, `:on-dismiss`, [Keyboard interaction](keyboard.md).
+
 #### Property: :focus-scope
 
 Confine keyboard operation to a subtree.

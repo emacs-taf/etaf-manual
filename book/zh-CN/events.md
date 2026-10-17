@@ -138,6 +138,22 @@ Host 为每种事件种类声明一个回调，属性名为 `:on-KIND`，其中 
 
 **参见。** `etaf-focus`、`ebox-focus-change-functions`、[焦点](focus.md)。
 
+#### Property: :on-focus-leave
+
+已接受的键盘焦点离开 Host 子树时运行的回调。
+
+**参数。** 无参数函数或 nil。
+
+**语义。** 焦点离开的启用 Host 由近及远接收此回调，随后新进入的 Host 接收 `:on-focus-enter`；共同祖先不接收任一通知。两个阶段共用一个响应式批次，观察的是已经接受的焦点，Tab、方向、按下与 `etaf-focus` 共用此路径。回调重新定向焦点时，停止通知已被取代的目的地。这是焦点移动通知，不是清理钩子；删除或卸载 Host 时使用组件生命周期清理。
+
+**返回。** 忽略返回值。
+
+**错误。** 回调错误从焦点操作传播。
+
+**示例。** `(column :on-focus-leave (lambda () (etaf-set-value active nil)) ...)`
+
+**参见。** `:on-focus-enter`、`etaf-focus` 与[组件生命周期](components.md)。
+
 ### 多个来源如何组合
 
 同一个 Host 最多可以从三个地方拿到同一个事件回调：Host 自己的声明、传给 Component 调用的透传属性、以及经 `:use` 附加的 Behavior。它们组合成一个回调：先跑内层声明，再跑外层，并保留第一个回调的返回值——Host 自己的回调，然后是调用者属性由内到外，最后是 Behavior 按声明序。任何回调报错都会停掉它之后的回调。调用者因此可以用自己的观察包裹控件的业务回调而不替换它，库 Behavior 也可以在它旁边添加行为。这条规则所属的合并表见 [Host](hosts.md#值与冲突)。

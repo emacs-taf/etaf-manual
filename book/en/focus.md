@@ -138,17 +138,17 @@ Focus a stop inside HOST-REF's committed subtree in RUNTIME.
 
 **See also.** `ebox-focus-within`, `etaf-focus`, `etaf-focused-host-ref`.
 
-#### Function: ebox-focus-edge (last &optional buffer-or-name)
+#### Function: ebox-focus-edge (last &optional buffer-or-name root)
 
 Focus the first member of the focused node's group, or the LAST one.
 
-**Arguments.** LAST non-nil selects the last member; nil the first.
+**Arguments.** LAST non-nil selects the last member; nil the first. BUFFER-OR-NAME selects the mounted buffer, defaulting to the current buffer. ROOT optionally restricts candidates and participating focus groups to a mounted subtree; nil uses the current modal scope.
 
-**Semantics.** With a focused node inside a focus group, the group's first or last member in tab order receives focus, which is how Home and End behave inside a toolbar or list. Outside a group, the same choice applies to the first or last stop of the modal scope. The group is looked up in the current modal scope, so an inner modal decides its own edges.
+**Semantics.** With a focused node inside a focus group, the group's first or last member in tab order receives focus, which is how Home and End behave inside a toolbar or list. Outside a group, the same choice applies to the first or last stop of the modal scope. The group is looked up within ROOT or the current modal scope, so an outer group cannot pull navigation outside an explicit subtree. If current focus is outside ROOT, the first or last eligible stop in ROOT is selected.
 
 **Returns.** The focused node.
 
-**Errors.** `error→ user-error` with `"No Ebox focus stop"` when there is no stop.
+**Errors.** `error→ user-error` with `"No Ebox focus stop"` when there is no stop, or `"Ebox focus root is not mounted"` when ROOT is not live in the selected mount.
 
 **Example.** `(ebox-focus-edge t)`
 

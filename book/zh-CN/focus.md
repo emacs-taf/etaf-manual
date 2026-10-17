@@ -138,17 +138,17 @@ Tab 导航遍历当前模态作用域的 *Tab 停靠点*：`:tab-index` 是大�
 
 **参见。** `ebox-focus-within`、`etaf-focus`、`etaf-focused-host-ref`。
 
-#### Function: ebox-focus-edge (last &optional buffer-or-name)
+#### Function: ebox-focus-edge (last &optional buffer-or-name root)
 
 聚焦焦点节点所在组的第一个成员，或 LAST 非 nil 时最后一个。
 
-**参数。** LAST 非 nil 选最后一个成员；nil 选第一个。
+**参数。** LAST 非 nil 选最后一个成员；nil 选第一个。BUFFER-OR-NAME 选择已挂载缓冲区，默认为当前缓冲区。ROOT 可把候选停靠点与参与导航的焦点组限制在已挂载子树内；nil 使用当前模态作用域。
 
-**语义。** 焦点节点在焦点组内时，组内 tab 序的第一个或最后一个成员获得焦点，Home 与 End 在工具栏或列表里就是这样；不在组内时，同样的选择作用于模态作用域的第一个或最后一个停靠点。组在当前模态作用域里查找，因此内层 modal 决定自己的边界。
+**语义。** 焦点节点在焦点组内时，组内 tab 序的第一个或最后一个成员获得焦点，Home 与 End 在工具栏或列表里就是这样；不在组内时，同样的选择作用于模态作用域的第一个或最后一个停靠点。焦点组在 ROOT 或当前模态作用域内查找，因此外层焦点组不能把导航带出显式子树。当前焦点位于 ROOT 外时，选择 ROOT 内第一个或最后一个合格停靠点。
 
 **返回。** 获得焦点的节点。
 
-**错误。** 没有停靠点时报 `error→ user-error`，消息 `"No Ebox focus stop"`。
+**错误。** 没有停靠点时报 `error→ user-error`，消息 `"No Ebox focus stop"`；ROOT 不属于选中的存活挂载时报同类错误，消息 `"Ebox focus root is not mounted"`。
 
 **示例。** `(ebox-focus-edge t)`
 

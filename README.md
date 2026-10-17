@@ -10,7 +10,7 @@ The book is complete: 87 chapters in twelve parts, appendices A-K, the concept i
 
 ## Requirements
 
-Emacs 29.1 or later, ETAF 0.2.1 and etaf-ui 0.1.0. The gate also reads the ecss, ekp, ebox, etaf, etaf-ui and etaf-db checkouts, which it expects next to this repository.
+Emacs 29.1 or later, ETAF 0.2.2 and etaf-ui 0.1.1. The gate also reads the ecss, ekp, ebox, etaf, etaf-ui and etaf-db checkouts, which it expects next to this repository.
 
 ## Use
 

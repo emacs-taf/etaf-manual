@@ -138,6 +138,22 @@ The callback that runs when keyboard focus enters the Host from outside it.
 
 **See also.** `etaf-focus`, `ebox-focus-change-functions`, [Focus](focus.md).
 
+#### Property: :on-focus-leave
+
+The callback that runs when accepted keyboard focus leaves the Host's subtree.
+
+**Arguments.** A function of no arguments, or nil.
+
+**Semantics.** Enabled Hosts left by a focus move receive this callback nearest-first, before newly entered Hosts receive `:on-focus-enter`. Shared ancestors receive neither notification. Both phases share one reactive batch and observe the already accepted focus; Tab, directions, presses and `etaf-focus` use the same path. Redirecting focus stops notifications for the superseded destination. These are movement notifications, not teardown hooks; removed or unmounted Hosts use Component cleanup instead.
+
+**Returns.** The return value is ignored.
+
+**Errors.** A handler error propagates from the focus operation.
+
+**Example.** `(column :on-focus-leave (lambda () (etaf-set-value active nil)) ...)`
+
+**See also.** `:on-focus-enter`, `etaf-focus`, [Component lifecycle](components.md).
+
 ### How several sources compose
 
 One Host can receive the same event callback from up to three places: the Host's own declaration, fallthrough attributes passed to a Component call, and Behaviors attached with `:use`. They compose into one callback that runs the inner declaration first and the outer ones after it, preserving the first callback's return value: the Host's own callback, then caller attributes from innermost to outermost, then Behaviors in declaration order. An error in any callback stops the callbacks after it. A caller can therefore wrap a control's business callback with its own observation without replacing it, and a library Behavior can add behavior beside it. [Hosts](hosts.md#values-and-conflicts) defines the merge table this rule belongs to.

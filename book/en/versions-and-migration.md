@@ -1,6 +1,6 @@
 # Versions and Migration
 
-The manual documents the version combination in the table below. Except for EKP 1.0.0 and Ebox 3.0.0 these are pre-1.0 release lines, so an interface may change between releases; each package's `CHANGELOG.md` is the authoritative list of user-visible changes. This appendix gives the requirements and the changes that need edits in existing code or files.
+The manual documents the version combination in the table below. Except for EKP 1.0.1 and Ebox 3.0.1 these are pre-1.0 release lines, so an interface may change between releases; each package's `CHANGELOG.md` is the authoritative list of user-visible changes. This appendix gives the requirements and the changes that need edits in existing code or files.
 
 <!-- index: version; requirements; migration -->
 
@@ -9,12 +9,12 @@ The manual documents the version combination in the table below. Except for EKP 
 | Package | Version | Requires |
 | --- | --- | --- |
 | `ecss` | 0.1.0 | Emacs 28.1 |
-| `ekp` | 1.0.0 | Emacs 29.1 |
-| `ebox` | 3.0.0 | Emacs 29.1, `ecss 0.1.0` |
-| `etaf` | 0.2.1 | Emacs 29.1, `ebox 3.0.0`, `ecss 0.1.0` |
-| `etaf-ui` | 0.1.0 | Emacs 29.1, `etaf 0.2.1`, `ebox 3.0.0` |
-| `etaf-db` | 0.1.0 | Emacs 29.1, `etaf 0.2.1` |
-| `etaf-manual` | 0.1.0 | Emacs 29.1, `etaf 0.2.1`, `etaf-ui 0.1.0` |
+| `ekp` | 1.0.1 | Emacs 29.1 |
+| `ebox` | 3.0.1 | Emacs 29.1, `ecss 0.1.0` |
+| `etaf` | 0.2.2 | Emacs 29.1, `ebox 3.0.1`, `ecss 0.1.0` |
+| `etaf-ui` | 0.1.1 | Emacs 29.1, `etaf 0.2.2`, `ebox 3.0.1` |
+| `etaf-db` | 0.1.0 | Emacs 29.1, `etaf` ≥ 0.2.1 |
+| `etaf-manual` | 0.1.1 | Emacs 29.1, `etaf 0.2.2`, `etaf-ui 0.1.1` |
 
 ## Requirements
 

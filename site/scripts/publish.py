@@ -62,12 +62,13 @@ footer { margin-top: 2rem; color: #55607a; font-size: .9rem; }
 nav { margin-bottom: 1rem; } nav a { margin-right: 1rem; }"""
 
 GROUPS = (
-    ("framework", {"etaf-install", "etaf-ui", "etaf", "ebox", "ecss", "ekp", "etaf-db", "etaf-manual"},
+    ("framework", {"etaf-install", "etaf-ui", "etaf", "ebox", "ecss", "ekp", "etaf-db"},
      "Framework", "框架"),
     ("applications", {"etaf-md-preview", "etaf-rss", "etaf-reader", "etaf-algo-lab", "etaf-screensaver",
                       "etaf-desktop", "etaf-miniflux", "etaf-ncm", "etaf-weread", "etaf-bili",
                       "etaf-youtube", "etaf-pi", "etaf-telega", "etaf-ascii-video",
-                      "etaf-video-player", "etaf-video-studio"}, "Applications", "应用"),
+                      "etaf-video-player", "etaf-video-studio", "etaf-manual"},
+     "Applications", "应用"),
     ("games", {"etaf-gamekit", "etaf-solitaire", "etaf-xiangqi", "etaf-tanks", "etaf-salvage"},
      "Games", "游戏"),
 )
@@ -177,7 +178,7 @@ def archive_pages(package_dir):
                     "</tr>")
             rows.append("</tbody>\n</table>")
         body = f"""<nav><a href="{text['other'][1]}">{text['other'][0]}</a>
-<a href="https://etaf.top/{'' if lang == 'en' else 'zh-cn/'}">Reference manual</a></nav>
+<a href="https://etaf.top/{'introduction/' if lang == 'en' else 'zh-cn/introduction/'}">Reference manual / 参考手册</a></nav>
 <h1>{text['archive']}</h1>
 <p class="lead">{text['lead']}</p>
 <pre><code>(require 'package)

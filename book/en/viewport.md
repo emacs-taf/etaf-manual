@@ -245,9 +245,9 @@ Return mounted RUNTIME's viewport as (WIDTH . HEIGHT) in pixels and lines.
 
 Return RUNTIME's display-window viewport as (WIDTH . HEIGHT).
 
-**Semantics.** WIDTH is the pixel width the window offers to a mounted tree and HEIGHT is its body height in lines. RUNTIME defaults to the Runtime in the current buffer. The read is a plain snapshot, not a reactive one; a Component that must reflow on a window change reads `etaf-runtime-viewport`, which the settled viewport change updates. Use this entry point when a surface has to match the window's pixel geometry rather than the laid-out text viewport.
+**Semantics.** WIDTH is the width the window offers to a mounted tree: pixels on a graphical frame and character cells on a text terminal. HEIGHT is its body height in lines. RUNTIME defaults to the Runtime in the current buffer. The read is a plain snapshot, not a reactive one; a Component that must reflow on a window change reads `etaf-runtime-viewport`, which the settled viewport change updates. Use this entry point when a surface has to match the window's geometry rather than the laid-out text viewport; floating panels center and clamp themselves from it on either display.
 
-**Returns.** The window viewport cons, or nil when no window displays RUNTIME's buffer or the display is not graphical.
+**Returns.** The window viewport cons, or nil when no window displays RUNTIME's buffer.
 
 **Errors.** A non-mounted Runtime signals `etaf-runtime-error`.
 

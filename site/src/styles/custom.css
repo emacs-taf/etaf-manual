@@ -30,7 +30,7 @@
   --sl-color-gray-1: var(--etaf-ink);
   --sl-color-gray-2: var(--etaf-ink-2);
   --sl-color-gray-3: var(--etaf-ink-3);
-  --sl-color-gray-4: #6f6a60;
+  --sl-color-gray-4: #71726b;
   --sl-color-gray-5: var(--etaf-rule-strong);
   --sl-color-gray-6: var(--etaf-paper-2);
   --sl-color-black: var(--etaf-paper);
@@ -51,6 +51,14 @@
   --sl-color-gray-7: var(--etaf-paper-2);
   --sl-color-accent: #6d50c0;
   --sl-color-text: var(--etaf-ink-2);
+}
+
+/* The grain belongs to the page surfaces, not to cards or images. */
+:root[data-theme='dark'] body,
+:root[data-theme='dark'] .header,
+:root[data-theme='dark'] .sidebar-pane {
+  background-image: var(--etaf-grain);
+  background-size: 160px 160px;
 }
 
 .sl-markdown-content {

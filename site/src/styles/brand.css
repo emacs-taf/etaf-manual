@@ -7,8 +7,10 @@
    Mono, with WenKai Mono for Chinese inside code.  Every face is split by
    unicode-range, so a page downloads only the glyphs it shows.
 
-   The palette is warm paper and ink rather than neutral grey, with the
-   violet of the ETAF mark kept for links and small accents. */
+   The light palette is warm paper and ink; the dark palette is a matte
+   charcoal with a fine grain, so a glossy screen reflects less and the surface
+   reads like painted paper rather than black glass.  The violet of the ETAF
+   mark stays for links and small accents. */
 
 @import '@fontsource-variable/source-serif-4/opsz.css';
 @import '@fontsource-variable/source-serif-4/opsz-italic.css';
@@ -26,16 +28,17 @@
     ui-monospace, "SF Mono", Menlo, monospace;
 
   /* Dark (default) */
-  --etaf-paper: #151412;
-  --etaf-paper-2: #1c1b18;
-  --etaf-paper-3: #24221e;
-  --etaf-rule: #34312b;
-  --etaf-rule-strong: #4a463e;
-  --etaf-ink: #eeeae2;
-  --etaf-ink-2: #c9c3b7;
-  --etaf-ink-3: #948e82;
-  --etaf-accent: #b9a6ee;
+  --etaf-paper: #191a1c;
+  --etaf-paper-2: #202225;
+  --etaf-paper-3: #25272b;
+  --etaf-rule: #2f3135;
+  --etaf-rule-strong: #43464b;
+  --etaf-ink: #e3e1db;
+  --etaf-ink-2: #b8b6af;
+  --etaf-ink-3: #89877f;
+  --etaf-accent: #c3b0ff;
   --etaf-accent-soft: #2b2540;
+  --etaf-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.055'/%3E%3C/svg%3E");
 }
 
 :root[data-theme='light'] {
@@ -49,4 +52,5 @@
   --etaf-ink-3: #7a7468;
   --etaf-accent: #5b3ea8;
   --etaf-accent-soft: #ece6f8;
+  --etaf-grain: none;
 }

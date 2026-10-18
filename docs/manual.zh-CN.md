@@ -45,8 +45,8 @@ Starlight 的内容流、标题包装和栏宽会和自由布局冲突，所以�
   fontsource 包，按 unicode-range 切片自托管；霞鹜文楷从其 webfont CDN 加载。
 - 阅读：正文 18px、行高 1.75（中文 1.85），栏宽 44rem；导航与页内目录保持
   15px 和 14px。
-- 配色：暖色纸墨，ETAF 标志的紫色只用于链接和小处点缀。不用渐变、光晕、
-  毛玻璃和仿窗口外框。
+- 配色：暖色纸墨，ETAF 标志的紫色只用于链接和小处点缀。深色主题是带细颗粒的
+  哑光炭灰，让表面像纸面而不是黑玻璃。不用渐变、光晕、毛玻璃和仿窗口外框。
 - 布局：任何宽度下都没有元素横向滚动，代码块与表格改为折行；改动后检查
   390 与 360 CSS 像素。
 
@@ -62,6 +62,8 @@ make site-publish PUBLISH_ARGS='--packages /path/to/release'
 
 `PUBLISH_ARGS='--packages-only /path/to/release'` 只更新包归档，不重新构建或改变当前页面。两种包发布模式都调用相邻工作区的 `scripts/package-release.py stage`：必须有封口检查点、匹配的验证摘要，以及每个受支持目标的两条安装路径证据；局部诊断报告会被拒绝。只上传索引、公开清单和其中列出的源码 tar 包，安装报告和日志保持私有。构建与安装检查流程以工作区工具手册为准。
 
+`PUBLISH_ARGS='--pages-only /path/to/archive'` 只根据已有的公开归档重新生成 `packages/index.html` 与各包详情页。清单和其中列出的 tar 包仍须通过校验，部署器会把历史 tar 包原样带入新版本；包字节没有变化时用它交付页面修改，不必重新构建和重跑安装门禁。
+
 默认 SSH 路径经 `lightos` 到 `root@aliyun-hk`。`ETAF_TOP_ROOT=direct` 使用直连；`ETAF_TOP_HOST` 更换主机，`ETAF_TOP_KEEP` 控制保留的站点版本数（默认 5，最少 2）。服务端需要 Python 3.10+。部署锁串行化站点与包发布；原子切换前检查 tar 路径、文件类型、摘要和公开文件白名单。已有包文件名不能被不同字节替换，包版本不能倒退。即使旧站点版本被清理，历史 tar 包也会带入新版本继续提供下载。
 
 每次包发布还会生成可浏览的归档。`packages/index.html` 按框架、应用、游戏分组列出
@@ -69,6 +71,8 @@ make site-publish PUBLISH_ARGS='--packages /path/to/release'
 构建所用的源码提交、校验和与源码包。包名链接指向详情页，而不是直接下载；手册链接
 写在正文里，不在页头放菜单。`package.el` 仍只读 `archive-contents`，浏览器打开裸目录
 看到的是归档说明而不是 404。两个页面每次发布都从清单重新生成，不属于清单内容。
+
+归档页还会显示每个包的下载次数。服务端的 `site/scripts/download-stats.py` 由 systemd 定时器（`etaf-download-stats`，每十分钟）运行：它统计 Caddy JSON 访问日志里版本化 tar 包的成功 GET 请求，跳过部署校验带 `?deployment=` 的请求，并把 `packages/downloads.json` 写在不可变版本目录之外。页面在浏览器里读取该文件，文件缺失时保留破折号，所以没有 JavaScript 或定时器时归档仍可阅读。访问日志、定时器与 `/srv/etaf.top/stats` 服务路径属于主机配置，发布过程不改动它们。
 
 切换后，部署器经 HTTPS 回读页面入口和包文件字节。检查失败则恢复上一条 `current`，再检查恢复后的服务；恢复检查遇到网络错误会明确标记为未验证，不声称回滚验证成功。客户端也回读 `current`。传输中断后应先查看该软链，再决定是否重试；SSH 响应丢失不等于发布没有发生。
 

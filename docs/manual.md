@@ -57,8 +57,9 @@ local styles:
 - Reading: 18px body text with a 1.75 line height (1.85 for Chinese) in a
   44rem column; navigation and the page outline stay at 15px and 14px.
 - Colour: warm paper and ink, with the violet of the ETAF mark only for
-  links and small accents.  No gradients, glows, glass blur or imitation
-  window frames.
+  links and small accents.  The dark theme is a matte charcoal with a fine
+  grain, so the surface reads as painted paper rather than black glass.  No
+  gradients, glows, glass blur or imitation window frames.
 - Layout: no element scrolls sideways at any width, including code blocks
   and tables, which wrap; check 390 and 360 CSS pixels after a change.
 
@@ -84,6 +85,12 @@ paths. Partial diagnostics are rejected. Only the index, public manifest and
 listed source tarballs are uploaded; installation reports and logs stay private.
 The workspace tool manual owns the build and installation-check workflow.
 
+`PUBLISH_ARGS='--pages-only /path/to/archive'` regenerates only the archive
+directory's `index.html` and per-package pages from an existing public archive.
+The manifest and every indexed tarball must verify, and the deployer carries
+older tarballs forward unchanged; use it to ship a presentation fix without
+rebuilding or re-gating packages whose bytes did not change.
+
 The default SSH route is through `lightos` to `root@aliyun-hk`.
 `ETAF_TOP_ROOT=direct` selects a direct connection; `ETAF_TOP_HOST` overrides the
 host and `ETAF_TOP_KEEP` controls retained site releases (default 5, minimum 2).
@@ -102,6 +109,16 @@ download; the manual links appear in the page text rather than as a header menu.
 `package.el` still reads only `archive-contents`, so a browser opening the bare
 directory sees the archive instead of a 404. Both pages are generated from the
 manifest on every release and are not part of it.
+
+The archive pages also show a download count per package. `site/scripts/download-stats.py`
+runs on the web host from a systemd timer (`etaf-download-stats`, every ten
+minutes): it counts successful GET requests for versioned tarballs in Caddy's
+JSON access log, skips the deployment verifier's `?deployment=` requests, and
+rewrites `packages/downloads.json` outside the immutable releases. The pages fetch
+that file in the browser and leave an em dash when it is missing, so the archive
+still reads without JavaScript or the timer. The access log, the timer and the
+served path (`/srv/etaf.top/stats`) are host configuration; publishing leaves
+them untouched.
 
 After switching, the deployer reads the served index and package bytes over HTTPS.
 A failed check restores the previous `current`, then checks it again; a recovery

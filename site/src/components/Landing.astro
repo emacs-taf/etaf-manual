@@ -206,7 +206,9 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
   *, *::before, *::after { box-sizing: border-box; }
 
   html {
-    background: var(--etaf-paper);
+    background-color: var(--etaf-paper);
+    background-image: var(--etaf-grain);
+    background-size: 160px 160px;
     color: var(--etaf-ink-2);
     font-family: var(--etaf-font-text);
     font-optical-sizing: auto;
@@ -235,7 +237,9 @@ const number = (index: number) => String(index + 1).padStart(2, '0');
 
   /* Navigation */
   .nav {
-    background: var(--etaf-paper);
+    background-color: var(--etaf-paper);
+    background-image: var(--etaf-grain);
+    background-size: 160px 160px;
     border-bottom: 1px solid var(--etaf-rule);
     position: sticky;
     top: 0;

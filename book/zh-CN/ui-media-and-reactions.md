@@ -36,13 +36,13 @@
 
 渲染一行受控的反应 chip，例如聊天消息下方的表情回应。
 
-**参数。** ITEMS——值或 ref——是带唯一非 nil `:key`、非空字符串 `:label`（通常是 emoji）、可选自然数 `:count`（显示在标签后）与布尔 `:chosen` 的 plist。ON-TOGGLE 接收被按 chip 的键。CHOICES 是 `(KEY . LABEL)` 的 alist，添加尾部名为 ADD-LABEL（默认 `"Add reaction"`）的笑脸 chip，打开选择浮层。
+**参数。** ITEMS——值或 ref——是带唯一非 nil 标量 `:key`（符号、整数或字符串，即 ETAF View 键接受的标识）、非空字符串 `:label`（通常是 emoji）、可选自然数 `:count`（显示在标签后）与布尔 `:chosen` 的 plist。ON-TOGGLE 接收被按 chip 的键。CHOICES 是 `(KEY . LABEL)` 的 alist，添加尾部名为 ADD-LABEL（默认 `"Add reaction"`）的笑脸 chip，打开选择浮层。
 
 **语义。** 选中的 chip 用 accent 前景画在 accent 浅色上，带 `chosen` 类与可访问的 `(chosen)` 后缀；选中与未选中的 chip 共享内边距与字重，所以切换永不移动邻居，只有 count 增位时 chip 变宽。选择浮层把选项每行六个、每格四列排布，行与行之间留一个空行，因此再宽的 emoji 也居中落在均匀网格里；选中一个会关闭浮层并以该键调用 ON-TOGGLE。整行不换行，所以请让 ITEMS 短到容器放得下。
 
 **返回。** 一个 View。
 
-**错误。** ITEMS 不是由唯一键、非空标签与自然数 count 构成的反应 plist 列表、CHOICES 不是由唯一键与非空字符串标签构成的 alist、ON-TOGGLE 不是函数、或 ADD-LABEL 不是非空字符串时报 `error→ etaf-component-call-error`。
+**错误。** ITEMS 不是由唯一标量键、非空标签与自然数 count 构成的反应 plist 列表、CHOICES 不是由唯一键与非空字符串标签构成的 alist、ON-TOGGLE 不是函数、或 ADD-LABEL 不是非空字符串时报 `error→ etaf-component-call-error`。
 
 **示例。**
 

@@ -36,13 +36,13 @@ Show one image, video or audio file in a controlled modal viewer over the applic
 
 Render one row of controlled reaction chips, for example under a chat message.
 
-**Arguments.** ITEMS — a value or ref — are plists with a unique non-nil `:key`, a nonempty string `:label` (usually an emoji), an optional natural `:count` shown after the label, and a boolean `:chosen`. ON-TOGGLE receives the key of the pressed chip. CHOICES, an alist of `(KEY . LABEL)`, adds a trailing smile chip named ADD-LABEL (default `"Add reaction"`) that opens a popover of the choices.
+**Arguments.** ITEMS — a value or ref — are plists with a unique non-nil scalar `:key` (a symbol, integer or string, the identities ETAF View keys accept), a nonempty string `:label` (usually an emoji), an optional natural `:count` shown after the label, and a boolean `:chosen`. ON-TOGGLE receives the key of the pressed chip. CHOICES, an alist of `(KEY . LABEL)`, adds a trailing smile chip named ADD-LABEL (default `"Add reaction"`) that opens a popover of the choices.
 
 **Semantics.** A chosen chip paints the accent foreground on the accent-soft tint and carries a `chosen` class and an accessible `(chosen)` suffix; chosen and unchosen chips share padding and weight, so toggling never moves a neighbour, and only a count gaining a digit widens its chip. The picker lays the choices out six per row in four-column cells with a blank row between rows, so even wide emoji sit centered in an even grid; picking one closes the popover and calls ON-TOGGLE with that key. The row does not wrap, so keep ITEMS short enough for its container.
 
 **Returns.** A View.
 
-**Errors.** `error→ etaf-component-call-error` when ITEMS is not a list of reaction plists with unique keys, nonempty labels and natural counts; CHOICES is not an alist of unique keys and nonempty string labels; ON-TOGGLE is not a function; or ADD-LABEL is not a nonempty string.
+**Errors.** `error→ etaf-component-call-error` when ITEMS is not a list of reaction plists with unique scalar keys, nonempty labels and natural counts; CHOICES is not an alist of unique keys and nonempty string labels; ON-TOGGLE is not a function; or ADD-LABEL is not a nonempty string.
 
 **Example.**
 

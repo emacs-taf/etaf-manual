@@ -121,6 +121,15 @@ still reads without JavaScript or the timer. The access log, the timer and the
 served path (`/srv/etaf.top/stats`) are host configuration; publishing leaves
 them untouched.
 
+Link previews use the same generated pages. The manual head supplies
+`https://etaf.top/og/manual.png` and a shared description; every archive page
+emits its own canonical URL, title and description and points at
+`https://etaf.top/og/archive.png`. The landing preview uses
+`/shots/etaf-ncm.png`. The cards are 1200x630 PNGs under `site/public/og/`;
+keep their paths stable so existing links keep their preview. Telegram caches
+previews per URL: after changing a card, send the link to `@WebpageBot` or
+share a versioned URL once to force a refetch.
+
 After switching, the deployer reads the served index and package bytes over HTTPS.
 A failed check restores the previous `current`, then checks it again; a recovery
 network failure is reported as unverified rather than successful rollback.

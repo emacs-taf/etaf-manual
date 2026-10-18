@@ -68,6 +68,7 @@
 | 变量 | 用途 |
 | --- | --- |
 | [`etaf-ui-icon-default-set`](ui-icons.md#variable-etaf-ui-icon-default-set) | 注册的回退风格，初始为 `nerd`；在渲染前绑定或设置它。 |
+| [`etaf-ui-terminal-icon-set`](ui-icons.md#variable-etaf-ui-terminal-icon-set) | 文本终端上处理 SVG 请求时最先查询的集，初始为 `tty`；设成终端字体画得出的字体集。 |
 
 ## Markdown
 

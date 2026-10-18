@@ -68,6 +68,7 @@ Every documented variable, grouped by the chapter that defines it. Each row link
 | Variable | Purpose |
 | --- | --- |
 | [`etaf-ui-icon-default-set`](ui-icons.md#variable-etaf-ui-icon-default-set) | The registered fallback style, initially `nerd`; bind or set it before rendering. |
+| [`etaf-ui-terminal-icon-set`](ui-icons.md#variable-etaf-ui-terminal-icon-set) | The set consulted first on a text terminal for an SVG request, initially `tty`; set it to a font set the terminal font can draw. |
 
 ## Markdown
 

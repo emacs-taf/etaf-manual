@@ -130,6 +130,14 @@ The registered fallback style, initially `nerd`; bind or set it before rendering
 
 **See also.** `etaf-ui-icon-set-register`, [Resolving a name](#resolving-a-name).
 
+#### Variable: etaf-ui-terminal-icon-set
+
+The icon set consulted first on a text terminal for an SVG request, initially `tty`.
+
+**Semantics.** A terminal cannot draw the SVG artwork, so a request for that set resolves through this one first; names it lacks continue to the requested set and the rest of the chain. Set it to a registered font set whose glyphs the terminal font contains — `nerd` with a Nerd Font — to keep one icon family in the terminal. A font-set request keeps the requested set first and consults this one second. Names that the terminal set does not cover fall through, so a partial set is safe.
+
+**See also.** `etaf-ui-icon-default-set`, `etaf-ui-icon-set-register`, [Resolving a name](#resolving-a-name).
+
 #### Function: etaf-ui-icon-set-register (name spec)
 
 Register NAME with the icon set SPEC, replacing a previous registration, and return NAME.

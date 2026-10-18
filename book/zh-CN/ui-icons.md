@@ -130,6 +130,14 @@
 
 **参见。** `etaf-ui-icon-set-register`、[解析一个名字](#解析一个名字)。
 
+#### Variable: etaf-ui-terminal-icon-set
+
+文本终端上处理 SVG 请求时最先查询的图标集，初始为 `tty`。
+
+**语义。** 终端画不出矢量图，所以对那个集的请求先经过这个集；它没有的名字再回到请求的集和后面的候选链。把它设成终端字体确实包含其字形的已注册字体集——装了 Nerd Font 时的 `nerd`——就能让终端保持同一套图标。字体集请求仍以请求的集为先，这个集排在第二。终端集没有覆盖的名字会继续回退，所以只提供部分名字是安全的。
+
+**参见。** `etaf-ui-icon-default-set`、`etaf-ui-icon-set-register`、[解析一个名字](#解析一个名字)。
+
 #### Function: etaf-ui-icon-set-register (name spec)
 
 用图标集规格 SPEC 注册 NAME，替换此前的注册，并返回 NAME。

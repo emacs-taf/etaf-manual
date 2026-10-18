@@ -28,11 +28,11 @@ The packages run in graphical and in terminal frames. A terminal frame paints so
 | Part | Graphical frame | Terminal frame |
 | --- | --- | --- |
 | Box backgrounds | `:border-radius` rounds the corners | Square corners; a background fills whole lines |
-| Borders | 1 px hairlines and rounded corners | Square border faces; a blank top border row is filled with the border color |
+| Borders | 1 px hairlines and rounded corners | One-cell box rules; a blank border row becomes `┌──┐` / `└──┘` |
 | Type sizes | `:font-size` scales the glyphs | One face size; a raised size renders bold |
 | Images | Displayed by Emacs | Converted to character cells by `chafa`, else by `ffmpeg`, else replaced by a placeholder |
 | Video in `image` mode | Each frame is displayed as an image | Falls back to `ascii` mode |
-| Icons | SVG sets are displayed as images, and font sets are drawn as SVG text, so tall glyphs are not clipped | Each set uses its text variants |
+| Icons | SVG sets are displayed as images, and font sets are drawn as SVG text, so tall glyphs are not clipped | The registered `tty` set supplies one-cell Unicode marks; other sets use their text variants |
 
 In both kinds of frame, every line of the buffer keeps its standard height, and the text of the buffer is never replaced. On a graphical frame, a character cluster that would make its line taller, such as a color emoji, is painted over with a line-high image when Ebox can render one (see [The Ebox emoji renderer](#the-ebox-emoji-renderer)), and is otherwise scaled down with a `height` display property until it fits. Batch Emacs and terminal frames leave clusters as they are.
 

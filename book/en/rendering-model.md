@@ -122,7 +122,7 @@ The same tree renders on a graphical frame and on a terminal; the model above do
 | Measurement | real font metrics; character widths are font pixels | one text line per row; widths follow the terminal's character grid |
 | Fitting | fallback glyphs are fitted and colour emoji can be image-based | nothing is fitted; a row is a text line |
 | Backgrounds | rounded corners and fractional block padding are painted as shapes | a background fills the whole border box |
-| Outlines | complete same-color 1 px solid frames use corner slices when blank padding permits; text stays native | square border faces; a blank top border row is filled with the border color because terminals have no overline attribute |
+| Outlines | complete same-color 1 px solid frames use corner slices when blank padding permits; text stays native | one-cell box rules (`┌─┐`, `│`, `└─┘`) when the character width table agrees; otherwise square border faces |
 | Typography | `:font-size` scales the glyphs | one face size; a node that raises its size takes bold weight, and children inherit it |
 | Images | drawn at the frame's cell metrics | approximated with characters |
 

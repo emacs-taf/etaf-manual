@@ -6,7 +6,7 @@
 
 ## 安装
 
-这些包要求 Emacs 29.1 或更新版本。官方 package.el 包源是 `https://etaf.top/packages/`。源码包由 Emacs 在本地编译；使用框架和组件库不需要 Git、Python、系统编译器或 Pi，安装也不替换用户配置。原生编译是可选能力。SQLite 另需 Emacs 本身具备支持，即 `sqlite-available-p` 返回非 nil；仅安装 sqlite3 可执行程序并不够。图形媒体需要图形 frame 及对应的 Emacs 图像支持。
+这些包要求 Emacs 29.1 或更新版本。官方 package.el 包源是 [https://etaf.top/packages/](https://etaf.top/packages/)。源码包由 Emacs 在本地编译；使用框架和组件库不需要 Git、Python、系统编译器或 Pi，安装也不替换用户配置。原生编译是可选能力。SQLite 另需 Emacs 本身具备支持，即 `sqlite-available-p` 返回非 nil；仅安装 sqlite3 可执行程序并不够。图形媒体需要图形 frame 及对应的 Emacs 图像支持。
 
 以下代码只需执行一次，然后选择组件画廊或其他受支持目标：
 

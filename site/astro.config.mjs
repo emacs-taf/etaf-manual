@@ -23,6 +23,10 @@ export default defineConfig({
       favicon: '/favicon.svg',
       logo: { src: './src/assets/etaf-icon.svg' },
       customCss: ['./src/styles/custom.css'],
+      components: {
+        ThemeSelect: './src/components/ThemeSelect.astro',
+        LanguageSelect: './src/components/LanguageSelect.astro',
+      },
       // Chinese text and code render in LXGW WenKai, subset by unicode-range,
       // so a page fetches only the glyph files it uses.
       head: [

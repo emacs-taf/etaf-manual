@@ -36,7 +36,8 @@
 Starlight 的内容流、标题包装和栏宽会和自由布局冲突，所以它只负责阅读页。
 两者共用 `site/src/styles/brand.css`，其中定义字体和浅色、深色两套配色；
 `site/src/styles/custom.css` 把它们映射到 Starlight 并设定阅读尺寸。
-配色主题存放在 `starlight-theme` 键下，在任一侧切换都会同步到另一侧。
+配色主题存放在 `starlight-theme` 键下，在任一侧切换都会同步到另一侧。手册页头复用首页的
+主题按钮和语言链接，不再使用 Starlight 的下拉选择。
 
 站点保持书籍式的排版风格，修改时调整这些设定，不要另加局部样式：
 

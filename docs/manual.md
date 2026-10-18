@@ -45,7 +45,8 @@ fight a free layout, so Starlight keeps only the reading pages.  Both share
 `site/src/styles/brand.css`, which holds the faces and the light and dark
 palettes; `site/src/styles/custom.css` maps them onto Starlight and sets the
 reading sizes.  The colour theme is stored under the `starlight-theme` key,
-so a choice on either side carries over.
+so a choice on either side carries over.  The manual header reuses the landing
+page's theme button and language link instead of Starlight's selects.
 
 The site keeps an editorial look, so change these tokens rather than adding
 local styles:

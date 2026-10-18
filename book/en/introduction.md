@@ -6,7 +6,7 @@ The manual is organized by subsystem, not by package. A subsystem that spans sev
 
 ## Installation
 
-The packages require Emacs 29.1 or newer. The official package.el archive is `https://etaf.top/packages/`. Source-only packages are compiled locally by Emacs; using the framework and catalog does not require Git, Python, a system compiler or Pi, and installation does not replace the user's configuration. Native compilation is optional. SQLite additionally requires an Emacs build for which `sqlite-available-p` returns non-nil; the sqlite3 executable alone is not sufficient. Graphical media require a graphical frame and the relevant Emacs image support.
+The packages require Emacs 29.1 or newer. The official package.el archive is [https://etaf.top/packages/](https://etaf.top/packages/). Source-only packages are compiled locally by Emacs; using the framework and catalog does not require Git, Python, a system compiler or Pi, and installation does not replace the user's configuration. Native compilation is optional. SQLite additionally requires an Emacs build for which `sqlite-available-p` returns non-nil; the sqlite3 executable alone is not sufficient. Graphical media require a graphical frame and the relevant Emacs image support.
 
 Evaluate the following once, then select the component gallery or another supported target:
 

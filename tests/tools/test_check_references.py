@@ -97,6 +97,13 @@ class CheckReferencesTests(unittest.TestCase):
         self.assertIn('book/en/real-missing-chapter.md', result.stderr)
         self.assertNotIn('literal-value', result.stderr)
 
+    def test_archive_url_is_not_a_chapter(self):
+        self.write_references("""\
+            The official archive is [etaf.top](https://etaf.top/packages/).
+        """)
+        result = self.run_check()
+        self.assertEqual(0, result.returncode, result.stderr)
+
     def test_missing_chapter_is_reported(self):
         self.write_references('https://etaf.top/missing/\n')
         result = self.run_check()

@@ -7,6 +7,8 @@ This check resolves prose URLs and Markdown links against the book sources:
 the chapter must exist and a section anchor must name a heading of that chapter.
 Fenced and inline code are literal data, not navigation links; for example a
 package.el archive URL in a configuration example is not a book chapter.
+The site also serves areas outside the book, such as the package archive at
+/packages/; a link to one of them navigates to the site, not to a chapter.
 It also rejects
 the retired repository paths (…/etaf-manual/src/branch/main/book/…) so the site
 stays the single link target."""
@@ -35,6 +37,10 @@ OLD_REFERENCE = re.compile(
 HEADING = re.compile(r'^[ ]{0,3}(#{1,6})[ \t]+(.*?)[ \t]*#*[ \t]*$')
 FENCE = re.compile(r'^[ ]{0,3}(`{3,}|~{3,})[ \t]*(.*)$')
 LINK = re.compile(r'\[([^]]*)\]\([^)]*\)')
+
+# Site areas that are not book chapters, so their URLs are not resolved against
+# the manuscript: /packages/ is the package archive.
+SITE_AREAS = {'packages'}
 
 
 def markdown_files(directory):
@@ -155,7 +161,7 @@ def check(root, manuscript):
                 language = 'zh-CN' if reference.group('language') else 'en'
                 chapter_id = reference.group('chapter')
                 target_name = f'book/{language}/{chapter_id}.md'
-                if chapter_id in generated:
+                if chapter_id in generated or chapter_id in SITE_AREAS:
                     continue
                 target = manuscript / target_name
                 if not target.is_file():

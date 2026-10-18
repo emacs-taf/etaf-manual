@@ -309,7 +309,10 @@ PAGE_SCRIPT = """(() => {
 })();"""
 
 
-def page(title, body, downloads="downloads.json"):
+def page(title, body, downloads="downloads.json", *, canonical, description):
+    title = html.escape(title)
+    description = html.escape(description)
+    canonical = html.escape(canonical)
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -317,6 +320,21 @@ def page(title, body, downloads="downloads.json"):
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <title>{title}</title>
+<meta name="description" content="{description}">
+<link rel="canonical" href="{canonical}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ETAF">
+<meta property="og:title" content="{title}">
+<meta property="og:description" content="{description}">
+<meta property="og:url" content="{canonical}">
+<meta property="og:image" content="https://etaf.top/og/archive.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ETAF package archive">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{title}">
+<meta name="twitter:description" content="{description}">
+<meta name="twitter:image" content="https://etaf.top/og/archive.png">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <style>{STYLE}</style>
 <script>{THEME_SCRIPT}</script>
@@ -404,7 +422,11 @@ versioned file never changes bytes.</p>
 <p class="asof" data-downloads-asof hidden></p>
 </footer>
 </main>"""
-    (package_dir / "index.html").write_text(page("ETAF package archive", body))
+    (package_dir / "index.html").write_text(page(
+        "ETAF package archive", body,
+        canonical="https://etaf.top/packages/",
+        description="ETAF package archive: framework, applications and games for Emacs 29.1 "
+                    "and newer. One package.el entry installs everything."))
     for item in packages:
         package_page(item, sources, package_dir / item["name"])
 
@@ -475,7 +497,10 @@ The archive is built from the commit above; rebuild it from that commit to compa
 </main>"""
     target = directory / "index.html"
     target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(page(f"{name} — ETAF package archive", body, "../downloads.json"))
+    target.write_text(page(
+        f"{name} — ETAF package archive", body, "../downloads.json",
+        canonical=f"https://etaf.top/packages/{name}/",
+        description=item.get("summary", "")))
 
 
 def pages_source(destination, source):

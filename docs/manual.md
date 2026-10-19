@@ -72,6 +72,27 @@ directory. Use `PUBLISH_ARGS=--build-only` for a local build, or `--no-build` fo
 an already built site. The host must already serve `/srv/etaf.top/current` over
 HTTPS; publication does not change Caddy or SSH configuration.
 
+Unknown paths must serve the generated `404.html`. The Caddy configuration on
+`aliyun-hk` lives outside this repository, and the deploy script never edits it;
+Caddy 2.6.2 serves the recovery page through `handle_errors`:
+
+```
+handle_errors {
+    root * /srv/etaf.top/current
+    rewrite * /404.html
+    file_server
+}
+```
+
+The current server answers unknown paths with an empty 404 body, so this is a
+host requirement rather than a repository change. Verify it with
+
+```sh
+curl -s -o /dev/null -w '%{http_code} %{size_download}\n' https://etaf.top/no-such-page/
+```
+
+The result must read `404` followed by a non-zero byte count.
+
 To publish a site and a validated workspace package release together:
 
 ```sh
@@ -85,6 +106,13 @@ matching validation hashes and every supported target through both installation
 paths. Partial diagnostics are rejected. Only the index, public manifest and
 listed source tarballs are uploaded; installation reports and logs stay private.
 The workspace tool manual owns the build and installation-check workflow.
+
+The gates read different sources. `make check` and `make book-check` read the
+sibling provider checkouts directly, while an archive release builds from the
+revisions pinned in `workspace.json`. An interface that exists only in a working
+copy therefore passes the local gate and fails the release gate with
+`` `NAME' is not a public interface ``. Seal and release a provider before its
+interfaces are documented or released.
 
 `PUBLISH_ARGS='--pages-only /path/to/archive'` regenerates only the archive
 directory's `index.html` and per-package pages from an existing public archive.

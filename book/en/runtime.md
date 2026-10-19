@@ -52,7 +52,7 @@ Mount normalized VIEW into BUFFER-OR-NAME and return its buffer.
 
 ### Native application windows
 
-A native text application owns the window it opens in. After `etaf-mount`, display the returned buffer with `(display-buffer-overriding-action '((display-buffer-same-window)))` bound around `pop-to-buffer`, so a user's `display-buffer` rules cannot split the frame into a side pane. Reserve one clear line at the top of the root View: count it as chrome in page and row budgets, and on a short window render fewer content rows rather than clipping the first line. These are conventions of the application, not options of `etaf-mount`.
+A native text application owns the window it opens in. `etaf-app-open` displays its buffer in the selected window regardless of the user's `display-buffer` rules, so they cannot split the frame into a side pane; the [Applications](applications.md) chapter covers that lifecycle. Reserve one clear line at the top of the root View: count it as chrome in page and row budgets, and on a short window render fewer content rows rather than clipping the first line. The top line is a convention of the application, not an option of `etaf-mount`.
 
 #### Function: etaf-unmount (&optional runtime)
 

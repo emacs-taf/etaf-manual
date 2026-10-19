@@ -52,7 +52,7 @@ View 是描述，Runtime 保存输出。View 的静态部分构建一次，每�
 
 ### 原生应用窗口
 
-原生文本应用拥有它打开所在的窗口。`etaf-mount` 之后，在 `pop-to-buffer` 外面绑定 `(display-buffer-overriding-action '((display-buffer-same-window)))` 再显示返回的缓冲区，这样用户的 `display-buffer` 规则就无法把 frame 拆成侧栏。根 View 顶部留一行空白：把它算进页面与行数预算的 chrome，短窗口时少渲染内容行而不是裁掉第一行。这些是应用的约定，不是 `etaf-mount` 的选项。
+原生文本应用拥有它打开所在的窗口。`etaf-app-open` 不理会用户的 `display-buffer` 规则，把缓冲区显示在选中窗口里，这些规则因此无法把 frame 拆成侧栏；这个生命周期见[应用](applications.md)一章。根 View 顶部留一行空白：把它算进页面与行数预算的 chrome，短窗口时少渲染内容行而不是裁掉第一行。顶部这一行是应用的约定，不是 `etaf-mount` 的选项。
 
 #### Function: etaf-unmount (&optional runtime)
 

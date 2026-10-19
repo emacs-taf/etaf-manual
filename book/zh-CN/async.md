@@ -91,6 +91,71 @@ START 可以返回一个零参取消函数，请求被取消、替换、释放�
 
 请求因替换或释放而作废时，丢弃是静默的；因取消或超时而作废时，对应的条件被记录为结果；每个所有者章说明各自的接口报告哪些状态。无论哪种情况，作废的完成都不碰所有者已发布的状态。
 
+## 子进程
+
+<!-- index: 子进程; 命令行后端; 进程作业 -->
+
+许多应用通过一个命令行程序与后端通信，这个程序打印一个答案后退出。`etaf-process-run` 在不阻塞 Emacs 的情况下运行这样的程序并报告一个结果，之后作业就结束了。协议（退出码与输出字段的含义）留给调用者；作业只保证结果如何收集与送达。
+
+#### Function: etaf-process-run (command &key callback timeout environment directory (output 'string) (coding 'utf-8-unix) name)
+
+不阻塞地运行 COMMAND，并返回一个作业。
+
+**参数。**
+
+- COMMAND 是非空字符串列表：程序及其参数。不经过 shell。
+- CALLBACK 是 nil 或单参函数，参数是结果 plist。
+- TIMEOUT 是 nil 或正的秒数。
+- ENVIRONMENT 是 `"NAME=VALUE"` 字符串列表，放在 `process-environment` 前面，所以会覆盖继承来的值。
+- DIRECTORY 是 nil 或工作目录；nil 使用 `default-directory`。
+- OUTPUT 是 `string`（默认）或 `json`。
+- CODING 是解码两条流所用的编码系统，默认 `utf-8-unix`；原始字节用 `binary`。
+- NAME 是 nil 或 `list-processes` 里显示的进程名。
+
+**语义。** 程序的标准输出与标准错误分开。程序退出时，两条流都读到末尾后才送达结果，所以结果不会漏掉报告退出时仍在途中的输出。CALLBACK 收到一个 plist：
+
+- `:status` 是 `exit`、`signal`、`timeout` 或 `failed`，`failed` 表示程序无法启动。
+- `:exit` 是退出码，`signal` 时是信号编号。
+- `:output` 是字符串形式的标准输出；OUTPUT 为 `json` 时是解析后的值：对象为 plist、数组为列表、null 为 nil、false 为 `:false`。空的或无效的 JSON 得到 nil。
+- `:stderr` 是完整的标准错误文本。
+- `:message` 描述超时或启动失败。
+
+即使程序无法启动，CALLBACK 也绝不会在 `etaf-process-run` 返回之前运行，所以调用者可以先保存作业。它最多运行一次。TIMEOUT 先到期时，进程被停止，结果的状态为 `timeout`。
+
+**返回。** 一个作业，传给 `etaf-process-cancel` 与 `etaf-process-live-p`。
+
+**错误。** COMMAND 不是非空字符串列表、TIMEOUT 不是正数，或 OUTPUT 既不是 `string` 也不是 `json` 时 `error→ wrong-type-argument`。程序本身的问题是结果，不是错误。
+
+**示例。** 一个 Resource 通过命令行客户端加载订阅源，替换或释放该 Resource 会停止进程。
+
+```elisp
+(etaf-async
+ (lambda (resolve reject)
+   (let ((job (etaf-process-run
+               '("feed-client" "list" "--json")
+               :output 'json :timeout 20
+               :callback
+               (lambda (result)
+                 (if (eql (plist-get result :exit) 0)
+                     (funcall resolve (plist-get result :output))
+                   (funcall reject
+                            (list 'error (or (plist-get result :message)
+                                             (plist-get result :stderr)))))))))
+     (lambda () (etaf-process-cancel job)))))
+```
+
+#### Function: etaf-process-cancel (job)
+
+停止 JOB 且不运行它的回调；JOB 尚未结算时返回非 nil。
+
+**语义。** 进程被删除、作业被结算，所以已在途中的结果会被丢弃。取消已结算的作业不做任何事并返回 nil。
+
+#### Function: etaf-process-live-p (job)
+
+JOB 既未结算也未被取消时返回非 nil。
+
+**语义。** 作业从 `etaf-process-run` 返回起一直是活的，直到它的回调被调用或它被取消。用它避免在一个请求未完成时再启动第二个。
+
 ## 错误与恢复
 
 <!-- index: etaf-async-error; etaf-async-timeout; etaf-async-cancelled -->

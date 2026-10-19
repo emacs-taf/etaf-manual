@@ -57,6 +57,7 @@
         "components",
         "reactivity",
         "runtime",
+        "applications",
         "context",
         "actions-behaviors-and-error-boundaries"
       ]

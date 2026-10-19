@@ -48,6 +48,29 @@ prop 就是普通 Component prop，[Component](components.md) 的调用规则原
 
 组件总是为自己读取的每个 token 提供内置回退值，因此没有任何 Theme 时目录也能运行且视觉自洽；在子树里提供某个键就会覆盖回退值。回退值就是目录的默认亮色外观。桌面 shell 还会读取自己的 shell token，因此窗口管理器可以独立地把 shell 及其选择器调暗或换色，而保留对话框的清晰。token 按声明解析，所以在保留 Host 属性或静态规则里读取的 token 固定的是*主题值*而非颜色：切换所提供的 Theme 会让同一批已挂载组件重绘。
 
+### 应用调色板
+
+应用通常只有几种自己的颜色（表面、正文、凸起的面板、边框、弱化文字和强调色），并希望每个目录组件都跟着它们走。`etaf-ui-theme-tokens` 把这样一份调色板映射到目录的颜色 token 上，应用只需提供一个 Theme，而不必逐个列出 `:ui-*` 键。
+
+#### Function: etaf-ui-theme-tokens (palette)
+
+返回应用调色板 PALETTE 对应的目录 Theme token。
+
+**参数。** PALETTE 是 `#RRGGBB` 颜色角色组成的 plist。`:bg`（应用表面）和 `:fg`（正文）必填。可选角色有 `:panel`（凸起表面，默认 `:bg`）、`:track`（进度条与范围条的轨道，默认 `:panel`）、`:border`（线条）、`:muted`（次要文字）、`:dim`（禁用文字，默认 `:muted`）、`:accent`（默认 `:fg`）、`:accent-fg`（强调色上的文字，默认白色）、`:accent-soft`（选中与色调填充），以及状态角色 `:success`、`:warning`、`:danger` 和 `:info`（默认 `:accent`），每个状态角色都有 `-bg` 与 `-border` 变体。
+
+**语义。** 省略的角色会被推导：`:border` 把正文色以 18% 混入表面，`:muted` 把表面色以 35% 混入正文，`:accent-soft` 把强调色以 16% 混入表面，状态的 `-bg` 把状态色以 12%、`-border` 以 35% 混入表面，默认状态色按 `:bg` 是亮是暗选取。随后每个角色填充所有以它为名的 token：`:panel` 成为面板、shell、选择器、窗口标题栏与禁用状态的背景，`:border` 成为所有边框与分隔线，`:accent` 成为主按钮、范围填充与表格选中文字，其余依此类推。结果只含颜色；间距与圆角 token 保持目录默认值。
+
+**返回。** 一个新的 `:ui-*` 键 Theme plist，可以追加在应用自己的 Theme 键之后交给 `etaf-theme-provide`。同一个键取第一个值，所以放在结果之前的 token 会覆盖它。
+
+**错误。** PALETTE 不是 plist、包含上面列表之外的角色、某个值不是字符串，或缺少 `:bg` 或 `:fg` 时，发出 `wrong-type-argument`。
+
+```elisp
+(etaf-theme-provide
+ (append '(:ui-shell-bg "#0B1220")
+         (etaf-ui-theme-tokens '(:bg "#101925" :fg "#E5EDF7" :panel "#182332"
+                                 :border "#2B3A4E" :accent "#356BB2"))))
+```
+
 ## `:view` 与 `:render` 怎么选
 
 `etaf-define-component` 的两个作者前端对目录组件都是普通选择，条目的内容描述行为，不描述用了哪一个。正如 [Component](components.md) 所定义，`:view` 是与定义一同编译的结构语言：它用到的每个 prop 名都是一次被追踪的读取，因此只组装 Host 与语义内容的组件应当用它，局部更新可以只重绘一个绑定，不必重跑整个渲染。`:render` 是在保留 effect 里求值的普通 Elisp；当输出依赖在 Lisp 里读取的 computed 值、必须程序化构建节点、或必须先对普通数据分支再决定结构时使用它。两者收到同样的 props、slot 与 Scope，也都能把静态规则与 Host 属性混用。

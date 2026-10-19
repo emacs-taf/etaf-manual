@@ -61,12 +61,14 @@ ETAF 的模块集最大。核心是作者模型；Runtime 是把模型接到 Ebo
 | `lisp/etaf-controlled-behavior.el` | 给应用所拥有的几何用的受控 Behavior 变体 | `lisp/etaf-behavior.el` |
 | `lisp/etaf-observer.el` | 作用域限于一次动态操作的观察口 | — |
 | `lisp/etaf-runtime.el` | 挂载、保留段树、提交与 Host 映射 | `lisp/etaf-view.el`、`lisp/etaf-component.el`、`lisp/etaf-reactive.el`、`lisp/etaf-behavior.el`、`lisp/etaf-context.el`、`lisp/etaf-observer.el`、Ebox |
+| `lisp/etaf-app.el` | 应用缓冲区：画布、主题 face、适配与单次关闭 | `lisp/etaf-runtime.el`、`lisp/etaf-reactive.el`、Ebox |
 | `lisp/etaf-events.el` | 进入 Host 回调的 Runtime 事件入口 | `lisp/etaf-runtime.el`、`lisp/etaf-reactive.el`、Ebox |
 | `lisp/etaf-actions.el` | 命名 Action 与其派发 | `lisp/etaf-runtime.el`、`lisp/etaf-reactive.el` |
 | `lisp/etaf-keys.el` | Host 键位表、帮助与提示键 | `lisp/etaf-runtime.el`、`lisp/etaf-events.el`、`lisp/etaf-regions.el`、`lisp/etaf-reactive.el`、Ebox |
 | `lisp/etaf-regions.el` | region 声明与 region 导航 | `lisp/etaf-runtime.el`、`lisp/etaf-events.el`、Ebox |
 | `lisp/etaf-viewport.el` | 嵌套视口 region 与静息后的 refit | `lisp/etaf-runtime.el`、`lisp/etaf-component.el`、`lisp/etaf-events.el` |
 | `lisp/etaf-async.el` | Resource 与 Data 共用的异步操作 | `lisp/etaf-reactive.el` |
+| `lisp/etaf-process.el` | 为命令行后端运行到结束的子进程 | — |
 | `lisp/etaf-resource.el` | 已加载的 Resource 值与清理 | `lisp/etaf-async.el`、`lisp/etaf-observer.el`、`lisp/etaf-reactive.el` |
 | `lisp/etaf-data.el` | 架在显式 source 能力之上的响应式数据控制器 | `lisp/etaf-async.el`、`lisp/etaf-observer.el`、`lisp/etaf-reactive.el` |
 | `lisp/etaf-list-cache.el` | stale-while-revalidate 列表缓存 | — |

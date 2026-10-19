@@ -91,6 +91,71 @@ Once a request has an outcome its later results are ignored. Once a request has 
 
 Discarding is silent when the request was replaced or released, and records the cancellation or timeout condition when it became obsolete for that reason; each owner chapter states the statuses its surface reports. In every case an obsolete completion leaves the owner's published state untouched.
 
+## Subprocesses
+
+<!-- index: subprocess; command-line backend; process job -->
+
+Many applications talk to a backend through a command-line program that prints one answer and exits. `etaf-process-run` runs such a program without blocking Emacs and reports one result, after which the job is gone. The protocol, the meaning of the exit code and of the output fields, stays with the caller; the job only guarantees how the result is collected and delivered.
+
+#### Function: etaf-process-run (command &key callback timeout environment directory (output 'string) (coding 'utf-8-unix) name)
+
+Run COMMAND without blocking and return a job.
+
+**Arguments.**
+
+- COMMAND is a non-empty list of strings: the program and its arguments. No shell is involved.
+- CALLBACK is nil or a function of one argument, the result plist.
+- TIMEOUT is nil or a positive number of seconds.
+- ENVIRONMENT is a list of `"NAME=VALUE"` strings placed in front of `process-environment`, so they override inherited values.
+- DIRECTORY is nil or the working directory; nil uses `default-directory`.
+- OUTPUT is `string` (the default) or `json`.
+- CODING is the coding system used to decode both streams, `utf-8-unix` by default; use `binary` for raw bytes.
+- NAME is nil or the process name shown in `list-processes`.
+
+**Semantics.** The program runs with separate standard output and standard error. When it exits, both streams are read to the end before the result is delivered, so the result never misses output that was still in flight when the exit was reported. CALLBACK receives a plist:
+
+- `:status` is `exit`, `signal`, `timeout` or `failed`, where `failed` means the program could not start.
+- `:exit` is the exit code, or the signal number for `signal`.
+- `:output` is standard output as a string, or with OUTPUT `json` its parsed value: objects as plists, arrays as lists, null as nil and false as `:false`. Empty or invalid JSON gives nil.
+- `:stderr` is the complete standard error text.
+- `:message` describes a timeout or a failure to start.
+
+CALLBACK never runs before `etaf-process-run` returns, even when the program cannot start, so the caller can store the job first. It runs at most once. When TIMEOUT expires first, the process is stopped and the result has status `timeout`.
+
+**Returns.** A job, to be passed to `etaf-process-cancel` and `etaf-process-live-p`.
+
+**Errors.** `error→ wrong-type-argument` when COMMAND is not a non-empty list of strings, when TIMEOUT is not a positive number, or when OUTPUT is neither `string` nor `json`. Problems of the program itself are results, not errors.
+
+**Example.** A Resource loads a feed through a command-line client, and replacing or releasing the Resource stops the process.
+
+```elisp
+(etaf-async
+ (lambda (resolve reject)
+   (let ((job (etaf-process-run
+               '("feed-client" "list" "--json")
+               :output 'json :timeout 20
+               :callback
+               (lambda (result)
+                 (if (eql (plist-get result :exit) 0)
+                     (funcall resolve (plist-get result :output))
+                   (funcall reject
+                            (list 'error (or (plist-get result :message)
+                                             (plist-get result :stderr)))))))))
+     (lambda () (etaf-process-cancel job)))))
+```
+
+#### Function: etaf-process-cancel (job)
+
+Stop JOB without running its callback, and return non-nil when JOB had not settled yet.
+
+**Semantics.** The process is deleted and the job is settled, so a result that was already on its way is discarded. Cancelling a settled job does nothing and returns nil.
+
+#### Function: etaf-process-live-p (job)
+
+Return non-nil while JOB has neither settled nor been cancelled.
+
+**Semantics.** A job is live from the moment `etaf-process-run` returns until its callback has been called or it is cancelled. Use it to skip starting a second request while one is pending.
+
 ## Errors and recovery
 
 <!-- index: etaf-async-error; etaf-async-timeout; etaf-async-cancelled -->

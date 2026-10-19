@@ -48,6 +48,29 @@ Catalog components paint through Theme tokens rather than literal colors. A toke
 
 A component always supplies a built-in fallback for every token it reads, so a catalog runs and looks coherent without any Theme; providing a key overrides the fallback for the whole subtree. The fallbacks are the catalog's default light look. A desktop shell additionally reads its own shell tokens, so a window manager can dim or recolor the shell and its pickers independently of the dialogs it keeps crisp. Because tokens resolve per declaration, a token read in a retained Host property or a static rule pins the *theme value*, not the color: switching the provided Theme repaints the same mounted components.
 
+### Application palettes
+
+An application usually owns a handful of colors (a surface, its text, a raised panel, a border, a muted text color and an accent) and wants every catalog component to follow them. `etaf-ui-theme-tokens` maps such a palette onto the catalog's color tokens, so the application provides one Theme instead of listing each `:ui-*` key.
+
+#### Function: etaf-ui-theme-tokens (palette)
+
+Return the catalog Theme tokens for application PALETTE.
+
+**Arguments.** PALETTE is a plist of `#RRGGBB` color roles. `:bg` (the application surface) and `:fg` (its text) are required. The optional roles are `:panel` (raised surfaces, default `:bg`), `:track` (progress and range tracks, default `:panel`), `:border` (lines), `:muted` (secondary text), `:dim` (disabled text, default `:muted`), `:accent` (default `:fg`), `:accent-fg` (text on the accent, default white), `:accent-soft` (selection and tonal fills), and the status roles `:success`, `:warning`, `:danger` and `:info` (default `:accent`), each with a `-bg` and a `-border` variant.
+
+**Semantics.** Omitted roles are derived: `:border` mixes the text 18% into the surface, `:muted` mixes the surface 35% into the text, `:accent-soft` mixes the accent 16% into the surface, a status `-bg` mixes its color 12% and a `-border` 35% into the surface, and the default status colors follow whether `:bg` is light or dark. Each role then fills every token that names it: `:panel` becomes the panel, shell, picker, window title and disabled backgrounds, `:border` every border and divider, `:accent` the primary button, the range fill and the table selection text, and so on. The result contains only colors; spacing and radius tokens keep their catalog defaults.
+
+**Returns.** A fresh Theme plist of `:ui-*` keys, ready to append to the application's own Theme keys and pass to `etaf-theme-provide`. Because the first value of a key wins, a token placed before the result overrides it.
+
+**Errors.** `wrong-type-argument` when PALETTE is not a plist, when it names a role outside the list above, when a value is not a string, or when `:bg` or `:fg` is missing.
+
+```elisp
+(etaf-theme-provide
+ (append '(:ui-shell-bg "#0B1220")
+         (etaf-ui-theme-tokens '(:bg "#101925" :fg "#E5EDF7" :panel "#182332"
+                                 :border "#2B3A4E" :accent "#356BB2"))))
+```
+
 ## Choosing between :view and :render
 
 Both authoring frontends of `etaf-define-component` are ordinary choices for a catalog component, and the component's entry describes behavior, not which one it uses. As [Component](components.md) defines, `:view` is the structural language compiled with the definition: each prop name it uses is a tracked read, so a component that only assembles Hosts and semantic content should use it, and a local update can repaint one binding without re-running the whole render. `:render` is ordinary Elisp evaluated in a retained effect; use it when the output depends on a computed value read in Lisp, when nodes must be built programmatically, or when the component must branch on ordinary data before choosing structure. Both receive the same props, slots and scope, and both can mix static rules with Host properties.

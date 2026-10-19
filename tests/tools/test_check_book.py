@@ -213,6 +213,44 @@ class CheckBookTests(unittest.TestCase):
         self.assertIn('etaf is version 0.2.1, not 0.9', result.stderr)
         self.assertNotIn('not 0.2.1', result.stderr)
 
+    def test_version_tables_must_match_the_entry_headers(self):
+        english = """
+        | Package | Version | Documented with |
+        | --- | --- | --- |
+        | `etaf` | 0.9.9 | Emacs 29.1 |
+        """
+        chinese = """
+        | 包 | 版本 | 配套版本 |
+        | --- | --- | --- |
+        | `etaf` | 0.9.9 | Emacs 29.1 |
+        """
+        for language, table in (('en', english), ('zh-CN', chinese)):
+            path = self.root / 'book' / language / 'reactivity.md'
+            path.write_text(path.read_text() + textwrap.dedent(table))
+        result = self.run_gate()
+        self.assertEqual(1, result.returncode)
+        self.assertEqual(
+            2, result.stderr.count(
+                'version table gives etaf 0.9.9, but its entry header is 0.2.1'),
+            result.stderr)
+
+    def test_version_tables_may_match_the_entry_headers(self):
+        english = """
+        | Package | Version | Documented with |
+        | --- | --- | --- |
+        | `etaf` | 0.2.1 | Emacs 29.1 |
+        """
+        chinese = """
+        | 包 | 版本 | 配套版本 |
+        | --- | --- | --- |
+        | `etaf` | 0.2.1 | Emacs 29.1 |
+        """
+        for language, table in (('en', english), ('zh-CN', chinese)):
+            path = self.root / 'book' / language / 'reactivity.md'
+            path.write_text(path.read_text() + textwrap.dedent(table))
+        result = self.run_gate()
+        self.assertEqual(0, result.returncode, result.stderr)
+
     def test_paragraphs_and_list_items_are_one_line(self):
         self.write('book/en/hosts.md', textwrap.dedent(HOSTS) + '\nA box holds\nchildren.\n\n- An item\n  continued.\n'
                    '- Another item.\n\n```elisp\n(etaf-ref\n 1)\n```\n')

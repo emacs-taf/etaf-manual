@@ -106,7 +106,7 @@ ETAF DB 把 Data Source 记录存进 SQLite。它的构造函数显式描述存�
 
 #### Error: etaf-sqlite-error
 
-Invalid ETAF SQLite operation
+消息为 "Invalid ETAF SQLite operation"。
 
 **语义。** 表示操作无法执行：查询不是 plist 或 alist、查询字段表里没有声明、不支持的操作、载荷缺主键或没有任何字段、或 `replace`/`update` 没有匹配行。用 `condition-case` 捕获；抛出它的调用不返回值。它是下面三个更具体条件的父条件。
 
@@ -116,7 +116,7 @@ Invalid ETAF SQLite operation
 
 #### Error: etaf-sqlite-schema-error
 
-Invalid ETAF SQLite schema。父条件为 `etaf-sqlite-error`。
+消息为 "Invalid ETAF SQLite schema"。父条件为 `etaf-sqlite-error`。
 
 **语义。** 表示描述非法——不可用的列 ID、不安全的物理名、不支持的类型、重复的 ID 或名、未知主键——或既有表与描述不符，例如初始化期间。声明被拒时不会创建或改动任何东西，半匹配的表也从不被默默接受。
 
@@ -126,7 +126,7 @@ Invalid ETAF SQLite schema。父条件为 `etaf-sqlite-error`。
 
 #### Error: etaf-sqlite-unavailable
 
-SQLite is unavailable。父条件为 `etaf-sqlite-error`。
+消息为 "SQLite is unavailable"。父条件为 `etaf-sqlite-error`。
 
 **语义。** 表示当前 Emacs 构建时没有 SQLite 支持，而某次操作需要连接。描述列、表与数据库不做这项检查，因为它不碰文件。
 
@@ -136,7 +136,7 @@ SQLite is unavailable。父条件为 `etaf-sqlite-error`。
 
 #### Error: etaf-sqlite-commit-unknown
 
-SQLite commit outcome is unknown。父条件为 `etaf-sqlite-error`。
+消息为 "SQLite commit outcome is unknown"。父条件为 `etaf-sqlite-error`。
 
 **语义。** 表示事务的提交、回滚或连接关闭让结果不确定，后端无法说明写入是否生效。数据包含失败阶段与底层条件。用 `condition-case` 捕获；抛出它的调用不返回值。
 

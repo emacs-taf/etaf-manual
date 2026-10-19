@@ -85,14 +85,14 @@ Unless `load-prefer-newer` is non-nil, Emacs loads a byte-compiled file even whe
 
 Each entry file has the `Version` and `Package-Requires` headers that package.el reads. A package archive of a package contains its entry file and its `lisp/` directory; an archive of EKP also needs `dictionaries/` and `native/`.
 
-Each Function and Macro record of a Commentary carries an autoload cookie:
+Function and Macro records may carry an autoload cookie:
 
 ```elisp
 ;; Function: ekp-c-module-load ()
 ;;;###autoload (autoload 'ekp-c-module-load "ekp" nil t)
 ```
 
-When package.el installs a package, it collects these cookies into the package's autoload file. Every public function and macro is then defined before its package is loaded: calling one loads the entry file first, and public commands such as `ekp-c-module-build` are available through `M-x` at once. Records of the other kinds have no autoloads, so require the package before using them. A source checkout has no autoload file; require its entry instead.
+When package.el installs a package, it collects these cookies into the package's autoload file. Public commands such as `ekp-c-module-build` are then available through `M-x` at once. A public function or macro that carries no cookie becomes available only after the package is loaded; `require` the package before calling it. Records of the other kinds have no autoloads, so require the package before using them. A source checkout has no autoload file; require its entry instead.
 
 ## Compiling
 

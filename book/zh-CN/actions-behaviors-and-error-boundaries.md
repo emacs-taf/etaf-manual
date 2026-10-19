@@ -428,7 +428,7 @@ Behavior 未变化时，每次 Host 属性解析的代价是一次规格比较�
 
 #### Error: etaf-action-error
 
-Invalid ETAF Action。Action 无法定义、登记或派发时抛出。用 `condition-case` 捕获；失败的调用不返回值。父条件是 `error`，数据是含一个格式化消息字符串的列表。
+消息为 "Invalid ETAF Action"。Action 无法定义、登记或派发时抛出。用 `condition-case` 捕获；失败的调用不返回值。父条件是 `error`，数据是含一个格式化消息字符串的列表。
 
 | 消息 | 起因 |
 | --- | --- |
@@ -441,7 +441,7 @@ Invalid ETAF Action。Action 无法定义、登记或派发时抛出。用 `cond
 
 #### Error: etaf-behavior-error
 
-Invalid ETAF Behavior。Behavior 规格、来源、安装函数或受控几何输入非法时抛出。用 `condition-case` 捕获；失败的调用不返回值。父条件是 `error`，数据是含一个格式化消息字符串的列表。
+消息为 "Invalid ETAF Behavior"。Behavior 规格、来源、安装函数或受控几何输入非法时抛出。用 `condition-case` 捕获；失败的调用不返回值。父条件是 `error`，数据是含一个格式化消息字符串的列表。
 
 | 消息 | 起因 |
 | --- | --- |

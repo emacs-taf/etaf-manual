@@ -301,6 +301,56 @@ give the version in that package's entry header."
                (t (etaf-manual-check--problem
                    file line "`%s' is not a public interface" span))))))))))
 
+(defconst etaf-manual-check--version-table-headers
+  '(("Package" . "Version") ("包" . "版本"))
+  "Header labels of a table whose first two columns name a package and its version.")
+
+(defun etaf-manual-check--table-cells (line)
+  "Return the trimmed cells of Markdown table LINE."
+  (mapcar #'string-trim
+          (split-string (string-trim (string-trim line) "\\`|" "\\'|") "|")))
+
+(defun etaf-manual-check--unquote-cell (cell)
+  "Return CELL without surrounding Markdown code ticks."
+  (string-trim cell "`" "`"))
+
+(defun etaf-manual-check--version-tables (book facts)
+  "Check package/version tables in BOOK against the entry versions in FACTS.
+A row such as `| \`etaf\` | 0.2.3 | ... |' must give the version in the
+package's entry header.  The first two columns of a table are recognized
+from the header, so a version table cannot drift without failing the gate."
+  (let ((versions (plist-get facts :versions)))
+    (dolist (chapter (plist-get book :chapters))
+      (when-let* ((text (etaf-manual-check--chapter-text chapter)))
+        (let ((line 0) (header nil))
+          (dolist (raw (split-string text "\n"))
+            (setq line (1+ line))
+            (cond
+             ((not (string-match-p "\\`[ \t]*|" raw))
+              (setq header nil))
+             ((null header)
+              (let ((cells (etaf-manual-check--table-cells raw)))
+                (when (and (>= (length cells) 2)
+                           (cl-some (lambda (pair)
+                                      (and (string= (nth 0 cells) (car pair))
+                                           (string= (nth 1 cells) (cdr pair))))
+                                    etaf-manual-check--version-table-headers))
+                  (setq header t))))
+             (t
+              (let* ((cells (etaf-manual-check--table-cells raw))
+                     (name (and (>= (length cells) 2)
+                                (etaf-manual-check--unquote-cell (nth 0 cells))))
+                     (version (and (>= (length cells) 2)
+                                   (etaf-manual-check--unquote-cell (nth 1 cells))))
+                     (expected (and name (cdr (assoc name versions)))))
+                (when (and expected
+                           (string-match-p "\\`[0-9]+\\(?:\\.[0-9]+\\)+\\'" version)
+                           (not (equal version expected)))
+                  (etaf-manual-check--problem
+                   (etaf-manual-check--label chapter) line
+                   "version table gives %s %s, but its entry header is %s"
+                   name version expected)))))))))))
+
 (defun etaf-manual-check--translations (books)
   "Check that every language in BOOKS has the structure of the first."
   (let ((reference (car books)))
@@ -663,6 +713,7 @@ Return non-nil when every package loaded; each failure is reported."
     (dolist (book books)
       (let ((defined (etaf-manual-check--definitions book facts)))
         (etaf-manual-check--references book facts defined)
+        (etaf-manual-check--version-tables book facts)
         (etaf-manual-check--generated book)
         (etaf-manual-check--orphans book)
         (etaf-manual-check--appendices book facts)

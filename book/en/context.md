@@ -56,7 +56,7 @@ Return the nearest provided value for KEY.
 
 **Returns.** The nearest provided value, or DEFAULT when the key is absent.
 
-**Errors.** `error→ etaf-context-error` with the message `"Context keys must be stable symbols: %S"` when KEY is not a stable symbol, and with the message `"Missing EAF Context dependency: %S"` when REQUIRED-P is non-nil and the key is absent from the whole chain. A failing lookup changes nothing.
+**Errors.** `error→ etaf-context-error` with the message `"Context keys must be stable symbols: %S"` when KEY is not a stable symbol, and with the message `"Missing ETAF Context dependency: %S"` when REQUIRED-P is non-nil and the key is absent from the whole chain. A failing lookup changes nothing.
 
 **Example.** A field label falls back to a default currency.
 
@@ -128,12 +128,12 @@ An injection is one hash-table lookup per frame visited, so its cost is proporti
 
 #### Error: etaf-context-error
 
-Invalid EAF Context operation. It is signaled when a Context operation is malformed or a required dependency is missing. Catch this condition with `condition-case`; failed calls do not return a value. Its parent condition is `error`, and its data is a list holding one formatted message string.
+Invalid ETAF Context operation. It is signaled when a Context operation is malformed or a required dependency is missing. Catch this condition with `condition-case`; failed calls do not return a value. Its parent condition is `error`, and its data is a list holding one formatted message string.
 
 | Message | Cause |
 | --- | --- |
 | `"Context keys must be stable symbols: %S"` | A KEY that is a keyword, nil, t, a string or another non-symbol object, in `etaf-provide` or `etaf-inject` |
-| `"Missing EAF Context dependency: %S"` | `etaf-inject` with a non-nil REQUIRED-P for a key absent from the whole chain |
+| `"Missing ETAF Context dependency: %S"` | `etaf-inject` with a non-nil REQUIRED-P for a key absent from the whole chain |
 
 The Theme functions in [Component Styles and Themes](component-styles-and-themes.md) use the same condition for their input validation; that chapter lists their messages.
 

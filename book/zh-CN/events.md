@@ -371,7 +371,7 @@ RET 或 SPC 的键盘激活与显式 `etaf-dispatch-event` 不产生指针状态
 
 #### Error: etaf-event-error
 
-Invalid ETAF Event。当事件操作因事件上下文或目标非法而无法执行时抛出。用 `condition-case` 捕获这个条件；失败的调用不返回值。它的父条件是 `error`，数据是描述违规的值列表。
+消息为 "Invalid ETAF Event"。当事件操作因事件上下文或目标非法而无法执行时抛出。用 `condition-case` 捕获这个条件；失败的调用不返回值。它的父条件是 `error`，数据是描述违规的值列表。
 
 | 数据 | 原因 |
 | --- | --- |

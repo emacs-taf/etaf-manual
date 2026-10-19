@@ -2,11 +2,11 @@
 
 本书是 ETAF 的参考手册。ETAF 是在 Emacs 中构建文本应用的框架。本书描述框架各包的每一个公共接口：每个函数、宏、变量、属性和组件做什么，事情按什么顺序发生，哪里可能失败，失败后留下什么状态。本书也讲清框架如何工作，包括数据流、时序、不变式和代价，方便开发者扩展和诊断框架。这些内容一律通过概念和公共接口来讲：内部函数和数据结构任何版本都可能改变，本书不点名它们。
 
-本书按子系统组织，不按包组织。样式、焦点这类横跨多个包的子系统只在一处讲，每个定义条目标明它属于哪个包。本书不是教程：它假定你熟悉 Emacs Lisp，需要的是精确的答案。
+本书按子系统组织，不按包组织。样式、焦点这类横跨多个包的子系统只在一处讲，每个定义条目标属于恰好一个包；所属包由「层与稳定性」一节说明。本书不是教程：它假定你熟悉 Emacs Lisp，需要的是精确的答案。
 
 ## 安装
 
-这些包要求 Emacs 29.1 或更新版本。官方 package.el 包源是 [https://etaf.top/packages/](https://etaf.top/packages/)。源码包由 Emacs 在本地编译；使用框架和组件库不需要 Git、Python、系统编译器或 Pi，安装也不替换用户配置。原生编译是可选能力。SQLite 另需 Emacs 本身具备支持，即 `sqlite-available-p` 返回非 nil；仅安装 sqlite3 可执行程序并不够。图形媒体需要图形 frame 及对应的 Emacs 图像支持。
+除 ECSS 外，这些包要求 Emacs 29.1 或更新版本；ECSS 单独支持 28.1。官方 package.el 包源是 [https://etaf.top/packages/](https://etaf.top/packages/)。源码包由 Emacs 在本地编译；使用框架和组件库不需要 Git、Python、系统编译器或 Pi，安装也不替换用户配置。原生编译是可选能力。SQLite 另需 Emacs 本身具备支持，即 `sqlite-available-p` 返回非 nil；仅安装 sqlite3 可执行程序并不够。图形媒体需要图形 frame 及对应的 Emacs 图像支持。
 
 以下代码只需执行一次，然后选择组件画廊或其他受支持目标：
 
@@ -201,7 +201,7 @@
 
 ## 版本
 
-This edition describes `ecss 0.1.0`、`ekp 1.0.1`、`ebox 3.0.2`、`etaf 0.2.3`、`etaf-ui 0.1.3` 和 `etaf-db 0.1.0`。本书与代码一同维护：本书已覆盖的包有公共接口缺少条目、签名与代码不符、正文点名了非公共符号，或上面的版本与包不符时，构建检查都会失败。
+本版描述 `ecss 0.1.0`、`ekp 1.0.1`、`ebox 3.0.2`、`etaf 0.2.3`、`etaf-ui 0.1.3` 和 `etaf-db 0.1.0`。本书与代码一同维护：本书已覆盖的包有公共接口缺少条目、签名与代码不符、正文点名了非公共符号，或上面的版本与包不符时，构建检查都会失败。
 
 ## 在 Emacs 中阅读本手册
 
@@ -214,4 +214,4 @@ This edition describes `ecss 0.1.0`、`ekp 1.0.1`、`ebox 3.0.2`、`etaf 0.2.3`�
 ;; ⇒ reactivity
 ```
 
-本版提供自动生成的[概念索引](concept-index.md)与[符号索引](symbol-index.md)；带 Info 式导航、条目卡片和符号查找的交互式阅读器尚未实现，HTML 版也尚未实现。
+本版提供自动生成的[概念索引](concept-index.md)与[符号索引](symbol-index.md)。`M-x etaf-manual-open` 在 Emacs 中打开阅读器，提供 Info 式章节导航、定义卡片、可运行示例与符号查找；`M-x etaf-manual-lookup` 从任意 buffer 打开某个符号的条目。同一份书源发布为网站 [https://etaf.top](https://etaf.top)，英文在根路径，简体中文在 `/zh-cn/`。

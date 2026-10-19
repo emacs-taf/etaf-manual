@@ -33,16 +33,7 @@ ECSS and Ebox can be used without the packages above them. Ebox suits a package 
 
 <!-- index: dependency direction; Package-Requires -->
 
-Each package declares its requirements in the `Package-Requires` header of its entry file:
-
-| Package | Version | Requires |
-| --- | --- | --- |
-| `ecss` | 0.1.0 | Emacs 28.1 |
-| `ekp` | 1.0.0 | Emacs 29.1 |
-| `ebox` | 3.0.0 | Emacs 29.1, `ecss` 0.1.0 |
-| `etaf` | 0.2.1 | Emacs 29.1, `ebox` 3.0.0, `ecss` 0.1.0 |
-| `etaf-ui` | 0.1.0 | Emacs 29.1, `etaf` 0.2.1, `ebox` 3.0.0 |
-| `etaf-db` | 0.1.0 | Emacs 29.1, `etaf` 0.2.1 |
+Each package declares its requirements in the `Package-Requires` header of its entry file; [Versions and Migration](versions-and-migration.md#versions) lists the version combination this edition documents and the minimum each package requires.
 
 The dependencies point in one direction. In the following figure, an arrow points from a package to the packages that require it:
 

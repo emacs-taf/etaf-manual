@@ -2,11 +2,11 @@
 
 This is the reference manual of ETAF, a framework for building text applications in Emacs. It describes every public interface of the framework packages: what each function, macro, variable, property and component does, in what order things happen, what can fail and what state a failure leaves. It also explains how the framework works, including data flow, ordering, invariants and cost, so that developers can extend it and diagnose it. All of this is explained through concepts and public interfaces: internal functions and data structures may change in any release, and the manual does not name them.
 
-The manual is organized by subsystem, not by package. A subsystem that spans several packages, such as styles or focus, is described in one place, and each definition entry identifies the package that owns it. It is not a tutorial: it assumes that you know Emacs Lisp and want precise answers.
+The manual is organized by subsystem, not by package. A subsystem that spans several packages, such as styles or focus, is described in one place, and each definition entry belongs to exactly one package; the Layers and stability section explains how that owner is determined. It is not a tutorial: it assumes that you know Emacs Lisp and want precise answers.
 
 ## Installation
 
-The packages require Emacs 29.1 or newer. The official package.el archive is [https://etaf.top/packages/](https://etaf.top/packages/). Source-only packages are compiled locally by Emacs; using the framework and catalog does not require Git, Python, a system compiler or Pi, and installation does not replace the user's configuration. Native compilation is optional. SQLite additionally requires an Emacs build for which `sqlite-available-p` returns non-nil; the sqlite3 executable alone is not sufficient. Graphical media require a graphical frame and the relevant Emacs image support.
+All packages except ECSS require Emacs 29.1 or newer; ECSS alone supports 28.1. The official package.el archive is [https://etaf.top/packages/](https://etaf.top/packages/). Source-only packages are compiled locally by Emacs; using the framework and catalog does not require Git, Python, a system compiler or Pi, and installation does not replace the user's configuration. Native compilation is optional. SQLite additionally requires an Emacs build for which `sqlite-available-p` returns non-nil; the sqlite3 executable alone is not sufficient. Graphical media require a graphical frame and the relevant Emacs image support.
 
 Evaluate the following once, then select the component gallery or another supported target:
 
@@ -214,4 +214,4 @@ The `etaf-manual` package provides the manual as data. `etaf-manual-book` return
 ;; ⇒ reactivity
 ```
 
-This edition ships a generated [concept index](concept-index.md) and [symbol index](symbol-index.md); an interactive reader with Info-style navigation, entry cards and symbol lookup is not implemented yet, nor is the HTML edition.
+This edition ships a generated [concept index](concept-index.md) and [symbol index](symbol-index.md). `M-x etaf-manual-open` opens the reader in Emacs, with Info-style section navigation, definition cards, runnable examples and symbol lookup; `M-x etaf-manual-lookup` opens a symbol's entry from any buffer. The same sources are published as a website at [https://etaf.top](https://etaf.top), English at the root and Simplified Chinese under `/zh-cn/`.

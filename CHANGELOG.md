@@ -6,6 +6,13 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
 
 ### Added
 
+- `etaf-ui-qr-paint` and `etaf-ui-qr-login` have definition entries in both
+  languages, so the manual covers etaf-ui 0.1.3 completely again.  The Gallery
+  chapter states that its 63 specimens do not include the QR sign-in panel.
+
+- The `check-book` gate validates package/version tables against the entry
+  headers, so a version column cannot drift while the prose check still passes.
+
 - Scoped `:on-help-open` preparation is documented in both languages, including
   modal boundaries, failure propagation and retained application state on close.
 
@@ -92,6 +99,23 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
 - A gate that checks the book against the provider packages: signatures, public names, versions, links, coverage, translation structure and one line per paragraph. Runnable examples are mounted by the acceptance tests.
 - The gate evaluates every `;; ⇒` result line in an `elisp` block and reports a value the form before it does not return, a result line without a preceding form, and a result value that is no readable datum; a line ending in a `; display` comment describes an object without a stable printed form and is not compared.
 - The Values, Selectors, Style Properties and Component Styles and Themes chapters show one inline figure each, in both languages.
+
+### Fixed
+
+- The Introduction describes the published website and the Emacs reader
+  instead of calling them unimplemented, names the reader commands, states that
+  every definition entry belongs to one package, and notes that ECSS alone
+  supports Emacs 28.1.
+
+- The dependency chapter links to the version appendix instead of repeating a
+  stale version table.  The appendix names its third column "Documented with"
+  and states that each package's `Package-Requires` header holds the minimum.
+
+- The Context condition messages and the focus-root message match the code, and
+  the Chinese error entries quote their English messages instead of starting
+  with an untranslated sentence.
+
+- Version 0.1.5.
 
 ### Changed
 

@@ -33,16 +33,7 @@ ECSS 和 Ebox 可以脱离上层的包单独使用。需要布局和 buffer 渲�
 
 <!-- index: 依赖方向; Package-Requires -->
 
-每个包在入口文件的 `Package-Requires` 头里声明依赖：
-
-| 包 | 版本 | 依赖 |
-| --- | --- | --- |
-| `ecss` | 0.1.0 | Emacs 28.1 |
-| `ekp` | 1.0.0 | Emacs 29.1 |
-| `ebox` | 3.0.0 | Emacs 29.1、`ecss` 0.1.0 |
-| `etaf` | 0.2.1 | Emacs 29.1、`ebox` 3.0.0、`ecss` 0.1.0 |
-| `etaf-ui` | 0.1.0 | Emacs 29.1、`etaf` 0.2.1、`ebox` 3.0.0 |
-| `etaf-db` | 0.1.0 | Emacs 29.1、`etaf` 0.2.1 |
+每个包在入口文件的 `Package-Requires` 头里声明依赖；[版本与迁移](versions-and-migration.md#版本)列出本版记录的版本组合与每个包要求的最低版本。
 
 依赖只朝一个方向。下图中箭头从一个包指向依赖它的包：
 

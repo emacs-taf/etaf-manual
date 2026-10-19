@@ -56,7 +56,7 @@ Context 是「整棵子树共享配置」的机制：面板给它的后代提供
 
 **返回。** 最近提供的值；键缺失时返回 DEFAULT。
 
-**错误。** KEY 不是稳定符号时 `error→ etaf-context-error`，消息为 `"Context keys must be stable symbols: %S"`；REQUIRED-P 非 nil 且整条链都没有该键时，消息为 `"Missing EAF Context dependency: %S"`。查找失败不改变任何东西。
+**错误。** KEY 不是稳定符号时 `error→ etaf-context-error`，消息为 `"Context keys must be stable symbols: %S"`；REQUIRED-P 非 nil 且整条链都没有该键时，消息为 `"Missing ETAF Context dependency: %S"`。查找失败不改变任何东西。
 
 **示例。** 字段标签回退到默认货币。
 
@@ -128,12 +128,12 @@ Context 本身不是响应式源。`etaf-provide` 与 `etaf-inject` 都不记录
 
 #### Error: etaf-context-error
 
-Invalid EAF Context operation。Context 操作格式错误，或必需依赖缺失时抛出。用 `condition-case` 捕获；失败的调用不返回值。父条件是 `error`，数据是含一个格式化消息字符串的列表。
+消息为 "Invalid ETAF Context operation"。Context 操作格式错误，或必需依赖缺失时抛出。用 `condition-case` 捕获；失败的调用不返回值。父条件是 `error`，数据是含一个格式化消息字符串的列表。
 
 | 消息 | 起因 |
 | --- | --- |
 | `"Context keys must be stable symbols: %S"` | `etaf-provide` 或 `etaf-inject` 的 KEY 是 keyword、nil、t、字符串或其它非符号对象 |
-| `"Missing EAF Context dependency: %S"` | `etaf-inject` 的 REQUIRED-P 非 nil，而该键整条链上都不存在 |
+| `"Missing ETAF Context dependency: %S"` | `etaf-inject` 的 REQUIRED-P 非 nil，而该键整条链上都不存在 |
 
 [组件样式与主题](component-styles-and-themes.md)里的 Theme 函数用同一个条件做输入校验；它们的消息由那一章列出。
 

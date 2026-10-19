@@ -274,7 +274,7 @@
 
 #### Error: etaf-observer-error
 
-Invalid ETAF observer operation。当观察者上下文状态以非法值构造或使用时抛出，例如不是函数的 sink、不是整数的身份。用 `condition-case` 捕获这个条件；失败的调用不返回值。它的父条件是 `error`，数据是描述违规的符号列表。
+消息为 "Invalid ETAF observer operation"。当观察者上下文状态以非法值构造或使用时抛出，例如不是函数的 sink、不是整数的身份。用 `condition-case` 捕获这个条件；失败的调用不返回值。它的父条件是 `error`，数据是描述违规的符号列表。
 
 | 数据 | 原因 |
 | --- | --- |

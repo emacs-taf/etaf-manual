@@ -85,14 +85,14 @@ Ebox 用帧实际使用的字体测量文字，所以普通文字不需要特定
 
 每个入口文件都带有 package.el 读取的 `Version` 和 `Package-Requires` 头。一个包的归档包含它的入口文件和 `lisp/` 目录；EKP 的归档还需要包含 `dictionaries/` 和 `native/`。
 
-Commentary 里每条 Function 和 Macro 记录都带一个 autoload 标记：
+Function 与 Macro 记录可以带一个 autoload 标记：
 
 ```elisp
 ;; Function: ekp-c-module-load ()
 ;;;###autoload (autoload 'ekp-c-module-load "ekp" nil t)
 ```
 
-package.el 安装一个包时，会把这些标记收集进这个包的 autoload 文件。这样，每个公共函数和宏在包加载之前就已定义：调用其中任何一个都会先加载入口文件，`ekp-c-module-build` 这样的公共命令也立刻能用 `M-x` 调用。其他种类的记录没有 autoload，使用前要先 require 这个包。源码检出没有 autoload 文件，要直接 require 入口。
+package.el 安装一个包时，会把这些标记收集进这个包的 autoload 文件。`ekp-c-module-build` 这样的公共命令装好就能用 `M-x` 调用。没有标记的公共函数或宏要等包加载后才可用；调用前先 require 这个包。其他种类的记录没有 autoload，同样要先 require。源码检出没有 autoload 文件，要直接 require 入口。
 
 ## 编译
 

@@ -269,6 +269,18 @@ refit 是一次操作、一个结果：测量视口，与已提交值不同时�
 
 **参见。** `ebox-mount-viewport`、`ebox-viewport-settle-delay`。
 
+#### Hook: ebox-display-window-change-functions
+
+窗口变化稳定后，以已挂载缓冲区和它的显示窗口为参数运行的异常钩子。
+
+**语义。** 视口任务在 refit 该缓冲区的挂载之后运行它，条件是这个窗口刚成为缓冲区的显示窗口，或者它的正文像素尺寸自上次为该缓冲区运行以来变了。固定视口让布局保持不变时它照样运行，这正是它与 `ebox-viewport-change-functions` 的区别：跟随窗口而不是跟随挂载画布的状态（页大小、行预算、调用方自己固定的画布高度）在这里重新适配。minibuffer、补全弹窗或回显区借走行时，窗口变矮不算变化，钩子不运行；变高和 frame 缩放是真实几何，会运行。
+
+**返回。** 钩子的返回值被忽略。
+
+**错误。** 出错会中止该 frame 这一批的剩余工作，视口任务在这一批结束后报告错误。
+
+**参见。** `ebox-viewport-change-functions`、`ebox-viewport-settle-delay`。
+
 ## 错误与恢复
 
 <!-- index: 视口错误; 高度不确定; 首次 flush -->

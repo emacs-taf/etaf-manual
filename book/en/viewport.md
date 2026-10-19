@@ -269,6 +269,18 @@ Abnormal hook run with a mounted buffer after its viewport size changed, whether
 
 **See also.** `ebox-mount-viewport`, `ebox-viewport-settle-delay`.
 
+#### Hook: ebox-display-window-change-functions
+
+Abnormal hook run with a mounted buffer and its display window once a window change settles.
+
+**Semantics.** The viewport task runs it after it refit the buffer's mount, when the window became the buffer's display window or its body pixel size changed since the hook last ran for that buffer. It runs even when a fixed viewport kept the layout unchanged, which is what distinguishes it from `ebox-viewport-change-functions`: state that follows the window rather than the mounted canvas — page sizes, row budgets, a canvas height the caller fixes itself — refits here. While the minibuffer, a completion popup or the echo area borrows lines, a shorter window is not a change and the hook does not run; growth and a frame resize are real geometry and do.
+
+**Returns.** The hook's value is ignored.
+
+**Errors.** An error stops the remaining work of that frame's batch and is reported by the viewport task once the batch ends.
+
+**See also.** `ebox-viewport-change-functions`, `ebox-viewport-settle-delay`.
+
 ## Errors and recovery
 
 <!-- index: viewport errors; indefinite height; first flush -->

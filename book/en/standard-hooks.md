@@ -11,6 +11,7 @@ Hooks are the observation points the framework runs at defined moments. All are 
 | [`ebox-after-flush-functions`](incremental-updates-and-publication.md#hook-ebox-after-flush-functions) | A flush actually published, after the observer and the background sync; the buffer shows the new output and geometry is settled. | the buffer | An error in one function does not prevent the others from running. |
 | [`ebox-viewport-change-functions`](viewport.md#hook-ebox-viewport-change-functions) | The viewport size changed, whether by a window resize or `ebox-mount-set-viewport`, once the relayout for the new size has settled. | the buffer | An error in one function does not stop the others. |
 | [`ebox-display-change-functions`](viewport.md#hook-ebox-display-change-functions) | Buffer text scaling has settled and the retained tree has been remeasured, including fixed-size viewports. | the buffer | A callback error is reported by the viewport task; unstarted work remains queued after a quit. |
+| [`ebox-display-window-change-functions`](viewport.md#hook-ebox-display-window-change-functions) | A window change settled and the mount was refit, when the window became the buffer's display window or its body pixel size changed; fixed viewports are notified too, borrowed lines are not. | the buffer and its display window | An error stops the rest of that frame's batch and is reported by the viewport task. |
 
 ## Notes
 

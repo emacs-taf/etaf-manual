@@ -11,6 +11,7 @@
 | [`ebox-after-flush-functions`](incremental-updates-and-publication.md#hook-ebox-after-flush-functions) | 一次 flush 真正发布之后，在观察者与后台同步之后；缓冲区已显示新输出，几何已确定。 | 缓冲区 | 一个函数出错不影响其余函数运行。 |
 | [`ebox-viewport-change-functions`](viewport.md#hook-ebox-viewport-change-functions) | 视口尺寸变化后——窗口缩放或 `ebox-mount-set-viewport`——新尺寸的重排完成时。 | 缓冲区 | 一个函数出错不阻止其余函数。 |
 | [`ebox-display-change-functions`](viewport.md#hook-ebox-display-change-functions) | 缓冲区文本缩放稳定且保留树完成重新测量后，固定尺寸视口也会收到通知。 | 缓冲区 | 回调错误由视口任务报告；中断后未开始的工作留在队列里。 |
+| [`ebox-display-window-change-functions`](viewport.md#hook-ebox-display-window-change-functions) | 窗口变化稳定且挂载已 refit，窗口刚成为缓冲区的显示窗口或其正文像素尺寸变了；固定视口也会收到，借走的行不算。 | 缓冲区和它的显示窗口 | 出错会中止该 frame 这一批的剩余工作，由视口任务报告。 |
 
 ## 说明
 

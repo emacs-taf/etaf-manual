@@ -6,10 +6,6 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
 
 ### Added
 
-- `etaf-ui-qr-paint` and `etaf-ui-qr-login` have definition entries in both
-  languages, so the manual covers etaf-ui 0.1.3 completely again.  The Gallery
-  chapter states that its 63 specimens do not include the QR sign-in panel.
-
 - The `check-book` gate validates package/version tables against the entry
   headers, so a version column cannot drift while the prose check still passes.
 

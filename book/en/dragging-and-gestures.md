@@ -6,9 +6,11 @@ Direct manipulation — moving a panel, resizing a split, scrubbing a slider —
 
 <!-- index: gesture; drag phase; drag payload -->
 
-A drag is a sequence of phases delivered to one handler. Ebox decides the owner when the primary button goes down — the nearest keymap owner under the pointer — and keeps that target for the whole gesture, so moving outside the Host does not hand the drag to whatever is under the pointer now. Each phase arrives as a plist carrying the phase symbol (`start`, `move`, `end`, `cancel` or `edge`), the raw event, the node, the window and buffer, the start and current positions in window pixels, the displacement from the start, a cancellation reason and the `:keyboard` flag for gestures synthesized from keys. An `edge` phase adds `:edges`, the window edges the pointer rests against. Each phase runs in its own reactive event batch and publishes before the next pointer event is read, so a handler that writes a reactive coordinate sees its own committed layout on the next phase instead of lagging one frame behind.
+A drag is a sequence of phases delivered to one handler. Ebox decides the owner when the primary button goes down — the nearest keymap owner under the pointer — and keeps that target for the whole gesture, so moving outside the Host does not hand the drag to whatever is under the pointer now. Each phase arrives as a plist carrying the phase symbol (`start`, `move`, `end`, `cancel` or `edge`), the raw event, the node, the window and buffer, the start and current positions in text-area pixels, the displacement from the start, the pointer's overshoot past the text area, a cancellation reason and the `:keyboard` flag for gestures synthesized from keys. An `edge` phase adds `:edges`, the window edges the pointer rests against or has passed, and `:elapsed`, the seconds since the previous `edge` phase. Each phase runs in its own reactive event batch and publishes before the next pointer event is read, so a handler that writes a reactive coordinate sees its own committed layout on the next phase instead of lagging one frame behind.
 
-A gesture ends in one of two ways. A normal release lands `end`; a gesture whose target becomes unavailable — removed, hidden or disabled — or that is aborted by Escape, another input or an error ends with `cancel` and a `:reason` of `target-unavailable`, `quit`, `input` or `error`. Escape is consumed as part of the cancellation; other input is left for Emacs. Handlers should treat `cancel` as "restore anything you changed optimistically", which is exactly what the shipped example does.
+A gesture ends in one of two ways. A release lands `end`, wherever the pointer is; a gesture whose target becomes unavailable — removed, hidden or disabled — or that is aborted by Escape, another input or an error ends with `cancel` and a `:reason` of `target-unavailable`, `quit`, `input` or `error`. Escape is consumed as part of the cancellation; other input is left for Emacs. Handlers should treat `cancel` as "restore anything you changed optimistically", which is exactly what the shipped example does.
+
+While the button is held the pointer may leave the text area, onto the mode line, another window or past the frame, and the gesture keeps tracking it. `:position` stays at the nearest point of the text area, so `:delta` never describes a place the window cannot show, and `:overshoot` gives the pointer's `(DX . DY)` distance past the text area in pixels: negative to the left and above, positive to the right and below, `(0 . 0)` inside. A release out there ends the gesture with `end` as usual.
 
 The window system can lose a button release; on macOS this happens most often while a tooltip is being shown or hidden. Ebox therefore hides any shown or pending tooltip and suppresses help echo while it tracks a gesture, and it treats a new press of the primary button during an unlocked gesture as the missing release: the gesture ends with `end` at its last position, and the press is then handled as a fresh press. Read the pointer from `:position`, not from `:event`: a native drag or release event starts at the press, and the event of an `end` implied by a new press is that press.
 
@@ -24,7 +26,7 @@ The window system can lose a button release; on macOS this happens most often wh
 
 Dragging past the visible edge of a sheet, list or canvas is how a person reaches content that is not on screen. The engine reports that intent; the application, which owns its viewport, decides what scrolls and how far.
 
-A Host with `:drag-edge` non-nil receives an extra `edge` phase while a drag rests in an edge band of its window. The gesture must have moved from its press; a press that merely rests at the edge reports nothing. The first phase arrives after one `ebox-drag-edge-interval`, then repeats at that cadence while the pointer stays inside `ebox-drag-edge-band` lines or columns of an inside edge. `:edges` names the touched edges in the fixed order `left`, `right`, `top`, `bottom`; a corner names both. Leaving the band or ending the gesture stops the phases, and leaving the window still cancels with `window-left`.
+A Host with `:drag-edge` non-nil receives an extra `edge` phase while a drag rests in or past an edge band of its window. The gesture must have moved from its press; a press that merely rests at the edge reports nothing. The first phase arrives after one `ebox-drag-edge-interval`, then repeats at that cadence while the pointer stays within `ebox-drag-edge-band` lines or columns of an inside edge or beyond that edge. `:edges` names the touched or passed edges in the fixed order `left`, `right`, `top`, `bottom`; a corner names both. Moving back into the interior or ending the gesture stops the phases. `:elapsed` is the wall time in seconds since the previous `edge` phase began, or since the pointer reached the band for the first one; it exceeds the interval when the handler and the publication after it take longer. Together with `:overshoot` it lets a handler scroll by distance and time: faster the further out the pointer is, at a speed that does not depend on how long a redraw takes.
 
 The engine does not scroll. `:position` and `:delta` describe the pointer only, so a handler that scrolls an Ebox scroller with `ebox-node-set-scroll` or `etaf-scroll-by` keeps a content-anchored object under the pointer by adding the scrolled lines and columns to the delta it applies. A model-driven viewport, such as a grid that changes its first visible row, advances that state in the same handler.
 
@@ -35,10 +37,15 @@ The engine does not scroll. `:position` and `:delta` describe the pointer only, 
        (pcase (plist-get gesture :phase)
          ('edge
           (when (memq 'bottom (plist-get gesture :edges))
-            ;; Scroll the application's viewport by one row; the move branch
-            ;; adds the scrolled rows to the delta so the content stays under
-            ;; the pointer.
-            (etaf-scroll-by (etaf-current-runtime) 'list 1)))
+            ;; Scroll faster the further the pointer is past the edge, and by
+            ;; elapsed time so the speed holds however long a redraw takes.
+            ;; The move branch adds the scrolled rows to the delta so the
+            ;; content stays under the pointer.
+            (let* ((past (max 0 (cdr (plist-get gesture :overshoot))))
+                   (rows-per-second (+ 8 (/ past 4.0)))
+                   (rows (max 1 (round (* rows-per-second
+                                          (plist-get gesture :elapsed))))))
+              (etaf-scroll-by (etaf-current-runtime) 'list rows))))
          ((or 'move 'end) (move-content (plist-get gesture :delta))))))
 ```
 
@@ -46,15 +53,15 @@ The engine does not scroll. `:position` and `:delta` describe the pointer only, 
 
 Lines and columns from a window edge where a drag reports edge intent.
 
-**Semantics.** The default is 1, so the last line and the last column of the display window report intent; each axis scales by the frame's character height and width. A larger value widens the band on both axes. The value is read when a gesture starts.
+**Semantics.** The default is 1, so the last line and the last column of the display window report intent; each axis scales by the frame's character height and width. A larger value widens the band on both axes, and a pointer past the edge, outside the window, counts as in the band. The value is read when a gesture starts.
 
 **See also.** `ebox-drag-edge-interval`, `:drag-edge`.
 
 #### Variable: ebox-drag-edge-interval
 
-Seconds between `edge` gestures while a drag rests in the edge band.
+Seconds between `edge` gestures while a drag rests in or past the edge band.
 
-**Semantics.** The default is 0.12. The first `edge` phase arrives one interval after the pointer enters the band, and later phases repeat at this cadence; a handler maps the cadence to whatever scroll step its viewport uses. The value is read when a gesture starts.
+**Semantics.** The default is 0.12. The first `edge` phase arrives one interval after the pointer reaches the band, and later phases repeat at this cadence; `:elapsed` reports the spacing actually observed, which grows when a handler is slower than the interval. A handler maps the cadence to whatever scroll step its viewport uses. The value is read when a gesture starts.
 
 **See also.** `ebox-drag-edge-band`, `:drag-edge`.
 

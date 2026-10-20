@@ -485,11 +485,11 @@ Keep a drag gesture alive across a button release.
 
 #### Property: :drag-edge
 
-Report edge intent while a drag rests in a window edge band.
+Report edge intent while a drag rests in or past a window edge band.
 
 **Arguments.** Any non-nil value enables the phases; nil, the default, leaves the gesture silent.
 
-**Semantics.** While a drag that started on this Host is in progress, has moved away from its press and rests inside `ebox-drag-edge-band` lines or columns of a window edge, Ebox delivers an `edge` phase after `ebox-drag-edge-interval` seconds and repeats it at that cadence until the pointer leaves the band or the gesture ends. `:edges` names the touched edges in the fixed order `left`, `right`, `top`, `bottom`; a corner names both. The phase reports intent only: Ebox does not scroll and does not change `:delta`, and a press resting at the edge without moving reports nothing. Leaving the window still cancels the gesture with `window-left`. The application owns the viewport, the scroll step and how a content-anchored target follows the scroll; see [Dragging and Gestures](dragging-and-gestures.md#edge-intent-and-scrolling).
+**Semantics.** While a drag that started on this Host is in progress, has moved away from its press and rests within `ebox-drag-edge-band` lines or columns of a window edge or beyond it, Ebox delivers an `edge` phase after `ebox-drag-edge-interval` seconds and repeats it at that cadence until the pointer moves back into the interior or the gesture ends. `:edges` names the touched or passed edges in the fixed order `left`, `right`, `top`, `bottom`; a corner names both. The phase reports intent only: Ebox does not scroll and does not change `:delta`, and a press resting at the edge without moving reports nothing. Past the edge, outside the window, the phases continue: `:overshoot` gives the pointer's distance past the text area in pixels and `:elapsed` the seconds since the previous phase, so a handler can scroll faster the further out the pointer is. The application owns the viewport, the scroll step and how a content-anchored target follows the scroll; see [Dragging and Gestures](dragging-and-gestures.md#edge-intent-and-scrolling).
 
 **Example.** `(box :on-drag (lambda (gesture) (when (eq (plist-get gesture :phase) 'edge) (scroll-view (plist-get gesture :edges)))) :drag-edge t ...)`
 

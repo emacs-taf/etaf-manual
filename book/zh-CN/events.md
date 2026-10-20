@@ -48,7 +48,7 @@ Host 为每种事件种类声明一个回调，属性名为 `:on-KIND`，其中 
 
 **参数。** 收一个参数（手势 plist）的函数，或 nil。
 
-**语义。** Ebox 在 Host 上跟踪主键，每个阶段调用处理器一次，plist 含 `:phase`（`start`、`move`、`end`、`cancel` 或 `edge`）、`:event`（原始鼠标事件）、`:window`、`:buffer`、`:start` 与 `:position`（窗口像素 cons）、`:delta`（相对 `:start` 的位移）、取消时的 `:reason`，以及手势来自 `etaf-drag-step` 而非指针时的 `:keyboard`。`edge` 阶段另外带 `:edges`，即指针贴住的窗口边缘。每个阶段各自一次响应式事件批，并在读取下一个指针事件前发布，因此拖拽处理器看到的是每个已提交位置。Ebox 拥有目标保留与跟踪循环：变成禁用的已保留 Host 收到一次终止性的 `cancel`，被移除或卸载的 Host 不再收到任何东西。Host 同时声明 `:on-press` 与 `:on-drag` 时，press 负责键盘激活，拖拽占用主键序列。`:reason` 取值是 `input`、`quit`、`error`、`window-left` 与 `target-unavailable` 之一；Escape 以 `quit` 取消并被消费。`:drag-lock-modifier` 可以让手势跨过按键释放继续存活，`:drag-edge` 增加 `edge` 阶段，为应用自己拥有的滚动报告意图；见它们的 [Host 条目](hosts.md#property-drag-lock-modifier)与[拖拽与手势](dragging-and-gestures.md#边缘意图与滚动)。
+**语义。** Ebox 在 Host 上跟踪主键，每个阶段调用处理器一次，plist 含 `:phase`（`start`、`move`、`end`、`cancel` 或 `edge`）、`:event`（原始鼠标事件）、`:window`、`:buffer`、`:start` 与 `:position`（文本区像素 cons）、`:delta`（相对 `:start` 的位移）、`:overshoot`（指针越出文本区的距离，此时 `:position` 停在文本区内）、取消时的 `:reason`，以及手势来自 `etaf-drag-step` 而非指针时的 `:keyboard`。`edge` 阶段另外带 `:edges`，即指针贴住或越过的窗口边缘，以及 `:elapsed`，即距上一个 `edge` 阶段的秒数。每个阶段各自一次响应式事件批，并在读取下一个指针事件前发布，因此拖拽处理器看到的是每个已提交位置。Ebox 拥有目标保留与跟踪循环：变成禁用的已保留 Host 收到一次终止性的 `cancel`，被移除或卸载的 Host 不再收到任何东西。Host 同时声明 `:on-press` 与 `:on-drag` 时，press 负责键盘激活，拖拽占用主键序列。`:reason` 取值是 `input`、`quit`、`error` 与 `target-unavailable` 之一；离开窗口不会取消手势，在任何地方释放都会结束手势；Escape 以 `quit` 取消并被消费。`:drag-lock-modifier` 可以让手势跨过按键释放继续存活，`:drag-edge` 增加 `edge` 阶段，为应用自己拥有的滚动报告意图；见它们的 [Host 条目](hosts.md#property-drag-lock-modifier)与[拖拽与手势](dragging-and-gestures.md#边缘意图与滚动)。
 
 **返回。** 返回值被忽略。
 

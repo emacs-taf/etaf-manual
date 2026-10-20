@@ -31,7 +31,7 @@ Every documented variable, grouped by the chapter that defines it. Each row link
 | Variable | Purpose |
 | --- | --- |
 | [`ebox-drag-edge-band`](dragging-and-gestures.md#variable-ebox-drag-edge-band) | Lines and columns from a window edge where a drag reports edge intent. |
-| [`ebox-drag-edge-interval`](dragging-and-gestures.md#variable-ebox-drag-edge-interval) | Seconds between `edge` gestures while a drag rests in the edge band. |
+| [`ebox-drag-edge-interval`](dragging-and-gestures.md#variable-ebox-drag-edge-interval) | Seconds between `edge` gestures while a drag rests in or past the edge band. |
 
 ## Keyboard
 

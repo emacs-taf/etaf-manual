@@ -229,9 +229,9 @@ Ebox 让库作者创建原生 keymap，其交互形态与 ETAF 把 Host 回调�
 
 从 OPTIONS 创建原生 keymap。
 
-**参数。** OPTIONS 是一个 plist，键有：`:activate`，零参回调，绑定 RET、return、SPC 以及——没有同时声明拖拽手势时——主鼠标键；`:bindings`，按键描述或向量到零参回调的 alist；`:drag`，逐阶段接收手势的一参回调；`:drag-lock-modifier`，`shift`、`control`、`meta`、`super` 或 `hyper` 之一，让拖拽跨过按键释放继续存活；`:drag-edge`，任何非 nil 值，让拖拽停在窗口边缘带时报告 `edge` 阶段。锁定修饰键需要 `:drag`；格式错误的选项或回调在创建键表时报错。
+**参数。** OPTIONS 是一个 plist，键有：`:activate`，零参回调，绑定 RET、return、SPC 以及——没有同时声明拖拽手势时——主鼠标键；`:bindings`，按键描述或向量到零参回调的 alist；`:drag`，逐阶段接收手势的一参回调；`:drag-lock-modifier`，`shift`、`control`、`meta`、`super` 或 `hyper` 之一，让拖拽跨过按键释放继续存活；`:drag-edge`，任何非 nil 值，让拖拽停在或越过窗口边缘带时报告 `edge` 阶段。锁定修饰键需要 `:drag`；格式错误的选项或回调在创建键表时报错。
 
-**语义。** 返回的 keymap 是普通 Emacs keymap，适用于 Ebox 画在节点上的 `:keymap` 文本属性。激活绑定占用主键序列，使按压既不开始区域选择也不到达全局命令，并且只在释放落在同一个拥有者上时激活；拖拽绑定占用整个主键序列，并通过手势回调转发移动，plist 带阶段、事件、节点、窗口、buffer、起始与当前像素位置、位移以及取消原因。给出 `:drag-edge` 时，回调还会收到带 `:edges` 的 `edge` 阶段；引擎只报告意图，滚动归应用所有，见[拖拽与手势](dragging-and-gestures.md#边缘意图与滚动)。同时有纯按压与序列绑定的键表会拒绝一个序列成为另一个的前缀，与应用键层拒绝「一个键既运行又开启序列」完全一样。ETAF 就用这个原语构建 Host keymap，因此 `:on-press` Host 的行为像 `:activate` 绑定，`:on-drag` Host 像 `:drag` 绑定。
+**语义。** 返回的 keymap 是普通 Emacs keymap，适用于 Ebox 画在节点上的 `:keymap` 文本属性。激活绑定占用主键序列，使按压既不开始区域选择也不到达全局命令，并且只在释放落在同一个拥有者上时激活；拖拽绑定占用整个主键序列，并通过手势回调转发移动，plist 带阶段、事件、节点、窗口、buffer、起始与当前像素位置、位移、指针越出文本区的距离以及取消原因。给出 `:drag-edge` 时，回调还会收到带 `:edges` 与 `:elapsed` 的 `edge` 阶段；引擎只报告意图，滚动归应用所有，见[拖拽与手势](dragging-and-gestures.md#边缘意图与滚动)。同时有纯按压与序列绑定的键表会拒绝一个序列成为另一个的前缀，与应用键层拒绝「一个键既运行又开启序列」完全一样。ETAF 就用这个原语构建 Host keymap，因此 `:on-press` Host 的行为像 `:activate` 绑定，`:on-drag` Host 像 `:drag` 绑定。
 
 **返回。** 新的 keymap。
 

@@ -30,24 +30,34 @@ Render ROWS by COLUMNS fixed cells with stable coordinate identities.
 
 ## The text grid
 
-<!-- index: etaf-text-grid; fixed-width rows; monospace surface -->
+<!-- index: etaf-text-grid; fixed-width rows; monospace surface; scrolling text grid; large row counts -->
 
-#### Component: etaf-text-grid (&key rows columns row-text row-ref label)
+#### Component: etaf-text-grid (&key rows columns row-text row-ref label height ref on-scroll)
 
 Display ROWS fixed text lines, each COLUMNS character columns wide.
 
-**Arguments.** ROWS and COLUMNS are positive integers. ROW-TEXT is a required callback receiving the zero-based row; it returns a single-line string whose display width fits COLUMNS, and short rows are padded with spaces. ROW-REF optionally returns distinct Text Host references for retained content updates — those updates must also fit and pad to COLUMNS, with the callback's state kept in sync. LABEL names the read-only surface (default `"Text grid"`).
+**Arguments.** ROWS and COLUMNS are positive integers. ROW-TEXT is a required callback receiving the zero-based row; it returns a single-line string whose display width fits COLUMNS, and short rows are padded with spaces. ROW-REF optionally returns distinct Text Host references for retained content updates — those updates must also fit and pad to COLUMNS, with the callback's state kept in sync. LABEL names the read-only surface (default `"Text grid"`). HEIGHT, a positive integer or nil (the default), is the number of lines the surface shows in a scrolling viewport. REF names the surface Host for `etaf-scroll-to`, `etaf-scroll-by` and `etaf-scroll-offset`; without it the grid uses an instance-local reference. ON-SCROLL is nil or a function called with the first visible row after the viewport moves.
 
 **Semantics.** Each row keeps a stable identity and its own retained boundary, so a change to one row's text repaints one line instead of the whole surface. The component has no focus targets, input handling, timers or terminal escape interpretation; it is a monospaced display, and wide characters occupy their Emacs display width. Individually retained rows are what a caller with a finer-grained identity uses instead of one big text host.
 
+Without HEIGHT every row is built and shown. With HEIGHT the surface is a scroll Host of HEIGHT lines that builds only the rows near its viewport; two spacers stand for the rows above and below, so the content keeps its full height while the cost of mounting, scrolling and repainting does not depend on ROWS. ROW-TEXT runs only for built rows, and a ref it reads repaints only those rows. When the viewport leaves the built rows the grid rebuilds the rows around it, keeping the keyed rows that remain in range. The wheel, the scroll keys and `etaf-scroll-to`/`etaf-scroll-by` on REF move the viewport; `etaf-scroll-offset` and ON-SCROLL report the first visible row, and `etaf-scroll-to` past the end clamps to the last full viewport. Changing ROWS rebuilds the range: a viewport beyond the new end moves to the last rows. To scroll columns, keep the first column in a ref that ROW-TEXT reads; changing it repaints the visible rows.
+
 **Returns.** A View.
 
-**Errors.** `error→ etaf-component-call-error` when ROWS or COLUMNS is not a positive integer, ROW-TEXT is not a function, ROW-REF is neither a function nor nil, or LABEL is not a string. At render time a row content that is not a string, contains a newline, carriage return or tab, or is wider than COLUMNS signals the same condition naming ROW-TEXT.
+**Errors.** `error→ etaf-component-call-error` when ROWS or COLUMNS is not a positive integer, ROW-TEXT is not a function, ROW-REF is neither a function nor nil, LABEL is not a string, HEIGHT is neither nil nor a positive integer, or ON-SCROLL is neither nil nor a function. At render time a row content that is not a string, contains a newline, carriage return or tab, or is wider than COLUMNS signals the same condition naming ROW-TEXT.
 
 **Example.**
 
 ```elisp
 (etaf-text-grid :rows 24 :columns 80 :row-text (lambda (row) (buffer-line row)))
+```
+
+A long log that scrolls through a 30-line viewport and reports the first visible row:
+
+```elisp
+(etaf-text-grid :rows 1000000 :columns 80 :height 30 :ref 'log
+                :row-text (lambda (row) (format "%7d  entry" row))
+                :on-scroll (lambda (row) (message "Row %d" row)))
 ```
 
 **See also.** `etaf-tile-grid`.

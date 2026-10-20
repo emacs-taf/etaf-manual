@@ -30,24 +30,34 @@
 
 ## 文本网格
 
-<!-- index: etaf-text-grid; fixed-width rows; monospace surface -->
+<!-- index: etaf-text-grid; fixed-width rows; monospace surface; scrolling text grid; large row counts -->
 
-#### Component: etaf-text-grid (&key rows columns row-text row-ref label)
+#### Component: etaf-text-grid (&key rows columns row-text row-ref label height ref on-scroll)
 
 显示 ROWS 个固定文本行，每行 COLUMNS 个字符列宽。
 
-**参数。** ROWS 与 COLUMNS 是正整数。ROW-TEXT 是必需回调，接收从零开始的行号；它返回显示宽度不超过 COLUMNS 的单行字符串，短行用空格补齐。ROW-REF 可选，为每行返回不同的 Text Host 引用以做保留内容更新——那些更新同样必须适配并补齐到 COLUMNS，且与回调状态保持同步。LABEL 命名这个只读表面（默认 `"Text grid"`）。
+**参数。** ROWS 与 COLUMNS 是正整数。ROW-TEXT 是必需回调，接收从零开始的行号；它返回显示宽度不超过 COLUMNS 的单行字符串，短行用空格补齐。ROW-REF 可选，为每行返回不同的 Text Host 引用以做保留内容更新——那些更新同样必须适配并补齐到 COLUMNS，且与回调状态保持同步。LABEL 命名这个只读表面（默认 `"Text grid"`）。HEIGHT 是正整数或 nil（默认），表示表面在滚动视口中显示的行数。REF 命名表面 Host，供 `etaf-scroll-to`、`etaf-scroll-by` 与 `etaf-scroll-offset` 使用；省略时网格使用实例内部引用。ON-SCROLL 是 nil 或函数，视口移动后以第一个可见行调用。
 
 **语义。** 每行保留稳定身份与自己的保留边界，因此一行文本变化只重绘一行而不是整个表面。组件没有焦点目标、输入处理、定时器或终端转义解释；它是等宽展示，宽字符按 Emacs 显示宽度占位。拥有更细粒度身份的调用方用这种逐行保留来替代一个大文本宿主。
 
+没有 HEIGHT 时构建并显示每一行。有 HEIGHT 时表面是 HEIGHT 行的滚动 Host，只构建视口附近的行；两个占位块代表上方与下方的行，所以内容保持完整高度，而挂载、滚动与重绘视口的开销与 ROWS 无关。ROW-TEXT 只为已构建的行运行，它读取的 ref 变化也只重绘这些行。视口离开已构建范围时，网格重建视口周围的行，仍在范围内的带键行保留。滚轮、滚动键以及对 REF 调用 `etaf-scroll-to`/`etaf-scroll-by` 移动视口；`etaf-scroll-offset` 与 ON-SCROLL 报告第一个可见行，`etaf-scroll-to` 越过末尾时停在最后一个完整视口。改变 ROWS 会重建范围：超出新末尾的视口移到最后几行。要横向滚动列，把首列放在 ROW-TEXT 读取的 ref 中；改变它会重绘可见行。
+
 **返回。** 一个 View。
 
-**错误。** ROWS 或 COLUMNS 不是正整数、ROW-TEXT 不是函数、ROW-REF 既不是函数也不是 nil、或 LABEL 不是字符串时报 `error→ etaf-component-call-error`。渲染期行内容不是字符串、含换行、回车或制表符、或宽于 COLUMNS 时报同一条件并点名 ROW-TEXT。
+**错误。** ROWS 或 COLUMNS 不是正整数、ROW-TEXT 不是函数、ROW-REF 既不是函数也不是 nil、LABEL 不是字符串、HEIGHT 既不是 nil 也不是正整数、或 ON-SCROLL 既不是 nil 也不是函数时报 `error→ etaf-component-call-error`。渲染期行内容不是字符串、含换行、回车或制表符、或宽于 COLUMNS 时报同一条件并点名 ROW-TEXT。
 
 **示例。**
 
 ```elisp
 (etaf-text-grid :rows 24 :columns 80 :row-text (lambda (row) (buffer-line row)))
+```
+
+一个在 30 行视口中滚动、并报告第一个可见行的长日志：
+
+```elisp
+(etaf-text-grid :rows 1000000 :columns 80 :height 30 :ref 'log
+                :row-text (lambda (row) (format "%7d  entry" row))
+                :on-scroll (lambda (row) (message "Row %d" row)))
 ```
 
 **参见。** `etaf-tile-grid`。

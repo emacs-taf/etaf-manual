@@ -209,6 +209,16 @@
 
 **返回。** 分发结果。
 
+#### Function: etaf-sheet-cell-at (runtime ref x y)
+
+返回已挂载 RUNTIME 的表格 REF 中像素 X、Y 处的单元格 `(ROW . COL)`。
+
+**参数。** X 与 Y 是窗口像素，与指针手势报告的值相同。REF 指定表格。
+
+**语义。** 位置落在表格边框区域或表格之外时返回 nil，应用据此区分「按在单元格上」与「按在旁边的边框上」，用于右键菜单、提示或拖放目标。表格自身的按压使用同一套映射，GUI 检查脚本 `scripts/etaf-ui-sheet-gui.el` 会在已挂载的表格上验证它。
+
+**返回。** 行列组成的 cons，或 nil。
+
 #### Function: etaf-sheet-scroll (runtime &optional ref lines)
 
 把已挂载 RUNTIME 的表格 REF 滚动 LINES 行，负数向上。

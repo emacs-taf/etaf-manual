@@ -209,6 +209,16 @@ Scroll the sheet REF of mounted RUNTIME so its cursor cell is visible.
 
 **Returns.** The dispatch result.
 
+#### Function: etaf-sheet-cell-at (runtime ref x y)
+
+Return the cell `(ROW . COL)` of the sheet REF in mounted RUNTIME at X and Y.
+
+**Arguments.** X and Y are window pixels, the same values a pointer gesture reports. REF names the sheet.
+
+**Semantics.** The result is nil when the position belongs to the sheet's chrome or lies outside it, so an application can tell a press on a cell from one beside it, for a context menu, a tooltip or a drop target. The sheet's own presses use the same mapping, which the GUI check `scripts/etaf-ui-sheet-gui.el` verifies against a mounted sheet.
+
+**Returns.** A cons of the row and column, or nil.
+
 #### Function: etaf-sheet-scroll (runtime &optional ref lines)
 
 Scroll the sheet REF of mounted RUNTIME by LINES, negative upwards.

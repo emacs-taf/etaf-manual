@@ -1,20 +1,59 @@
 # 拖拽与手势
 
-直接操作——移动面板、缩放分栏、拖动滑块——与按钮按压建立在同一套事件机制上。Host 声明 `:on-drag`；Ebox 跟踪主键并逐阶段送出手势；ETAF 为每个阶段各开一次响应式批处理。框架在此之上加了两样应用不该自己重建的东西：每个指针手势的键盘等价操作，以及把手势位移变成调用者所有几何的 Behavior。本章把整个手势契约讲完：阶段与载荷、拖拽锁定、键盘路径、受控几何 Behavior 与随框架附带的缩放示例。[事件](events.md#property-on-drag)定义 `:on-drag` 属性及其载荷，[Host](hosts.md#property-drag-lock-modifier)定义锁定修饰键，[Action、Behavior 与错误边界](actions-behaviors-and-error-boundaries.md)定义 `etaf-draggable`、`etaf-resizable` 与它们的受控版本。
+直接操作——移动面板、缩放分栏、拖动滑块——与按钮按压建立在同一套事件机制上。Host 声明 `:on-drag`；Ebox 跟踪主键并逐阶段送出手势；ETAF 为每个阶段各开一次响应式批处理。框架在此之上加了两样应用不该自己重建的东西：每个指针手势的键盘等价操作，以及把手势位移变成调用者所有几何的 Behavior。本章把整个手势契约讲完：阶段与载荷、拖拽锁定、供应用自己滚动用的边缘意图、键盘路径、受控几何 Behavior 与随框架附带的缩放示例。[事件](events.md#property-on-drag)定义 `:on-drag` 属性及其载荷，[Host](hosts.md#property-drag-lock-modifier)定义锁定修饰键，[Action、Behavior 与错误边界](actions-behaviors-and-error-boundaries.md)定义 `etaf-draggable`、`etaf-resizable` 与它们的受控版本。
 
 ## 手势阶段与载荷
 
 <!-- index: 手势; 拖拽阶段; 拖拽载荷 -->
 
-一次拖拽是一串阶段，全部交给同一个处理器。主键按下时 Ebox 决定拥有者——指针下最近的 keymap 拥有者——并为整个手势保留这个目标，因此移出 Host 不会把拖拽交给指针现在下方的东西。每个阶段以一个 plist 到达，含阶段符号（`start`、`move`、`end` 或 `cancel`）、原始事件、节点、窗口与 buffer、窗口像素的起始与当前位置、相对起始的位移、取消原因，以及由按键合成的手势上的 `:keyboard` 标志。每个阶段各自一次响应式批处理，并在读取下一个指针事件前发布，因此写入响应式坐标的处理器在下一阶段看到的是自己已提交的布局，而不是慢一帧。
+一次拖拽是一串阶段，全部交给同一个处理器。主键按下时 Ebox 决定拥有者——指针下最近的 keymap 拥有者——并为整个手势保留这个目标，因此移出 Host 不会把拖拽交给指针现在下方的东西。每个阶段以一个 plist 到达，含阶段符号（`start`、`move`、`end`、`cancel` 或 `edge`）、原始事件、节点、窗口与 buffer、窗口像素的起始与当前位置、相对起始的位移、取消原因，以及由按键合成的手势上的 `:keyboard` 标志。`edge` 阶段另带 `:edges`，即指针贴住的窗口边缘。每个阶段各自一次响应式批处理，并在读取下一个指针事件前发布，因此写入响应式坐标的处理器在下一阶段看到的是自己已提交的布局，而不是慢一帧。
 
-手势以两种方式之一结束。正常释放落 `end`；目标变得不可用——被移除、隐藏或禁用——或被 Escape、其他输入或错误中止的手势以 `cancel` 结束，`:reason` 是 `target-unavailable`、`quit`、`input` 或 `error`。处理器应把 `cancel` 当作「把乐观改动还原」，随附示例正是这么做的。
+手势以两种方式之一结束。正常释放落 `end`；目标变得不可用（被移除、隐藏或禁用），或者被 Escape、其他输入或错误中止的手势以 `cancel` 结束，`:reason` 是 `target-unavailable`、`quit`、`input` 或 `error`。Escape 在取消时被消费，其他输入留给 Emacs。处理器应把 `cancel` 当作「把乐观改动还原」，随附示例正是这么做的。
 
 ## 拖拽锁定
 
 <!-- index: 拖拽锁定; 点击后拖拽 -->
 
 `:drag-lock-modifier` 让手势跨过按键释放继续存活。手势开始时按住该修饰键时，释放按钮不会结束手势：它继续跟踪指针（此时没有按住的按钮），直到下一次主键按下结束它，或 Escape 取消它。点击后拖拽因此合成一个手势，缩放把手在快速点击之后仍然跟着指针，就是这样实现的。修饰键与 `:on-drag` 一起声明在 Host 上，没有拖拽处理器的锁定修饰键在 Host 提交时被拒绝。随附示例用 `shift`，让这个行为可见且需要主动选择。
+
+## 边缘意图与滚动
+
+<!-- index: 边缘意图; 自动滚动; 拖拽边缘 -->
+
+把内容拖到表格、列表或画布的可见边缘之外，是人够到屏幕外内容的方式。引擎报告这个意图；视口归应用所有，滚什么、滚多远由应用决定。
+
+`:drag-edge` 非 nil 的 Host 在拖拽停在窗口边缘带时收到额外的 `edge` 阶段。手势必须已经从按压点移动过；只在边缘按住不动不会报告。第一个阶段在一个 `ebox-drag-edge-interval` 之后到达，之后只要指针停在内侧边缘 `ebox-drag-edge-band` 行或列的范围内，就按这个节奏重复。`:edges` 按固定顺序 `left`、`right`、`top`、`bottom` 给出贴住的边缘；角落会同时给出两个。离开边缘带或结束手势都会停止这些阶段，离开窗口仍以 `window-left` 取消。
+
+引擎不滚动。`:position` 与 `:delta` 只描述指针，因此用 `ebox-node-set-scroll` 或 `etaf-scroll-by` 滚动 Ebox 滚动器时，处理器要把滚过的行与列加到自己应用的位移上，内容锚定的对象才会留在指针下。模型驱动的视口（例如靠改变首个可见行来滚动的表格）在同一个处理器里推进自己的状态。
+
+```elisp
+(box :drag-edge t
+     :on-drag
+     (lambda (gesture)
+       (pcase (plist-get gesture :phase)
+         ('edge
+          (when (memq 'bottom (plist-get gesture :edges))
+            ;; 把应用视口滚一行；move 分支会把滚过的行加到位移里，
+            ;; 内容因此留在指针下。
+            (etaf-scroll-by (etaf-current-runtime) 'list 1)))
+         ((or 'move 'end) (move-content (plist-get gesture :delta))))))
+```
+
+#### Variable: ebox-drag-edge-band
+
+拖拽报告边缘意图时，距窗口边缘的行数与列数。
+
+**语义。** 默认是 1，也就是显示窗口的最后一行与最后一列会报告意图；每个轴按 frame 的字符高与字符宽换算。更大的值会同时加宽两个轴上的边缘带。手势开始时读取该值。
+
+**参见。** `ebox-drag-edge-interval`、`:drag-edge`。
+
+#### Variable: ebox-drag-edge-interval
+
+拖拽停在边缘带期间，两次 `edge` 手势之间的秒数。
+
+**语义。** 默认是 0.12。指针进入边缘带满一个间隔后送出第一个 `edge` 阶段，之后按这个节奏重复；处理器把节奏映射成自己视口的滚动步长。手势开始时读取该值。
+
+**参见。** `ebox-drag-edge-band`、`:drag-edge`。
 
 ## 键盘等价操作
 
@@ -74,4 +113,4 @@
 
 <!-- index: 手势错误; 取消 -->
 
-手势失败遵循阶段模型。处理器报错会让手势以 `cancel` 结束，`:reason` 为 `error`，错误在该阶段的批处理排空后传播，剩余阶段不再运行。目标在手势中途消失会产生终止性的 `cancel`，`:reason` 为 `target-unavailable`，这是框架告诉处理器释放已获取资源的方式。锁定手势期间按 Escape 产生 `:reason` 为 `quit` 的 `cancel`。受控 Behavior 在每次 `cancel` 时丢弃起点，因此最安全的处理器模式就是示例用的那种：`start` 时记录起始值，`move` 与 `end` 时写入移动后的值，`cancel` 时还原记录。`etaf-drag-step` 先校验参数，报 `etaf-event-error` 而不是合成一个坏手势。
+手势失败遵循阶段模型。处理器报错会让手势以 `cancel` 结束，`:reason` 为 `error`，错误在该阶段的批处理排空后传播，剩余阶段不再运行。目标在手势中途消失会产生终止性的 `cancel`，`:reason` 为 `target-unavailable`，这是框架告诉处理器释放已获取资源的方式。Escape 会让锁定手势与普通手势都产生 `:reason` 为 `quit` 的 `cancel`。受控 Behavior 在每次 `cancel` 时丢弃起点，因此最安全的处理器模式就是示例用的那种：`start` 时记录起始值，`move` 与 `end` 时写入移动后的值，`cancel` 时还原记录。`etaf-drag-step` 先校验参数，报 `etaf-event-error` 而不是合成一个坏手势。

@@ -483,6 +483,18 @@ Host 的鼠标指针形状。
 
 **参见。** [拖拽与手势](dragging-and-gestures.md)。
 
+#### Property: :drag-edge
+
+拖拽停在窗口边缘带里时报告边缘意图。
+
+**参数。** 任何非 nil 值启用这些阶段；nil 是默认值，手势保持安静。
+
+**语义。** 从这个 Host 开始的拖拽进行中、已经离开按压点移动过，并且停在距窗口内侧边缘 `ebox-drag-edge-band` 行或列的范围内时，Ebox 在 `ebox-drag-edge-interval` 秒后送出一个 `edge` 阶段，之后按同一间隔重复，直到指针离开边缘带或手势结束。`:edges` 按固定顺序给出贴住的边缘：`left`、`right`、`top`、`bottom`；角落会同时给出两个。该阶段只报告意图：Ebox 不滚动，也不修改 `:delta`；在边缘按下却没有移动时什么也不报告。移出窗口仍以 `window-left` 取消手势。视口、滚动步长以及内容锚定目标如何跟随滚动都归应用所有；见[拖拽与手势](dragging-and-gestures.md#边缘意图与滚动)。
+
+**示例。** `(box :on-drag (lambda (gesture) (when (eq (plist-get gesture :phase) 'edge) (scroll-view (plist-get gesture :edges)))) :drag-edge t ...)`
+
+**参见。** [拖拽与手势](dragging-and-gestures.md#边缘意图与滚动)、`:on-drag`、`:drag-lock-modifier`。
+
 #### Property: :hover-group
 
 让多个 Host 共享一个悬停状态。

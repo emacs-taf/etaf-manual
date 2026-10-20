@@ -26,6 +26,13 @@ Every documented variable, grouped by the chapter that defines it. Each row link
 | [`ebox-swipe-distance`](scrolling.md#variable-ebox-swipe-distance) | Horizontal pixels a gesture travels before it counts as a swipe. |
 | [`ebox-swipe-quiet`](scrolling.md#variable-ebox-swipe-quiet) | Seconds without horizontal wheel events that end a swipe gesture; a direction change also ends it immediately. |
 
+## Dragging
+
+| Variable | Purpose |
+| --- | --- |
+| [`ebox-drag-edge-band`](dragging-and-gestures.md#variable-ebox-drag-edge-band) | Lines and columns from a window edge where a drag reports edge intent. |
+| [`ebox-drag-edge-interval`](dragging-and-gestures.md#variable-ebox-drag-edge-interval) | Seconds between `edge` gestures while a drag rests in the edge band. |
+
 ## Keyboard
 
 | Variable | Purpose |

@@ -1,20 +1,60 @@
 # Dragging and Gestures
 
-Direct manipulation — moving a panel, resizing a split, scrubbing a slider — is built from the same event machinery as a button press. A Host declares `:on-drag`; Ebox tracks the primary button and delivers the gesture phase by phase; ETAF runs each phase in its own reactive batch. On top of that, the framework adds two things applications should not rebuild: a keyboard equivalent for every pointer gesture, and Behaviors that turn gesture deltas into caller-owned geometry. This chapter describes the gesture contract as a whole, the drag lock, the keyboard path, the controlled geometry Behaviors and the shipped resize example. [Events](events.md#property-on-drag) defines the `:on-drag` property and its payload, [Hosts](hosts.md#property-drag-lock-modifier) the lock modifier, and [Actions, Behaviors and Error Boundaries](actions-behaviors-and-error-boundaries.md) the `etaf-draggable` and `etaf-resizable` Behaviors and their controlled variants.
+Direct manipulation — moving a panel, resizing a split, scrubbing a slider — is built from the same event machinery as a button press. A Host declares `:on-drag`; Ebox tracks the primary button and delivers the gesture phase by phase; ETAF runs each phase in its own reactive batch. On top of that, the framework adds two things applications should not rebuild: a keyboard equivalent for every pointer gesture, and Behaviors that turn gesture deltas into caller-owned geometry. This chapter describes the gesture contract as a whole, the drag lock, edge intent for application-owned scrolling, the keyboard path, the controlled geometry Behaviors and the shipped resize example. [Events](events.md#property-on-drag) defines the `:on-drag` property and its payload, [Hosts](hosts.md#property-drag-lock-modifier) the lock modifier, and [Actions, Behaviors and Error Boundaries](actions-behaviors-and-error-boundaries.md) the `etaf-draggable` and `etaf-resizable` Behaviors and their controlled variants.
 
 ## Gesture phases and the payload
 
 <!-- index: gesture; drag phase; drag payload -->
 
-A drag is a sequence of phases delivered to one handler. Ebox decides the owner when the primary button goes down — the nearest keymap owner under the pointer — and keeps that target for the whole gesture, so moving outside the Host does not hand the drag to whatever is under the pointer now. Each phase arrives as a plist carrying the phase symbol (`start`, `move`, `end` or `cancel`), the raw event, the node, the window and buffer, the start and current positions in window pixels, the displacement from the start, a cancellation reason and the `:keyboard` flag for gestures synthesized from keys. Each phase runs in its own reactive event batch and publishes before the next pointer event is read, so a handler that writes a reactive coordinate sees its own committed layout on the next phase instead of lagging one frame behind.
+A drag is a sequence of phases delivered to one handler. Ebox decides the owner when the primary button goes down — the nearest keymap owner under the pointer — and keeps that target for the whole gesture, so moving outside the Host does not hand the drag to whatever is under the pointer now. Each phase arrives as a plist carrying the phase symbol (`start`, `move`, `end`, `cancel` or `edge`), the raw event, the node, the window and buffer, the start and current positions in window pixels, the displacement from the start, a cancellation reason and the `:keyboard` flag for gestures synthesized from keys. An `edge` phase adds `:edges`, the window edges the pointer rests against. Each phase runs in its own reactive event batch and publishes before the next pointer event is read, so a handler that writes a reactive coordinate sees its own committed layout on the next phase instead of lagging one frame behind.
 
-A gesture ends in one of two ways. A normal release lands `end`; a gesture whose target becomes unavailable — removed, hidden or disabled — or that is aborted by Escape, another input or an error ends with `cancel` and a `:reason` of `target-unavailable`, `quit`, `input` or `error`. Handlers should treat `cancel` as "restore anything you changed optimistically", which is exactly what the shipped example does.
+A gesture ends in one of two ways. A normal release lands `end`; a gesture whose target becomes unavailable — removed, hidden or disabled — or that is aborted by Escape, another input or an error ends with `cancel` and a `:reason` of `target-unavailable`, `quit`, `input` or `error`. Escape is consumed as part of the cancellation; other input is left for Emacs. Handlers should treat `cancel` as "restore anything you changed optimistically", which is exactly what the shipped example does.
 
 ## The drag lock
 
 <!-- index: drag lock; click-then-drag -->
 
 `:drag-lock-modifier` makes a gesture survive the button release. When the modifier is held as the drag starts, releasing the button does not end the gesture: it keeps tracking the pointer, now with no button held, until the next primary press finishes it or Escape cancels it. That turns a click-then-drag sequence into one gesture, which is how a resize handle stays attached to the pointer after a quick click. The modifier is declared on the Host alongside `:on-drag`, and a lock modifier without a drag handler is rejected when the Host commits. The shipped example uses `shift` so the behavior is visible and opt-in.
+
+## Edge intent and scrolling
+
+<!-- index: edge intent; auto-scroll; drag edge -->
+
+Dragging past the visible edge of a sheet, list or canvas is how a person reaches content that is not on screen. The engine reports that intent; the application, which owns its viewport, decides what scrolls and how far.
+
+A Host with `:drag-edge` non-nil receives an extra `edge` phase while a drag rests in an edge band of its window. The gesture must have moved from its press; a press that merely rests at the edge reports nothing. The first phase arrives after one `ebox-drag-edge-interval`, then repeats at that cadence while the pointer stays inside `ebox-drag-edge-band` lines or columns of an inside edge. `:edges` names the touched edges in the fixed order `left`, `right`, `top`, `bottom`; a corner names both. Leaving the band or ending the gesture stops the phases, and leaving the window still cancels with `window-left`.
+
+The engine does not scroll. `:position` and `:delta` describe the pointer only, so a handler that scrolls an Ebox scroller with `ebox-node-set-scroll` or `etaf-scroll-by` keeps a content-anchored object under the pointer by adding the scrolled lines and columns to the delta it applies. A model-driven viewport, such as a grid that changes its first visible row, advances that state in the same handler.
+
+```elisp
+(box :drag-edge t
+     :on-drag
+     (lambda (gesture)
+       (pcase (plist-get gesture :phase)
+         ('edge
+          (when (memq 'bottom (plist-get gesture :edges))
+            ;; Scroll the application's viewport by one row; the move branch
+            ;; adds the scrolled rows to the delta so the content stays under
+            ;; the pointer.
+            (etaf-scroll-by (etaf-current-runtime) 'list 1)))
+         ((or 'move 'end) (move-content (plist-get gesture :delta))))))
+```
+
+#### Variable: ebox-drag-edge-band
+
+Lines and columns from a window edge where a drag reports edge intent.
+
+**Semantics.** The default is 1, so the last line and the last column of the display window report intent; each axis scales by the frame's character height and width. A larger value widens the band on both axes. The value is read when a gesture starts.
+
+**See also.** `ebox-drag-edge-interval`, `:drag-edge`.
+
+#### Variable: ebox-drag-edge-interval
+
+Seconds between `edge` gestures while a drag rests in the edge band.
+
+**Semantics.** The default is 0.12. The first `edge` phase arrives one interval after the pointer enters the band, and later phases repeat at this cadence; a handler maps the cadence to whatever scroll step its viewport uses. The value is read when a gesture starts.
+
+**See also.** `ebox-drag-edge-band`, `:drag-edge`.
 
 ## Keyboard equivalents
 
@@ -74,4 +114,4 @@ Mount a fixed-text resize example, returning BUFFER-OR-NAME (default `*ETAF Reta
 
 <!-- index: gesture errors; cancellation -->
 
-Gesture failures follow from the phase model. A handler that signals ends the gesture with a `cancel` whose reason is `error`, and the error propagates after that phase's batch drains; the remaining phases do not run. A target that disappears mid-gesture produces a terminal `cancel` with `target-unavailable`, which is the framework's way of telling the handler to release anything it acquired. Escape during a locked gesture produces `cancel` with `quit`. The controlled Behaviors drop their origin on every `cancel`, so the safest handler pattern is the one the example uses: record the starting value on `start`, write the moved value on `move` and `end`, and restore the recording on `cancel`. `etaf-drag-step` validates its arguments up front and signals `etaf-event-error` rather than synthesizing a broken gesture.
+Gesture failures follow from the phase model. A handler that signals ends the gesture with a `cancel` whose reason is `error`, and the error propagates after that phase's batch drains; the remaining phases do not run. A target that disappears mid-gesture produces a terminal `cancel` with `target-unavailable`, which is the framework's way of telling the handler to release anything it acquired. Escape produces `cancel` with `quit`, for a locked or a plain gesture alike. The controlled Behaviors drop their origin on every `cancel`, so the safest handler pattern is the one the example uses: record the starting value on `start`, write the moved value on `move` and `end`, and restore the recording on `cancel`. `etaf-drag-step` validates its arguments up front and signals `etaf-event-error` rather than synthesizing a broken gesture.

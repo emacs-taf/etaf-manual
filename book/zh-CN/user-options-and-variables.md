@@ -26,6 +26,13 @@
 | [`ebox-swipe-distance`](scrolling.md#variable-ebox-swipe-distance) | 手势在被认定为一划之前走过的水平像素数。 |
 | [`ebox-swipe-quiet`](scrolling.md#variable-ebox-swipe-quiet) | 结束一次滑动所需的无水平滚轮事件秒数；方向改变也立即结束。 |
 
+## 拖拽
+
+| 变量 | 用途 |
+| --- | --- |
+| [`ebox-drag-edge-band`](dragging-and-gestures.md#variable-ebox-drag-edge-band) | 拖拽报告边缘意图时，距窗口边缘的行数与列数。 |
+| [`ebox-drag-edge-interval`](dragging-and-gestures.md#variable-ebox-drag-edge-interval) | 拖拽停在边缘带期间，两次 `edge` 手势之间的秒数。 |
+
 ## 键盘
 
 | 变量 | 用途 |

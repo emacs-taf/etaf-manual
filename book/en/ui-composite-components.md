@@ -1,6 +1,6 @@
 # Composite Components
 
-Two catalog components exist to compose existing contracts rather than introduce new ones. `etaf-date-picker` is the catalog's native text field plus a date contract, and `etaf-command-palette` is a modal dialog around a selectable list. Both are controlled and stateless: the caller owns the value or the command registry, and the components only render and report. [Text Input Controls](ui-text-input-controls.md) defines the field they build on, [Overlays](ui-overlays.md) the dialog, [Navigation and Collections](ui-navigation-and-collections.md) the list, and [UI Overview](ui-overview.md) the shared contract.
+Three catalog components exist to compose existing contracts rather than introduce new ones. `etaf-date-picker` is the catalog's native text field plus a date contract, `etaf-command-palette` is a modal dialog around a selectable list, and `etaf-ui-qr-login` is a modal dialog around a painted code and a status line. All three are controlled and stateless: the caller owns the value, the command registry or the sign-in cycle, and the components only render and report. [Text Input Controls](ui-text-input-controls.md) defines the field they build on, [Overlays](ui-overlays.md) the dialog, [Navigation and Collections](ui-navigation-and-collections.md) the list, and [UI Overview](ui-overview.md) the shared contract. `etaf-ui-qr-paint` turns module rows into the text code the sign-in panel shows.
 
 ## The date picker
 
@@ -53,6 +53,55 @@ Compose a modal Dialog and List for caller-owned command selection.
 ```
 
 **See also.** `etaf-list`, `etaf-dialog`.
+
+## The scanned-code sign-in panel
+
+<!-- index: etaf-ui-qr-paint; etaf-ui-qr-login; scannable code; sign-in panel -->
+
+`etaf-ui-qr-paint` turns module rows into a text code, and `etaf-ui-qr-login` presents that code in a modal sign-in panel.  The application or its backend owns the rows, the request cycle and the account state; neither function reads the network or a file.
+
+#### Function: etaf-ui-qr-paint (rows &optional quiet)
+
+Paint module rows as a scannable code string.
+
+**Arguments.** ROWS is a list of strings of `"0"` and `"1"`; a shorter row is blank past its end.  QUIET, when non-nil, is the number of blank modules drawn on every side; nil uses four.
+
+**Semantics.** Two module rows share one text row through half blocks, so the code stays square in a text cell twice as tall as it is wide.  A pair of set modules becomes a full block, a set upper or lower module becomes that half block, and an empty pair becomes a space.  Every glyph keeps pure black on white in both palettes, because a scanner needs that contrast.  The caller or its backend supplies the rows; the function paints text and contacts nothing.
+
+**Returns.** A string of newline-separated text rows, each glyph carrying the black-on-white face.
+
+**Errors.** `error→ wrong-type-argument` with `(list-of-strings ROWS)` when ROWS is not a list of strings.
+
+**Example.**
+
+```elisp
+(etaf-ui-qr-paint '("111" "101" "111"))
+```
+
+**See also.** `etaf-ui-qr-login`.
+
+#### Component: etaf-ui-qr-login (&key open code status hint on-close)
+
+Show a scanned-code sign-in panel over the calling application.
+
+**Arguments.** OPEN is nil, t, a ref or a computed value; nil (the default) keeps the panel closed, and the caller owns visibility.  CODE is an optional painted-code string or ref, normally from `etaf-ui-qr-paint`; nil shows no code.  STATUS is an optional string or ref for the transport state or the site's own error.  HINT is an optional string explaining the confirmation step.  ON-CLOSE is a required zero-argument function, called while the panel is hidden as well.
+
+**Semantics.** The panel composes `etaf-dialog`, so the page underneath keeps its content, dims once and stays readable, and the panel centers in the application's root canvas.  Mount it as the last child of the application shell rather than in a separate buffer.  The code sizes the panel: the caller paints whatever rows the service returned, so a wider or taller code makes a taller panel.  The status line sits above the code, so a transport message stays visible when a tall code fills the available height.  When the code is taller than the window allows, the panel keeps the window's height and scrolls, so every control stays reachable.  Escape, the header close control and the footer cancel button request ON-CLOSE; covered controls stay blocked while it is open.  The panel's title, close label and default hint are fixed Chinese strings (`扫码登录`, `取消` and `请用手机客户端扫码，并在手机上确认登录。`); only HINT can be replaced.  The caller owns the request cycle (obtaining and polling the code, reloading after confirmation) and the account state; the component sends no request and asks for no credentials.
+
+**Returns.** A View while open; nothing while closed.
+
+**Errors.** `error→ etaf-component-call-error` when OPEN is not nil, t, a ref or a computed value; CODE or STATUS is not nil, a string or a ref; or HINT is not nil or a string.  The composed dialog signals the same condition when ON-CLOSE is missing or not a function.
+
+**Example.**
+
+```elisp
+(etaf-ui-qr-login :open open
+                  :code (etaf-ui-qr-paint rows)
+                  :status status
+                  :on-close (lambda () (setf open nil)))
+```
+
+**See also.** `etaf-ui-qr-paint`, `etaf-dialog`, `etaf-ref`.
 
 ## Markdown document rendering
 
@@ -118,7 +167,8 @@ The condition of a rejected markdown document operation.
 
 - The date picker separates a draft from an error: text that is not yet a complete date is simply not reported, and submitting it signals `user-error` without writing the value; cancelling the session restores the activation value.
 - The palette composes the list's validation: a malformed item list fails the render with `etaf-component-call-error` before any surface appears, and a missing close callback fails the same way.
-- Both components are stateless: a rejected input leaves the caller's value and the mounted instance as they were.
+- The sign-in panel validates its props and composes the dialog's own close-callback check before any surface appears; backend failures belong in STATUS, because the panel sends no request and has no transport error of its own.
+- All three components are stateless: a rejected input leaves the caller's value and the mounted instance as they were.
 
 **See also.** [UI Overview](ui-overview.md#errors-and-recovery).
 

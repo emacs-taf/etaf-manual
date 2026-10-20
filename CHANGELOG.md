@@ -6,6 +6,10 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
 
 ### Added
 
+- `etaf-ui-qr-paint` and `etaf-ui-qr-login` have definition entries in both
+  languages, so the manual covers etaf-ui 0.2.1 completely again.  The Gallery
+  chapter states that its 63 specimens do not include the modal QR sign-in
+  panel.
 - The `check-book` gate validates package/version tables against the entry
   headers, so a version column cannot drift while the prose check still passes.
 
@@ -114,6 +118,9 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
 - Version 0.1.5.
 
 ### Changed
+
+- The version appendix documents etaf-ui 0.2.1, which adds the painted code
+  and the sign-in panel.
 
 - The site home page is a splash page: the icon, the pitch, one aligned
   capability grid and application and game galleries replace the single

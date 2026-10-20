@@ -1,6 +1,6 @@
 # 组合组件
 
-目录里有两个组件存在的意义是组合既有契约而不是引入新契约。`etaf-date-picker` 是目录的原生文本字段加一条日期契约，`etaf-command-palette` 是裹着可选择列表的模态对话框。两者都受控且无状态：值或命令表归调用方所有，组件只负责渲染与报告。[文本输入控件](ui-text-input-controls.md)定义它们所基于的字段，[浮层](ui-overlays.md)定义对话框，[导航与集合](ui-navigation-and-collections.md)定义列表，[UI 组件库总论](ui-overview.md)定义共同契约。
+目录里有三个组件存在的意义是组合既有契约而不是引入新契约。`etaf-date-picker` 是目录的原生文本字段加一条日期契约，`etaf-command-palette` 是裹着可选择列表的模态对话框，`etaf-ui-qr-login` 是裹着画好的代码与状态行的模态对话框。三者都受控且无状态：值、命令表或登录周期归调用方所有，组件只负责渲染与报告。[文本输入控件](ui-text-input-controls.md)定义它们所基于的字段，[浮层](ui-overlays.md)定义对话框，[导航与集合](ui-navigation-and-collections.md)定义列表，[UI 组件库总论](ui-overview.md)定义共同契约。`etaf-ui-qr-paint` 把模块行变成登录面板显示的文字代码。
 
 ## 日期选择器
 
@@ -53,6 +53,55 @@
 ```
 
 **参见。** `etaf-list`、`etaf-dialog`。
+
+## 扫码登录面板
+
+<!-- index: etaf-ui-qr-paint; etaf-ui-qr-login; 可扫描代码; 登录面板 -->
+
+`etaf-ui-qr-paint` 把模块行画成文字代码，`etaf-ui-qr-login` 把代码放进模态登录面板。模块行、请求周期与账号状态都归应用或其后端所有；两者都不读网络或文件。
+
+#### Function: etaf-ui-qr-paint (rows &optional quiet)
+
+把模块行画成可扫描的代码字符串。
+
+**参数。** ROWS 是 `"0"` 与 `"1"` 组成的字符串列表；较短的行在末尾之后视为空白。QUIET 非 nil 时是四周留出的空白模块数；nil 使用 4。
+
+**语义。** 两行模块共用一行文字，用半块字符拼接，所以代码在高度为宽度两倍的文字单元里仍保持方形。一对都置位的模块变成全块，只置位上半或下半的模块变成对应的半块，一对空模块变成空格。两种配色下每个字形都保持纯黑底纯白，因为扫描器需要这个对比度。模块行由调用方或其后端提供；本函数只画文字，不访问任何东西。
+
+**返回。** 由换行分隔的文字行组成的字符串，每个字形都带黑底白字的 face。
+
+**错误。** ROWS 不是字符串列表时报 `error→ wrong-type-argument`，数据为 `(list-of-strings ROWS)`。
+
+**示例。**
+
+```elisp
+(etaf-ui-qr-paint '("111" "101" "111"))
+```
+
+**参见。** `etaf-ui-qr-login`。
+
+#### Component: etaf-ui-qr-login (&key open code status hint on-close)
+
+在调用方应用之上显示扫码登录面板。
+
+**参数。** OPEN 是 nil、t、ref 或 computed；nil（默认）保持面板关闭，可见性归调用方所有。CODE 是可选的画好的代码字符串或 ref，通常来自 `etaf-ui-qr-paint`；nil 不显示代码。STATUS 是可选的字符串或 ref，用于传输状态或站点自己的错误。HINT 是可选字符串，说明确认步骤。ON-CLOSE 是必需的无参函数，面板隐藏时也会被调用。
+
+**语义。** 面板组合 `etaf-dialog`，所以下面的页面保留内容、只调暗一次并保持可读，面板在应用根画布中居中。把它挂成应用外壳的最后一个子节点，不要挂进单独的 buffer。面板由代码决定大小：调用方画出服务返回的模块行，代码越宽或越高，面板就越高。状态行在代码上方，所以代码很高、占满可用高度时传输状态仍然可见。代码比窗口允许的高度更高时，面板保持窗口高度并滚动，所以每个控件仍然可达。Escape、标题栏关闭控件与底部取消按钮都会请求 ON-CLOSE；面板打开时被覆盖的控件保持不可操作。组件的标题、关闭标签与默认提示是固定的中文字符串（`扫码登录`、`取消` 与 `请用手机客户端扫码，并在手机上确认登录。`）；只有 HINT 可以替换。调用方拥有请求周期（取得并轮询代码、确认后重新加载）与账号状态；组件不发请求，也不要凭据。
+
+**返回。** 打开时是一个 View；关闭时什么都不渲染。
+
+**错误。** OPEN 不是 nil、t、ref 或 computed，CODE 或 STATUS 不是 nil、字符串或 ref，或 HINT 不是 nil 或字符串时报 `error→ etaf-component-call-error`；ON-CLOSE 缺失或不是函数时，组合出的对话框报同一个条件。
+
+**示例。**
+
+```elisp
+(etaf-ui-qr-login :open open
+                  :code (etaf-ui-qr-paint rows)
+                  :status status
+                  :on-close (lambda () (setf open nil)))
+```
+
+**参见。** `etaf-ui-qr-paint`、`etaf-dialog`、`etaf-ref`。
 
 ## Markdown 正文渲染
 
@@ -118,7 +167,8 @@ Markdown 文档操作被拒绝时的条件。
 
 - 日期选择器区分草稿与错误：尚不完整的日期文本只是不被报告，提交它报 `user-error` 且不写入值；取消会话恢复激活时的值。
 - 面板组合列表的校验：形式非法的 item 列表在任何表面出现之前就以 `etaf-component-call-error` 失败，缺少关闭回调同样失败。
-- 两个组件都无状态：被拒绝的输入让调用方的值与已挂载实例保持原样。
+- 扫码登录面板在表面出现前校验属性，对话框自带关闭回调校验；后端失败放进 STATUS，因为面板不发请求，也没有自己的传输错误。
+- 三个组件都无状态：被拒绝的输入让调用方的值与已挂载实例保持原样。
 
 **参见。** [UI 组件库总论](ui-overview.md#错误与恢复)。
 

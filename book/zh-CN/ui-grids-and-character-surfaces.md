@@ -128,6 +128,98 @@
 
 **语义。** 选中与悬停都只是绘制——牌的几何与牌堆的布局从不移动——没有提供 Theme 时每个 token 都回退到目录的内置调色板。
 
+## 单元格表格
+
+<!-- index: etaf-sheet; etaf-cell-line; 电子表格; 单元格网格; 列宽; 行高; 选区; 单元格编辑 -->
+
+#### Function: etaf-cell-line (cells &key (stripe 'px) border-color rule rule-color leading-edge)
+
+返回一行单元格的带样式文本。
+
+**参数。** CELLS 是单元格 plist 的列表。`:width` 是内容宽度（字符数，必需）；`:text` 是单元格的单行文本；`:align` 是 `left`（默认）、`right` 或 `center`；`:face` 是叠加在文本上的 face 或 face plist；`:edge` 是该单元格之后分隔线的颜色。STRIPE 为 `px`（默认）或 `glyph`：一像素宽的空格加背景，或无法绘制像素的终端上的框线字符。BORDER-COLOR 是没有 `:edge` 的单元格使用的分隔线颜色。给定 RULE 时整行带 RULE-COLOR 颜色的底线，LEADING-EDGE 在第一个单元格之前再加一条该颜色的分隔线。
+
+**语义。** 每个单元格左右各留一个空格，在宽度内对齐，超宽文本被截断。单元格之间用 Ebox 盒子侧边框那样的竖线分隔，行尾用盒子的下划线收尾。因此选区填充能到达竖线、两格之间不会出现半格缝隙，而一行单元格只花一个文本 Host，而不是每格两个 Host。画笔自身没有状态、滚动和交互：由上层决定显示哪些单元格、每格写什么。
+
+**返回。** 带属性的字符串。`etaf-cell-line-width` 返回它的字符宽度。
+
+**错误。** 单元格列表不是正规列表、宽度不是非负整数、文本不是字符串或含换行、回车、制表符，或对齐方式不是 `left`、`right`、`center` 时，在绘制之前报错。
+
+**示例。**
+
+```elisp
+(etaf-cell-line (list (list :width 8 :text "Item 1")
+                      (list :width 5 :text "38" :align 'right))
+                :border-color "#687386" :rule t :rule-color "#687386")
+```
+
+#### Function: etaf-cell-line-width (cells)
+
+返回一行 CELLS 的字符宽度，含分隔线。
+
+**参数。** CELLS 与 `etaf-cell-line` 绘制的单元格列表相同。
+
+**语义。** 计数包含每格的左右留白和每格之后的一条分隔线，便于上层在绘制前确定 Host 尺寸。
+
+**返回。** 一个整数。
+
+**错误。** 与 `etaf-cell-line` 相同的单元格校验。
+
+#### Component: etaf-sheet (&key rows columns widths heights version cell-text cell-face cell-align header row-head cursor region height editing cell-edit-text colors on-commit on-edit-cancel on-resize-column on-resize-row keys label ref)
+
+把调用方拥有的单元格网格显示为可滚动的表格。
+
+**参数。** ROWS 与 COLUMNS 是表格尺寸。WIDTHS 是各列内容宽度的向量（字符数），或保存它的响应式来源。CELL-TEXT 以行、列调用并返回该格单行文本；CELL-FACE 返回叠加在该格文本上的 face；CELL-ALIGN 返回 `left`（默认）、`right` 或 `center`。HEIGHTS 是行到额外行数的 eql 哈希，用于少数超过一行的行；VERSION 是调用方在改变单元格文本后递增的可写 ref。CURSOR 是活动单元格 `(ROW . COL)` 的可写 ref，REGION 是选区另一角的可写 ref，HEIGHT 是可见主体的行数。HEADER 与 ROW-HEAD 绘制列字母和行号：`t` 使用内置命名，函数按索引返回名称，nil 表示不画。EDITING 是正在编辑的单元格的可写 ref；CELL-EDIT-TEXT 提供编辑起始文本（默认 CELL-TEXT），ON-COMMIT 在提交后收到 `(ROW COL TEXT)`，ON-EDIT-CANCEL 收到被放弃的文本。ON-RESIZE-COLUMN 在拖动列头后收到 `(COLUMN WIDTH)`，ON-RESIZE-ROW 在拖动行号后收到 `(ROW LINES)`。COLORS 覆盖绘制用的颜色 plist，KEYS 在表格自带按键之前追加 `(KEY COMMAND LABEL)`，LABEL 命名网格，REF 命名表格 Host。
+
+**语义。** 表格拥有视口：构建哪些行列、滚动位置和指针落在哪一格。它不拥有单元格，所以公式、格式、撤销和持久化都留在调用方的模型里；画出的每格都来自 CELL-TEXT，每次改动都经回调返回。每个可见行用 `etaf-cell-line` 构建一个文本 Host，因此挂载、滚动和重绘的成本跟随视口而非表格规模；只有被编辑的那一格成为独立 Host，即表格聚焦的 `etaf-text-input`。方向键移动光标，Shift 加方向键扩展选区，F2 与 RET 开始编辑，横向滚轮滚动列。提供对应回调时，拖动列头改变列宽，拖动行号改变行高。颜色取目录调色板（`:ui-table-border`、`:ui-table-selected-bg`、`:ui-table-selected-fg`、`:ui-panel-bg`、`:ui-muted-fg`、`:ui-accent`），深色框架使用表格自带的深色配色，COLORS 可覆盖两者。文本终端用框线字符代替一像素竖线。
+
+**返回。** 一个 View。
+
+**错误。** ROWS、COLUMNS 或 HEIGHT 不是正整数，WIDTHS 既不是向量也不是响应式来源，CELL-TEXT 不是函数，CELL-ALIGN、CELL-FACE、ON-EDIT-CANCEL、ON-RESIZE-COLUMN 或 ON-RESIZE-ROW 既不是 nil 也不是函数，HEIGHTS 既不是 nil 也不是哈希表，CURSOR 不是可写 ref，REGION 或 EDITING 既不是 nil 也不是可写 ref，ON-COMMIT 不是函数，HEADER 或 ROW-HEAD 不是 nil、`t` 或函数，KEYS 或 COLORS 不是列表时，报 `error→ etaf-component-call-error`。
+
+**示例。**
+
+```elisp
+(etaf-sheet :rows 1000 :columns 6 :widths widths :height 20
+            :cursor cursor :region region :editing editing
+            :cell-text read-cell :cell-align (lambda (row col) 'right)
+            :header t :row-head t :ref 'orders
+            :on-commit write-cell
+            :on-resize-column (lambda (col width) (setf (aref widths col) width)))
+```
+
+#### Function: etaf-sheet-begin-edit (runtime ref editing cell)
+
+在已挂载 RUNTIME 的表格 REF 中开始编辑 CELL。
+
+**参数。** EDITING 是表格作为 `:editing` 接收的可写 ref；REF 是表格稳定的 `:ref`，因为编辑器 Host 以 REF 的 `-editor` 伴生名寻址。CELL 是要编辑的单元格。
+
+**语义。** 设置 EDITING 并启动字段的原生编辑会话。应在命令或按键处理函数中调用，且不在响应式批次内，这样编辑行先发布、字段再取得焦点。这就是 Excel 的「直接打字替换单元格」所需的入口。
+
+**返回。** 字段的引用；表格或编辑器未挂载时为 nil。
+
+**参见。** `etaf-sheet-reveal`、`etaf-sheet-scroll`。
+
+#### Function: etaf-sheet-reveal (runtime &optional ref)
+
+滚动已挂载 RUNTIME 的表格 REF，使光标单元格可见。
+
+**参数。** REF 默认 `etaf-sheet`。
+
+**语义。** 表格自己的按键与指针拖动已经会揭示光标；在应用代码里移动 `:cursor` 之后调用它，例如「跳转到单元格」命令或恢复会话。
+
+**返回。** 分发结果。
+
+#### Function: etaf-sheet-scroll (runtime &optional ref lines)
+
+把已挂载 RUNTIME 的表格 REF 滚动 LINES 行，负数向上。
+
+**参数。** REF 默认 `etaf-sheet`。LINES 默认一页，即表格可见主体高度。
+
+**语义。** 滚动只移动视口，所以翻页的应用同时移动 `:cursor` ref 并揭示它。用于翻页键或没有滚动条的「跳到某行」；表格的指针滚轮与方向键不需要它。
+
+**返回。** 分发结果。
+
+
 ## 错误与恢复
 
 - `error→ etaf-component-call-error` 经 `etaf-check-prop` 报告每一条被拒绝的输入：非正的尺寸、不是函数的回调、不是适配列宽的单独一行的行内容、过宽的点数、未知花色以及窄于七列的牌。

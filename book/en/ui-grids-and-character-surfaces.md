@@ -128,6 +128,98 @@ The hover tint of an interactive card.
 
 **Semantics.** Selection and hover are paint only — the card's geometry and the pile's layout never move — and every token falls back to the catalog's built-in palette when no Theme is provided.
 
+## The cell sheet
+
+<!-- index: etaf-sheet; etaf-cell-line; spreadsheet; cell grid; column widths; row height; selection; cell editing -->
+
+#### Function: etaf-cell-line (cells &key (stripe 'px) border-color rule rule-color leading-edge)
+
+Return the styled text of one grid line holding CELLS.
+
+**Arguments.** CELLS is a proper list of cell plists. `:width` is the content width in characters and is required; `:text` is the cell's single-line text; `:align` is `left` (the default), `right` or `center`; `:face` is a face or face plist merged over the text; `:edge` is the colour of the separator drawn after that cell. STRIPE is `px` (the default) or `glyph`: a one-pixel space with a background, or the box-rule character on a frame that cannot paint pixels. BORDER-COLOR is the separator colour a cell without `:edge` uses. With RULE the line carries a bottom rule in RULE-COLOR, and LEADING-EDGE adds one separator before the first cell in that colour.
+
+**Semantics.** Each cell is padded by one space on both sides and aligned inside its width; text wider than its cell is truncated. Cells are separated by the stripe an Ebox box paints for a side border and closed by the underline it paints on its last line. A selected cell's fill therefore reaches the stroke, no half-cell gap can appear between two cells, and a row of cells costs one text Host instead of two Hosts per cell. The painter owns no state, no scrolling and no interaction: a surface decides which cells are visible and what each one says.
+
+**Returns.** A propertized string. `etaf-cell-line-width` returns its character width.
+
+**Errors.** A cell list that is not a proper list, a width that is not a non-negative integer, a text that is not a string or contains a newline, carriage return or tab, or an alignment other than `left`, `right` or `center` signals an error before anything is painted.
+
+**Example.**
+
+```elisp
+(etaf-cell-line (list (list :width 8 :text "Item 1")
+                      (list :width 5 :text "38" :align 'right))
+                :border-color "#687386" :rule t :rule-color "#687386")
+```
+
+#### Function: etaf-cell-line-width (cells)
+
+Return how many characters wide a line of CELLS is, separators included.
+
+**Arguments.** CELLS is the same cell list `etaf-cell-line` paints.
+
+**Semantics.** The count includes each cell's padding and one separator per cell, so a surface can size its Host before painting.
+
+**Returns.** An integer.
+
+**Errors.** The same cell validation as `etaf-cell-line`.
+
+#### Component: etaf-sheet (&key rows columns widths heights version cell-text cell-face cell-align header row-head cursor region height editing cell-edit-text colors on-commit on-edit-cancel on-resize-column on-resize-row keys label ref)
+
+Show a caller-owned grid of cells as a scrolling sheet.
+
+**Arguments.** ROWS and COLUMNS are the sheet's size. WIDTHS is a vector of content widths in characters, or a reactive source holding one. CELL-TEXT is called with a row and a column and returns the cell's one-line text; CELL-FACE returns a face merged over the cell's text; CELL-ALIGN returns `left` (the default), `right` or `center`. HEIGHTS is an eql hash mapping rows to extra lines, for the few rows taller than one line, and VERSION is a writable ref the caller bumps after changing cell text. CURSOR is the writable ref of the active cell `(ROW . COL)`, REGION the writable ref of the selection's other corner, and HEIGHT the visible body in lines. HEADER and ROW-HEAD draw column letters and row numbers: `t` for the built-in naming, a function of the index, or nil to leave them out. EDITING is a writable ref naming the cell being edited; CELL-EDIT-TEXT supplies the text an edit starts from (default CELL-TEXT), ON-COMMIT receives `(ROW COL TEXT)` after a submit and ON-EDIT-CANCEL the abandoned text. ON-RESIZE-COLUMN receives `(COLUMN WIDTH)` from a dragged column heading and ON-RESIZE-ROW receives `(ROW LINES)` from a dragged row number. COLORS overrides the painted colour plist, KEYS adds `(KEY COMMAND LABEL)` entries before the sheet's own, LABEL names the grid and REF names the sheet Host.
+
+**Semantics.** The sheet owns the viewport: which rows and columns are built, where the scroller sits and which cell a pointer landed on. It owns no cells, so formulas, formatting, undo and persistence stay in the caller's model; every cell it paints comes from CELL-TEXT and every change returns through a callback. One text Host per visible row is built with `etaf-cell-line`, so mounting, scrolling and repainting cost the viewport rather than the sheet; only the edited cell becomes a Host of its own, an `etaf-text-input` that the sheet focuses. Arrow keys move the cursor, Shift with an arrow extends the selection, F2 and RET begin an edit, and the horizontal wheel scrolls columns. Column headings resize their column and row numbers resize their row when the corresponding callbacks are supplied. Colours come from the catalog palette (`:ui-table-border`, `:ui-table-selected-bg`, `:ui-table-selected-fg`, `:ui-panel-bg`, `:ui-muted-fg`, `:ui-accent`), a dark frame gets the sheet's own dark colours, and COLORS overrides either. A text frame paints box-rule separators instead of one-pixel stripes.
+
+**Returns.** A View.
+
+**Errors.** `error→ etaf-component-call-error` when ROWS, COLUMNS or HEIGHT is not a positive integer, WIDTHS is neither a vector nor a reactive source, CELL-TEXT is not a function, CELL-ALIGN, CELL-FACE, ON-EDIT-CANCEL, ON-RESIZE-COLUMN or ON-RESIZE-ROW is neither nil nor a function, HEIGHTS is neither nil nor a hash table, CURSOR is not a writable ref, REGION or EDITING is neither nil nor a writable ref, ON-COMMIT is not a function, HEADER or ROW-HEAD is neither nil, `t` nor a function, or KEYS and COLORS are not lists.
+
+**Example.**
+
+```elisp
+(etaf-sheet :rows 1000 :columns 6 :widths widths :height 20
+            :cursor cursor :region region :editing editing
+            :cell-text read-cell :cell-align (lambda (row col) 'right)
+            :header t :row-head t :ref 'orders
+            :on-commit write-cell
+            :on-resize-column (lambda (col width) (setf (aref widths col) width)))
+```
+
+#### Function: etaf-sheet-begin-edit (runtime ref editing cell)
+
+Begin editing CELL in the sheet REF of mounted RUNTIME.
+
+**Arguments.** EDITING is the writable ref the sheet took as `:editing`; REF is the sheet's stable `:ref`, because the editor Host is addressable as REF's `-editor` companion. CELL is the cell to edit.
+
+**Semantics.** Sets EDITING and starts the field's native session. Call it from a command or a key handler, outside a reactive batch, so the editing row is published before the field takes focus. It is what Excel's type-to-edit needs, where the first typed character replaces the cell.
+
+**Returns.** The field's reference, or nil when the sheet or its editor is not mounted.
+
+**See also.** `etaf-sheet-reveal`, `etaf-sheet-scroll`.
+
+#### Function: etaf-sheet-reveal (runtime &optional ref)
+
+Scroll the sheet REF of mounted RUNTIME so its cursor cell is visible.
+
+**Arguments.** REF defaults to `etaf-sheet`.
+
+**Semantics.** The sheet's own keys and pointer drags reveal the cursor already; call this after moving `:cursor` from application code, such as a "go to cell" command or a restored session.
+
+**Returns.** The dispatch result.
+
+#### Function: etaf-sheet-scroll (runtime &optional ref lines)
+
+Scroll the sheet REF of mounted RUNTIME by LINES, negative upwards.
+
+**Arguments.** REF defaults to `etaf-sheet`. LINES defaults to one page, the sheet's visible body height.
+
+**Semantics.** Scrolling moves the viewport only, so an application that pages a sheet also moves the `:cursor` ref and reveals it. Use it for page keys or a scrollbar-free "jump to row"; the sheet's pointer wheel and arrow keys need no help.
+
+**Returns.** The dispatch result.
+
+
 ## Errors and recovery
 
 - `error→ etaf-component-call-error` reports every rejected input through `etaf-check-prop`: a non-positive dimension, a callback that is not a function, a row content that is not a single line fitting its column count, a card rank that is too wide, an unknown suit and a card narrower than seven columns.

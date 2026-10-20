@@ -10,6 +10,8 @@ A drag is a sequence of phases delivered to one handler. Ebox decides the owner 
 
 A gesture ends in one of two ways. A normal release lands `end`; a gesture whose target becomes unavailable — removed, hidden or disabled — or that is aborted by Escape, another input or an error ends with `cancel` and a `:reason` of `target-unavailable`, `quit`, `input` or `error`. Escape is consumed as part of the cancellation; other input is left for Emacs. Handlers should treat `cancel` as "restore anything you changed optimistically", which is exactly what the shipped example does.
 
+The window system can lose a button release; on macOS this happens most often while a tooltip is being shown or hidden. Ebox therefore hides any shown or pending tooltip and suppresses help echo while it tracks a gesture, and it treats a new press of the primary button during an unlocked gesture as the missing release: the gesture ends with `end` at its last position, and the press is then handled as a fresh press. Read the pointer from `:position`, not from `:event`: a native drag or release event starts at the press, and the event of an `end` implied by a new press is that press.
+
 ## The drag lock
 
 <!-- index: drag lock; click-then-drag -->

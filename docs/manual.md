@@ -137,7 +137,19 @@ and the source tarball. Package names link to the page, never straight to a
 download; the manual links appear in the page text rather than as a header menu.
 `package.el` still reads only `archive-contents`, so a browser opening the bare
 directory sees the archive instead of a 404. Both pages are generated from the
-manifest on every release and are not part of it.
+manifest on every release and are not part of it. `site/scripts/archive_pages.py`
+writes them and can run against any published archive on its own.
+
+Each row states when the package last changed, and a package page expands that
+into what changed, what it costs and who needs it. The date is the newest commit
+that touched the files the package ships, recorded in the manifest's `updated`
+map by the release build; publishing a release or changing an unrelated file in a
+repository does not move it, and rebuilding the same revision reproduces it. The
+package page lists the newest `CHANGELOG.md` entries shipped with that version, the
+downloaded size and file count, and the packages that require it, all read from
+the manifest and the tarballs on the host. A filter field narrows the index by
+name, summary or requirement; it needs JavaScript, and the unfiltered table is the
+no-JavaScript state.
 
 The archive pages also show a download count per package. `site/scripts/download-stats.py`
 runs on the web host from a systemd timer (`etaf-download-stats`, every ten

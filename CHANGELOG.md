@@ -6,6 +6,13 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
 
 ### Added
 
+- The archive pages state when each package last changed, and each package page
+  lists the newest `CHANGELOG.md` entries shipped with that version, the
+  downloaded size and file count, and the packages that require it. The date is
+  the newest commit that touched the files the package ships, so a release does
+  not reset it. The index also filters by name, summary or requirement.
+  `site/scripts/archive_pages.py` now owns page generation and runs against any
+  published archive.
 - `etaf-ui-qr-paint` and `etaf-ui-qr-login` have definition entries in both
   languages, so the manual covers etaf-ui 0.2.1 completely again.  The Gallery
   chapter states that its 63 specimens do not include the modal QR sign-in

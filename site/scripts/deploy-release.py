@@ -118,7 +118,7 @@ def packages(directory, *, historical=False):
             required <= present and present <= required | optional
             and pages <= names):
         raise ValueError("A new package payload may contain only its indexed files")
-    if set(manifest) - {"schema", "packages", "workspace", "sources"}:
+    if set(manifest) - {"schema", "packages", "workspace", "sources", "updated"}:
         raise ValueError("Package manifest contains non-public fields")
     for item in manifest["packages"]:
         if set(item) != {"name", "version", "requirements", "summary", "file", "sha256"}:

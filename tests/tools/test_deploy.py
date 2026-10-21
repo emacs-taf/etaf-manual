@@ -226,6 +226,28 @@ class DeploymentTests(unittest.TestCase):
                 self.deploy(self.payload(packages=archive), "packages", success=False)
                 self.assertEqual((self.base / "current").readlink(), previous)
 
+    def test_manifest_update_dates_are_published_and_must_cover_every_package(self):
+        self.deploy(self.payload(page="stable"), "site")
+        archive = self.package()
+        path = archive / "manifest.json"
+        document = json.loads(path.read_text())
+        document["updated"] = {"example": "2026-10-20T22:40:00+08:00"}
+        path.write_text(json.dumps(document))
+        self.deploy(self.payload(packages=archive), "packages")
+        served = json.loads((self.base / "current/packages/manifest.json").read_text())
+        self.assertEqual(served["updated"], {"example": "2026-10-20T22:40:00+08:00"})
+        previous = (self.base / "current").readlink()
+        for broken in ({"example": "2026-10-20"},
+                       {"other": "2026-10-20T22:40:00+08:00"},
+                       {"example": 20261020},
+                       ["2026-10-20T22:40:00+08:00"]):
+            with self.subTest(updated=broken):
+                document["updated"] = broken
+                path.write_text(json.dumps(document))
+                result = self.deploy(self.payload(packages=archive), "packages", success=False)
+                self.assertIn("update dates", result.stderr)
+                self.assertEqual((self.base / "current").readlink(), previous)
+
     def test_site_only_cannot_replace_packages_and_package_only_needs_a_site(self):
         package = self.package()
         self.deploy(self.payload(packages=package), "packages", success=False)

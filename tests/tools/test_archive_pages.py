@@ -148,15 +148,56 @@ class ArchivePageTests(unittest.TestCase):
         self.write_manifest()
         self.pages()
         index = self.index()
-        self.assertIn('<section class="group" id="community">', index)
+        self.assertNotIn('id="community"', index)
+        applications = index[index.index('<section class="group" id="applications">'):]
+        self.assertIn('<a href="gamma/"><strong>gamma</strong>', applications)
         self.assertIn('<td class="author"><a href="https://github.com/someone">someone</a></td>', index)
         self.assertIn('<td class="author"><a href="https://github.com/emacs-taf">emacs-taf</a></td>', index)
         page = self.page("gamma")
         self.assertIn('<a class="button" href="https://github.com/someone/gamma">Repository</a>', page)
         self.assertIn("<dt>Maintained by</dt><dd>someone</dd>", page)
         self.assertIn("<dt>License</dt><dd>GPL-3.0-or-later</dd>", page)
-        self.assertIn("its author maintains it", page)
+        self.assertIn("pick it in <code>M-x etaf-install</code>", page)
         self.assertNotIn("Maintained by", self.page("alpha"))
+
+    def test_a_known_package_and_a_community_one_land_in_their_own_sections(self):
+        # Rename two fixture builds to real catalog names so the role table, not
+        # a default, decides each section.
+        import shutil
+        rename = {"alpha": "ebox", "beta": "etaf-tanks"}
+        for old, new in rename.items():
+            shutil.copyfile(self.archive / f"{old}-1.0.0.tar", self.archive / f"{new}-1.0.0.tar")
+        for package in self.manifest["packages"]:
+            if package["name"] in rename:
+                new = rename[package["name"]]
+                package["name"] = new
+                package["file"] = f"{new}-1.0.0.tar"
+        self.manifest["sources"] = {"ebox": "e" * 40, "etaf-tanks": "f" * 40, "gamma": "c" * 40}
+        self.manifest["community"] = {"gamma": {"url": "https://github.com/someone/gamma",
+                                                "license": "GPL-3.0-or-later",
+                                                "maintainer": "someone",
+                                                "group": "application"}}
+        self.write_manifest()
+        self.pages()
+        index = self.index()
+        framework = index[index.index('id="framework"'):index.index('id="applications"')]
+        self.assertIn('<strong>ebox</strong>', framework)
+        self.assertNotIn('etaf-tanks', framework)
+        applications = index[index.index('id="applications"'):index.index('id="games"')]
+        self.assertIn('<strong>gamma</strong>', applications)
+        self.assertNotIn('ebox', applications)
+        games = index[index.index('id="games"'):]
+        self.assertIn('<strong>etaf-tanks</strong>', games)
+
+    def test_packages_without_a_declared_group_keep_their_role(self):
+        self.pages()
+        index = self.index()
+        # These fixture packages name no role, so the default group must not
+        # file them under applications: they belong to Other.
+        self.assertNotIn('id="framework"', index)
+        self.assertNotIn('id="games"', index)
+        self.assertNotIn('id="applications"', index)
+        self.assertIn('<section class="group" id="other">', index)
 
     def test_archive_without_update_dates_still_writes_readable_pages(self):
         self.write_manifest(dates=False)

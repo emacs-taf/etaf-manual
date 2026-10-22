@@ -488,29 +488,30 @@ def tar_icon_link(item, prefix=""):
             f'title="Download {name} {version}">{TAR_ICON}<span>tar</span></a>')
 
 
-COMMUNITY = "Community"
-
-
-def groups(packages, community=()):
+def groups(packages, community={}):
     """Split packages into the published roles, keeping any unknown name visible.
 
     A package another author publishes through this archive is never filed
     under our own applications: the section states who maintains it.
     """
     placed, result = set(), []
+    def declared_group(item):
+        # Only a package the archive redistributes for another author has a
+        # declared group; ours are grouped by GROUPS alone, or every package
+        # would match the default.
+        record = community.get(item["name"])
+        return None if record is None else record.get("group", "application")
+
     for label, members in GROUPS:
+        key = label.lower().rstrip("s")
         selected = [item for item in packages
-                    if item["name"] in members and item["name"] not in community]
+                    if item["name"] in members or declared_group(item) == key]
         placed.update(item["name"] for item in selected)
         if selected:
             result.append((label, selected))
-    other = [item for item in packages
-             if item["name"] not in placed and item["name"] not in community]
+    other = [item for item in packages if item["name"] not in placed]
     if other:
         result.append(("Other", other))
-    outside = [item for item in packages if item["name"] in community]
-    if outside:
-        result.append((COMMUNITY, outside))
     return result
 
 
@@ -589,7 +590,7 @@ def archive_pages(package_dir):
     rows_by_name = {item["name"]: item for item in packages}
     sections = []
     community = manifest.get("community", {})
-    for label, selected in groups(packages, set(community)):
+    for label, selected in groups(packages, community):
         rows = []
         for item in selected:
             name = html.escape(item["name"])
@@ -606,12 +607,8 @@ def archive_pages(package_dir):
                 f"{download_cell(item['name'])}"
                 f'<td class="src">{tar_icon_link(item)}</td>'
                 "</tr>")
-        note = ('<p class="note">Packages other authors built with ETAF and publish through this '
-                'archive. Their own repositories and licenses govern them.</p>'
-                if label == COMMUNITY else "")
         sections.append(f"""<section class="group" id="{label.lower()}">
 <div class="group-head"><h2>{label}</h2><span class="tag" data-count="{len(selected)}">{len(selected)} packages</span></div>
-{note}
 <table>
 <thead><tr><th scope="col">Package</th><th scope="col">Version</th>
 <th scope="col">Author</th><th scope="col">Updated</th>
@@ -710,7 +707,7 @@ def package_page(item, sources, updated, rows_by_name, used_by, directory, origi
     else:
         updated_fact = "not recorded"
         when = ""
-    pill = ('<span class="version">community</span>' if community else "")
+    pill = ""
     owner = (f"<div><dt>Maintained by</dt><dd>"
              f"{html.escape((origin or {}).get('maintainer') or label)}</dd></div>"
              f"<div><dt>License</dt><dd>{html.escape((origin or {}).get('license', 'unspecified'))}</dd></div>"
@@ -735,10 +732,8 @@ def package_page(item, sources, updated, rows_by_name, used_by, directory, origi
 """
     if community:
         install_note = (
-            f"This archive serves <code>{safe_name}</code>, but its author maintains it, so "
-            "<code>M-x etaf-install</code> does not list it. Add the archive once, then install "
-            f"<code>{safe_name}</code> with <code>M-x package-install</code> or "
-            "<code>M-x list-packages</code>; the declared dependencies come from the same archive. "
+            f"Install <code>{safe_name}</code> with <code>M-x package-install</code> or pick it in "
+            "<code>M-x etaf-install</code>; the declared dependencies come from the same archive. "
             f'Read the <a href="{INSTALL}">installation reference</a> for the bootstrap snippet.')
     else:
         install_note = (

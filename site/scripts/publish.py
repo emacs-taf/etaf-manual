@@ -130,6 +130,16 @@ def publish(args):
             current = remote("readlink /srv/etaf.top/current", capture_output=True, text=True).stdout.strip()
             if current != "/srv/etaf.top/releases/" + stamp:
                 raise ValueError(f"A different release is current after deployment: {current}")
+            if archive_input:
+                # The deployer proves served bytes; this proves the pages say
+                # what the manifest means, so a grouping mistake cannot ship.
+                checked = subprocess.run(
+                    [sys.executable, str(SITE / "scripts/check-archive.py"),
+                     "--archive", "https://etaf.top/packages/"],
+                    capture_output=True, text=True, timeout=120)
+                print(checked.stdout.strip())
+                if checked.returncode:
+                    raise ValueError(f"Published pages do not match the manifest:\n{checked.stdout}")
             print(f"Published https://etaf.top ({mode}, release {stamp}); current read back")
         finally:
             try:

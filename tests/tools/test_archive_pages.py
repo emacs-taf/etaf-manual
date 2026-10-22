@@ -160,6 +160,25 @@ class ArchivePageTests(unittest.TestCase):
         self.assertIn("pick it in <code>M-x etaf-install</code>", page)
         self.assertNotIn("Maintained by", self.page("alpha"))
 
+    def test_community_package_is_named_after_its_repository(self):
+        self.manifest["community"] = {"gamma": {"url": "https://github.com/someone/gamma.el",
+                                                "license": "GPL-3.0-or-later",
+                                                "maintainer": "someone"}}
+        self.write_manifest()
+        self.pages()
+        applications = self.index()[self.index().index('<section class="group" id="applications">'):]
+        self.assertIn('<a href="gamma/"><strong>gamma.el</strong>', applications)
+        page = self.page("gamma")
+        self.assertIn("<h1>gamma.el</h1>", page)
+        self.assertIn('<span aria-hidden="true">/</span><span>gamma.el</span>', page)
+        self.assertIn("<title>gamma.el — ETAF package archive</title>", page)
+        # The repository name is the label; the installable package keeps its own.
+        self.assertIn("<dt>Package</dt><dd><code>gamma</code></dd>", page)
+        self.assertIn("Install <code>gamma</code> with <code>M-x package-install</code>", page)
+        self.assertIn('data-downloads="gamma"', page)
+        self.assertIn('href="../gamma-1.0.0.tar"', page)
+        self.assertNotIn('data-downloads="gamma.el"', page)
+
     def test_a_known_package_and_a_community_one_land_in_their_own_sections(self):
         # Rename two fixture builds to real catalog names so the role table, not
         # a default, decides each section.

@@ -466,6 +466,22 @@ def author_cell(item, origin):
     return f'<td class="author"><a href="{html.escape(href)}">{html.escape(label)}</a></td>'
 
 
+def source_name(item, origin):
+    """Name a community package after its author's repository.
+
+    A package installs under the name its entry file gives it, while the
+    project it lives in may be called something else (`exc.el` ships `exc.el`).
+    The archive names the repository and states the installable package, so a
+    visitor sees the author's own project name.
+    """
+    if not origin:
+        return item["name"]
+    repository = origin.get("url", "").rstrip("/").rsplit("/", 1)[-1]
+    if repository.endswith(".git"):
+        repository = repository[:-4]
+    return repository or item["name"]
+
+
 def download_cell(name):
     """A count cell filled by downloads.json; the dash is the no-JavaScript state."""
     safe = html.escape(name)
@@ -473,12 +489,13 @@ def download_cell(name):
             f'title="Downloads of every {safe} version">—</td>')
 
 
-def search_text(item, updated):
+def search_text(item, updated, origin=None):
     """Everything a visitor may type to find this row."""
     day = stamp_date(updated.get(item["name"]))
     requirements = " ".join(f"{dependency} {minimum}"
                             for dependency, minimum in item["requirements"])
-    values = [item["name"], item.get("summary", ""), requirements, long_date(day) if day else ""]
+    values = [item["name"], source_name(item, origin), item.get("summary", ""), requirements,
+              long_date(day) if day else ""]
     return html.escape(" ".join(value for value in values if value).lower(), quote=True)
 
 
@@ -594,12 +611,13 @@ def archive_pages(package_dir):
         rows = []
         for item in selected:
             name = html.escape(item["name"])
+            shown = html.escape(source_name(item, community.get(item["name"])))
             version = html.escape(item["version"])
             summary = html.escape(item.get("summary", ""))
             rows.append(
                 "<tr"
-                f' data-search="{search_text(item, updated)}">'
-                f'<td class="pkg"><a href="{name}/"><strong>{name}</strong></a>'
+                f' data-search="{search_text(item, updated, community.get(item["name"]))}">'
+                f'<td class="pkg"><a href="{name}/"><strong>{shown}</strong></a>'
                 f'<span class="summary">{summary}</span></td>'
                 f'<td class="version-cell"><span class="version">{version}</span></td>'
                 f"{author_cell(item, community.get(item['name'])) + update_cell(item, updated, sources.get(item['name']))}"
@@ -687,6 +705,7 @@ def package_page(item, sources, updated, rows_by_name, used_by, directory, origi
     """
     name = item["name"]
     safe_name = html.escape(name)
+    display = html.escape(source_name(item, origin))
     version = html.escape(item["version"])
     home = (origin or {}).get("url", "")
     repo = home or f"https://github.com/{REPOSITORIES.get(name, f'emacs-taf/{name}')}"
@@ -708,10 +727,13 @@ def package_page(item, sources, updated, rows_by_name, used_by, directory, origi
         updated_fact = "not recorded"
         when = ""
     pill = ""
-    owner = (f"<div><dt>Maintained by</dt><dd>"
-             f"{html.escape((origin or {}).get('maintainer') or label)}</dd></div>"
-             f"<div><dt>License</dt><dd>{html.escape((origin or {}).get('license', 'unspecified'))}</dd></div>"
-             if community else "")
+    owner = ""
+    if community:
+        owner = (f"<div><dt>Maintained by</dt><dd>"
+                 f"{html.escape((origin or {}).get('maintainer') or label)}</dd></div>"
+                 f"<div><dt>License</dt><dd>{html.escape((origin or {}).get('license', 'unspecified'))}</dd></div>")
+        if display != safe_name:
+            owner += f"<div><dt>Package</dt><dd><code>{safe_name}</code></dd></div>"
     users = sorted(used_by.get(name, []))
     used_by_fact = (", ".join(f'<a href="../{html.escape(other)}/">{html.escape(other)}</a>'
                               for other in users) if users else "nothing else in this archive")
@@ -745,9 +767,9 @@ def package_page(item, sources, updated, rows_by_name, used_by, directory, origi
             f'<a href="{INSTALL}">installation reference</a> for the full workflow.')
     body = f"""<main class="wrap">
 <nav class="crumbs" aria-label="Breadcrumb"><a href="../">Packages</a>
-<span aria-hidden="true">/</span><span>{safe_name}</span></nav>
+<span aria-hidden="true">/</span><span>{display}</span></nav>
 <section class="hero detail">
-<div class="title-row"><h1>{safe_name}</h1><span class="version">{version}</span>{when}{pill}</div>
+<div class="title-row"><h1>{display}</h1><span class="version">{version}</span>{when}{pill}</div>
 <p class="lead">{html.escape(item.get("summary", ""))}</p>
 <div class="actions">
 <a class="button primary" href="../{html.escape(item["file"])}">{TAR_ICON}<span>Download {version}</span></a>
@@ -785,7 +807,7 @@ The archive is built from the commit above; rebuild it from that commit to compa
     target = directory / "index.html"
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(page(
-        f"{name} — ETAF package archive", body, "../downloads.json",
+        f"{source_name(item, origin)} — ETAF package archive", body, "../downloads.json",
         canonical=f"https://etaf.top/packages/{name}/",
         description=item.get("summary", "")))
 

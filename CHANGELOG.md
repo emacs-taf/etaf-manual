@@ -4,6 +4,14 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
 
 ## Unreleased
 
+### Changed
+
+- The archive's download count now counts installations instead of file fetches:
+  a tarball counts only when the same client also requested its signature (what
+  package.el does), one client counts once per package per UTC day, and the
+  deployment verifier's requests stay excluded. Reprocessing the current access
+  log turns 287 counted fetches into 83 installs.
+
 ### Added
 
 - Every archive row names the package's author, linking the `emacs-taf`

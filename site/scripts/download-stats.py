@@ -2,11 +2,22 @@
 """Refresh the archive download counts from Caddy's JSON access log.
 
 The archive pages read `downloads.json` in the browser; this timer rewrites it
-from the log so the counts stay current between package releases. Deployment
-verification appends `?deployment=<stamp>` to every archived file: those
-requests check bytes, they are not somebody installing a package, so they are
-excluded. Rotated logs stay readable, so counts survive log rotation for as
-long as the files are kept.
+from the log so the counts stay current between package releases.
+
+A count means "somebody installed this package here", not "somebody fetched a
+file":
+
+- A tarball counts only when the same client fetched its `.tar.sig` within a
+  minute, which is what package.el does and what a crawler, a link checker or a
+  hand-run `curl` does not.
+- One client counts once per package per UTC day, so re-installing or re-running
+  a test suite from the same machine does not inflate the number.
+- Deployment verification appends `?deployment=<stamp>` to every archived file:
+  those requests check bytes, they are not somebody installing a package, so
+  they are excluded.
+
+Rotated logs stay readable, so counts survive log rotation for as long as the
+files are kept.
 """
 from __future__ import annotations
 
@@ -20,7 +31,11 @@ import re
 import sys
 
 ARCHIVE = re.compile(r"/packages/([a-z][a-z0-9-]*)-[0-9]+(?:\.[0-9]+)*\.tar\Z")
+SIGNATURE = re.compile(r"/packages/([a-z][a-z0-9-]*)-[0-9]+(?:\.[0-9]+)*\.tar\.sig\Z")
 HOST = "etaf.top"
+# package.el fetches a tarball and its signature together; the two requests may
+# arrive in either order, and a retry repeats both.
+PAIRING_SECONDS = 60
 
 
 def lines(path):
@@ -29,10 +44,8 @@ def lines(path):
         yield from stream
 
 
-def count(log_dir):
-    """Return per-package downloads and the timestamp of the oldest counted request."""
-    counts = {}
-    first = None
+def fetches(log_dir):
+    """Yield (timestamp, client, package, is_signature) for each archived fetch."""
     for path in sorted(log_dir.glob(f"{HOST}.access*.log*")):
         if not path.is_file() or path.is_symlink():
             continue
@@ -43,17 +56,44 @@ def count(log_dir):
                 continue
             request = record.get("request") or {}
             uri = request.get("uri") or ""
-            if (record.get("status") != 200 or request.get("method") != "GET"
-                    or request.get("host") != HOST or "deployment=" in uri):
-                continue
-            match = ARCHIVE.fullmatch(uri)
-            if not match:
-                continue
-            counts[match[1]] = counts.get(match[1], 0) + 1
             stamp = record.get("ts")
-            if isinstance(stamp, (int, float)):
-                first = stamp if first is None else min(first, stamp)
-    return counts, first
+            if (request.get("method") != "GET"
+                    or request.get("host") != HOST or "deployment=" in uri
+                    or not isinstance(stamp, (int, float))):
+                continue
+            archive = ARCHIVE.fullmatch(uri)
+            signature = SIGNATURE.fullmatch(uri)
+            if not archive and not signature:
+                continue
+            # package.el asks for a signature beside every tarball; this archive
+            # signs nothing, so that request is a 404 and still proves the fetch
+            # is a package installation rather than a crawler.
+            if archive and record.get("status") != 200:
+                continue
+            found = archive or signature
+            yield stamp, request.get("remote_ip") or "", found[1], bool(signature)
+
+
+def count(log_dir):
+    """Return per-package installs and the timestamp of the oldest counted install."""
+    signatures, tarballs = {}, []
+    for stamp, client, package, signature in fetches(log_dir):
+        if signature:
+            signatures.setdefault((client, package), []).append(stamp)
+        else:
+            tarballs.append((stamp, client, package))
+    installs, first, counted = {}, None, set()
+    for stamp, client, package in tarballs:
+        if not any(abs(value - stamp) <= PAIRING_SECONDS
+                   for value in signatures.get((client, package), ())):
+            continue
+        day = datetime.fromtimestamp(stamp, timezone.utc).date()
+        if (package, client, day) in counted:
+            continue
+        counted.add((package, client, day))
+        installs[package] = installs.get(package, 0) + 1
+        first = stamp if first is None else min(first, stamp)
+    return installs, first
 
 
 def moment(value):
@@ -78,14 +118,7 @@ def main():
     temporary = args.output.with_name(args.output.name + ".tmp")
     temporary.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     os.replace(temporary, args.output)
-    print(f"downloads={payload['total']} packages={len(counts)} "
-          f"since={payload['since']} output={args.output}")
-    return 0
 
 
 if __name__ == "__main__":
-    try:
-        sys.exit(main())
-    except (OSError, ValueError) as error:
-        print(f"error=stats\nhint={error}", file=sys.stderr)
-        sys.exit(1)
+    sys.exit(main())

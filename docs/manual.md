@@ -160,8 +160,11 @@ installed with `M-x package-install` from the same archive.
 
 The archive pages also show a download count per package. `site/scripts/download-stats.py`
 runs on the web host from a systemd timer (`etaf-download-stats`, every ten
-minutes): it counts successful GET requests for versioned tarballs in Caddy's
-JSON access log, skips the deployment verifier's `?deployment=` requests, and
+minutes) and counts installations, not fetches: a versioned tarball counts only
+when the same client asked for its `.tar.sig` within a minute, which is what
+package.el does and a crawler or a hand-run `curl` does not; one client counts
+once per package per UTC day, so re-running a test suite does not inflate the
+number; and the deployment verifier's `?deployment=` requests are skipped. It
 rewrites `packages/downloads.json` outside the immutable releases. The pages fetch
 that file in the browser and leave an em dash when it is missing, so the archive
 still reads without JavaScript or the timer. The access log, the timer and the

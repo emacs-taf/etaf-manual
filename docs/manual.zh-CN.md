@@ -73,7 +73,7 @@ make site-publish PUBLISH_ARGS='--packages /path/to/release'
 写在正文里，不在页头放菜单。`package.el` 仍只读 `archive-contents`，浏览器打开裸目录
 看到的是归档说明而不是 404。两个页面每次发布都从清单重新生成，不属于清单内容。
 
-归档页还会显示每个包的下载次数。服务端的 `site/scripts/download-stats.py` 由 systemd 定时器（`etaf-download-stats`，每十分钟）运行：它统计 Caddy JSON 访问日志里版本化 tar 包的成功 GET 请求，跳过部署校验带 `?deployment=` 的请求，并把 `packages/downloads.json` 写在不可变版本目录之外。页面在浏览器里读取该文件，文件缺失时保留破折号，所以没有 JavaScript 或定时器时归档仍可阅读。访问日志、定时器与 `/srv/etaf.top/stats` 服务路径属于主机配置，发布过程不改动它们。
+归档页还会显示每个包的下载次数。服务端的 `site/scripts/download-stats.py` 由 systemd 定时器（`etaf-download-stats`，每十分钟）运行，统计的是「安装」而不是「取文件」：版本化 tar 包只有同一客户端在一分钟内也请求它的 `.tar.sig` 才计数——package.el 会这么做，爬虫或手工 `curl` 不会；同一客户端每个包每个 UTC 日只算一次，所以反复跑测试不会把数字抬高；部署校验带 `?deployment=` 的请求直接跳过。它把 `packages/downloads.json` 写在不可变版本目录之外。页面在浏览器里读取该文件，文件缺失时保留破折号，所以没有 JavaScript 或定时器时归档仍可阅读。访问日志、定时器与 `/srv/etaf.top/stats` 服务路径属于主机配置，发布过程不改动它们。
 
 链接预览复用同一套生成页面。手册页头提供 `https://etaf.top/og/manual.png` 和统一描述；归档的每个页面输出自己的 canonical、标题和描述，并指向 `https://etaf.top/og/archive.png`。首页预览用 `/shots/etaf-ncm.png`。卡片是 `site/public/og/` 下的 1200×630 PNG；保持路径稳定，已有链接的预览才不会失效。Telegram 按 URL 缓存预览：换图后把链接发给 `@WebpageBot`，或用带版本参数的 URL 分享一次，强制重新抓取。
 

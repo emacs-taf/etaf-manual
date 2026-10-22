@@ -151,6 +151,13 @@ the manifest and the tarballs on the host. A filter field narrows the index by
 name, summary or requirement; it needs JavaScript, and the unfiltered table is the
 no-JavaScript state.
 
+Every row names its author: `emacs-taf` for a package this project maintains and
+the author's GitHub account for a package another developer publishes through the
+archive, each linking the organization or profile. Those community packages are
+filed under their own section, and their page states the license, links the
+author's repository and says that `M-x etaf-install` does not list them; they are
+installed with `M-x package-install` from the same archive.
+
 The archive pages also show a download count per package. `site/scripts/download-stats.py`
 runs on the web host from a systemd timer (`etaf-download-stats`, every ten
 minutes): it counts successful GET requests for versioned tarballs in Caddy's

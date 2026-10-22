@@ -6,6 +6,11 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
 
 ### Added
 
+- Every archive row names the package's author, linking the `emacs-taf`
+  organization or the third-party author's GitHub account. Packages other
+  authors publish through the archive are grouped under Community, and their page
+  states the license, links the author's repository and explains that
+  `M-x etaf-install` does not list them.
 - The archive pages state when each package last changed, and each package page
   lists the newest `CHANGELOG.md` entries shipped with that version, the
   downloaded size and file count, and the packages that require it. The date is

@@ -290,6 +290,10 @@ th:last-child, td:last-child { padding-right: 0; }
   font-size: .74rem; white-space: nowrap; }
 td.updated { color: var(--ink-3); font-family: var(--font-mono); font-size: .76rem;
   white-space: nowrap; }
+td.author { color: var(--ink-3); font-family: var(--font-mono); font-size: .74rem;
+  white-space: nowrap; }
+td.author a { color: var(--ink-2); text-decoration-color: var(--rule-strong); }
+td.author a:hover { color: var(--accent); }
 td.updated time { color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .requires { max-width: 18rem; color: var(--ink-3); font-family: var(--font-mono);
   font-size: .72rem; line-height: 1.6; overflow-wrap: anywhere; }
@@ -345,13 +349,15 @@ th.src, td.src { width: 1%; text-align: right; white-space: nowrap; }
 .site-footer .asof { font-family: var(--font-mono); font-size: .7rem; }
 @media (max-width: 720px) {
   thead { display: none; }
-  tbody tr { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto;
-    grid-template-areas: "pkg pkg pkg pkg" "ver when dl tar"; gap: .35rem .8rem;
+  tbody tr { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto;
+    grid-template-areas: "pkg pkg pkg pkg" "ver auth when tar" "dl dl dl dl";
+    gap: .35rem .8rem;
     align-items: center; padding: .85rem 0; border-bottom: 1px solid var(--rule); }
   tbody td { padding: 0; border-bottom: 0; }
   tbody tr:hover td { background: none; }
   td.pkg { grid-area: pkg; }
   td.version-cell { grid-area: ver; }
+  td.author { grid-area: auth; font-size: .72rem; }
   td.updated { grid-area: when; font-size: .72rem; }
   td.requires { display: none; }
   td.num { grid-area: dl; justify-self: start; text-align: left; font-size: .78rem; }
@@ -445,6 +451,21 @@ def requirements_html(item, names, prefix=""):
     return ", ".join(parts) if parts else "Emacs"
 
 
+ORGANIZATION = ("emacs-taf", "https://github.com/emacs-taf")
+
+
+def author_cell(item, origin):
+    """Name who maintains the package and link to that account or organization."""
+    if origin:
+        parts = [part for part in origin.get("url", "").split("/") if part]
+        account = origin.get("maintainer") or (parts[2] if len(parts) > 3 else "")
+        href = f"https://github.com/{account}" if account else origin.get("url", "")
+        label = account or "community"
+    else:
+        label, href = ORGANIZATION
+    return f'<td class="author"><a href="{html.escape(href)}">{html.escape(label)}</a></td>'
+
+
 def download_cell(name):
     """A count cell filled by downloads.json; the dash is the no-JavaScript state."""
     safe = html.escape(name)
@@ -467,17 +488,29 @@ def tar_icon_link(item, prefix=""):
             f'title="Download {name} {version}">{TAR_ICON}<span>tar</span></a>')
 
 
-def groups(packages):
-    """Split packages into the published roles, keeping any unknown name visible."""
+COMMUNITY = "Community"
+
+
+def groups(packages, community=()):
+    """Split packages into the published roles, keeping any unknown name visible.
+
+    A package another author publishes through this archive is never filed
+    under our own applications: the section states who maintains it.
+    """
     placed, result = set(), []
     for label, members in GROUPS:
-        selected = [item for item in packages if item["name"] in members]
+        selected = [item for item in packages
+                    if item["name"] in members and item["name"] not in community]
         placed.update(item["name"] for item in selected)
         if selected:
             result.append((label, selected))
-    other = [item for item in packages if item["name"] not in placed]
+    other = [item for item in packages
+             if item["name"] not in placed and item["name"] not in community]
     if other:
         result.append(("Other", other))
+    outside = [item for item in packages if item["name"] in community]
+    if outside:
+        result.append((COMMUNITY, outside))
     return result
 
 
@@ -555,7 +588,8 @@ def archive_pages(package_dir):
     newest = max(dates) if dates else None
     rows_by_name = {item["name"]: item for item in packages}
     sections = []
-    for label, selected in groups(packages):
+    community = manifest.get("community", {})
+    for label, selected in groups(packages, set(community)):
         rows = []
         for item in selected:
             name = html.escape(item["name"])
@@ -567,16 +601,21 @@ def archive_pages(package_dir):
                 f'<td class="pkg"><a href="{name}/"><strong>{name}</strong></a>'
                 f'<span class="summary">{summary}</span></td>'
                 f'<td class="version-cell"><span class="version">{version}</span></td>'
-                f"{update_cell(item, updated, sources.get(item['name']))}"
+                f"{author_cell(item, community.get(item['name'])) + update_cell(item, updated, sources.get(item['name']))}"
                 f'<td class="requires">{requirements_html(item, names)}</td>'
                 f"{download_cell(item['name'])}"
                 f'<td class="src">{tar_icon_link(item)}</td>'
                 "</tr>")
+        note = ('<p class="note">Packages other authors built with ETAF and publish through this '
+                'archive. Their own repositories and licenses govern them.</p>'
+                if label == COMMUNITY else "")
         sections.append(f"""<section class="group" id="{label.lower()}">
 <div class="group-head"><h2>{label}</h2><span class="tag" data-count="{len(selected)}">{len(selected)} packages</span></div>
+{note}
 <table>
 <thead><tr><th scope="col">Package</th><th scope="col">Version</th>
-<th scope="col">Updated</th><th scope="col" class="requires">Requires</th>
+<th scope="col">Author</th><th scope="col">Updated</th>
+<th scope="col" class="requires">Requires</th>
 <th scope="col" class="num">Downloads</th>
 <th scope="col" class="src"><span class="visually-hidden">Tarball</span></th></tr></thead>
 <tbody>
@@ -637,21 +676,30 @@ versioned file never changes bytes.</p>
             if dependency in used_by and dependency != item["name"]:
                 used_by[dependency].append(item["name"])
     for item in packages:
-        package_page(item, sources, updated, rows_by_name, used_by, package_dir / item["name"])
+        package_page(item, sources, updated, rows_by_name, used_by,
+                     package_dir / item["name"], community.get(item["name"]))
     return {"packages": len(packages), "updated": str(newest) if newest else None}
 
 
-def package_page(item, sources, updated, rows_by_name, used_by, directory):
-    """Write one package's detail page."""
+def package_page(item, sources, updated, rows_by_name, used_by, directory, origin=None):
+    """Write one package's detail page.
+
+    ORIGIN names the author of a community package: the page links their
+    repository, states the license, and stops promising that `M-x etaf-install`
+    owns it.
+    """
     name = item["name"]
     safe_name = html.escape(name)
     version = html.escape(item["version"])
-    repo = REPOSITORIES.get(name, f"emacs-taf/{name}")
+    home = (origin or {}).get("url", "")
+    repo = home or f"https://github.com/{REPOSITORIES.get(name, f'emacs-taf/{name}')}"
+    label = repo.removeprefix("https://").removeprefix("http://")
+    community = bool(origin)
     revision = sources.get(name, "")
     facts = inspect_archive(directory.parent / item["file"])
     day = stamp_date(updated.get(name))
     source_line = (
-        f'<a href="https://github.com/{repo}/commit/{revision}"><code>{html.escape(revision[:12])}</code></a>'
+        f'<a href="{html.escape(repo)}/commit/{revision}"><code>{html.escape(revision[:12])}</code></a>'
         if revision else "not recorded")
     if day:
         commit_note = (f'<span class="fact-note">newest commit that changed the files this '
@@ -662,11 +710,16 @@ def package_page(item, sources, updated, rows_by_name, used_by, directory):
     else:
         updated_fact = "not recorded"
         when = ""
+    pill = ('<span class="version">community</span>' if community else "")
+    owner = (f"<div><dt>Maintained by</dt><dd>"
+             f"{html.escape((origin or {}).get('maintainer') or label)}</dd></div>"
+             f"<div><dt>License</dt><dd>{html.escape((origin or {}).get('license', 'unspecified'))}</dd></div>"
+             if community else "")
     users = sorted(used_by.get(name, []))
     used_by_fact = (", ".join(f'<a href="../{html.escape(other)}/">{html.escape(other)}</a>'
                               for other in users) if users else "nothing else in this archive")
     changes = latest_changes(facts["changelog"])
-    changelog_url = f"https://github.com/{repo}/blob/{revision}/CHANGELOG.md" if revision else ""
+    changelog_url = f"{repo}/blob/{revision}/CHANGELOG.md" if revision else ""
     changed = ""
     if changes:
         entries = "\n".join(f"<li>{html.escape(text)}</li>" for text in changes)
@@ -680,15 +733,30 @@ def package_page(item, sources, updated, rows_by_name, used_by, directory):
 </ul>{more}
 </section>
 """
+    if community:
+        install_note = (
+            f"This archive serves <code>{safe_name}</code>, but its author maintains it, so "
+            "<code>M-x etaf-install</code> does not list it. Add the archive once, then install "
+            f"<code>{safe_name}</code> with <code>M-x package-install</code> or "
+            "<code>M-x list-packages</code>; the declared dependencies come from the same archive. "
+            f'Read the <a href="{INSTALL}">installation reference</a> for the bootstrap snippet.')
+    else:
+        install_note = (
+            "One entry installs everything ETAF provides. Evaluate this once (it only bootstraps "
+            f"the installer), then use <code>M-x etaf-install</code> and pick <code>{safe_name}</code>. "
+            "<code>etaf-install</code> checks the required capabilities, installs the framework "
+            "dependencies, opens the application and reopens it offline later. Upgrade or remove "
+            "with <code>M-x list-packages</code>, then restart Emacs. Read the "
+            f'<a href="{INSTALL}">installation reference</a> for the full workflow.')
     body = f"""<main class="wrap">
 <nav class="crumbs" aria-label="Breadcrumb"><a href="../">Packages</a>
 <span aria-hidden="true">/</span><span>{safe_name}</span></nav>
 <section class="hero detail">
-<div class="title-row"><h1>{safe_name}</h1><span class="version">{version}</span>{when}</div>
+<div class="title-row"><h1>{safe_name}</h1><span class="version">{version}</span>{when}{pill}</div>
 <p class="lead">{html.escape(item.get("summary", ""))}</p>
 <div class="actions">
 <a class="button primary" href="../{html.escape(item["file"])}">{TAR_ICON}<span>Download {version}</span></a>
-<a class="button" href="https://github.com/{repo}">Repository</a>
+<a class="button" href="{html.escape(repo)}">Repository</a>
 <span class="stat"><strong data-downloads="{safe_name}">—</strong> downloads</span>
 </div>
 </section>
@@ -696,12 +764,7 @@ def package_page(item, sources, updated, rows_by_name, used_by, directory):
 <div class="install-head"><h2 id="install-title">Install</h2>
 <button class="copy" type="button" data-copy="#bootstrap">Copy</button></div>
 <pre id="bootstrap"><code>{BOOTSTRAP}</code></pre>
-<p class="note">One entry installs everything ETAF provides. Evaluate this once (it only bootstraps
-the installer), then use <code>M-x etaf-install</code> and pick <code>{safe_name}</code>.
-<code>etaf-install</code> checks the required capabilities, installs the framework dependencies,
-opens the application and reopens it offline later. Upgrade or remove with
-<code>M-x list-packages</code>, then restart Emacs. Read the
-<a href="{INSTALL}">installation reference</a> for the full workflow.</p>
+<p class="note">{install_note}</p>
 </section>
 {changed}<section class="details" aria-labelledby="details-title">
 <div class="group-head"><h2 id="details-title">Package details</h2></div>
@@ -711,9 +774,9 @@ opens the application and reopens it offline later. Upgrade or remove with
 <div><dt>Requires</dt><dd>{requirements_html(item, set(rows_by_name), "../")}</dd></div>
 <div><dt>Used by</dt><dd>{used_by_fact}</dd></div>
 <div><dt>Installs</dt><dd>{facts["files"]} files, {max(1, round(facts["size"] / 1024))} KB downloaded</dd></div>
-<div><dt>Repository</dt><dd><a href="https://github.com/{repo}">github.com/{repo}</a></dd></div>
+<div><dt>Repository</dt><dd><a href="{html.escape(repo)}">{html.escape(label)}</a></dd></div>
 <div><dt>Source commit</dt><dd>{source_line}</dd></div>
-<div><dt>SHA-256</dt><dd><code>{html.escape(item["sha256"])}</code></dd></div>
+{owner}<div><dt>SHA-256</dt><dd><code>{html.escape(item["sha256"])}</code></dd></div>
 <div><dt>Archive file</dt><dd><a href="../{html.escape(item["file"])}"><code>{html.escape(item["file"])}</code></a>
 — the exact bytes <code>package.el</code> installs, byte-compiled locally on install</dd></div>
 </dl>

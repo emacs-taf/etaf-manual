@@ -141,6 +141,23 @@ class ArchivePageTests(unittest.TestCase):
         self.assertIn(f"https://github.com/emacs-taf/alpha/blob/{'a' * 40}/CHANGELOG.md", page)
         self.assertNotIn("Latest changes", self.page("beta"))
 
+    def test_community_package_names_its_author_and_its_own_repository(self):
+        self.manifest["community"] = {"gamma": {"url": "https://github.com/someone/gamma",
+                                                "license": "GPL-3.0-or-later",
+                                                "maintainer": "someone"}}
+        self.write_manifest()
+        self.pages()
+        index = self.index()
+        self.assertIn('<section class="group" id="community">', index)
+        self.assertIn('<td class="author"><a href="https://github.com/someone">someone</a></td>', index)
+        self.assertIn('<td class="author"><a href="https://github.com/emacs-taf">emacs-taf</a></td>', index)
+        page = self.page("gamma")
+        self.assertIn('<a class="button" href="https://github.com/someone/gamma">Repository</a>', page)
+        self.assertIn("<dt>Maintained by</dt><dd>someone</dd>", page)
+        self.assertIn("<dt>License</dt><dd>GPL-3.0-or-later</dd>", page)
+        self.assertIn("its author maintains it", page)
+        self.assertNotIn("Maintained by", self.page("alpha"))
+
     def test_archive_without_update_dates_still_writes_readable_pages(self):
         self.write_manifest(dates=False)
         self.pages()

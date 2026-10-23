@@ -305,7 +305,27 @@ The border of the success status.
 
 <!-- index: frame background mode; theme toggle -->
 
-ETAF does not install a theme hook and does not re-resolve a Theme when the Emacs frame changes: a Theme is application data, and the application decides when to rebuild it. The provided building blocks are `etaf-theme-current-mode`, which reports whether the current frame is light or dark, and `etaf-theme-resolve-palette`, which turns one palette into a Theme for an explicit mode. A common arrangement is to keep the palette in application data, resolve it for the mode when the application starts or when its own toggle changes, and provide the result; because a provided Theme may be a ref, re-providing the new mode republishes the subtree without re-rendering it.
+ETAF does not install a theme hook and does not re-resolve a Theme when the Emacs frame changes: a Theme is application data, and the application decides when to rebuild it. A host that owns several surfaces provides their appearance explicitly ([Appearance inheritance](#appearance-inheritance)) and updates it when it re-resolves a Theme, so the Components below follow without knowing the host. The provided building blocks are `etaf-theme-current-mode`, which reports whether the current frame is light or dark, and `etaf-theme-resolve-palette`, which turns one palette into a Theme for an explicit mode. A common arrangement is to keep the palette in application data, resolve it for the mode when the application starts or when its own toggle changes, and provide the result; because a provided Theme may be a ref, re-providing the new mode republishes the subtree without re-rendering it.
+
+## Appearance inheritance
+
+<!-- index: appearance; light and dark surface; panel appearance -->
+
+A host may render a surface whose appearance differs from the frame, as a light panel inside a dark Emacs frame does. `etaf-appearance-provide` provides that appearance to the Component subtree, and `etaf-appearance` reads the nearest provided one; without a provider the frame's mode is returned. A host may provide a ref or a computed, so switching the appearance republishes the subtree without re-rendering it.
+
+#### Function: etaf-appearance-provide (appearance)
+
+Provide APPEARANCE (`light` or `dark`) to the current Component subtree.
+
+**Semantics.** APPEARANCE is `light`, `dark`, a ref or a computed. An invalid value signals `etaf-context-error` before anything is provided. The value applies to the current Component and its descendants until a nested provider replaces it.
+
+#### Function: etaf-appearance ()
+
+Return the appearance inherited from the nearest host, or the frame mode.
+
+**Semantics.** A provided ref or computed is read through `etaf-value`, so the calling Component re-renders when the host switches appearance. Without a provider the value comes from `etaf-theme-current-mode`.
+
+**Returns.** The symbol `light` or `dark`.
 
 ## Rule files
 

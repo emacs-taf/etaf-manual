@@ -305,7 +305,27 @@ token 在包含它的声明被降级时解析：内联 Host 属性在 Host 提�
 
 <!-- index: frame 背景模式; 主题切换 -->
 
-ETAF 不注册 theme hook，也不会在 Emacs frame 变化时重新解析 Theme：Theme 是应用数据，由应用决定何时重建它。提供的构件是 `etaf-theme-current-mode`（报告当前 frame 是明还是暗）与 `etaf-theme-resolve-palette`（按显式模式把一份调色板变成 Theme）。常见做法是把调色板放在应用数据里，在应用启动或自己的切换发生时按模式解析并提供结果；由于提供的 Theme 可以是 ref，重新提供新模式就能重新发布子树，而无需重渲染。
+ETAF 不注册 theme hook，也不会在 Emacs frame 变化时重新解析 Theme：Theme 是应用数据，由应用决定何时重建它。拥有多个表面的宿主可以显式提供它们的外观（见[外观继承](#外观继承)），并在重新解析 Theme 时更新它，下面的 Component 因此无需知道宿主就能跟随。提供的构件是 `etaf-theme-current-mode`（报告当前 frame 是明还是暗）与 `etaf-theme-resolve-palette`（按显式模式把一份调色板变成 Theme）。常见做法是把调色板放在应用数据里，在应用启动或自己的切换发生时按模式解析并提供结果；由于提供的 Theme 可以是 ref，重新提供新模式就能重新发布子树，而无需重渲染。
+
+## 外观继承
+
+<!-- index: 外观; 明暗表面; 面板外观 -->
+
+宿主可以渲染外观与 frame 不同的表面，例如深色 Emacs frame 里的亮色面板。`etaf-appearance-provide` 把该外观提供给当前 Component 子树，`etaf-appearance` 读取最近一次提供的值；没有提供者时返回 frame 的模式。宿主可以提供 ref 或 computed，于是切换外观会重新发布子树，而无需重新渲染。
+
+#### Function: etaf-appearance-provide (appearance)
+
+把 APPEARANCE（`light` 或 `dark`）提供给当前 Component 子树。
+
+**语义。** APPEARANCE 是 `light`、`dark`、ref 或 computed。非法值在提供之前以 `etaf-context-error` signal。该值作用于当前 Component 及其后代，直到更近的提供者替换它。
+
+#### Function: etaf-appearance ()
+
+返回从最近宿主继承的外观，或 frame 的模式。
+
+**语义。** 提供的 ref 或 computed 经 `etaf-value` 读取，因此宿主切换外观时调用方会重渲染。没有提供者时，值来自 `etaf-theme-current-mode`。
+
+**返回。** 符号 `light` 或 `dark`。
 
 ## 规则文件
 

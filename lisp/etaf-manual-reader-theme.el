@@ -13,6 +13,7 @@
 ;;; Code:
 
 (require 'cl-lib)
+(require 'etaf)
 
 (defcustom etaf-manual-reader-language "zh-CN"
   "Language the manual reader opens with.
@@ -80,8 +81,8 @@ reader's own language switch changes it for the running session."
   "Color palettes of the manual reader.")
 
 (defun etaf-manual-reader-auto-theme ()
-  "Return the palette matching the current frame's background mode."
-  (if (eq (frame-parameter nil 'background-mode) 'dark) 'dark 'light))
+  "Return the palette matching the host appearance."
+  (etaf-appearance))
 
 (defun etaf-manual-reader-palette (theme)
   "Return THEME's palette alist.

@@ -110,7 +110,7 @@ const text = {
     manualLead: 'This manual documents every public interface of ecss, ekp, ebox, etaf, etaf-ui and etaf-db, with the mechanisms behind them. Read the Introduction first, or jump to a reference.',
     other: { label: '简体中文', href: '/zh-cn/' },
     contact: {
-      telegram: { label: 'Telegram group', href: 'https://t.me/vhkd_group' },
+      telegram: { label: 'Telegram group', href: 'https://t.me/+4X48uOJC0KBkOWY1' },
       archive: { label: 'Package archive', href: '/packages/' },
     },
     theme: 'Switch color theme',
@@ -134,7 +134,7 @@ const text = {
     manualLead: '这里收录 ecss、ekp、ebox、etaf、etaf-ui 与 etaf-db 的全部公共接口，以及它们背后的机制。先读引言，也可以直接跳到参考章节。',
     other: { label: 'English', href: '/' },
     contact: {
-      telegram: { label: 'Telegram 群组', href: 'https://t.me/vhkd_group' },
+      telegram: { label: 'Telegram 群组', href: 'https://t.me/+4X48uOJC0KBkOWY1' },
       archive: { label: '包归档', href: '/packages/' },
     },
     theme: '切换配色',

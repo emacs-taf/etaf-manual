@@ -314,11 +314,11 @@ The gate reads the book and the sibling provider checkouts and reports each prob
 | `definition entries differ from LANGUAGE`, `section structure differs from LANGUAGE`, `runnable examples differ from LANGUAGE`, `index terms differ from LANGUAGE` | A translation does not match the reference language |
 | `generated NAME does not link KIND NAME`, `generated concept index does not link TARGET` / `does not list TERM` | Generated content misses an interface or index term it promises |
 | `Unknown generated content` | `generate` names no implemented generator |
-| `provider checkout missing: DIRECTORY`, `cannot read provider source`, `cannot load provider package PACKAGE` | A provider cannot be read or loaded |
+| `provider checkout missing: DIRECTORY`, `cannot read provider source`, `cannot load provider package PACKAGE` | A provider cannot be read or loaded; a package documented outside the workspace, such as `etaf-posframe`, needs its own dependency on `load-path` |
 
 ## Commands
 
-Run these from the repository root, with the provider repositories checked out as siblings:
+Run these from the repository root, with the provider repositories checked out as siblings.  The panels part documents `etaf-posframe`, which needs Posframe — an ELPA package, not a checkout — so `make book-check` and `make coverage` also need `POSFRAME_DIR`, defaulting to the newest `~/.emacs.d/elpa/posframe-*`:
 
 | Command | Effect |
 | --- | --- |

@@ -34,7 +34,7 @@ Every remaining panel option is passed to `etaf-posframe-show` unchanged, with r
 | `:focusable` | `t` |
 | `:focus-on-open`, `:auto-hide`, `:fill-height`, `:theme`, `:border`, `:draggable` | the `etaf-posframe-show` defaults |
 
-`:key` cannot be chosen by a registration: the registry sets it to ID, which is what makes `etaf-posframe-app` find the panel it opened. The full value table for the panel options is in [Panel options](posframe-panels.md#panel-options).
+An application that declared its surface with `etaf-surface-declare` in its View no longer takes `:theme`: the panel paints the application's palette, the title bar offers the application's modes, and the application's own switch and the title-bar switch write one cell of state, as [Surface declaration](component-styles-and-themes.md#surface-declaration) describes. `:key` cannot be chosen by a registration: the registry sets it to ID, which is what makes `etaf-posframe-app` find the panel it opened. The full value table for the panel options is in [Panel options](posframe-panels.md#panel-options).
 
 **Semantics.** Registration is global and independent of any open panel: it records how to build the application and nothing else, so registering twice with the same ID replaces the record and its shortcut instead of opening two panels. The session is created by `:create` and owned by the panel; hiding a panel whose application is not `:keep-alive` stops it, so a closed panel leaves nothing running, and a `:keep-alive` application keeps its session until `etaf-posframe-app-quit` stops it. `:on-stop` is the one place an application releases what its session holds — a socket, a timer, a file.
 

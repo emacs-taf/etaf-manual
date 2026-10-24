@@ -10,23 +10,23 @@
 
 | 选项 | 取值 | 默认 | 含义 |
 | --- | --- | --- | --- |
-| `:at` | 锚点符号、`(ANCHOR ROWS COLS)`、`(cells ROW COL)`、`(pixels X . Y)`、Posframe 的 poshandler | `point` | 面板落在哪里，按像素或按锚点。 |
-| `:stack` | `t`、`nil` | `nil` | 避开同一锚点上已打开的面板。需要带锚点的 `:at`。 |
-| `:width` | 正整数列数、`(fraction F)`，0 < F ≤ 1 | `etaf-posframe-default-width`，56 | 面板的内容列数。 |
-| `:height` | 正整数行数、`(fraction F)`，0 < F ≤ 1 | `etaf-posframe-default-max-height`，30 | 行预算；内容更高就裁剪。 |
-| `:fill-height` | `t`、`nil` | `nil` | frame 保持行预算高度，不收到内容高度。 |
-| `:title` | 字符串、`nil` | `nil` | 标题栏文字。不给就没有 header line，也不能拖动。 |
-| `:draggable` | `t`、`nil` | `nil` | 拖标题栏移动面板。需要 `:title`。 |
-| `:focusable` | `t`、`nil` | `nil` | 让面板拿键盘。 |
-| `:focus-on-open` | `t`、`nil` | 取 `:focusable` 的值 | 打开时选中面板。 |
-| `:auto-hide` | `nil`、`t`、正数秒 | `:focusable` 时为 `nil`，否则为 `t` | 用户转到别处时隐藏，或按秒数延迟隐藏。 |
-| `:theme` | `auto`、`light`、`dark`、Theme plist、Theme ref、Theme computed | `auto` | 面板与其中 View 的调色板。 |
-| `:border` | `:width`、`:color`、`:focus`、`:hover` 组成的 plist | `nil` | frame 边框宽度与三种状态颜色。 |
-| `:key` | 符号、`nil` | `nil` | 面板标识。同 key 的活面板会被替换。 |
+| `:at` | 落位 | `point` | 面板放在哪里 |
+| `:stack` | `t`、`nil` | `nil` | 同锚点叠放时避开已开的面板 |
+| `:width` | 列数、比例 | 56 | 内容列数 |
+| `:height` | 行数、比例 | 30 | 内容行预算 |
+| `:fill-height` | `t`、`nil` | `nil` | 保持行预算的高度 |
+| `:title` | 字符串 | `nil` | 标题栏文字 |
+| `:draggable` | `t`、`nil` | `nil` | 拖标题栏移动面板 |
+| `:focusable` | `t`、`nil` | `nil` | 让面板拿键盘 |
+| `:focus-on-open` | `t`、`nil` | 同 `:focusable` | 打开时选中面板 |
+| `:auto-hide` | `nil`、`t`、秒数 | 随 `:focusable` | 用户离开后隐藏 |
+| `:theme` | 模式、plist、ref | `auto` | 调色板 |
+| `:border` | 边框 plist | `nil` | 边框宽度与状态颜色 |
+| `:key` | 符号 | `nil` | 面板标识 |
 
 每个选项在进入时就校验，所以错值在 frame 还不存在时就报出来，而不是建到一半才炸。下面几节给每组的取值与行为；后面 `etaf-posframe-show` 的条目只写函数契约，调色板见 `etaf-posframe-theme` 与各变量的条目。
 
-### 落位：`:at` 与 `:stack`
+### 落位与叠放
 
 <!-- index: 面板锚点; 锚点名称; 字符格落位; 像素落位; 叠放面板 -->
 
@@ -35,7 +35,7 @@
 | 写法 | 例子 | 落点 |
 | --- | --- | --- |
 | 锚点符号 | `'frame-top-right` | 父 frame 或父窗口文本区里的一个具名位置。 |
-| 锚点加偏移 | `'(frame-top-right -2 0)` | 锚点再按字符格偏移：先行（负值向上），后列（负值向左）。 |
+| 锚点加偏移 | `'(point 0 -1)` | 锚点再按字符格偏移：先行（负值向上），后列（负值向左）。 |
 | 字符格 | `'(cells 0 0)` | 父窗口文本区里从左上角数起的第 ROW 行、第 COL 列，从 0 开始。 |
 | frame 像素 | `'(pixels 120 . 40)` | 父 frame 像素坐标的 X 与 Y。 |
 | 函数 | 任意 Posframe poshandler | 收到 Posframe 的落位信息，返回 `(X . Y)`。 |
@@ -58,7 +58,7 @@
 
 `:stack t` 读已有面板的 frame 矩形，与新面板比较后挪开。面板从顶部或居中锚点向下排、从底部锚点向上排，一列排不下就向左挪一列，始终不出父 frame；两个面板之间留 6 像素。`:stack` 需要带锚点的 `:at`（锚点符号或锚点加偏移），因为字符格、像素对和 poshandler 都没有叠放方向；`:stack` 配上其他 `:at` 会报错。
 
-### 尺寸：`:width`、`:height` 与 `:fill-height`
+### 面板尺寸
 
 <!-- index: 面板宽度; 面板高度; 面板比例; 面板收高 -->
 
@@ -74,13 +74,13 @@ frame 会收到渲染内容的高度，最多到 `:height` 预算，所以短的
 | `(fraction 0.5)` | 父 frame 宽或高的一半，夹在 frame 之内。 |
 | `(fraction 1)` | 整个父 frame。 |
 
-### 标题栏与拖动：`:title` 与 `:draggable`
+### 标题栏与拖动
 
 <!-- index: 面板标题; 面板拖动 -->
 
 `:title` 是字符串，变成内容之上的标题栏：整行宽，底色是面板表面，下面一条细线。没有 `:title` 的面板完全没有 header line，因此也没有标题栏上的主题切换条，也不能拖动。`:draggable t` 把 Posframe 自带的拖动绑到标题栏上；它需要 `:title`，而只有 `:draggable` 没有标题不会报错，只是不起作用。
 
-### 输入与寿命：`:focusable`、`:focus-on-open` 与 `:auto-hide`
+### 输入与寿命
 
 <!-- index: 面板焦点; 面板键盘; 面板自动隐藏 -->
 
@@ -96,7 +96,7 @@ frame 会收到渲染内容的高度，最多到 `:height` 预算，所以短的
 
 所以默认值跟着输入契约走：被动面板在用户去别处时消失，而拿着键盘的面板要留到被关闭，因为在用户手底下藏起来会丢掉已输入的内容。`etaf-posframe-hide-inactive` 是另一件事：Emacs 不是前台应用时隐藏所有面板，与 `:auto-hide` 无关。
 
-### 外观：`:theme` 与 `:border`
+### 主题与边框
 
 <!-- index: 面板主题选项; 面板边框选项; 面板调色板选择 -->
 
@@ -110,20 +110,20 @@ frame 会收到渲染内容的高度，最多到 `:height` 预算，所以短的
 | Theme plist | 原样使用，不做推导。 |
 | Theme ref 或 computed | 每次渲染时读取，持有调色板的宿主可以在面板活着时换掉它。 |
 
-`:theme` 为 `auto`、`light` 或 `dark` 的面板带标题栏主题切换条，因为这三种正是它能在其间切换的模式；自带调色板的面板没有切换条。
+`:theme` 为 `auto`、`light` 或 `dark` 的面板带标题栏主题切换条，因为这三种正是它能在其间切换的模式。内容用 `etaf-surface-declare`（见[表面声明](component-styles-and-themes.md#表面声明)）声明了自己的表面时，`:theme` 不再影响这个面板：面板改用内容声明的调色板，切换条也换成内容声明的模式。
 
 `:border` 用一个 plist 描述 frame 边框：
 
-| 字段 | 取值 | 默认 |
+| 字段 | 取值 | 不给时 |
 | --- | --- | --- |
-| `:width` | 0 到 19 的整数像素 | `etaf-posframe-border-width`，1 |
+| `:width` | 0 到 19 的整数像素 | 1 像素 |
 | `:color` | 颜色字符串、`nil` | 主题的面板边框色 |
-| `:focus` | 颜色字符串、`nil` | 主题强调色按 `etaf-posframe-border-focus-strength` 混进面板表面 |
-| `:hover` | 颜色字符串、`nil` | 同样的强调色按 `etaf-posframe-border-hover-strength` 混进面板表面 |
+| `:focus` | 颜色字符串、`nil` | 强调色按聚焦强度混入表面 |
+| `:hover` | 颜色字符串、`nil` | 强调色按悬停强度混入表面 |
 
-未知字段、超出 0 到 19 的宽度、非字符串的颜色都报 `etaf-posframe-error`。颜色写 `nil` 意思是「这一种从主题推导」，所以调用方可以只覆盖聚焦边框，另外两种继续跟随主题。
+写 `nil` 的那几种从主题推导：宽度取 `etaf-posframe-border-width`（默认 1），`:focus` 与 `:hover` 取 `etaf-posframe-border-focus-strength`（0.6）与 `etaf-posframe-border-hover-strength`（0.3），所以调用方可以只覆盖聚焦边框，另外两种继续跟随主题。未知字段、超出 0 到 19 的宽度、非字符串的颜色都报 `etaf-posframe-error`。
 
-### 标识：`:key`
+### 面板标识
 
 <!-- index: 面板 key; 替换面板 -->
 
@@ -217,7 +217,7 @@ frame 会收到渲染内容的高度，最多到 `:height` 预算，所以短的
 
 带 `:title` 的面板有整行宽的标题栏：一行高，底色是面板表面往前景轻抬一点的颜色，下面一条细线；`:theme` 是模式时，右侧还有主题切换条。标题栏会清掉主题自带的 `header-line` face，所以亮色主题不会给面板套一圈深色轮廓，即使在会反色 header line 的主题里，标题栏也保持面板自己的颜色。
 
-切换条是一行三个格子，每格是一个模式：
+面板自己的切换条是一行三个格子，每格是一个模式：
 
 | 格子 | 模式 | 效果 |
 | --- | --- | --- |
@@ -226,6 +226,8 @@ frame 会收到渲染内容的高度，最多到 `:height` 预算，所以短的
 | `暗` | `dark` | 把面板钉在暗色调色板。 |
 
 当前模式那一格填上主题强调色，字色按强调色的亮度取黑或白；另外两格保持标题栏表面，悬停时略暗。点一下会让这个面板在它剩下的寿命里按选中的模式重画。`:theme` 仍然是调用方传入的值，所以这个选择是会话设置，从不写进配置，面板重开时又回到配置的模式。这个控件是 etaf-ui 的 `etaf-toggle-strip`，见[按钮与选择控件](ui-buttons-and-choice-controls.md)。
+
+内容声明了自己的表面时，切换条改为按内容声明的模式表渲染，格子数与文字都由内容决定（微信读书因此是 `深`、`浅`、`纸` 三档），选中的是内容的当前模式，点一下写的就是内容与宿主共用的那一格模式。内容自己的快捷键写的也是同一格，所以两边任一处切换，内容、标题栏、frame 与边框一起重画，一个应用只有一个外观状态。
 
 指针不会抢键盘。面板不打开 buffer 级的 `track-mouse`，因为那会让 Emacs 在指针每次移动时选中指针下的 frame，离开面板就会把键盘带走。悬停边框改由一个短计时器读指针：指针下的面板把边框画成强调色，只有点击才移动键盘。已经聚焦的面板保持聚焦边框，不再加悬停色，两种状态因此不会叠在一起；主题切换条上已选中的格子同理，不加悬停底色。
 
@@ -263,7 +265,7 @@ Emacs 不是前台应用时隐藏面板，默认 `t`。
 
 <!-- index: 面板主题; 面板令牌; 面板边框; 边框强度 -->
 
-面板给它的 View 提供一个从父 frame 的 default face 推导出来的 Theme，所以面板里的应用跟着用户的调色板走，而不是自带一套颜色。面板 frame 画的是面板表面，标题栏、边框与 View 读同一份调色板，这也是亮色面板放在暗色 frame 里仍然亮而可读的原因。填了强调色的地方，字色按强调色的亮度选，所以浅强调色的暗主题与深强调色的亮主题都能得到可读的标签。
+面板给它的 View 提供一个从父 frame 的 default face 推导出来的 Theme，所以面板里的应用跟着用户的调色板走，而不是自带一套颜色。面板 frame 画的是面板表面，标题栏、边框与 View 读同一份调色板，这也是亮色面板放在暗色 frame 里仍然亮而可读的原因。内容用 `etaf-surface-declare` 声明了自己的表面时，面板改画内容的 Theme：frame、标题栏与边框都用那份调色板，面板不再从父 frame 推导第二份。填了强调色的地方，字色按强调色的亮度选，所以浅强调色的暗主题与深强调色的亮主题都能得到可读的标签。
 
 #### Function: etaf-posframe-theme (&optional frame mode)
 

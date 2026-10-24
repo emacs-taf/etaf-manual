@@ -34,7 +34,7 @@
 | `:focusable` | `t` |
 | `:focus-on-open`、`:auto-hide`、`:fill-height`、`:theme`、`:border`、`:draggable` | 与 `etaf-posframe-show` 的默认相同 |
 
-`:key` 不能由注册指定：注册表把它设成 ID，`etaf-posframe-app` 才能找到自己开的面板。面板选项的完整取值表见[面板选项](posframe-panels.md#面板选项)。
+应用在自己的 View 里用 `etaf-surface-declare` 声明了表面时，`:theme` 对它不再起作用：面板画应用自己的调色板，标题栏给出应用自己的模式，应用内部的切换与标题栏的切换写同一格状态，见[表面声明](component-styles-and-themes.md#表面声明)。`:key` 不能由注册指定：注册表把它设成 ID，`etaf-posframe-app` 才能找到自己开的面板。面板选项的完整取值表见[面板选项](posframe-panels.md#面板选项)。
 
 **语义。** 注册是全局的，与任何已打开的面板无关：它只记录怎么建这个应用，所以同一个 ID 再注册是替换记录与快捷键，而不是开出两个面板。会话由 `:create` 建、由面板持有；关掉一个没有 `:keep-alive` 的应用会停止它，面板关了就不留东西在跑，而 `:keep-alive` 的应用会一直留着会话，直到 `etaf-posframe-app-quit` 停它。`:on-stop` 是应用释放会话所持东西的唯一地方——一个连接、一个计时器、一个文件。
 

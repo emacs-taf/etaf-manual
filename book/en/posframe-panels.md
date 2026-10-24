@@ -8,25 +8,25 @@ A panel is a child frame that hosts one ETAF Runtime above the window you are wo
 
 `etaf-posframe-show`, `etaf-posframe-toggle` and `etaf-posframe-register-app` accept the same panel vocabulary. This table is the complete list: an option not in it is rejected with `etaf-posframe-error` before any frame is created.
 
-| Option | Accepted values | Default | Meaning |
+| Option | Value | Default | Meaning |
 | --- | --- | --- | --- |
-| `:at` | an anchor symbol, `(ANCHOR ROWS COLS)`, `(cells ROW COL)`, `(pixels X . Y)`, or a Posframe poshandler | `point` | Where the panel sits, in pixels or by anchor. |
-| `:stack` | `t`, `nil` | `nil` | Keep clear of the live panels opened at the same anchor. Needs an anchored `:at`. |
-| `:width` | positive integer columns, `(fraction F)` with 0 < F ≤ 1 | `etaf-posframe-default-width`, 56 | Content columns of the panel. |
-| `:height` | positive integer rows, `(fraction F)` with 0 < F ≤ 1 | `etaf-posframe-default-max-height`, 30 | Row budget; taller content clips. |
-| `:fill-height` | `t`, `nil` | `nil` | Keep the frame at the row budget instead of shrinking to the content. |
-| `:title` | string, `nil` | `nil` | Title-bar text. Without it the panel has no header line and cannot be dragged. |
-| `:draggable` | `t`, `nil` | `nil` | Move the panel by dragging its title bar. Needs `:title`. |
-| `:focusable` | `t`, `nil` | `nil` | Let the panel take the keyboard. |
-| `:focus-on-open` | `t`, `nil` | the value of `:focusable` | Select the panel when it opens. |
-| `:auto-hide` | `nil`, `t`, positive number of seconds | `nil` when `:focusable`, `t` otherwise | Hide the panel when the user works elsewhere, or after a delay. |
-| `:theme` | `auto`, `light`, `dark`, a Theme plist, a Theme ref, a Theme computed | `auto` | Palette of the panel and of the Views inside it. |
-| `:border` | plist of `:width`, `:color`, `:focus`, `:hover` | `nil` | Frame border width and the three state colours. |
-| `:key` | symbol, `nil` | `nil` | Identity of the panel. A live panel with the same key is replaced. |
+| `:at` | placement | `point` | Where the panel sits |
+| `:stack` | `t`, `nil` | `nil` | Clear of the panels at the same anchor |
+| `:width` | columns, fraction | 56 | Content columns |
+| `:height` | rows, fraction | 30 | Content row budget |
+| `:fill-height` | `t`, `nil` | `nil` | Keep the budget height |
+| `:title` | string | `nil` | Title-bar text |
+| `:draggable` | `t`, `nil` | `nil` | Drag the title bar to move it |
+| `:focusable` | `t`, `nil` | `nil` | Let the panel take the keyboard |
+| `:focus-on-open` | `t`, `nil` | the value of `:focusable` | Select it on open |
+| `:auto-hide` | `nil`, `t`, seconds | follows `:focusable` | Hide when the user moves on |
+| `:theme` | mode, plist, ref | `auto` | Palette |
+| `:border` | border plist | `nil` | Border width and state colours |
+| `:key` | symbol | `nil` | Identity of the panel |
 
 Every option is validated on entry, so a bad value signals before a frame exists rather than after a panel is half built. The rest of this section gives the accepted forms and the behaviour of each group; the entry for `etaf-posframe-show` below states the function contract, and the entries for `etaf-posframe-theme` and the variables give the palette.
 
-### Placement: `:at` and `:stack`
+### Placement and stacking
 
 <!-- index: panel anchor; anchor names; character cell placement; pixel placement; stacked panels -->
 
@@ -35,7 +35,7 @@ Every option is validated on entry, so a bad value signals before a frame exists
 | Form | Example | Position |
 | --- | --- | --- |
 | Anchor symbol | `'frame-top-right` | A named place inside the parent frame or the parent window's text area. |
-| Anchor plus offset | `'(frame-top-right -2 0)` | The anchor, shifted by character cells: rows first (negative goes up), columns second (negative goes left). |
+| Anchor plus offset | `'(point 0 -1)` | The anchor, shifted by character cells: rows first (negative goes up), columns second (negative goes left). |
 | Character cell | `'(cells 0 0)` | The cell at zero-based ROW and COL of the parent window's text area, counted from its top left. |
 | Frame pixels | `'(pixels 120 . 40)` | Absolute X and Y in the parent frame's pixels. |
 | Function | any Posframe poshandler | Called with Posframe's placement info, returns `(X . Y)`. |
@@ -58,7 +58,7 @@ An anchored panel keeps a margin to the edge it is anchored to, so it never sits
 
 `:stack t` reads the live panels, compares their frame rectangles with the new panel's and moves the new panel clear of them. Panels tile down a column from a top or centre anchor and up from a bottom one, jump to the left when the frame runs out of room, and never leave the parent frame; the gap between two stacked panels is 6 pixels. `:stack` needs an anchored `:at` — an anchor symbol or an anchor with an offset — because a character cell, a pixel pair or a poshandler carries no tiling direction. `:stack` with any other `:at` signals.
 
-### Size: `:width`, `:height` and `:fill-height`
+### Panel size
 
 <!-- index: panel width; panel height; panel fraction; panel fitting -->
 
@@ -74,13 +74,13 @@ Sizing is measured in the parent frame's character metrics. A panel whose conten
 | `(fraction 0.5)` | Half the parent frame's width or height, clamped to the frame. |
 | `(fraction 1)` | The whole parent frame. |
 
-### Title bar and dragging: `:title` and `:draggable`
+### Title bar and dragging
 
 <!-- index: panel title; panel dragging -->
 
 `:title` is a string and becomes the title bar above the content, painted full width in the panel surface with a hairline below it. A panel without `:title` has no header line at all, so it has no title-bar theme toggle either and cannot be dragged. `:draggable t` binds Posframe's own drag to that title bar; it needs `:title`, and a `:draggable` without a title is silently ineffective rather than an error.
 
-### Input and lifetime: `:focusable`, `:focus-on-open` and `:auto-hide`
+### Input and lifetime
 
 <!-- index: panel focus; panel keyboard; panel auto hide -->
 
@@ -96,7 +96,7 @@ Sizing is measured in the parent frame's character metrics. A panel whose conten
 
 The default therefore follows the input contract: a passive panel vanishes when the user works elsewhere, while a panel that holds the keyboard stays until it is closed, because hiding it under the user's hands would lose typed input. `etaf-posframe-hide-inactive` is a separate behaviour: it hides every panel while Emacs is not the active application, whatever `:auto-hide` says.
 
-### Appearance: `:theme` and `:border`
+### Theme and border
 
 <!-- index: panel theme option; panel border option; panel palette choice -->
 
@@ -110,20 +110,20 @@ The default therefore follows the input contract: a passive panel vanishes when 
 | Theme plist | Used as given, no derivation. |
 | Theme ref or computed | Read on each render, so a host that owns a palette can switch it under a live panel. |
 
-A panel whose `:theme` is `auto`, `light` or `dark` carries the title-bar theme toggle, because those three are the modes it can switch between; a panel with its own palette has no toggle.
+A panel whose `:theme` is `auto`, `light` or `dark` carries the title-bar theme toggle, because those three are the modes it can switch between. When the content declared its own surface with `etaf-surface-declare` (see [Surface declaration](component-styles-and-themes.md#surface-declaration)), `:theme` no longer affects that panel: the panel paints the content's palette and the toggle offers the content's modes.
 
 `:border` describes the frame border in one plist:
 
-| Field | Accepted values | Default |
+| Field | Accepted values | When absent |
 | --- | --- | --- |
-| `:width` | integer 0 to 19 pixels | `etaf-posframe-border-width`, 1 |
+| `:width` | integer 0 to 19 pixels | 1 pixel |
 | `:color` | colour string, `nil` | the Theme's panel border |
-| `:focus` | colour string, `nil` | the Theme accent tinted `etaf-posframe-border-focus-strength` into the panel surface |
-| `:hover` | colour string, `nil` | the same accent tinted `etaf-posframe-border-hover-strength` |
+| `:focus` | colour string, `nil` | the accent tinted into the surface by the focus strength |
+| `:hover` | colour string, `nil` | the same by the hover strength |
 
-An unknown field, a width outside 0 to 19 or a non-string colour signals `etaf-posframe-error`. A `nil` colour means "derive this one from the Theme", so a caller can override only the focused border and keep the other two derived.
+A `nil` colour means "derive this one from the Theme": the width comes from `etaf-posframe-border-width` (1), `:focus` and `:hover` from `etaf-posframe-border-focus-strength` (0.6) and `etaf-posframe-border-hover-strength` (0.3), so a caller can override only the focused border and keep the other two derived. An unknown field, a width outside 0 to 19 or a non-string colour signals `etaf-posframe-error`.
 
-### Identity: `:key`
+### Panel identity
 
 <!-- index: panel key; replacing a panel -->
 
@@ -217,7 +217,7 @@ Return non-nil while PANEL's frame exists and its Runtime is mounted.
 
 A panel with a `:title` has a full-width title bar: one row high, painted in the panel surface lifted slightly toward the foreground, with a hairline below it and, when the panel's `:theme` is a mode, the theme toggle at its right. The title bar clears the theme's own `header-line` face, so a light theme gets no dark outline around it and the bar keeps the panel's colors even when the theme inverts its header line.
 
-The toggle is one row of three boxes and every segment is a mode:
+The panel's own toggle is one row of three boxes and every segment is a mode:
 
 | Segment | Mode | Effect |
 | --- | --- | --- |
@@ -226,6 +226,8 @@ The toggle is one row of three boxes and every segment is a mode:
 | `暗` | `dark` | Pin the panel to the dark palette. |
 
 The segment of the current mode fills with the theme accent and its label takes black or white by the accent's luminance; the other two keep the title-bar surface and darken on hover. A click repaints that panel on the chosen mode for the rest of its life. `:theme` stays the value the caller passed, so the choice is a session setting that is never written to configuration, and reopening the panel starts from the configured mode again. The control is `etaf-toggle-strip` from etaf-ui, documented in [Buttons and Choice Controls](ui-buttons-and-choice-controls.md).
+
+When the content declared its own surface, the toggle renders that content's mode table instead: the number of segments and their labels come from the content, which is why the reader offers `深`, `浅` and `纸`. The selected segment is the content's current mode, and a click writes the one mode cell the content and its host share. The content's own key writes the same cell, so a switch on either side repaints the content, the title bar, the frame and the border together: one application has one appearance state.
 
 The pointer never takes the keyboard. A panel leaves buffer-level `track-mouse` off, because Emacs then selects the frame under the pointer whenever it moves, and leaving a panel would take the keyboard with the pointer. The hover border reads the pointer from a short timer instead: the panel under the pointer paints its border in the accent, and only a click moves the keyboard. A panel that is already focused keeps its focused border and takes no hover paint, so the two states never stack, and a focused segment of the theme toggle takes no hover fill for the same reason.
 
@@ -263,7 +265,7 @@ Move the input focus to a panel the mouse pointer rests on, `nil` by default.
 
 <!-- index: panel theme; panel token; panel border; border strength -->
 
-A panel provides a Theme to its Views, derived from the parent frame's default face, so an application painted inside it follows the user's palette instead of shipping colors. The panel frame paints the panel surface, and the title bar, the borders and the Views all read the same palette, which is why a light panel inside a dark frame stays light and readable. Ink on a filled accent follows the accent's luminance, so a dark theme with a pale accent and a light theme with a deep one both get readable labels.
+A panel provides a Theme to its Views, derived from the parent frame's default face, so an application painted inside it follows the user's palette instead of shipping colors. The panel frame paints the panel surface, and the title bar, the borders and the Views all read the same palette, which is why a light panel inside a dark frame stays light and readable. When the content declared its own surface with `etaf-surface-declare`, the panel paints that Theme instead: the frame, title bar and border all take that palette, and the panel derives no second one from the parent frame. Ink on a filled accent follows the accent's luminance, so a dark theme with a pale accent and a light theme with a deep one both get readable labels.
 
 #### Function: etaf-posframe-theme (&optional frame mode)
 

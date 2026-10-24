@@ -11,8 +11,20 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
   the palette and the border strengths, and a "Panel Applications" chapter for
   registering, opening, keeping alive and binding a whole application.  The two
   chapters are now that package's only user documentation.
+- `etaf-manual-reader-session` returns the reader session mounted in a buffer,
+  or nil.  `etaf-manual-open` is one host of `etaf-manual-reader-view'; a
+  floating panel or a desktop host is another, and each records its session in
+  the buffer it renders into, so the reader's commands and their Host keys find
+  the session instead of signalling that the buffer is not a reader.
 
 ### Changed
+
+- A reader mounted under a host declares its palette, its palette mode and the
+  `浅色`/`深色` modes there, so a panel framing it paints the reader's palette
+  and its title bar switches the reader: the two switches write one cell.
+- The reader's header no longer carries its own palette switch; `t` switches
+  the palette in the reader buffer and the title bar of a panel offers the same
+  two modes.
 
 - The archive's download count now counts installations instead of file fetches:
   a tarball counts only when the same client also requested its signature (what

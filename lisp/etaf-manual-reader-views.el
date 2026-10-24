@@ -5,7 +5,7 @@
 ;;; Commentary:
 ;;
 ;; The application shell of the manual reader: header with the brand,
-;; breadcrumb, language switch and theme switch; the navigation column with
+;; breadcrumb and language switch; the navigation column with
 ;; the three-level outline; the scrolling article column; and the key-hint
 ;; footer.  The shell composes the article layer of
 ;; `etaf-manual-reader-article' and the design system of
@@ -130,10 +130,6 @@ the reading position."
     (error (etaf-manual-reader-message
             session (error-message-string error)))))
 
-(defun etaf-manual-reader--theme-options ()
-  "Return the theme switch options."
-  '((light . "浅色") (dark . "深色")))
-
 (defun etaf-manual-reader--breadcrumb (session env compact)
   "Return SESSION's reading trail in ENV: part, chapter and section.
 COMPACT keeps only the chapter and section."
@@ -163,8 +159,6 @@ COMPACT keeps only the chapter and section."
 (defun etaf-manual-reader--header-view (session env)
   "Return the header View of SESSION in ENV."
   (let* ((language (etaf-manual-reader--read session :language))
-         (theme (or (etaf-manual-reader--read session :theme)
-                    (etaf-manual-reader-auto-theme)))
          (wide (etaf-manual-reader--wide-p env))
          (compact (etaf-manual-reader--compact-p env))
          (chrome (etaf-manual-reader--chrome
@@ -192,15 +186,7 @@ COMPACT keeps only the chapter and section."
                                     :options (etaf-manual-reader--language-options compact)
                                     :on-change (lambda (code)
                                                  (etaf-manual-reader--switch-language session code)))
-                              nil)
-                   (unless compact
-                     (etaf-node 'etaf-segmented
-                                (list :value theme
-                                      :options (etaf-manual-reader--theme-options)
-                                      :on-change (lambda (value)
-                                                   (etaf-manual-reader-set-theme
-                                                    session value)))
-                                nil))))))
+                              nil)))))
     (etaf-node 'box
                (list :ref 'etaf-manual-header
                      :width 'stretch

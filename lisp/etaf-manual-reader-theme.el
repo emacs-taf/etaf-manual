@@ -80,6 +80,12 @@ reader's own language switch changes it for the running session."
               (:hover . "#e9eef5"))))
   "Color palettes of the manual reader.")
 
+(defconst etaf-manual-reader--theme-modes
+  '((light . "浅色") (dark . "深色"))
+  "Palette modes the reader offers, in display order.
+The header switch and the title bar of a panel framing the reader both use
+this list, so the two controls never show different choices.")
+
 (defun etaf-manual-reader-auto-theme ()
   "Return the palette matching the host appearance."
   (etaf-appearance))

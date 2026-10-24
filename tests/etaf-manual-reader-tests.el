@@ -549,5 +549,68 @@ a renderer bug."
         (should (string-match-p "左子节点" text))
         (should-not (string-match-p "▶ 运行" text))))))
 
+(ert-deftest etaf-manual-reader-session-is-recorded-by-its-host ()
+  "A host that mounts the reader records its session in the host buffer.
+`etaf-manual-open' is one such host; a panel or a desktop host is another,
+which is why the reader's commands and Host keys find the mounted session
+there instead of reporting that the buffer is not a reader."
+  (let* ((session (etaf-manual-reader-create :language "zh-CN"
+                                             :chapter 'introduction))
+         (buffer (generate-new-buffer " *etaf-manual-reader-host*")))
+    (unwind-protect
+        (progn
+          (should-not (etaf-manual-reader-session buffer))
+          (etaf-mount buffer (etaf-manual-reader-view session))
+          (with-current-buffer buffer
+            (etaf-runtime-flush (etaf-runtime-for-buffer buffer)))
+          (should (eq session (etaf-manual-reader-session buffer)))
+          (with-current-buffer buffer
+            (should (eq session (etaf-manual-reader-session))))
+          (etaf-unmount (etaf-runtime-for-buffer buffer))
+          (should-not (etaf-manual-reader-session buffer)))
+      (when-let* ((runtime (etaf-runtime-for-buffer buffer)))
+        (ignore-errors (etaf-unmount runtime)))
+      (when (buffer-live-p buffer) (kill-buffer buffer)))))
+
+(defvar etaf-manual-reader-test--surface-session nil
+  "Reader session mounted by the surface host during a case.")
+
+(etaf-define-component etaf-manual-reader-test-surface-host (&key surface)
+  "Provide SURFACE to the reader mounted below."
+  :setup (etaf-surface-provide surface)
+  :view (expr (etaf-manual-reader-view etaf-manual-reader-test--surface-session)))
+
+(ert-deftest etaf-manual-reader-declares-its-palette-to-a-host ()
+  "A panel frames the reader with the reader's palette and switch.
+The session's palette mode is the one cell the reader's own header switch and
+the panel's title bar both write."
+  (let ((surface (etaf-surface-create))
+        (buffer (generate-new-buffer " *etaf-manual-reader-surface*")))
+    (let ((etaf-manual-reader-test--surface-session
+           (etaf-manual-reader-create :language "zh-CN" :theme 'dark)))
+      (unwind-protect
+          (progn
+            (etaf-mount buffer
+                        (etaf-view (etaf-manual-reader-test-surface-host
+                                    :surface surface))
+                        (list :viewport-width 1200 :viewport-height 40))
+            (should (equal '((light . "浅色") (dark . "深色"))
+                           (etaf-surface-modes surface)))
+            (should (eq 'dark (etaf-value (etaf-surface-mode surface))))
+            (should (equal "#191a1c"
+                           (plist-get (etaf-value (etaf-surface-theme surface))
+                                      :ui-bg)))
+            ;; A title-bar click writes the session's own palette mode, and
+            ;; the surface repaints from it.
+            (etaf-set-value (etaf-surface-mode surface) 'light)
+            (should (eq 'light
+                        (plist-get (etaf-manual-reader-state
+                                    etaf-manual-reader-test--surface-session)
+                                   :theme)))
+            (should (equal "#ffffff"
+                           (plist-get (etaf-value (etaf-surface-theme surface))
+                                      :ui-bg))))
+        (when (buffer-live-p buffer) (kill-buffer buffer))))))
+
 (provide 'etaf-manual-reader-tests)
 ;;; etaf-manual-reader-tests.el ends here

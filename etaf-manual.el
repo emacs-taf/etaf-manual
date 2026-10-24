@@ -122,6 +122,15 @@
 ;; mounted application uses.  The navigation and display functions below take such a
 ;; session as their first argument.
 ;;
+;; Function: etaf-manual-reader-session (&optional buffer)
+;;;###autoload (autoload 'etaf-manual-reader-session "etaf-manual" nil nil)
+;; Return the reader session mounted in BUFFER-OR-NAME, or nil.
+;; BUFFER-OR-NAME defaults to the current buffer.  `etaf-manual-open', a
+;; floating panel and a desktop host all mount `etaf-manual-reader-view', and
+;; each records its session in the buffer it renders into, so a command or a
+;; host can find the reader it acts on; a buffer without a mounted reader
+;; returns nil.
+;;
 ;; Function: etaf-manual-reader-state (session)
 ;; Return a detached snapshot of SESSION's reading state.
 ;; Keys are `:language', `:theme', `:chapter', `:chapter-title', `:part',

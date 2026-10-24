@@ -45,7 +45,34 @@ repaints the reader without a remount."
                         (etaf-manual-reader-theme-tokens (etaf-value theme)))
                       :name 'etaf-manual-reader-theme-tokens)))
   :setup
-  (etaf-theme-provide tokens)
+  (progn
+    (etaf-theme-provide tokens)
+    ;; One appearance state for the reader and the panel that frames it: the
+    ;; title bar's switch writes the session's palette mode, `T' writes the
+    ;; same cell, and both the reading surface and the panel's chrome paint
+    ;; from it.  A host that frames the reader declares the modes too.
+    (when-let* ((surface (etaf-surface-host)))
+      (etaf-surface-declare surface :theme tokens :mode theme
+                            :modes etaf-manual-reader--theme-modes))
+    ;; The reader's commands find their session in the buffer they run in.
+    ;; `etaf-manual-open' records it itself, but a panel or a desktop host
+    ;; mounts the same View without it, and the keys there must reach this
+    ;; session instead of reporting that the buffer is not a reader.
+    (etaf-on-mounted
+     (lambda ()
+       (when-let* ((runtime (etaf-current-runtime))
+                   (buffer (and runtime (etaf-runtime-buffer runtime))))
+         (when (buffer-live-p buffer)
+           (with-current-buffer buffer
+             (setq-local etaf-manual-reader--session reader))))))
+    (etaf-on-unmounted
+     (lambda ()
+       (when-let* ((runtime (etaf-current-runtime))
+                   (buffer (and runtime (etaf-runtime-buffer runtime))))
+         (when (buffer-live-p buffer)
+           (with-current-buffer buffer
+             (when (eq etaf-manual-reader--session reader)
+               (kill-local-variable 'etaf-manual-reader--session))))))))
   :render
   ;; A headless mount (batch or a hidden buffer) reports a zero viewport, so
   ;; only positive measurements are trusted; the renderer then keeps its
@@ -66,9 +93,20 @@ Use it to embed the reader in your own `etaf-mount' call; prefer
 
 ;;;; Buffer and commands
 
+;;;###autoload
+(defun etaf-manual-reader-session (&optional buffer)
+  "Return the reader session mounted in BUFFER-OR-NAME, or nil.
+BUFFER-OR-NAME defaults to the current buffer.  Every host that mounts
+`etaf-manual-reader-view' records its session in the buffer it renders into,
+so the reader's commands and their Host keys find the session they act on.
+A buffer without a mounted reader returns nil."
+  (let ((buffer (get-buffer (or buffer (current-buffer)))))
+    (and (buffer-live-p buffer)
+         (buffer-local-value 'etaf-manual-reader--session buffer))))
+
 (defun etaf-manual-reader--current ()
   "Return the session of the current buffer."
-  (or etaf-manual-reader--session
+  (or (etaf-manual-reader-session)
       (user-error "当前缓冲区不是 ETAF 手册阅读器")))
 
 (defun etaf-manual-reader--display (session name)

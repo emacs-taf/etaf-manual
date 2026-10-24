@@ -133,7 +133,7 @@ frame 会收到渲染内容的高度，最多到 `:height` 预算，所以短的
 | Theme plist | 原样使用，不做推导。 |
 | Theme ref 或 computed | 每次渲染时读取，持有调色板的宿主可以在面板活着时换掉它。 |
 
-`:theme` 为 `auto`、`light` 或 `dark` 的面板带标题栏主题切换条，因为这三种正是它能在其间切换的模式。内容用 `etaf-surface-declare`（见[表面声明](component-styles-and-themes.md#表面声明)）声明了自己的表面时，`:theme` 不再影响这个面板：面板改用内容声明的调色板，切换条也换成内容声明的模式。
+`:theme` 为 `auto`、`light` 或 `dark` 的面板带标题栏主题切换条，因为这三种正是它能在其间切换的模式。内容用 `etaf-surface-declare`（见[表面声明](component-styles-and-themes.md#表面声明)）声明了自己的表面时，调色板归内容所有，切换条也换成内容声明的模式。钉住的 `:theme` 一样会传到内容：面板在开面板那一刻把它切到钉住的模式，所以自带颜色的应用按调用方要的模式打开，而不是用它自己的默认。之后以内容的模式为准：标题栏切换条与内容自己的开关写同一个格子，两边重画的是同一个状态。
 
 `:border` 用一个 plist 描述 frame 边框：
 

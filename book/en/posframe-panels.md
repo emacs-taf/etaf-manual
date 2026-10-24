@@ -133,7 +133,7 @@ The default therefore follows the input contract: a passive panel vanishes when 
 | Theme plist | Used as given, no derivation. |
 | Theme ref or computed | Read on each render, so a host that owns a palette can switch it under a live panel. |
 
-A panel whose `:theme` is `auto`, `light` or `dark` carries the title-bar theme toggle, because those three are the modes it can switch between. When the content declared its own surface with `etaf-surface-declare` (see [Surface declaration](component-styles-and-themes.md#surface-declaration)), `:theme` no longer affects that panel: the panel paints the content's palette and the toggle offers the content's modes.
+A panel whose `:theme` is `auto`, `light` or `dark` carries the title-bar theme toggle, because those three are the modes it can switch between. When the content declared its own surface with `etaf-surface-declare` (see [Surface declaration](component-styles-and-themes.md#surface-declaration)), the content owns the palette and its modes are what the toggle offers. A pinned `:theme` still reaches that content: the panel starts it in the pinned mode once when it opens, so an application that owns its colours opens in the mode the caller asked for instead of its own default. From then on the content's mode cell is authoritative — the title-bar switch and the content's own switch write the same cell, and both repaints follow one state.
 
 `:border` describes the frame border in one plist:
 

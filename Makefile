@@ -3,6 +3,9 @@
 EMACS ?= emacs
 PYTHON ?= python3
 LOAD_PATH = -L . -L lisp -L ../etaf -L ../etaf-ui -L ../ebox -L ../ecss -L ../ekp
+# etaf-posframe is checked against the window manager it wraps; that is an
+# installed ELPA package, not a workspace checkout.
+POSFRAME_DIR ?= $(lastword $(sort $(wildcard $(HOME)/.emacs.d/elpa/posframe-*)))
 SOURCES = lisp/etaf-manual-book.el lisp/etaf-manual-generate.el
 SOURCES += lisp/etaf-manual-reader-theme.el lisp/etaf-manual-reader-style.el
 SOURCES += lisp/etaf-manual-reader-model.el lisp/etaf-manual-reader-article.el
@@ -20,12 +23,16 @@ compile:
 		--eval '(unless (cl-every (function byte-compile-file) (quote ($(foreach file,$(SOURCES),"$(file)")))) (kill-emacs 1))'
 
 # Validate book/ against the sibling provider checkouts; see docs/manual.md.
+# The panels part documents etaf-posframe, which needs Posframe: an ELPA
+# package, not a workspace checkout, so the book cannot be checked without it.
 book-check:
-	$(EMACS) -Q --batch -L . -L lisp --eval '(setq load-prefer-newer t)' -l scripts/check-book.el
+	@test -n "$(POSFRAME_DIR)" || { echo "book-check needs Posframe: install it, or set POSFRAME_DIR=/path/to/posframe"; exit 2; }
+	$(EMACS) -Q --batch -L . -L lisp -L $(POSFRAME_DIR) --eval '(setq load-prefer-newer t)' -l scripts/check-book.el
 
 # Print how many interfaces of each package already have a definition entry.
 coverage:
-	$(EMACS) -Q --batch -L . -L lisp --eval '(setq load-prefer-newer t)' -l scripts/check-book.el --coverage
+	@test -n "$(POSFRAME_DIR)" || { echo "coverage needs Posframe: install it, or set POSFRAME_DIR=/path/to/posframe"; exit 2; }
+	$(EMACS) -Q --batch -L . -L lisp -L $(POSFRAME_DIR) --eval '(setq load-prefer-newer t)' -l scripts/check-book.el --coverage
 
 tool-check:
 	EMACS="$(EMACS)" $(PYTHON) -m unittest discover -s tests/tools -p 'test_*.py'

@@ -36,6 +36,7 @@ The manual covers six packages:
 | `etaf` | The application framework: Views, Hosts, Components, reactive state, Context, Runtimes, events, Behaviors, Actions, Resources and Data | `ebox`, `ecss` |
 | `etaf-ui` | The official component catalog and its theme tokens | `etaf`, `ebox` |
 | `etaf-db` | Database backends for ETAF Data; currently SQLite | `etaf` |
+| `etaf-posframe` | Floating panels: any ETAF View in a child frame, with placement, a title bar, a theme toggle and an application registry | `etaf`, `etaf-ui` |
 
 Applications reach Ebox and ECSS only through ETAF, and no other package uses EKP. The manual still describes the public interfaces of these three packages completely, because each can be used on its own: Ebox without ETAF, ECSS with another host, and EKP for ordinary Emacs text each have a part of their own.
 
@@ -201,7 +202,7 @@ Every entry is public: it is part of its package's supported interface, and an i
 
 ## Versions
 
-This edition describes `ecss 0.1.0`, `ekp 1.0.1`, `ebox 3.1.1`, `etaf 0.3.1`, `etaf-ui 0.3.0` and `etaf-db 0.1.0`. The manual is maintained together with the code: a build check fails when a public interface of a package the manual covers has no entry, when a signature differs from the code, when the text names a symbol that is not public, or when a version above differs from the package.
+This edition describes `ecss 0.1.0`, `ekp 1.0.1`, `ebox 3.1.1`, `etaf 0.3.1`, `etaf-ui 0.3.0`, `etaf-db 0.1.0` and `etaf-posframe 0.1.0`. The manual is maintained together with the code: a build check fails when a public interface of a package the manual covers has no entry, when a signature differs from the code, when the text names a symbol that is not public, or when a version above differs from the package.
 
 ## Reading this manual in Emacs
 

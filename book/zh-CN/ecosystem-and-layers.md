@@ -25,6 +25,7 @@ ETAF 由六个包组成，分层的原则是每一类事实只有一个所有者
 | `etaf` | View 与 Component 语法、响应式状态与绑定、Runtime 的生命周期、Context、Theme、Behavior、Action、Data 与 Resource、分作用域的键盘层，以及对已提交 Host 的查询 | 布局、命中测试、焦点顺序和 buffer 写入，这些都委托给 Ebox |
 | `etaf-ui` | 官方组件目录：带键盘行为的可复用组件，以及它们读取的主题 token | 布局、焦点和命中测试：它的组件都是普通的 ETAF 组件 |
 | `etaf-db` | ETAF Data Source 契约的数据库后端；目前是 SQLite | Data Controller，它属于 ETAF |
+| `etaf-posframe` | 浮动面板：每块面板一个子 frame，以及它的落位、标题栏、主题开关、边框与应用注册表 | 面板内容，就是普通的 ETAF View；frame 的创建归 Posframe |
 | `ekp` | 中日韩文字与拉丁文字混排段落的 Knuth–Plass 最优断行，含避头尾规则、断词和像素级两端对齐；用 Emacs Lisp 实现，可选用 C 模块 | — |
 
 ECSS 和 Ebox 可以脱离上层的包单独使用。需要布局和 buffer 渲染、但用不着组件和响应式状态的包，适合直接用 Ebox。任何程序只要注册自己的属性词表，就能用 ECSS 计算样式，结果拿去驱动文字、控件还是诊断信息都可以。EKP 给普通的 Emacs 文本排版，其他包都不使用它。
@@ -38,12 +39,12 @@ ECSS 和 Ebox 可以脱离上层的包单独使用。需要布局和 buffer 渲�
 依赖只朝一个方向。下图中箭头从一个包指向依赖它的包：
 
 ```text
-ecss ──▶ ebox ──▶ etaf ──┬──▶ etaf-ui
+ecss ──▶ ebox ──▶ etaf ──┬──▶ etaf-ui ──▶ etaf-posframe
                          └──▶ etaf-db
 ekp
 ```
 
-没有哪个包依赖它上层的包，应用位于 `etaf-ui` 和 `etaf-db` 之上。ETAF 还直接依赖 ECSS：解析 Theme token 时，有些值要等到层叠阶段才由 ECSS 计算，直接依赖才能把这些值原样保留下来。
+没有哪个包依赖它上层的包，应用位于 `etaf-ui`、`etaf-db` 与 `etaf-posframe` 之上。ETAF 还直接依赖 ECSS：解析 Theme token 时，有些值要等到层叠阶段才由 ECSS 计算，直接依赖才能把这些值原样保留下来。
 
 应用使用 ETAF 和组件目录，不调用 Ebox。应用需要只有 Ebox 才有的能力时，比如测量或控制视口，由 ETAF 为它发布接口，应用再使用这个接口。
 

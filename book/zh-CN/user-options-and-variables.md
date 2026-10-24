@@ -126,6 +126,22 @@
 | [`ekp-para-cache-limit`](ekp-parameters.md#variable-ekp-para-cache-limit) | 缓存段落的最大数量。 |
 | [`ekp-use-c-module`](ekp-parameters.md#variable-ekp-use-c-module) | 非 nil 时用 C 动态模块计算 DP（若可用）。 |
 
+## 面板
+
+| Variable | Purpose |
+| --- | --- |
+| [`etaf-posframe-panel-keys`](posframe-panels.md#variable-etaf-posframe-panel-keys) | 可聚焦面板拿着焦点时始终生效的 keymap；在 `q`、`ESC` 与 `C-g` 上关闭面板。 |
+| [`etaf-posframe-hide-inactive`](posframe-panels.md#variable-etaf-posframe-hide-inactive) | Emacs 不是当前活动应用时隐藏面板。 |
+| [`etaf-posframe-focus-follows-mouse`](posframe-panels.md#variable-etaf-posframe-focus-follows-mouse) | 指针停在面板上时把输入焦点移过去。 |
+| [`etaf-posframe-border-width`](posframe-panels.md#variable-etaf-posframe-border-width) | `:border` 没给宽度时的 frame 边框像素数。 |
+| [`etaf-posframe-border-focus-strength`](posframe-panels.md#variable-etaf-posframe-border-focus-strength) | 聚焦边框里主题强调色占的比重。 |
+| [`etaf-posframe-border-hover-strength`](posframe-panels.md#variable-etaf-posframe-border-hover-strength) | 悬停边框里主题强调色占的比重。 |
+| [`etaf-posframe-default-width`](posframe-panels.md#variable-etaf-posframe-default-width) | 没有 `:width` 时新面板的内容列数。 |
+| [`etaf-posframe-default-max-height`](posframe-panels.md#variable-etaf-posframe-default-max-height) | 没有 `:height` 时新面板的最大内容行数。 |
+| [`etaf-posframe-apps`](posframe-applications.md#variable-etaf-posframe-apps) | 已注册应用，按注册顺序排列的 `(ID . PLIST)` 记录。 |
+| [`etaf-posframe-app-map`](posframe-applications.md#variable-etaf-posframe-app-map) | 每个注册快捷键一个绑定的 keymap。 |
+| [`etaf-posframe-app-repeat-delay`](posframe-applications.md#variable-etaf-posframe-app-repeat-delay) | 忽略重复应用开关的秒数。 |
+
 ## 性能工程
 
 | 变量 | 用途 |

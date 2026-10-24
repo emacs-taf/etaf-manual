@@ -126,6 +126,22 @@ Every documented variable, grouped by the chapter that defines it. Each row link
 | [`ekp-para-cache-limit`](ekp-parameters.md#variable-ekp-para-cache-limit) | Maximum number of cached paragraphs. |
 | [`ekp-use-c-module`](ekp-parameters.md#variable-ekp-use-c-module) | When non-nil, use C dynamic module for DP computation if available. |
 
+## Panels
+
+| Variable | Purpose |
+| --- | --- |
+| [`etaf-posframe-panel-keys`](posframe-panels.md#variable-etaf-posframe-panel-keys) | Keymap always active while a focusable panel has focus; closes it on `q`, `ESC` and `C-g`. |
+| [`etaf-posframe-hide-inactive`](posframe-panels.md#variable-etaf-posframe-hide-inactive) | Hide the panels while Emacs is not the active application. |
+| [`etaf-posframe-focus-follows-mouse`](posframe-panels.md#variable-etaf-posframe-focus-follows-mouse) | Move the input focus to a panel the pointer rests on. |
+| [`etaf-posframe-border-width`](posframe-panels.md#variable-etaf-posframe-border-width) | Frame border width in pixels when `:border` gives none. |
+| [`etaf-posframe-border-focus-strength`](posframe-panels.md#variable-etaf-posframe-border-focus-strength) | How much of the Theme accent a focused border shows. |
+| [`etaf-posframe-border-hover-strength`](posframe-panels.md#variable-etaf-posframe-border-hover-strength) | How much of the Theme accent a hovered border shows. |
+| [`etaf-posframe-default-width`](posframe-panels.md#variable-etaf-posframe-default-width) | Content columns of a new panel without `:width`. |
+| [`etaf-posframe-default-max-height`](posframe-panels.md#variable-etaf-posframe-default-max-height) | Maximum content lines of a new panel without `:height`. |
+| [`etaf-posframe-apps`](posframe-applications.md#variable-etaf-posframe-apps) | Registered applications as `(ID . PLIST)` records, in registration order. |
+| [`etaf-posframe-app-map`](posframe-applications.md#variable-etaf-posframe-app-map) | Keymap with one binding per registered shortcut. |
+| [`etaf-posframe-app-repeat-delay`](posframe-applications.md#variable-etaf-posframe-app-repeat-delay) | Seconds during which a repeated app toggle is ignored. |
+
 ## Performance Engineering
 
 | Variable | Purpose |

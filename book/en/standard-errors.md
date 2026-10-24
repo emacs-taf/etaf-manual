@@ -74,3 +74,10 @@ The error conditions are part of the public API: a program that calls the framew
 | [`etaf-sqlite-schema-error`](sqlite-backend.md#error-etaf-sqlite-schema-error) | `etaf-sqlite-error` | A descriptor or an initialized database does not match the declared schema. |
 | [`etaf-sqlite-unavailable`](sqlite-backend.md#error-etaf-sqlite-unavailable) | `etaf-sqlite-error` | The Emacs build has no SQLite support. |
 | [`etaf-sqlite-commit-unknown`](sqlite-backend.md#error-etaf-sqlite-commit-unknown) | `etaf-sqlite-error` | A mutation's commit outcome cannot be determined. |
+
+## ETAF Posframe
+
+| Condition | Parent | Signaled when |
+| --- | --- | --- |
+| [`etaf-posframe-error`](posframe-panels.md#error-etaf-posframe-error) | `error` | A panel option, anchor, size or `:border` plist is invalid, or the frame is not graphical. |
+

@@ -74,3 +74,10 @@
 | [`etaf-sqlite-schema-error`](sqlite-backend.md#error-etaf-sqlite-schema-error) | `etaf-sqlite-error` | 描述符或已初始化的数据库与声明的 schema 不符。 |
 | [`etaf-sqlite-unavailable`](sqlite-backend.md#error-etaf-sqlite-unavailable) | `etaf-sqlite-error` | 这个 Emacs 构建没有 SQLite 支持。 |
 | [`etaf-sqlite-commit-unknown`](sqlite-backend.md#error-etaf-sqlite-commit-unknown) | `etaf-sqlite-error` | 变更的提交结果无法确定。 |
+
+## ETAF Posframe
+
+| Condition | Parent | 触发条件 |
+| --- | --- | --- |
+| [`etaf-posframe-error`](posframe-panels.md#error-etaf-posframe-error) | `error` | 面板选项、锚点、尺寸或 `:border` plist 非法，或 frame 不是图形 frame。 |
+

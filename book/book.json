@@ -13,7 +13,8 @@
     "ebox",
     "etaf",
     "etaf-ui",
-    "etaf-db"
+    "etaf-db",
+    "etaf-posframe"
   ],
   "references": [
     "ebox-playground",
@@ -30,7 +31,8 @@
     "ebox",
     "ecss",
     "ekp",
-    "etaf"
+    "etaf",
+    "etaf-posframe"
   ],
   "parts": [
     {
@@ -164,6 +166,17 @@
         "ui-media-and-reactions",
         "ui-grids-and-character-surfaces",
         "ui-gallery-and-acceptance"
+      ]
+    },
+    {
+      "id": "panels",
+      "title": {
+        "en": "Floating Panels",
+        "zh-CN": "浮动面板"
+      },
+      "chapters": [
+        "posframe-panels",
+        "posframe-applications"
       ]
     },
     {

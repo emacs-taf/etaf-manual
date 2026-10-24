@@ -282,3 +282,29 @@ The unfilled track of a range bar.
                    :options '((day . "Day") (week . "Week")))
    (etaf-checkbox :label "Auto-save" :checked t)))
 ```
+
+## Toggle rows
+
+A header line and a mode line hold text, not Components.  `etaf-toggle-strip` is the same choice control as text, so a title bar or a status row can offer a small mutually exclusive switch without a second layout.
+
+#### Function: etaf-toggle-strip (&key options value on-change theme label surface)
+
+Return a two-way or three-way choice as one row of boxes for a text row.
+
+**Arguments.** OPTIONS is a nonempty alist of at least two unique scalar values with nonempty labels. VALUE is the selected key or nil. ON-CHANGE, when non-nil, receives the key of a clicked segment. THEME is the token plist that supplies `:ui-panel-fg`, `:ui-panel-border`, `:ui-accent` and `:ui-accent-fg`. LABEL, when non-nil, is painted before the row in `:ui-muted-fg`. SURFACE is the row's own background behind an unselected segment; nil uses the Theme's panel surface.
+
+**Semantics.** A header line and a mode line cannot mount a Component, so this returns the same control as a propertized string. The segments form one run, every segment is the same number of columns wide, and each carries its own one-pixel box, so the shared edges separate the segments and the chosen one paints the accent behind its label. A click calls ON-CHANGE. The selected segment takes no pointer-hover face, so the two states never stack and its label stays readable. The result is plain text: it is not a focus target and not a Tab stop, and the caller installs it in `header-line-format` or `mode-line-format` itself.
+
+**Returns.** A propertized string of `(length OPTIONS) × cells` columns.
+
+**Errors.** `error→ etaf-component-call-error` for an empty or malformed OPTIONS, for duplicate values or labels, for a VALUE outside OPTIONS, for a THEME without `:ui-panel-border`, or for an ON-CHANGE that is not a function.
+
+**Example.**
+
+```elisp
+(let ((theme (etaf-ui-theme-tokens '(:bg "#FAFAFA" :fg "#383A42"))))
+  (setq-local header-line-format
+              (etaf-toggle-strip :options '((light . "亮") (auto . "随") (dark . "暗"))
+                                 :value 'auto :theme theme
+                                 :on-change #'my-choose-mode)))
+```

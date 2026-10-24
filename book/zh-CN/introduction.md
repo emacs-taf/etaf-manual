@@ -36,6 +36,7 @@
 | `etaf` | 应用框架：View、Host、Component、响应式状态、Context、Runtime、事件、Behavior、Action、Resource 与 Data | `ebox`、`ecss` |
 | `etaf-ui` | 官方组件库及其主题 token | `etaf`、`ebox` |
 | `etaf-db` | ETAF Data 的数据库后端，目前实现 SQLite | `etaf` |
+| `etaf-posframe` | 浮动面板：把任意 ETAF View 放进子 frame，带落位、标题栏、主题开关与应用注册表 | `etaf`、`etaf-ui` |
 
 应用只经由 ETAF 使用 Ebox 和 ECSS，其他包都不使用 EKP。本书仍然完整描述这三个包的公共接口，因为它们都能单独使用。不经 ETAF 使用 Ebox、把 ECSS 接到别的宿主、用 EKP 给普通 Emacs 文本排版，各有一个部分专门讲。
 
@@ -201,7 +202,7 @@
 
 ## 版本
 
-本版描述 `ecss 0.1.0`、`ekp 1.0.1`、`ebox 3.1.1`、`etaf 0.3.1`、`etaf-ui 0.3.0` 和 `etaf-db 0.1.0`。本书与代码一同维护：本书已覆盖的包有公共接口缺少条目、签名与代码不符、正文点名了非公共符号，或上面的版本与包不符时，构建检查都会失败。
+本版描述 `ecss 0.1.0`、`ekp 1.0.1`、`ebox 3.1.1`、`etaf 0.3.1`、`etaf-ui 0.3.0`、`etaf-db 0.1.0` 和 `etaf-posframe 0.1.0`。本书与代码一同维护：本书已覆盖的包有公共接口缺少条目、签名与代码不符、正文点名了非公共符号，或上面的版本与包不符时，构建检查都会失败。
 
 ## 在 Emacs 中阅读本手册
 

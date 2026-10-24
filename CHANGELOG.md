@@ -4,6 +4,14 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
 
 ## Unreleased
 
+### Added
+
+- The manual documents `etaf-posframe`: a "Floating Panels" part with the panel
+  surface, the placement options, the title bar and theme toggle, the keyboard,
+  the palette and the border strengths, and a "Panel Applications" chapter for
+  registering, opening, keeping alive and binding a whole application.  The two
+  chapters are now that package's only user documentation.
+
 ### Changed
 
 - The archive's download count now counts installations instead of file fetches:

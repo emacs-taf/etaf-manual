@@ -25,6 +25,7 @@ The same buffer works in graphical and in terminal frames. A terminal frame draw
 | `etaf` | View and Component syntax, reactive state and bindings, the lifetime of Runtimes, Context, Themes, Behaviors, Actions, Data and Resources, the scoped keyboard layer, and queries about committed Hosts | Layout, hit testing, focus order and buffer writes, which it delegates to Ebox |
 | `etaf-ui` | The official component catalog: reusable components with their keyboard behavior, and the theme tokens they read | Layout, focus and hit testing: its components are ordinary ETAF components |
 | `etaf-db` | Database backends for the Data Source contract of ETAF; currently SQLite | Data Controllers, which belong to ETAF |
+| `etaf-posframe` | Floating panels: a child frame per panel, its placement, title bar, theme toggle, border and its application registry | Panel content, which is an ordinary ETAF View; frame creation, which Posframe owns |
 | `ekp` | Knuth–Plass optimal line breaking for paragraphs of mixed CJK and Latin text, with kinsoku rules, hyphenation and pixel-accurate justification, in Emacs Lisp and optionally in a C module | — |
 
 ECSS and Ebox can be used without the packages above them. Ebox suits a package that needs layout and buffer rendering but no components or reactive state. ECSS computes styles for any program that registers its own property vocabulary, whether the result drives text, a widget or a diagnostic. EKP lays out ordinary Emacs text; none of the other packages uses it.
@@ -38,12 +39,12 @@ Each package declares its requirements in the `Package-Requires` header of its e
 The dependencies point in one direction. In the following figure, an arrow points from a package to the packages that require it:
 
 ```text
-ecss ──▶ ebox ──▶ etaf ──┬──▶ etaf-ui
+ecss ──▶ ebox ──▶ etaf ──┬──▶ etaf-ui ──▶ etaf-posframe
                          └──▶ etaf-db
 ekp
 ```
 
-No package requires a package above it, and applications sit above `etaf-ui` and `etaf-db`. ETAF also requires ECSS directly, so that resolving Theme tokens can keep values whose computation ECSS defers to the cascade.
+No package requires a package above it, and applications sit above `etaf-ui`, `etaf-db` and `etaf-posframe`. ETAF also requires ECSS directly, so that resolving Theme tokens can keep values whose computation ECSS defers to the cascade.
 
 Applications use ETAF and the component catalog and do not call Ebox. When an application needs a capability that only Ebox has, such as a measurement or control of the viewport, ETAF publishes an interface for it, and the application uses that interface.
 

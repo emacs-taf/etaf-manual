@@ -282,3 +282,29 @@ range 条未填充的轨道。
                    :options '((day . "Day") (week . "Week")))
    (etaf-checkbox :label "Auto-save" :checked t)))
 ```
+
+## 文本行里的开关
+
+标题栏与模式行放的是文字，不是 Component。`etaf-toggle-strip` 是同一个选择控件的文字形式，标题栏或状态行因此能直接放一个小型互斥开关，不必再排一次布局。
+
+#### Function: etaf-toggle-strip (&key options value on-change theme label surface)
+
+把两三项互斥选择渲染成一行方框，供文本行使用。
+
+**参数。** OPTIONS 是至少两项的 alist，键为唯一标量、标签为非空字符串；VALUE 是选中的键或 nil；ON-CHANGE 非空时接收被点击分段的键；THEME 是提供 `:ui-panel-fg`、`:ui-panel-border`、`:ui-accent` 与 `:ui-accent-fg` 的 token plist；LABEL 非空时在控件前以 `:ui-muted-fg` 绘制；SURFACE 是未选中分段的底色，nil 用 Theme 的面板底。
+
+**语义。** 标题栏与模式行挂不上 Component，所以这里返回同一个控件的字符串形式。各分段连成一段，宽度相同，每段自带 1 px 边框，因此相邻边线把分段分隔开，选中段在标签后填强调色。点击调用 ON-CHANGE。选中段不带鼠标悬停底色，两种状态不会叠加，标签始终可读。结果是纯文本：不进焦点、不是 Tab 停靠点，由调用方放进 `header-line-format` 或 `mode-line-format`。
+
+**返回。** 一段带文本属性的字符串，宽度为 `(length OPTIONS) × 单元格` 列。
+
+**错误。** OPTIONS 为空或形式非法、值或标签重复、VALUE 不在 OPTIONS 中、THEME 缺 `:ui-panel-border`、或 ON-CHANGE 不是函数时报 `error→ etaf-component-call-error`。
+
+**示例。**
+
+```elisp
+(let ((theme (etaf-ui-theme-tokens '(:bg "#FAFAFA" :fg "#383A42"))))
+  (setq-local header-line-format
+              (etaf-toggle-strip :options '((light . "亮") (auto . "随") (dark . "暗"))
+                                 :value 'auto :theme theme
+                                 :on-change #'my-choose-mode)))
+```

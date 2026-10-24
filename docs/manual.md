@@ -205,6 +205,20 @@ Parts are numbered with Roman numerals, chapters with integers across the whole 
 
 A generated appendix or index has no source file. The package builds its Markdown from the definition entries and index markers, parses it with the same chapter parser and keeps it in the chapter's `:content`, so generated content is checked, translated and read like a written chapter.
 
+## Adding a package
+
+Documenting one more package in the book touches a fixed set of places, and the gate names any one of them that is missing:
+
+1. `book/book.json`: add the package to `packages` and `coverage`, and add a part whose `chapters` list the new chapter ids in reading order.
+2. Write the chapter once per language under `book/en/` and `book/zh-CN/` with the same headings, the same definition entries and the same number of examples.
+3. Give every Commentary record of the package one definition entry with the record's exact signature; `make coverage` prints `documented / total` per package and names what is still missing.
+4. Appendix rows live in `user-options-and-variables.md` (each `Variable:` record) and `standard-errors.md` (each `Error:` record), in both languages.
+5. Add the package to the version table in `versions-and-migration.md`, the package table and the edition line in `introduction.md`, and the responsibility table and dependency figure in `ecosystem-and-layers.md`, in both languages.
+6. When the package's dependency is an ELPA package rather than a sibling checkout, put it on the gate's `load-path` in the `Makefile` and say so here: the gate loads every documented package.
+7. The package's own repository then keeps no `docs/manual.md`; its README and entry Commentary link the chapters instead.
+
+Two traps cost time. A chapter's extra eLisp example block shifts the reader's example indexing, and `etaf-manual-reader-example-modes-switch` pins a chapter's example navigation, so give a new block its own section and rerun `make acceptance`. A code span naming a symbol is checked against the Commentary, so a variable an entry's docstring already names must be declared there before the book may mention it.
+
 ## Chapter format
 
 A chapter is a Markdown file. Write each paragraph, list item and table row on one line, and let the renderer fill it to the window: a line break inside a Chinese paragraph would render as a space.

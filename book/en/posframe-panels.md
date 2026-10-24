@@ -56,7 +56,7 @@ The anchors are twenty symbols: `point`, `point-top`, and every combination of `
 
 An anchored panel keeps a margin to the edge it is anchored to, so it never sits on a scroll bar or a window border: 8 pixels inside the parent frame, 4 pixels inside the window's text area. A right or bottom anchor also keeps the panel's own width or height inside the parent, so a wide panel cannot run off the screen. `point` places the panel at point growing upward, which keeps the text before point visible; `point-top` places it at point growing downward.
 
-`:stack t` reads the live panels, compares their frame rectangles with the new panel's and moves the new panel clear of them. Panels tile down a column from a top or centre anchor and up from a bottom one, jump to the left when the frame runs out of room, and never leave the parent frame; the gap between two stacked panels is 6 pixels. `:stack` needs an anchored `:at` — an anchor symbol or an anchor with an offset — because a character cell, a pixel pair or a poshandler carries no tiling direction. `:stack` with any other `:at` signals.
+`:stack t` reads the live panels and places the new panel against them, so a stack stays closed however tall each panel turned out. From a top or centre anchor the panel sits directly below the lowest panel it meets, from a bottom anchor directly above the highest, and two stacked frames stay 6 pixels apart. A column to the left takes the panel only when the frame has no room in the one it starts in, and a panel never leaves the parent frame. `:stack` needs an anchored `:at` — an anchor symbol or an anchor with an offset — because a character cell, a pixel pair or a poshandler carries no stacking direction. `:stack` with any other `:at` signals.
 
 ### Panel size
 

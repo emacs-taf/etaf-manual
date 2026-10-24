@@ -266,6 +266,14 @@ Copy the signature from the Commentary record; whitespace differences are ignore
 
 A style entry starts with a table giving the value syntax, the initial value, what the property applies to, whether it is inherited and whether it affects paint or geometry. Key bindings have no entry kind: list them in a table of key, command and context in the entry or section that owns the keymap.
 
+### Tables
+
+A table carries the values of one object and nothing else: one row per option, argument or condition, with short cells so a column can be read down. Put the exact names, formulas and defaults in the paragraph after the table, where they wrap like prose.
+
+The reason is mechanical: a cell wraps at word boundaries, so a cell holding a full identifier has nothing to wrap at and draws the run across its grid line, which makes the whole table read as misaligned. The same identifier in the paragraph below wraps normally.
+
+Keep every cell to one clause. Order the columns the way the reader asks: the name, its accepted values, its default and what it does; a two-column table pairs a value with its effect.
+
 ### Notation
 
 | Mark | Meaning |
@@ -361,5 +369,7 @@ When a package changes a public interface, update the affected chapters in every
         (plist-get (etaf-manual-book "zh-CN") :chapters))
      ⇒ ("引言" "响应式系统")
 ```
+
+A chapter identifier is a symbol, and the reader also accepts its name as a string: `(etaf-manual-open "posframe-panels")` and `(etaf-manual-open 'posframe-panels)` open the same chapter, and an unknown name signals `etaf-manual-error` instead of showing an empty page.
 
 `etaf-manual-book` caches the parsed book until a source file changes and signals `etaf-manual-error` for malformed sources. `etaf-manual-example-view` evaluates a runnable example and returns its View for `etaf-mount`.

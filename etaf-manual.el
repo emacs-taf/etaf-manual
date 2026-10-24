@@ -75,9 +75,10 @@
 ;; Function: etaf-manual-open (&optional chapter)
 ;;;###autoload (autoload 'etaf-manual-open "etaf-manual" nil t)
 ;; Open the manual reader in its own buffer and return that buffer.
-;; CHAPTER names a chapter identifier to start from, defaulting to the
-;; remembered reading position when there is one and to the first chapter
-;; otherwise.  The buffer gets `etaf-manual-reader-mode': `n' and `p' move
+;; CHAPTER is the chapter identifier (a symbol) or its name as a string, and
+;; defaults to the remembered reading position when there is one and to the
+;; first chapter otherwise.  An unknown chapter signals
+;; `etaf-manual-error' instead of opening an empty page.  The buffer gets `etaf-manual-reader-mode': `n' and `p' move
 ;; between sections, `u' goes up one level, `l' and `r' walk the reading
 ;; history, `[' and `]' change chapter, `/` searches the whole book and
 ;; `M-n'/`M-p' walk the matches, `e' edits the example at the reading
@@ -114,9 +115,11 @@
 ;; Function: etaf-manual-reader-create (&key language theme chapter)
 ;; Create a headless manual reader session and return it.
 ;; LANGUAGE defaults to `etaf-manual-language', THEME to the frame's own
-;; background mode, and CHAPTER to the manual's first chapter.  The session
-;; owns no buffer, so scripts and tests drive the same model the mounted
-;; application uses.  The navigation and display functions below take such a
+;; background mode, and CHAPTER to the manual's first chapter.  CHAPTER is
+;; the chapter identifier (a symbol) or its name as a string; an unknown
+;; chapter signals `etaf-manual-error' here, before any buffer exists.  The
+;; session owns no buffer, so scripts and tests drive the same model the
+;; mounted application uses.  The navigation and display functions below take such a
 ;; session as their first argument.
 ;;
 ;; Function: etaf-manual-reader-state (session)
@@ -139,8 +142,10 @@
 ;;
 ;; Function: etaf-manual-reader-goto (session chapter &optional node)
 ;; Move SESSION to CHAPTER and NODE, recording the previous position.
-;; NODE is a zero-based index into the chapter's section nodes, or nil for
-;; the chapter top.
+;; CHAPTER is the chapter identifier (a symbol) or its name as a string; an
+;; unknown chapter signals `etaf-manual-error' and leaves the reading
+;; position unchanged.  NODE is a zero-based index into the chapter's section
+;; nodes, or nil for the chapter top.
 ;;
 ;; Function: etaf-manual-reader-next (session)
 ;; Move SESSION to the next section, rolling into the next chapter.

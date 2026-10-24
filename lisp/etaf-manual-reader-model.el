@@ -70,10 +70,15 @@ missing, unreadable or malformed file is ignored.  nil uses
 (cl-defun etaf-manual-reader-create (&key language theme chapter)
   "Create a headless manual reader session and return it.
 LANGUAGE defaults to `etaf-manual-reader-language', THEME to the frame's own
-background mode, and CHAPTER to the manual's first chapter.  The session owns
-no buffer, so it is a complete headless reader for scripts and tests."
+background mode, and CHAPTER to the manual's first chapter.  CHAPTER is a
+chapter identifier, which is a symbol, or its name as a string.  An unknown
+chapter signals `etaf-manual-error' here, so a caller cannot mount a reader
+that has no chapter to show.  The session owns no buffer, so it is a complete
+headless reader for scripts and tests."
   (let* ((language (or language (etaf-manual-reader--default-language)))
-         (book (etaf-manual-book language)))
+         (book (etaf-manual-book language))
+         (chapter (and chapter (etaf-manual-reader--chapter-id
+                                (etaf-manual-reader--book-chapters book) chapter))))
     (list
      :language (etaf-ref language :name 'etaf-manual-reader-language)
      :theme (etaf-ref (or theme (etaf-manual-reader-auto-theme))
@@ -123,6 +128,22 @@ no buffer, so it is a complete headless reader for scripts and tests."
 (defun etaf-manual-reader--book (session)
   "Return SESSION's book in its current language."
   (etaf-manual-book (etaf-manual-reader--read session :language)))
+
+(defun etaf-manual-reader--book-chapters (book)
+  "Return BOOK's chapters in reading order."
+  (plist-get book :chapters))
+
+(defun etaf-manual-reader--chapter-id (chapters chapter)
+  "Return CHAPTER as the identifier CHAPTERS carries.
+CHAPTER is that identifier or its name string; anything else, including a
+name the book does not know, signals `etaf-manual-error'."
+  (let* ((id (if (stringp chapter) (intern chapter) chapter))
+         (known (and (symbolp id)
+                     (cl-find id chapters :key (lambda (entry) (plist-get entry :id))))))
+    (or known
+        (signal 'etaf-manual-error
+                (list (format "Unknown chapter: %S" chapter))))
+    id))
 
 (defun etaf-manual-reader--chapters (session)
   "Return SESSION's chapters in reading order."
@@ -704,9 +725,13 @@ progressively; it then completes the rest when Emacs is idle."
 
 (defun etaf-manual-reader-goto (session chapter &optional node)
   "Move SESSION to CHAPTER and NODE, recording the previous position.
-NODE is a zero-based index into the chapter's nodes, or nil for the chapter
-top.  Return SESSION."
-  (let ((target (cons chapter node)))
+CHAPTER is a chapter identifier or its name as a string; an unknown chapter
+signals `etaf-manual-error' and leaves SESSION where it was.  NODE is a
+zero-based index into the chapter's nodes, or nil for the chapter top.
+Return SESSION."
+  (let* ((chapter (etaf-manual-reader--chapter-id
+                   (etaf-manual-reader--chapters session) chapter))
+         (target (cons chapter node)))
     (etaf-batch
       (unless (equal (etaf-manual-reader--record session) target)
         (etaf-manual-reader--write

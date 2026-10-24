@@ -52,6 +52,16 @@
       "purpose": "A new session reads the first chapter and exposes its outline."
     },
     {
+      "name": "etaf-manual-reader-accepts-a-chapter-name",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "A chapter named by its string name opens that chapter, and the same name works for a later jump."
+    },
+    {
+      "name": "etaf-manual-reader-rejects-an-unknown-chapter",
+      "file": "tests/etaf-manual-reader-tests.el",
+      "purpose": "An unknown chapter signals etaf-manual-error and leaves the reading position unchanged."
+    },
+    {
       "name": "etaf-manual-reader-navigation-walks-sections-and-chapters",
       "file": "tests/etaf-manual-reader-tests.el",
       "purpose": "Next and previous move through sections and roll into other chapters."

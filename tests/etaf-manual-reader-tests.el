@@ -55,6 +55,36 @@
     (should (member "范围" (plist-get state :nodes)))
     (should-not (plist-get state :can-back))))
 
+(ert-deftest etaf-manual-reader-accepts-a-chapter-name ()
+  "A chapter may be named by its string name, which opens that chapter.
+The reader indexes chapters by symbol, so a name that stays a string used to
+match nothing and the page rendered empty."
+  (let* ((session (etaf-manual-reader-create :language "zh-CN"
+                                             :chapter "posframe-panels"))
+         (state (etaf-manual-reader-state session)))
+    (should (eq 'posframe-panels (plist-get state :chapter)))
+    (should (equal "浮动面板" (plist-get state :chapter-title)))
+    (should (member "面板选项" (plist-get state :nodes)))
+    (etaf-manual-reader-goto session "introduction")
+    (should (eq 'introduction
+                (plist-get (etaf-manual-reader-state session) :chapter)))))
+
+(ert-deftest etaf-manual-reader-rejects-an-unknown-chapter ()
+  "An unknown chapter signals before a reader shows a blank page.
+Arithmetic on the missing reading position used to fail instead, which read as
+a renderer bug."
+  (should-error (etaf-manual-reader-create :chapter "no-such-chapter")
+                :type 'etaf-manual-error)
+  (should-error (etaf-manual-reader-create :chapter 'no-such-chapter)
+                :type 'etaf-manual-error)
+  (let ((session (etaf-manual-reader-create :language "zh-CN"))
+        (before nil))
+    (setq before (etaf-manual-reader-state session))
+    (should-error (etaf-manual-reader-goto session "no-such-chapter")
+                  :type 'etaf-manual-error)
+    (should (eq (plist-get before :chapter)
+                (plist-get (etaf-manual-reader-state session) :chapter)))))
+
 (ert-deftest etaf-manual-reader-navigation-walks-sections-and-chapters ()
   "Next and previous move through sections and roll into other chapters."
   (let ((session (etaf-manual-reader-create :language "zh-CN")))

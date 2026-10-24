@@ -87,7 +87,7 @@ A panel's frame can be changed from outside: the user drags an edge, a caller ca
 | `nil` | None; the frame returns to the size the panel had. |
 | list | The axes whose edges it names: `left` or `right` for a width change, `top` or `bottom` for a height change. |
 
-The list names edges but acts per axis, because a child frame reports only its new size, not which edge the pointer held: `'(left right)` accepts any width change and no height change, and `'(bottom)` accepts a height change and refuses the width. A refused axis is put back immediately, so the frame never keeps a size the panel does not allow.
+The list names edges but acts per axis, because a child frame reports only its new size, not which edge the pointer held: `'(left right)` accepts any width change and no height change, and `'(bottom)` accepts a height change and refuses the width. A refused axis is put back immediately, so the frame never keeps a size the panel does not allow. A top or left edge drag moves the frame origin while it resizes, so a refused axis returns the origin too and the panel keeps its place.
 
 The panel's own fit to its content is not an outside resize, so it keeps working: a `nil` panel still shrinks to short content, and `:fill-height` still holds the row budget. A height change is only kept when it becomes the new budget — taller than the budget, or shorter than the content needs — because a panel otherwise fits its content.
 

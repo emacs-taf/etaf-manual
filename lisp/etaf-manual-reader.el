@@ -63,6 +63,10 @@ repaints the reader without a remount."
        (when-let* ((runtime (etaf-current-runtime))
                    (buffer (and runtime (etaf-runtime-buffer runtime))))
          (when (buffer-live-p buffer)
+           ;; The session records the buffer it renders into, which is what
+           ;; scrolling, progressive rendering and remembering read; a host
+           ;; other than `etaf-manual-open' must set it too.
+           (plist-put reader :buffer buffer)
            (with-current-buffer buffer
              (setq-local etaf-manual-reader--session reader))))))
     (etaf-on-unmounted
@@ -72,7 +76,13 @@ repaints the reader without a remount."
          (when (buffer-live-p buffer)
            (with-current-buffer buffer
              (when (eq etaf-manual-reader--session reader)
-               (kill-local-variable 'etaf-manual-reader--session))))))))
+               (kill-local-variable 'etaf-manual-reader--session))))
+         (when (eq (plist-get reader :buffer) buffer)
+           (plist-put reader :buffer nil))
+         ;; A mount renders the whole chapter again, so the next mount of a
+         ;; kept-alive session is complete instead of resuming a partial
+         ;; extent that no buffer is growing any more.
+         (etaf-manual-reader--write reader :extent nil)))))
   :render
   ;; A headless mount (batch or a hidden buffer) reports a zero viewport, so
   ;; only positive measurements are trusted; the renderer then keeps its

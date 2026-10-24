@@ -6,6 +6,11 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
 
 ### Added
 
+- A reader mounted by a host records the buffer it renders into, so its keys,
+  its scrolling, its progressive rendering and its position saving work in a
+  floating panel or a desktop host, not only in the buffer `etaf-manual-open`
+  creates.
+
 - The manual documents `etaf-posframe`: a "Floating Panels" part with the panel
   surface, the placement options, the title bar and theme toggle, the keyboard,
   the palette and the border strengths, and a "Panel Applications" chapter for
@@ -29,6 +34,15 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
 - The reader's header no longer carries its own palette switch; `t` switches
   the palette in the reader buffer and a panel's title bar offers all three
   modes.
+
+### Fixed
+
+- `n` and `p` now move the article, not only the navigation column: a host
+  records the buffer the session renders into, which is what the scroll after
+  a navigation reads.  Closing a host-mounted reader also finds its session.
+
+- Unmounting a reader clears its partial render extent, so a kept-alive
+  session reopens complete instead of resuming an extent no buffer grows.
 
 - The archive's download count now counts installations instead of file fetches:
   a tarball counts only when the same client also requested its signature (what

@@ -590,6 +590,36 @@ the theme while `亮' and `暗' pin the palette."
                                       :ui-bg))))
         (when (buffer-live-p buffer) (kill-buffer buffer))))))
 
+(ert-deftest etaf-manual-reader-mounted-by-a-host-saves-its-position ()
+  "A host-mounted reader resolves its own session and saves the position.
+Both look the session up in the buffer the host renders into; a panel that
+recorded neither left closing inert and never saved where the reader was."
+  (let* ((file (make-temp-file "etaf-manual-position" nil ".eld"))
+         (etaf-manual-reader-position-file file)
+         (session (etaf-manual-reader-create :language "zh-CN"
+                                             :chapter 'introduction))
+         (buffer (generate-new-buffer " *etaf-manual-reader-host*")))
+    (unwind-protect
+        (progn
+          (etaf-mount buffer (etaf-manual-reader-view session))
+          (with-current-buffer buffer
+            (etaf-runtime-flush (etaf-runtime-for-buffer buffer))
+            (etaf-manual-reader-goto session 'introduction 2)
+            ;; Closing from the reader buffer finds the session the host
+            ;; recorded, and remembers the section the reader moved to.
+            (call-interactively #'etaf-manual-close))
+          (should (file-exists-p file))
+          (let ((saved (with-temp-buffer
+                         (insert-file-contents file)
+                         (read (current-buffer)))))
+            (should (eq 'introduction (plist-get saved :chapter)))
+            (should (eql 2 (plist-get saved :node)))))
+      (when-let* ((runtime (and (buffer-live-p buffer)
+                                (etaf-runtime-for-buffer buffer))))
+        (ignore-errors (etaf-unmount runtime)))
+      (when (buffer-live-p buffer) (kill-buffer buffer))
+      (when (file-exists-p file) (delete-file file)))))
+
 (ert-deftest etaf-manual-reader-session-is-recorded-by-its-host ()
   "A host that mounts the reader records its session in the host buffer.
 `etaf-manual-open' is one such host; a panel or a desktop host is another,

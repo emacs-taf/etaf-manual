@@ -210,6 +210,11 @@
    "name": "etaf-manual-reader-auto-follows-the-host-appearance",
    "file": "tests/etaf-manual-reader-tests.el",
    "purpose": "An `auto' reader paints with the appearance its host provides and repaints when the host switches it, so 随 follows the Emacs theme while 亮 and 暗 pin the palette."
+  },
+  {
+   "name": "etaf-manual-reader-mounted-by-a-host-saves-its-position",
+   "file": "tests/etaf-manual-reader-tests.el",
+   "purpose": "A reader mounted by a host resolves its own session for keys and saves the section it moved to when it closes."
   }
  ]
 }

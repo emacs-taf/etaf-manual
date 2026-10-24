@@ -15,6 +15,7 @@ A panel is a child frame that hosts one ETAF Runtime above the window you are wo
 | `:width` | columns, fraction | 56 | Content columns |
 | `:height` | rows, fraction | 30 | Content row budget |
 | `:fill-height` | `t`, `nil` | `nil` | Keep the budget height |
+| `:resizable` | `t`, `nil`, side list | `t` | Which edges accept a resize |
 | `:title` | string | `nil` | Title-bar text |
 | `:draggable` | `t`, `nil` | `nil` | Drag the title bar to move it |
 | `:focusable` | `t`, `nil` | `nil` | Let the panel take the keyboard |
@@ -73,6 +74,28 @@ Sizing is measured in the parent frame's character metrics. A panel whose conten
 | `30` | Thirty content columns or rows. |
 | `(fraction 0.5)` | Half the parent frame's width or height, clamped to the frame. |
 | `(fraction 1)` | The whole parent frame. |
+
+### Resizing
+
+<!-- index: panel resize; resizable panel; panel width change; panel height change -->
+
+A panel's frame can be changed from outside: the user drags an edge, a caller calls `set-frame-size`, a tiling step rewrites it. A change the panel accepts becomes its new width and row budget, and the View re-lays out at it. `:resizable` decides which changes to accept.
+
+| Value | Accepted |
+| --- | --- |
+| `t` (default) | Any edge. |
+| `nil` | None; the frame returns to the size the panel had. |
+| list | The axes whose edges it names: `left` or `right` for a width change, `top` or `bottom` for a height change. |
+
+The list names edges but acts per axis, because a child frame reports only its new size, not which edge the pointer held: `'(left right)` accepts any width change and no height change, and `'(bottom)` accepts a height change and refuses the width. A refused axis is put back immediately, so the frame never keeps a size the panel does not allow.
+
+The panel's own fit to its content is not an outside resize, so it keeps working: a `nil` panel still shrinks to short content, and `:fill-height` still holds the row budget. A height change is only kept when it becomes the new budget — taller than the budget, or shorter than the content needs — because a panel otherwise fits its content.
+
+```elisp
+(etaf-posframe-show (etaf-view (text "panel"))
+                    :width 24 :height 8 :fill-height t
+                    :resizable '(left right bottom))
+```
 
 ### Title bar and dragging
 

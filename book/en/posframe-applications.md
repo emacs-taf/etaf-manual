@@ -32,7 +32,7 @@ Every remaining panel option is passed to `etaf-posframe-show` unchanged, with r
 | `:height` | `etaf-posframe-default-max-height` |
 | `:title` | the registration's `:title` |
 | `:focusable` | `t` |
-| `:focus-on-open`, `:auto-hide`, `:fill-height`, `:theme`, `:border`, `:draggable` | the `etaf-posframe-show` defaults |
+| `:focus-on-open`, `:auto-hide`, `:fill-height`, `:theme`, `:border`, `:draggable`, `:resizable` | the `etaf-posframe-show` defaults |
 
 An application that declared its surface with `etaf-surface-declare` in its View no longer takes `:theme`: the panel paints the application's palette, the title bar offers the application's modes, and the application's own switch and the title-bar switch write one cell of state, as [Surface declaration](component-styles-and-themes.md#surface-declaration) describes. `:key` cannot be chosen by a registration: the registry sets it to ID, which is what makes `etaf-posframe-app` find the panel it opened. The full value table for the panel options is in [Panel options](posframe-panels.md#panel-options).
 

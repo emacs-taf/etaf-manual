@@ -15,6 +15,7 @@
 | `:width` | 列数、比例 | 56 | 内容列数 |
 | `:height` | 行数、比例 | 30 | 内容行预算 |
 | `:fill-height` | `t`、`nil` | `nil` | 保持行预算的高度 |
+| `:resizable` | `t`、`nil`、方向列表 | `t` | 哪些边可以缩放 |
 | `:title` | 字符串 | `nil` | 标题栏文字 |
 | `:draggable` | `t`、`nil` | `nil` | 拖标题栏移动面板 |
 | `:focusable` | `t`、`nil` | `nil` | 让面板拿键盘 |
@@ -73,6 +74,28 @@ frame 会收到渲染内容的高度，最多到 `:height` 预算，所以短的
 | `30` | 三十个内容列或行。 |
 | `(fraction 0.5)` | 父 frame 宽或高的一半，夹在 frame 之内。 |
 | `(fraction 1)` | 整个父 frame。 |
+
+### 缩放
+
+<!-- index: 面板缩放; 可缩放面板; 面板改宽; 面板改高 -->
+
+面板的 frame 可以被外部改尺寸：用户拖边、调用方 `set-frame-size`、平铺一步。面板接受的变化会成为它新的宽度与行预算，View 按新尺寸重排。`:resizable` 决定接受哪些变化。
+
+| 取值 | 接受的变化 |
+| --- | --- |
+| `t`（默认） | 任意边。 |
+| `nil` | 都不接受；frame 回到面板原来的尺寸。 |
+| 列表 | 列表里那些边所在的轴：`left` 或 `right` 管宽度，`top` 或 `bottom` 管高度。 |
+
+列表写的是边，作用却按轴算，因为子 frame 只报新的尺寸，不报指针拖的是哪条边：`'(left right)` 接受任何宽度变化、不接受高度变化，`'(bottom)` 接受高度变化、拒绝宽度。被拒的那个轴立刻还原，frame 不会留着面板不允许的尺寸。
+
+面板自己按内容收高不是外部缩放，照样生效：`:resizable nil` 的面板仍会缩到矮内容，`:fill-height` 仍守住行预算。高度变化只有成为新预算时才保留——比预算更高，或比内容需要更矮——否则面板本来就贴内容。
+
+```elisp
+(etaf-posframe-show (etaf-view (text "panel"))
+                    :width 24 :height 8 :fill-height t
+                    :resizable '(left right bottom))
+```
 
 ### 标题栏与拖动
 

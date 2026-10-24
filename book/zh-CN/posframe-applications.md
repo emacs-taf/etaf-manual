@@ -32,7 +32,7 @@
 | `:height` | `etaf-posframe-default-max-height` |
 | `:title` | 注册里的 `:title` |
 | `:focusable` | `t` |
-| `:focus-on-open`、`:auto-hide`、`:fill-height`、`:theme`、`:border`、`:draggable` | 与 `etaf-posframe-show` 的默认相同 |
+| `:focus-on-open`、`:auto-hide`、`:fill-height`、`:theme`、`:border`、`:draggable`、`:resizable` | 与 `etaf-posframe-show` 的默认相同 |
 
 应用在自己的 View 里用 `etaf-surface-declare` 声明了表面时，`:theme` 对它不再起作用：面板画应用自己的调色板，标题栏给出应用自己的模式，应用内部的切换与标题栏的切换写同一格状态，见[表面声明](component-styles-and-themes.md#表面声明)。`:key` 不能由注册指定：注册表把它设成 ID，`etaf-posframe-app` 才能找到自己开的面板。面板选项的完整取值表见[面板选项](posframe-panels.md#面板选项)。
 

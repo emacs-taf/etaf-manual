@@ -14,7 +14,7 @@
 
 <!-- index: etaf-taskbar; window buttons; launcher button -->
 
-#### Component: etaf-taskbar (&key items active on-select on-launch launcher-label class)
+#### Component: etaf-taskbar (&key items active on-select on-launch launcher-label ref-prefix class)
 
 渲染受控任务栏，展示窗口 item。
 
@@ -40,7 +40,7 @@
 
 <!-- index: etaf-workspace-bar; workspace tabs; layout control; status -->
 
-#### Component: etaf-workspace-bar (&key workspaces active on-select on-add on-close add-label brand status layout-label layout-action settings-label settings-action class)
+#### Component: etaf-workspace-bar (&key workspaces active on-select on-add on-close add-label brand status layout-label layout-action settings-label settings-action ref-prefix class)
 
 把受控工作区渲染为可访问的工作区切换栏。
 

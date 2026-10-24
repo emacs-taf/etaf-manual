@@ -14,7 +14,7 @@ The bars and their items paint from the shell token set — `:ui-shell-bg`, `:ui
 
 <!-- index: etaf-taskbar; window buttons; launcher button -->
 
-#### Component: etaf-taskbar (&key items active on-select on-launch launcher-label class)
+#### Component: etaf-taskbar (&key items active on-select on-launch launcher-label ref-prefix class)
 
 Render a controlled taskbar for window items.
 
@@ -40,7 +40,7 @@ Render a controlled taskbar for window items.
 
 <!-- index: etaf-workspace-bar; workspace tabs; layout control; status -->
 
-#### Component: etaf-workspace-bar (&key workspaces active on-select on-add on-close add-label brand status layout-label layout-action settings-label settings-action class)
+#### Component: etaf-workspace-bar (&key workspaces active on-select on-add on-close add-label brand status layout-label layout-action settings-label settings-action ref-prefix class)
 
 Render controlled workspaces as an accessible workspace switcher bar.
 

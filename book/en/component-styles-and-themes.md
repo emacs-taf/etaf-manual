@@ -335,6 +335,62 @@ Return the appearance inherited from the nearest host, or the frame mode.
 
 **Returns.** The symbol `light` or `dark`.
 
+## Surface declaration
+
+<!-- index: surface declaration; application palette; panel paint -->
+
+An application that owns its palette and its light/dark switch can declare both to the host that frames it instead of letting the host guess a second one. `etaf-surface-create` makes the declaration slot, and the host provides it with `etaf-surface-provide` before rendering the content; the content reads the slot with `etaf-surface-host` in its Component `:setup` and writes its Theme, mode cell and mode table with `etaf-surface-declare`. The host reads `etaf-surface-theme`, `etaf-surface-mode` and `etaf-surface-modes` to paint its own frame, title bar and border, and uses the mode table as its switch. The mode cell is the only state: the content's own switch writes it and the host's switch writes it too, so the content and the surface framing it have one appearance state instead of one each. Without a host `etaf-surface-host` returns nil, and the content paints itself as before.
+
+#### Function: etaf-surface-create ()
+
+Return an empty surface declaration for a host to provide.
+
+**Semantics.** The host creates it once before providing it and keeps that same object afterwards: the content fills it in and the host reads the same one after the content mounts. The slot is ordinary data and does not travel in Context; the object itself does.
+
+**Returns.** A surface declaration, opaque to callers; pass it to `etaf-surface-provide` and the three readers.
+
+#### Function: etaf-surface-provide (surface)
+
+Provide SURFACE to the current Component subtree.
+
+**Semantics.** SURFACE comes from `etaf-surface-create`; any other value signals `etaf-context-error`. The slot is inherited down the Context, and the content reads it with `etaf-surface-host`. The object is mutable, so what the host reads after mounting is what the content wrote, not a copy taken when it was provided.
+
+**Returns.** SURFACE.
+
+#### Function: etaf-surface-host ()
+
+Return the surface declaration of the nearest host, or nil.
+
+**Semantics.** Call it from a content Component's `:setup`. An ordinary buffer, or a host that provides no slot, returns nil, so an application declares its surface only while it is framed and keeps painting its own palette when it stands alone.
+
+**Returns.** A surface declaration, or nil.
+
+#### Function: etaf-surface-declare (surface &key theme mode modes)
+
+Declare the content's own surface on host SURFACE.
+
+**Semantics.** THEME is a ref or computed holding the Theme plist, MODE a ref holding the current mode symbol, and MODES the ordered alist of `(MODE . LABEL)`, where LABEL is a string. Each keyword may be omitted, and an omitted field keeps its value, so the palette and the mode table can be declared in separate calls. The host paints its frame, title bar and border from THEME, uses MODES as the title-bar switch and writes MODE; the content reads the same cell, so a switch on either side repaints both. Calling it while rendering, an invalid value, or a SURFACE that is not a declaration slot signals `etaf-context-error` before anything is stored.
+
+**Returns.** SURFACE.
+
+#### Function: etaf-surface-theme (surface)
+
+Return SURFACE's Theme source (a ref or a computed), or nil when it declared none.
+
+**Semantics.** The host reads it through `etaf-value` after the content mounts and repaints its own surface; a content that replaces the source is followed by the host.
+
+#### Function: etaf-surface-mode (surface)
+
+Return SURFACE's mode ref, or nil when it declared none.
+
+**Semantics.** This is the one cell content and host share: the content's own switch writes it and the host's switch writes it too, and the Components that read it and the host repaint with it.
+
+#### Function: etaf-surface-modes (surface)
+
+Return SURFACE's ordered alist of `(MODE . LABEL)`, or nil when it declared none.
+
+**Semantics.** The host renders its switch in that order; nil means the content has no switch, and the host draws none.
+
 ## Rule files
 
 <!-- index: rule file; .ecss; stylesheet reload -->

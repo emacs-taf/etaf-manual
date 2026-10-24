@@ -335,6 +335,62 @@ token 在包含它的声明被降级时解析：内联 Host 属性在 Host 提�
 
 **返回。** 符号 `light` 或 `dark`。
 
+## 表面声明
+
+<!-- index: 表面声明; 应用自有主题; 面板配色 -->
+
+一个自带调色板和明暗开关的应用可以把这两样声明给承载它的宿主，而不是让宿主再猜一份。`etaf-surface-create` 造出声明槽，宿主在渲染内容之前用 `etaf-surface-provide` 把它放进 Context；内容在自己的 Component `:setup` 里用 `etaf-surface-host` 读到槽，再用 `etaf-surface-declare` 写下 Theme、模式格与模式表。宿主读 `etaf-surface-theme`、`etaf-surface-mode` 与 `etaf-surface-modes` 来画自己的 frame、标题栏和边框，并把模式表用作自己的切换。模式格是唯一的状态：内容自己的开关写它，宿主的切换也写它，于是内容与承载它的表面只有一个外观状态，而不是各存一份。没有宿主时 `etaf-surface-host` 返回 nil，内容照旧自己画自己。
+
+#### Function: etaf-surface-create ()
+
+返回一个空的表面声明，供宿主提供。
+
+**语义。** 宿主在提供之前造一次，之后一直持有同一个对象：内容把它填进去，宿主在内容挂载之后读同一份。声明槽是普通数据，不进 Context；随 Context 走的是这个对象本身。
+
+**返回。** 一个表面声明值，对调用方不透明；交给 `etaf-surface-provide` 和三个读取函数。
+
+#### Function: etaf-surface-provide (surface)
+
+把 SURFACE 提供给当前 Component 子树。
+
+**语义。** SURFACE 来自 `etaf-surface-create`，其他值以 `etaf-context-error` signal。槽沿 Context 向下继承，内容用 `etaf-surface-host` 读到它；对象本身可变，所以宿主在挂载之后读到的是内容写下的值，而不是提供时的那一份副本。
+
+**返回。** SURFACE。
+
+#### Function: etaf-surface-host ()
+
+返回最近宿主提供的表面声明，或 nil。
+
+**语义。** 在内容 Component 的 `:setup` 里调用。普通 buffer 或没有提供槽的宿主返回 nil，应用据此只在被宿主框住时声明，独立使用时仍画自己的调色板。
+
+**返回。** 表面声明，或 nil。
+
+#### Function: etaf-surface-declare (surface &key theme mode modes)
+
+在宿主 SURFACE 上声明内容自己的表面。
+
+**语义。** THEME 是持有 Theme plist 的 ref 或 computed，MODE 是持有当前模式符号的 ref，MODES 是 `(MODE . LABEL)` 的有序 alist，LABEL 是字符串。三个关键字各自可省略，省略的字段保持原值，所以调色板和模式表可以分两次声明。宿主从 THEME 画 frame、标题栏和边框，把 MODES 用作标题栏的切换并写 MODE；内容读同一格，因此任何一侧的切换都同时重画两侧。渲染期间调用、非法值、不是声明槽的 SURFACE 都在写入之前 signal `etaf-context-error`。
+
+**返回。** SURFACE。
+
+#### Function: etaf-surface-theme (surface)
+
+返回 SURFACE 的 Theme 来源（ref 或 computed），没有声明时为 nil。
+
+**语义。** 宿主在内容挂载后经 `etaf-value` 读它并重画自己的表面；内容换掉这个来源时宿主跟着重画。
+
+#### Function: etaf-surface-mode (surface)
+
+返回 SURFACE 的模式 ref，没有声明时为 nil。
+
+**语义。** 这是内容与宿主共用的那一格：内容自己的开关写它，宿主的切换也写它，读取它的 Component 和宿主随之重画。
+
+#### Function: etaf-surface-modes (surface)
+
+返回 SURFACE 的有序 `(MODE . LABEL)` alist，没有声明时为 nil。
+
+**语义。** 宿主按这个顺序渲染自己的切换控件；值为 nil 表示内容没有切换，宿主也不画切换。
+
 ## 规则文件
 
 <!-- index: 规则文件; .ecss; 样式表重载 -->

@@ -313,6 +313,14 @@ ETAF does not install a theme hook and does not re-resolve a Theme when the Emac
 
 A host may render a surface whose appearance differs from the frame, as a light panel inside a dark Emacs frame does. `etaf-appearance-provide` provides that appearance to the Component subtree, and `etaf-appearance` reads the nearest provided one; without a provider the frame's mode is returned. A host may provide a ref or a computed, so switching the appearance republishes the subtree without re-rendering it.
 
+#### Function: etaf-appearance-mode (&optional override)
+
+Return a computed appearance mode that follows the host.
+
+**Semantics.** OVERRIDE, when non-nil, is a ref holding `light` or `dark` and wins over the host; that is what an application's own light/dark switch writes. The computed tracks the host appearance, so a Component that reads it re-renders when the host switches.
+
+**Returns.** A computed ref whose value is `light` or `dark`.
+
 #### Function: etaf-appearance-provide (appearance)
 
 Provide APPEARANCE (`light` or `dark`) to the current Component subtree.

@@ -313,6 +313,14 @@ ETAF 不注册 theme hook，也不会在 Emacs frame 变化时重新解析 Theme
 
 宿主可以渲染外观与 frame 不同的表面，例如深色 Emacs frame 里的亮色面板。`etaf-appearance-provide` 把该外观提供给当前 Component 子树，`etaf-appearance` 读取最近一次提供的值；没有提供者时返回 frame 的模式。宿主可以提供 ref 或 computed，于是切换外观会重新发布子树，而无需重新渲染。
 
+#### Function: etaf-appearance-mode (&optional override)
+
+返回跟随宿主的 computed 外观模式。
+
+**语义。** OVERRIDE 非 nil 时是持有 `light` 或 `dark` 的 ref，优先于宿主；应用自己的明暗切换就写它。computed 会跟踪宿主外观，读取它的 Component 在宿主切换时重渲染。
+
+**返回。** 值为 `light` 或 `dark` 的 computed。
+
 #### Function: etaf-appearance-provide (appearance)
 
 把 APPEARANCE（`light` 或 `dark`）提供给当前 Component 子树。

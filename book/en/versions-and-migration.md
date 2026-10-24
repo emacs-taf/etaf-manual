@@ -14,7 +14,7 @@ The manual documents the version combination in the table below. Except for EKP 
 | `etaf` | 0.3.1 | Emacs 29.1, `ebox 3.1.1`, `ecss 0.1.0` |
 | `etaf-ui` | 0.3.0 | Emacs 29.1, `etaf 0.3.1`, `ebox 3.1.1` |
 | `etaf-db` | 0.1.0 | Emacs 29.1, `etaf 0.3.1` |
-| `etaf-manual` | 0.1.7 | Emacs 29.1, `etaf 0.3.1`, `etaf-ui 0.3.0` |
+| `etaf-manual` | 0.1.8 | Emacs 29.1, `etaf 0.3.1`, `etaf-ui 0.3.0` |
 
 The third column is the combination this edition documents.  Each package's `Package-Requires` header states the minimum it installs with, which can be lower.
 

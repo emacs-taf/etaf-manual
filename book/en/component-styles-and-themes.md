@@ -118,7 +118,7 @@ Resolve semantic PALETTE token specs for explicit MODE.
 
 Return the current frame color mode as `light` or `dark`.
 
-**Semantics.** The mode is read from the frame's `background-mode` parameter: `dark` maps to `dark` and anything else to `light`. This is only the default argument for palette resolution — an application-owned light/dark toggle passes its own mode to `etaf-theme-resolve-palette` instead of changing the Emacs frame.
+**Semantics.** The mode is read from the frame's `background-mode` parameter: `dark` maps to `dark` and anything else to `light`. This is only the default argument for palette resolution — an application-owned light/dark toggle passes its own mode to `etaf-theme-resolve-palette` instead of changing the Emacs frame. It also ties the caller to the theme-switch signal: after a switch, a Theme computed that reads it re-derives instead of keeping the mode it first read.
 
 **Returns.** The symbol `light` or `dark`.
 
@@ -305,7 +305,7 @@ The border of the success status.
 
 <!-- index: frame background mode; theme toggle -->
 
-ETAF does not install a theme hook and does not re-resolve a Theme when the Emacs frame changes: a Theme is application data, and the application decides when to rebuild it. A host that owns several surfaces provides their appearance explicitly ([Appearance inheritance](#appearance-inheritance)) and updates it when it re-resolves a Theme, so the Components below follow without knowing the host. The provided building blocks are `etaf-theme-current-mode`, which reports whether the current frame is light or dark, and `etaf-theme-resolve-palette`, which turns one palette into a Theme for an explicit mode. A common arrangement is to keep the palette in application data, resolve it for the mode when the application starts or when its own toggle changes, and provide the result; because a provided Theme may be a ref, re-providing the new mode republishes the subtree without re-rendering it.
+A Theme computed from the frame re-derives after an Emacs theme switch: `etaf-theme-current-mode` ties its caller to the switch, and a Theme or a render that reads it re-runs once per switch, after the enable and disable steps settle. A Theme that pins its own mode stays application data, and the application decides when to rebuild it. A host that owns several surfaces provides their appearance explicitly ([Appearance inheritance](#appearance-inheritance)) and updates it when it re-resolves a Theme, so the Components below follow without knowing the host. The provided building blocks are `etaf-theme-current-mode`, which reports whether the current frame is light or dark, and `etaf-theme-resolve-palette`, which turns one palette into a Theme for an explicit mode. A common arrangement is to keep the palette in application data, resolve it for the mode when the application starts or when its own toggle changes, and provide the result; because a provided Theme may be a ref, re-providing the new mode republishes the subtree without re-rendering it.
 
 ## Appearance inheritance
 

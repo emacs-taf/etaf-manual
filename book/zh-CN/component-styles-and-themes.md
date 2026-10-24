@@ -118,7 +118,7 @@ Theme 提供的 Host 默认值以 UA 来源进入 Ebox，因此普通作者声�
 
 把当前 frame 的颜色模式返回为 `light` 或 `dark`。
 
-**语义。** 模式从 frame 的 `background-mode` 参数读取：`dark` 映射为 `dark`，其他一切映射为 `light`。它只是解析调色板的默认参数——应用自己的明暗切换应把自身的模式传给 `etaf-theme-resolve-palette`，而不是去改 Emacs frame。
+**语义。** 模式从 frame 的 `background-mode` 参数读取：`dark` 映射为 `dark`，其他一切映射为 `light`。它只是解析调色板的默认参数——应用自己的明暗切换应把自身的模式传给 `etaf-theme-resolve-palette`，而不是去改 Emacs frame。它同时把调用方接到主题切换信号上：切换之后，读取它的 Theme computed 会重新推导，而不是沿用第一次读到的模式。
 
 **返回。** 符号 `light` 或 `dark`。
 
@@ -305,7 +305,7 @@ token 在包含它的声明被降级时解析：内联 Host 属性在 Host 提�
 
 <!-- index: frame 背景模式; 主题切换 -->
 
-ETAF 不注册 theme hook，也不会在 Emacs frame 变化时重新解析 Theme：Theme 是应用数据，由应用决定何时重建它。拥有多个表面的宿主可以显式提供它们的外观（见[外观继承](#外观继承)），并在重新解析 Theme 时更新它，下面的 Component 因此无需知道宿主就能跟随。提供的构件是 `etaf-theme-current-mode`（报告当前 frame 是明还是暗）与 `etaf-theme-resolve-palette`（按显式模式把一份调色板变成 Theme）。常见做法是把调色板放在应用数据里，在应用启动或自己的切换发生时按模式解析并提供结果；由于提供的 Theme 可以是 ref，重新提供新模式就能重新发布子树，而无需重渲染。
+由 frame 推导的 Theme 会在 Emacs 主题切换后重新推导：`etaf-theme-current-mode` 把调用方接到切换信号上，读取它的 Theme 或渲染在每次切换后重跑一次，且只在开关主题的多个步骤都结束后跑。钉住自身模式的 Theme 仍是应用数据，由应用决定何时重建。拥有多个表面的宿主可以显式提供它们的外观（见[外观继承](#外观继承)），并在重新解析 Theme 时更新它，下面的 Component 因此无需知道宿主就能跟随。提供的构件是 `etaf-theme-current-mode`（报告当前 frame 是明还是暗）与 `etaf-theme-resolve-palette`（按显式模式把一份调色板变成 Theme）。常见做法是把调色板放在应用数据里，在应用启动或自己的切换发生时按模式解析并提供结果；由于提供的 Theme 可以是 ref，重新提供新模式就能重新发布子树，而无需重渲染。
 
 ## 外观继承
 

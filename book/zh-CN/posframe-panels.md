@@ -2,21 +2,148 @@
 
 面板是一个子 frame，在你正在工作的窗口之上承载一个 ETAF Runtime：一个时钟、一个播放器、一个计时器、一份搜索结果。面板彼此独立——各自拥有 frame、Runtime 与输入，可以同时开好几个，而且面板从不改变当前 buffer。可聚焦的面板能拿到键盘；点面板任意位置会把它提到其他面板之上。本章讲面板本体；整套应用作为面板注册见[面板应用](posframe-applications.md)，面板提供给 View 的 Theme plist 见[组件样式与主题](component-styles-and-themes.md)，可聚焦面板收到的输入见[焦点](focus.md)与[键盘](keyboard.md)，面板落位的绝对坐标见[定位、层与浮层](positioning-layers-and-overlays.md)。
 
+## 面板选项
+
+<!-- index: 面板选项; etaf-posframe-show 选项; :at; :stack; :width; :height; :title; :theme; :border; :key -->
+
+`etaf-posframe-show`、`etaf-posframe-toggle` 与 `etaf-posframe-register-app` 接受同一套面板选项。下表是完整清单：不在表里的选项会在建 frame 之前就被 `etaf-posframe-error` 拒掉。
+
+| 选项 | 取值 | 默认 | 含义 |
+| --- | --- | --- | --- |
+| `:at` | 锚点符号、`(ANCHOR ROWS COLS)`、`(cells ROW COL)`、`(pixels X . Y)`、Posframe 的 poshandler | `point` | 面板落在哪里，按像素或按锚点。 |
+| `:stack` | `t`、`nil` | `nil` | 避开同一锚点上已打开的面板。需要带锚点的 `:at`。 |
+| `:width` | 正整数列数、`(fraction F)`，0 < F ≤ 1 | `etaf-posframe-default-width`，56 | 面板的内容列数。 |
+| `:height` | 正整数行数、`(fraction F)`，0 < F ≤ 1 | `etaf-posframe-default-max-height`，30 | 行预算；内容更高就裁剪。 |
+| `:fill-height` | `t`、`nil` | `nil` | frame 保持行预算高度，不收到内容高度。 |
+| `:title` | 字符串、`nil` | `nil` | 标题栏文字。不给就没有 header line，也不能拖动。 |
+| `:draggable` | `t`、`nil` | `nil` | 拖标题栏移动面板。需要 `:title`。 |
+| `:focusable` | `t`、`nil` | `nil` | 让面板拿键盘。 |
+| `:focus-on-open` | `t`、`nil` | 取 `:focusable` 的值 | 打开时选中面板。 |
+| `:auto-hide` | `nil`、`t`、正数秒 | `:focusable` 时为 `nil`，否则为 `t` | 用户转到别处时隐藏，或按秒数延迟隐藏。 |
+| `:theme` | `auto`、`light`、`dark`、Theme plist、Theme ref、Theme computed | `auto` | 面板与其中 View 的调色板。 |
+| `:border` | `:width`、`:color`、`:focus`、`:hover` 组成的 plist | `nil` | frame 边框宽度与三种状态颜色。 |
+| `:key` | 符号、`nil` | `nil` | 面板标识。同 key 的活面板会被替换。 |
+
+每个选项在进入时就校验，所以错值在 frame 还不存在时就报出来，而不是建到一半才炸。下面几节给每组的取值与行为；后面 `etaf-posframe-show` 的条目只写函数契约，调色板见 `etaf-posframe-theme` 与各变量的条目。
+
+### 落位：`:at` 与 `:stack`
+
+<!-- index: 面板锚点; 锚点名称; 字符格落位; 像素落位; 叠放面板 -->
+
+`:at` 有五种写法，写法决定位置怎么算：
+
+| 写法 | 例子 | 落点 |
+| --- | --- | --- |
+| 锚点符号 | `'frame-top-right` | 父 frame 或父窗口文本区里的一个具名位置。 |
+| 锚点加偏移 | `'(frame-top-right -2 0)` | 锚点再按字符格偏移：先行（负值向上），后列（负值向左）。 |
+| 字符格 | `'(cells 0 0)` | 父窗口文本区里从左上角数起的第 ROW 行、第 COL 列，从 0 开始。 |
+| frame 像素 | `'(pixels 120 . 40)` | 父 frame 像素坐标的 X 与 Y。 |
+| 函数 | 任意 Posframe poshandler | 收到 Posframe 的落位信息，返回 `(X . Y)`。 |
+
+锚点共二十个：`point`、`point-top`，以及 `frame` 或 `window` 与九个位置的全部组合。
+
+| 位置 | 在父 frame 内 | 在父窗口文本区内 |
+| --- | --- | --- |
+| 左上 | `frame-top-left` | `window-top-left` |
+| 上中 | `frame-top-center` | `window-top-center` |
+| 右上 | `frame-top-right` | `window-top-right` |
+| 左中 | `frame-center-left` | `window-center-left` |
+| 正中 | `frame-center` | `window-center` |
+| 右中 | `frame-center-right` | `window-center-right` |
+| 左下 | `frame-bottom-left` | `window-bottom-left` |
+| 下中 | `frame-bottom-center` | `window-bottom-center` |
+| 右下 | `frame-bottom-right` | `window-bottom-right` |
+
+按锚点落位时面板与所贴的边留出余量，不会压在滚动条或窗口边框上：父 frame 内留 8 像素，窗口文本区内留 4 像素。贴右或贴下的锚点还会把面板自己的宽或高留在父 frame 之内，宽面板不会跑出屏幕。`point` 把面板放在 point 处向上长，point 之前的文字仍然看得见；`point-top` 放在 point 处向下长。
+
+`:stack t` 读已有面板的 frame 矩形，与新面板比较后挪开。面板从顶部或居中锚点向下排、从底部锚点向上排，一列排不下就向左挪一列，始终不出父 frame；两个面板之间留 6 像素。`:stack` 需要带锚点的 `:at`（锚点符号或锚点加偏移），因为字符格、像素对和 poshandler 都没有叠放方向；`:stack` 配上其他 `:at` 会报错。
+
+### 尺寸：`:width`、`:height` 与 `:fill-height`
+
+<!-- index: 面板宽度; 面板高度; 面板比例; 面板收高 -->
+
+`:width` 是内容列数，`:height` 是内容行预算，边框、内边距与标题栏都加在它们之外。两者都接受正整数，或 `(fraction F)`，F 大于 0 且不超过 1，表示父 frame 宽或高的比例，结果夹在父 frame 之内。
+
+frame 会收到渲染内容的高度，最多到 `:height` 预算，所以短的 View 得到矮面板，长的到预算就裁剪而不是长出屏幕。`:fill-height t` 让 frame 始终占满行预算，固定网格的应用（例如棋盘）需要它：剩余的行由表面画出来，而不是 frame 收窄把棋盘裁掉。用户从外部改过的 frame 会成为面板新的宽或高，View 按它重排，收高也不再跟用户的尺寸较劲。
+
+尺寸用的是父 frame 的字符度量。内容比父 frame 宽的面板会被夹住，比例在每次显示时解析一次，之后改父 frame 大小是让面板重排，而不是重算比例。
+
+| 取值 | 含义 |
+| --- | --- |
+| `30` | 三十个内容列或行。 |
+| `(fraction 0.5)` | 父 frame 宽或高的一半，夹在 frame 之内。 |
+| `(fraction 1)` | 整个父 frame。 |
+
+### 标题栏与拖动：`:title` 与 `:draggable`
+
+<!-- index: 面板标题; 面板拖动 -->
+
+`:title` 是字符串，变成内容之上的标题栏：整行宽，底色是面板表面，下面一条细线。没有 `:title` 的面板完全没有 header line，因此也没有标题栏上的主题切换条，也不能拖动。`:draggable t` 把 Posframe 自带的拖动绑到标题栏上；它需要 `:title`，而只有 `:draggable` 没有标题不会报错，只是不起作用。
+
+### 输入与寿命：`:focusable`、`:focus-on-open` 与 `:auto-hide`
+
+<!-- index: 面板焦点; 面板键盘; 面板自动隐藏 -->
+
+`:focusable t` 让面板拿键盘，它的 View 的 `:keys`、文本框与按钮才收得到输入。默认是 nil，也就是面板默认只是只读表面，由调用方决定要不要接键盘；无论哪种情况，点面板任意位置都会把它提到其他面板之上。`:focus-on-open` 决定打开那一刻是否选中面板，默认取 `:focusable` 的值，所以可聚焦的面板一开就能直接打字，写 nil 则要等用户点一下。
+
+`:auto-hide` 管用户离开之后面板的寿命：
+
+| 取值 | 行为 | 默认用于 |
+| --- | --- | --- |
+| `nil` | 一直留到被关闭、被计时器隐藏或父 buffer 消失。 | `:focusable` 的面板 |
+| `t` | 下一条在面板之外执行的命令之前隐藏，预览随手一转就消失。 | 不可聚焦的面板 |
+| 正数 | 开面板后这么多秒隐藏。 | 无 |
+
+所以默认值跟着输入契约走：被动面板在用户去别处时消失，而拿着键盘的面板要留到被关闭，因为在用户手底下藏起来会丢掉已输入的内容。`etaf-posframe-hide-inactive` 是另一件事：Emacs 不是前台应用时隐藏所有面板，与 `:auto-hide` 无关。
+
+### 外观：`:theme` 与 `:border`
+
+<!-- index: 面板主题选项; 面板边框选项; 面板调色板选择 -->
+
+`:theme` 接受五类取值：
+
+| 取值 | 调色板 |
+| --- | --- |
+| `auto`（默认） | 从父 frame 的 default face 推导，跟随 Emacs 主题。 |
+| `light` | 钉在亮色模式。与 frame 一致的钉住保留 frame 自己的表面；不一致时用包里中性的亮色基色。 |
+| `dark` | 钉在暗色模式，规则同上：与 frame 一致就保留它的表面，否则用中性的暗色基色。 |
+| Theme plist | 原样使用，不做推导。 |
+| Theme ref 或 computed | 每次渲染时读取，持有调色板的宿主可以在面板活着时换掉它。 |
+
+`:theme` 为 `auto`、`light` 或 `dark` 的面板带标题栏主题切换条，因为这三种正是它能在其间切换的模式；自带调色板的面板没有切换条。
+
+`:border` 用一个 plist 描述 frame 边框：
+
+| 字段 | 取值 | 默认 |
+| --- | --- | --- |
+| `:width` | 0 到 19 的整数像素 | `etaf-posframe-border-width`，1 |
+| `:color` | 颜色字符串、`nil` | 主题的面板边框色 |
+| `:focus` | 颜色字符串、`nil` | 主题强调色按 `etaf-posframe-border-focus-strength` 混进面板表面 |
+| `:hover` | 颜色字符串、`nil` | 同样的强调色按 `etaf-posframe-border-hover-strength` 混进面板表面 |
+
+未知字段、超出 0 到 19 的宽度、非字符串的颜色都报 `etaf-posframe-error`。颜色写 `nil` 意思是「这一种从主题推导」，所以调用方可以只覆盖聚焦边框，另外两种继续跟随主题。
+
+### 标识：`:key`
+
+<!-- index: 面板 key; 替换面板 -->
+
+`:key` 是当前 buffer 内标识面板的符号。用已活着的 key 再显示一个 View 会替换那个面板——frame 被复用、View 重新挂载——而不同 key 的面板各自拥有 frame、Runtime 与位置。不给 `:key` 就是匿名面板，每次显示都新开一个。
+
 ## 打开、刷新与关闭
 
-<!-- index: etaf-posframe-show; etaf-posframe-hide; etaf-posframe-toggle; 面板选项; 面板标识 -->
+<!-- index: etaf-posframe-show; etaf-posframe-hide; etaf-posframe-toggle; etaf-posframe-refresh -->
 
 #### Function: etaf-posframe-show (view &rest options)
 
 把 VIEW 显示在一个浮动面板里并返回该面板。
 
-**参数。** VIEW 是一个 View，或返回 View 的零参函数；每次开面板都重新挂载并拿到自己的 Runtime，面板跟随调用时的当前 buffer。OPTIONS 是 plist：`:at` 是落位，可以是 `frame-top-right`、`window-center`、`point` 这类锚点，`(ANCHOR ROWS COLS)` 按字符格偏移锚点（负的行向上、负的列向左），`(cells ROW COL)` 指当前窗口的某个字符格，`(pixels X . Y)` 指 frame 像素，也可以直接给 Posframe 的 poshandler，默认 `point`；`:stack` 让面板避开同锚点上已有面板，顶部与居中锚点向下叠、底部锚点向上叠；`:width` 是内容列数，默认 `etaf-posframe-default-width`，写 `(fraction 0.5)` 取父 frame 宽度的一半，并夹在父 frame 之内；`:height` 是行预算，默认 `etaf-posframe-default-max-height`，写 `(fraction 0.5)` 取父 frame 高度的一半，内容更高就裁剪；`:fill-height` 让 frame 保持行预算而不是收到内容高度；`:title` 是标题栏文字，不给就没有 header line 也不能拖动；`:draggable` 允许拖标题栏移动面板；`:focusable` 让面板拿键盘，它的 View 的 `:keys`、文本框与按钮才收得到输入；`:focus-on-open` 决定打开时是否选中面板，默认与 `:focusable` 相同；`:auto-hide` 为 nil 时面板一直留到关闭，为 t 时用户转到别处就隐藏，为数字时表示秒数；`:theme` 为 `auto` 跟随 Emacs 主题、`light` 或 `dark` 钉住调色板、也可以直接给 Theme plist；`:border` 是[外观与边框](#外观与边框)里说明的边框 plist；`:key` 是面板标识。
+**参数。** VIEW 是一个 View，或返回 View 的零参函数。OPTIONS 是[面板选项](#面板选项)里那张表的 plist；本条只写契约，不重复表格。
 
-**语义。** 面板是一个 frame 加一份挂载好的 Runtime，所以里面的 View 与在 buffer 里完全一样：refs、组件、按键与保留更新都照旧，面板只额外提供 frame、标题栏与指针处理。用已经活着的 `:key` 再显示会替换那个面板；不同的 key 各自拥有 frame、Runtime 与位置，两个计时器才能并排放着。从外部改过大小的 frame 会成为面板新的宽或高，View 按新尺寸重排，而不是被弹回原尺寸。
+**语义。** 面板是一个 frame 加一份挂载好的 Runtime，所以里面的 View 与在 buffer 里完全一样：refs、组件、按键与保留更新都照旧，面板只额外提供 frame、标题栏与指针处理。每次开面板都重新挂载 View，并把面板的 Theme 与外观交给它，所以面板里的应用不用知道自己在一个面板里就跟着用户的调色板走。用已经活着的 `:key` 再显示会替换那个面板；不同的 key 各自拥有 frame、Runtime 与位置，两个计时器才能并排放着。
 
-**返回。** 一个面板值，对调用方不透明；交给下面几个函数使用。
+**返回。** 一个面板值，对调用方不透明；交给下面几个函数或 `etaf-posframe-hide` 使用。
 
-**错误。** 选项未知、锚点非法、或 frame 不是图形 frame 时报 `etaf-posframe-error`。显示失败会先卸载 View、删掉 frame，再把错误抛出去。
+**错误。** 选项未知、取值不在上表范围内、`:stack` 没有带锚点的 `:at`、或 frame 不是图形 frame 时报 `etaf-posframe-error`。显示失败会先卸载 View、删掉 frame，再把错误抛出去，所以调用方换成合法选项重试时是从干净状态开始。
 
 **示例。**
 
@@ -30,9 +157,9 @@
 
 隐藏 PANEL，并释放它的 Runtime、计时器与 frame。
 
-**语义。** PANEL 默认取当前 buffer 最新的面板，面板自己的按键就是这样调它的；其他面板不受影响。隐藏会释放这个面板持有的一切，所以隐藏之后到再显示之前不占任何开销。重复调用安全，只有真的隐藏了一个活面板才返回非 nil。
+**语义。** PANEL 默认取当前 buffer 最新的面板，面板自己的按键就是这样调它的；其他面板不受影响。隐藏会释放这个面板持有的一切——Runtime、自动隐藏计时器与 frame——所以隐藏之后到再显示之前不占任何开销，再显示时是重新挂载 View 而不是恢复旧状态。重复调用安全，对已经隐藏的面板也安全。
 
-**返回。** 隐藏了活面板时返回非 nil。
+**返回。** 隐藏了活面板时返回非 nil，否则返回 nil。
 
 **参见。** `etaf-posframe-show`、`etaf-posframe-toggle`、`etaf-posframe-app`。
 
@@ -40,7 +167,7 @@
 
 隐藏同一个 `:key` 的面板，或按 OPTIONS 显示 VIEW。
 
-**语义。** 没有 `:key` 时针对当前 buffer 最新的面板。这是「一个按键开关同一个面板、不碰其他面板」的入口，接受的选项与 `etaf-posframe-show` 相同。因为面板是重新挂载而不是复用，每次打开 View 都会读当时应用的状态。
+**语义。** 没有 `:key` 时针对当前 buffer 最新的面板。它接受 `etaf-posframe-show` 的全部选项，是「一个按键开关同一个面板、不碰其他面板」的入口。面板是重新挂载而不是复用，所以每次打开 View 都读当时应用的状态。
 
 **返回。** 新面板；隐藏了面板时返回 nil。
 
@@ -50,7 +177,7 @@
 
 安排 PANEL 按它的 frame 宽度重排，并把 frame 收到渲染内容的高度。
 
-**语义。** PANEL 默认取当前 buffer 的面板。从外部改过大小的 frame 会成为面板宽度，View 因此重排、标题栏按新的列数重画；收高推迟到当前事件与渲染之后，所以从按钮、计时器或主题回调里调用都安全。宿主 frame 尺寸变化时面板本来也会自动收高，只有内容高度变了却没有 Runtime 更新时才需要手动调一次。收高带退避，反复改尺寸的条件不会把 CPU 跑满。
+**语义。** PANEL 默认取当前 buffer 的面板。从外部改过大小的 frame 会成为面板宽度，View 因此重排、标题栏按新的列数重画；收高推迟到当前事件与渲染之后，所以从按钮、计时器或主题回调里调用都安全。宿主 frame 尺寸变化时面板本来也会自动收高，只有内容高度变了却没有 Runtime 更新时才需要手动调一次。收高带退避：一秒内收到二十次就停下，等两秒再试，所以跟它较劲的条件不会把 CPU 跑满。
 
 **返回。** PANEL 还活着时返回非 nil。
 
@@ -62,7 +189,7 @@
 
 返回活着的面板，最新的在前。
 
-**语义。** 返回的是副本，调用方可以边遍历边隐藏。顺序是最近使用顺序，`etaf-posframe-hide` 取默认面板、`etaf-posframe-cycle` 轮转都按它走。
+**语义。** 返回的是副本，调用方可以边遍历边隐藏。顺序是最近使用顺序，`etaf-posframe-hide` 取默认面板、`etaf-posframe-cycle` 轮转都按它走，`:stack` 找要避开的邻居也读它。
 
 **返回。** 面板值的列表。
 
@@ -70,7 +197,7 @@
 
 返回 PANEL 的子 frame；PANEL 不在了返回 nil。
 
-**语义。** 要读或比较 frame 用它，而不是去翻内部结构，例如按某个面板的位置摆放另一个面板，或记下 window id 用于截图。
+**语义。** 要读或比较 frame 用它，而不是去翻内部结构，例如按某个面板的位置摆放另一个面板、记下 window id 用于截图，或检查哪个 frame 有焦点。
 
 **返回。** 一个 frame 或 nil。
 
@@ -78,71 +205,101 @@
 
 #### Function: etaf-posframe-live-p (panel)
 
-PANEL 的 frame 还在、Runtime 还挂着时返回非 nil。
+只要 PANEL 的 frame 还在、Runtime 还挂着就返回非 nil。
 
-**语义。** 面板值比面板活得久：面板隐藏之后继续持有它是安全的，这个谓词回答还有没有东西可以对话。
+**语义。** 面板值比面板活得久：面板隐藏之后再拿着它也是安全的，这个谓词回答「还有没有活的对象可谈」。`etaf-posframe-hide` 的返回就是这个问题的另一个侧面。
 
-**返回。** 布尔量。
-
-## 落位
-
-<!-- index: 面板锚点; 面板叠放; 字符格落位 -->
-
-锚点名把面板放在父 frame 或当前窗口的相对位置，偏移锚点按字符格移动，面板就能贴着一行字而不是盖住它。字符格或像素对给出精确位置，跟随指针的面板、恢复记录位置的面板都靠它。`:stack` 读取同一锚点上的活面板并让新面板避开它们，所以同一个键连着开几个面板是叠起来而不是互相覆盖。面板是子 frame，按 frame 像素定位，不参与窗口布局。
+**返回。** 一个布尔值。
 
 ## 标题栏与指针
 
-<!-- index: 面板标题栏; 面板主题开关; 面板悬停边框; 面板拖动 -->
+<!-- index: 面板标题栏; 面板主题切换; 面板悬停边框 -->
 
-带 `:title` 的面板有一整行标题栏：一行高，底色是面板底向文字色微微抬起，下面一条发丝线，右侧在面板的 `:theme` 是某个模式时放着主题开关。标题栏会清掉主题自带的 `header-line` 脸，所以亮色主题不会在它周围画一圈深色描边。设了 `:draggable` 时拖标题栏移动面板，那是 Posframe 自己的拖动，应用不必写代码。
+带 `:title` 的面板有整行宽的标题栏：一行高，底色是面板表面往前景轻抬一点的颜色，下面一条细线；`:theme` 是模式时，右侧还有主题切换条。标题栏会清掉主题自带的 `header-line` face，所以亮色主题不会给面板套一圈深色轮廓，即使在会反色 header line 的主题里，标题栏也保持面板自己的颜色。
 
-指针不会拿走键盘。面板不打开 buffer 级的 `track-mouse`，因为那样指针一动 Emacs 就会选中指针下的 frame，离开面板就等于把键盘带走了。悬停边框改由一个短计时器读指针：指针下的面板把边框画成强调色，只有点击才移动键盘。已经聚焦的面板保持聚焦边框、不叠悬停色，所以两种状态不会叠在一起。
+切换条是一行三个格子，每格是一个模式：
 
-标题栏里的主题开关就是[按钮与选择控件](ui-buttons-and-choice-controls.md)里的 `etaf-toggle-strip`，一排 `亮`、`随`、`暗`：选中格填主题强调色，其余格保持标题栏底色。点一下就让这块面板在余下的生命周期里用那个模式重画；`:theme` 仍然是调用方传的值，所以这个选择是会话设置，从不写配置。自带调色板的面板没有开关。
+| 格子 | 模式 | 效果 |
+| --- | --- | --- |
+| `亮` | `light` | 把面板钉在亮色调色板。 |
+| `随` | `auto` | 重新跟随 Emacs 主题。 |
+| `暗` | `dark` | 把面板钉在暗色调色板。 |
+
+当前模式那一格填上主题强调色，字色按强调色的亮度取黑或白；另外两格保持标题栏表面，悬停时略暗。点一下会让这个面板在它剩下的寿命里按选中的模式重画。`:theme` 仍然是调用方传入的值，所以这个选择是会话设置，从不写进配置，面板重开时又回到配置的模式。这个控件是 etaf-ui 的 `etaf-toggle-strip`，见[按钮与选择控件](ui-buttons-and-choice-controls.md)。
+
+指针不会抢键盘。面板不打开 buffer 级的 `track-mouse`，因为那会让 Emacs 在指针每次移动时选中指针下的 frame，离开面板就会把键盘带走。悬停边框改由一个短计时器读指针：指针下的面板把边框画成强调色，只有点击才移动键盘。已经聚焦的面板保持聚焦边框，不再加悬停色，两种状态因此不会叠在一起；主题切换条上已选中的格子同理，不加悬停底色。
+
+`:draggable` 打开后拖动标题栏就能移动面板；拖动由 Posframe 负责，应用不用写代码，面板位置也不会回报。
 
 ## 键盘
 
 <!-- index: 面板按键; 面板焦点; 面板轮转 -->
 
-只有用 `:focusable` 打开的面板才能聚焦，也只有那时它的 View 的按键、文本框与按钮才收得到输入；点面板任意位置把它提到其他面板之上，这一条与是否可聚焦无关。可聚焦面板拿着键盘时 `etaf-posframe-panel-keys` 始终生效，而且只在这三个绑定上压过 View 自己的按键，关闭面板因此不依赖应用记得去绑它。
+面板只有在打开时给了 `:focusable` 才能拿键盘，也只有那时它的 View 的按键、文本框与按钮才收得到输入；无论哪种情况，点面板任意位置都会把它提到其他面板之上。拿到焦点之后，面板的按键来自 View，`etaf-posframe-panel-keys` 只额外加三个优先于它们的绑定，所以关闭面板从不指望应用记得去绑它。
 
 #### Variable: etaf-posframe-panel-keys
 
-可聚焦面板拿着焦点时始终生效的 keymap。
+可聚焦面板有焦点时始终生效的 keymap。
 
-**语义。** 它在 `q`、`ESC` 与 `C-g` 上关闭面板，也只在这三个绑定上压过 View 自己的按键，其余按键应用可以随便用。View 想抢回这三个键是不可能的：正因如此，面板在任何状态下都能关掉，包括按键处理卡住的 View。
+**语义。** 它把 `q`、`ESC` 与 `C-g` 绑成关闭面板，并只在这三个绑定上压过 View 自己的按键，所以应用可以随意使用其他键。View 的按键赢不了这三个，这正是面板在任何状态下（包括 View 自己的按键处理卡住时）都关得掉的原因。这个 map 在面板拿焦点时读取，调用方可以往里加绑定，只在这三个键上会被它盖住。
 
 **参见。** `etaf-posframe-cycle`、`etaf-posframe-hide`。
 
 #### Variable: etaf-posframe-hide-inactive
 
-Emacs 不是当前活动应用时隐藏面板，默认 t。
+Emacs 不是前台应用时隐藏面板，默认 `t`。
 
-**语义。** 子 frame 本身就是一个窗口，会列出窗口的窗口管理器因此会把它当成目标，点它会激活 Emacs 而不是它背后的应用。另一个应用活动时把面板藏起来，那份窗口列表就干净了；Emacs 重新活动时面板回来。
+**语义。** 子 frame 本身是一个窗口，所以会列出窗口的窗口管理器（例如 macOS 的调度中心）会把面板当成切换目标，点它会激活 Emacs 而不是身后的应用。前台是别的应用时隐藏面板就能让这份列表保持干净；Emacs 回到前台时面板再出现。写 nil 则保持可见，适合要贴着别的应用一直留在屏幕上的面板。这个变量与 `:auto-hide` 无关，后者管的是用户在 Emacs 里去了别处。
 
 #### Variable: etaf-posframe-focus-follows-mouse
 
-指针停在面板上时把输入焦点移过去，默认 nil。
+指针停在哪个面板上就把输入焦点给它，默认 `nil`。
 
-**语义。** 只会聚焦可接受键盘的面板。默认把键盘留在用户放的地方，悬停边框因此不需要选项：指针下的面板画强调色边框但不动键盘，移动键盘的是点击。
+**语义。** 只对接受键盘的面板生效。默认把键盘留在用户放下的地方，这也是悬停边框不需要开关的原因：指针下的面板把边框画成强调色、键盘不动，点击才移动它。设成 `t` 之后悬停本身就换键盘目标，适合以指针为主的用法，不适合以打字为主的用法。
 
 **参见。** `etaf-posframe-show`、`etaf-posframe-panel-keys`。
 
 ## 外观与边框
 
-<!-- index: 面板主题; 面板调色板; 面板边框; 边框强度 -->
+<!-- index: 面板主题; 面板令牌; 面板边框; 边框强度 -->
 
-面板给它的 View 提供一份 Theme，从父 frame 的默认脸推导，所以画在里面的应用跟随用户的调色板，而不是自带一套颜色。面板 frame 画的是面板底色，标题栏、边框与 View 读同一份调色板，深色 frame 里的亮色面板因此仍然亮着、仍然可读。
+面板给它的 View 提供一个从父 frame 的 default face 推导出来的 Theme，所以面板里的应用跟着用户的调色板走，而不是自带一套颜色。面板 frame 画的是面板表面，标题栏、边框与 View 读同一份调色板，这也是亮色面板放在暗色 frame 里仍然亮而可读的原因。填了强调色的地方，字色按强调色的亮度选，所以浅强调色的暗主题与深强调色的亮主题都能得到可读的标签。
 
 #### Function: etaf-posframe-theme (&optional frame mode)
 
-返回从 FRAME 默认脸推导出的 ETAF UI Theme plist。
+返回从 FRAME 的 default face 推导出来的 ETAF UI Theme plist。
 
-**参数。** FRAME 默认取选中的 frame。MODE 为 `light` 或 `dark` 时把调色板钉在该模式，nil 则跟随 FRAME。与 frame 自身底色一致的钉法保留那个底色，所以在跟随主题与钉住 frame 自己的模式之间切换时面板颜色不动；不一致的钉法推导出该极性的调色板。模式按 frame 实际底色判断，主题把 `background-mode` 留成旧值也照样读对。
+**参数。** FRAME 默认取选中的 frame。MODE 为 `light` 或 `dark` 时把调色板钉在该模式，为 nil 时跟随 frame。与 frame 自己表面一致的钉住保留那份表面，所以「跟随主题」与「钉到 frame 自己的模式」之间来回切不会让面板变色；不一致的钉住则按被钉的极性推导。模式读的是 frame 的实际背景色，所以主题把 `background-mode` 留成过期值也照样读得对。
 
-**语义。** 结果带上这个包会用到的 ETAF UI token：`:ui-mode`、`:ui-bg`、`:ui-fg`、`:ui-panel-bg`、`:ui-panel-fg`、`:ui-muted-fg`、`:ui-panel-border`、`:ui-accent`、`:ui-accent-fg`，以及由它们派生的按钮与面板 token。`etaf-posframe-show` 打开的面板已经提供了它，所以这个函数是给自己搭边界的应用用的——第二个子 frame、面板里的一块区域——想要同一份调色板时调它。填充强调色上的文字按强调色的亮度取黑或白，深色主题配浅强调色、亮色主题配深强调色都能读。
+**语义。** 结果带着本包绘制所用的令牌表。`:ui-panel-bg` 是面板表面：暗色下调色板把 frame 背景按 `etaf-posframe-dark-shade` 往 `etaf-posframe-dark-surface` 沉，亮色下按 `etaf-posframe-surface-lift` 往黑沉。`:ui-accent` 是 frame 的 `link` 前景色，主题没给时落到一个固定蓝。其余令牌都从这三者派生，所以改了 frame 颜色的调用方得到的是一份自洽的调色板，而不是混色。
 
-**返回。** 一个 Theme plist。
+| 令牌 | 推导 |
+| --- | --- |
+| `:ui-mode` | `dark` 或 `light`：解析出的极性。 |
+| `:ui-bg` | frame 的背景色；被钉的模式与 frame 不一致时用中性基色的背景。 |
+| `:ui-fg` | frame 的前景色；同上情况用基色的前景。 |
+| `:ui-border` | 面板表面往前景混 16%。 |
+| `:ui-panel-bg` | frame 背景按上面的规则下沉后的颜色。 |
+| `:ui-panel-fg` | 前景色。 |
+| `:ui-panel-border` | 与 `:ui-border` 相同。 |
+| `:ui-muted-fg` | 前景往表面混 42%。 |
+| `:ui-accent` | `link` 前景；没有时亮色用 `#2F6FE4`、暗色用 `#6CB6FF`。 |
+| `:ui-accent-fg` | 强调色上文字的黑或白，按强调色亮度取。 |
+| `:ui-accent-soft-bg` | 表面往强调色混 12%。 |
+| `:ui-disabled-fg` | 前景往表面混 60%。 |
+| `:ui-disabled-bg` | 表面往边框混 12%。 |
+| `:ui-disabled-border` | 边框色。 |
+| `:ui-button-primary-fg` | 强调色上的字色。 |
+| `:ui-button-primary-bg` | 强调色。 |
+| `:ui-button-secondary-fg` | 前景往强调色混 35%。 |
+| `:ui-button-secondary-bg` | 表面往强调色混 18%。 |
+| `:ui-button-ghost-fg` | 前景色。 |
+| `:ui-info-bg`、`:ui-info-fg`、`:ui-info-border` | 表面、前景与边框往 `#6CB6FF` 分别混 20%、55%、40%。 |
+| `:ui-success-bg`、`:ui-success-fg`、`:ui-success-border` | 同样三处往 `#4FB477` 混 20%、50%、40%。 |
+| `:ui-warning-bg`、`:ui-warning-fg`、`:ui-warning-border` | 同样三处往 `#E8B45C` 混 20%、55%、40%。 |
+| `:ui-danger-bg`、`:ui-danger-fg`、`:ui-danger-border` | 同样三处往 `#FF7A7A` 混 20%、55%、40%。 |
+
+**返回。** 带齐上述令牌的 Theme plist；调用方自己搭边界（例如第二个子 frame、或面板里的一块区域）时，可以把它交给组件的 `:setup` 里的 `etaf-theme-provide`。
 
 **示例。**
 
@@ -151,58 +308,80 @@ Emacs 不是当前活动应用时隐藏面板，默认 t。
   (plist-get theme :ui-panel-bg))
 ```
 
+#### Variable: etaf-posframe-dark-surface
+
+暗色面板表面沉向的中性近黑，默认 `#101214`。
+
+**语义。** 暗色应用画的是平铺的近黑表面，面板按 `etaf-posframe-dark-shade` 沉下去就留在同一族里，而不是把主题色抬成一张灰卡片。想让面板贴着某个应用的底色，就把它设成那个应用的背景色。
+
+#### Variable: etaf-posframe-dark-shade
+
+暗色面板表面往 `etaf-posframe-dark-surface` 沉多少，0 到 1，默认 0.5。
+
+**语义。** 0 保留 frame 自己的暗背景，1 直接取中性近黑。一半既保留暗主题的色相，又跟面板身后的应用读成同一种表面。
+
+#### Variable: etaf-posframe-surface-lift
+
+亮色面板表面往黑沉多少，0 到 0.5，默认 0.03。
+
+**语义。** 亮色面板留一点浅灰，好让它还读得出一层表面，而不是跟白色页面糊在一起。调高会让所有亮色面板更暗，设成 0 则面板与身后的白 buffer 分不开。
+
 #### Variable: etaf-posframe-border-width
 
-`:border` 没有 `:width` 时用的 frame 边框宽度，单位像素，0 到 19。
+frame 边框宽度，0 到 19 像素，`:border` 没给 `:width` 时用它。
 
-**语义。** 一像素、主题边框色的边框把面板与背后 buffer 分开，让它读作一块浮起来的表面。面板的 `:border` 选项可以逐块覆盖。
+**语义。** 一像素、主题边框色的边是把面板与身后的 buffer 分开、让它读成浮层的那个元素。面板的 `:border` 选项可以逐面板覆盖它；写 0 会去掉 frame 边框，标题栏下的细线仍然保留。
 
 #### Variable: etaf-posframe-border-focus-strength
 
-聚焦边框里主题强调色占的比重，0 到 1，默认 0.6。
+聚焦边框显示多少主题强调色，0 到 1，默认 0.6。
 
-**语义。** 边框是面板底色向主题 `link` 色染过去的结果：0 就是底色，1 就是强调色本身。面板自己的 `:border` `:focus` 颜色会完全替代这个染色。用染色而不是直接画强调色，一像素描边在两套调色板里都不会读成一个饱和的框。
+**语义。** 边框是面板表面往主题的 `link` 色混：0 保持表面，1 直接画强调色。面板 `:border` 的 `:focus` 颜色会完全替代这个混合。用混色而不是直接画强调色，一像素的描边在两种调色板里都不会变成一圈饱和的框。
 
 #### Variable: etaf-posframe-border-hover-strength
 
-悬停边框里主题强调色占的比重，0 到 1，默认 0.3。
+悬停边框显示多少主题强调色，0 到 1，默认 0.3。
 
-**语义。** 悬停的面板没有拿键盘，所以它只比聚焦更弱地暗示强调色。保持它低于 `etaf-posframe-border-focus-strength`，悬停提示、点击确认才能区分；面板自己的 `:border` `:hover` 颜色会完全替代这个染色。
+**语义。** 悬停的面板没有拿到键盘，所以它提示强调色的力度要比聚焦时更弱。保持它低于 `etaf-posframe-border-focus-strength`，悬停是提示、点击才是落下，两者才不会混；面板 `:border` 的 `:hover` 颜色会替代这个混合。
 
 ## 尺寸与收高
 
-<!-- index: 面板宽度; 面板高度; 面板等高 -->
+<!-- index: etaf-posframe-default-width; etaf-posframe-default-max-height -->
 
 #### Variable: etaf-posframe-default-width
 
 没有 `:width` 时新面板的列数，默认 56。
 
-**语义。** 这个值是内容的列数，不是 frame 的列数：边框、内边距与标题栏是加在它外面的。内容画在固定网格上的面板改传 `:width`，要占 frame 一定比例的面板传 `(fraction F)`。
+**语义。** 这个值是内容列数，不是 frame 宽度：边框、内边距与标题栏都加在它之外。画在固定网格上的面板改传 `:width`，要占父 frame 一定比例的面板传 `(fraction F)`。
 
 **参见。** `etaf-posframe-show`、`etaf-posframe-default-max-height`。
 
 #### Variable: etaf-posframe-default-max-height
 
-没有 `:height` 时新面板的最大内容行数，默认 30。
+没有 `:height` 时新面板最多多少内容行，默认 30。
 
-**语义。** 面板在这个预算之内把 frame 收到渲染内容的高度，所以短的 View 得到矮面板。必须保持固定高度的面板，比如固定网格的游戏棋盘，传 `:height` 加 `:fill-height`，剩下的地方由底色填满。
+**语义。** 面板把 frame 收到渲染内容的高度，最多到这个预算，所以短的 View 得到矮面板。必须固定高度的面板（例如固定网格的棋盘）把 `:height` 与 `:fill-height` 一起给，剩下的由表面画出来。
 
 **参见。** `etaf-posframe-show`、`etaf-posframe-default-width`。
 
 ## 错误与恢复
 
-<!-- index: etaf-posframe-error -->
+<!-- index: etaf-posframe-error; 面板失败 -->
 
 #### Error: etaf-posframe-error
 
-表示面板输入非法、能力不可用。
+报非法的面板输入与不可用的能力。
 
-**语义。** 这条条件报告选项未知、锚点非法、尺寸非正、`:border` plist 形状不对、或 frame 不是图形 frame。显示失败会先收拾干净再报：View 已卸载、frame 已删除，所以接住错误、换成合法选项重试的调用方是从干净状态开始，而不是漏掉一个 frame。
+**语义。** 每个选项都在 frame 存在之前校验，被拒的显示会先清理再报错：View 卸载、frame 删除。条件数据是一个列表，第一个元素是说明字符串，调用方可以直接拿去显示。
 
-| 失败 | 结果 |
+| 失败 | 什么时候报 |
 | --- | --- |
-| 选项名未知 | 建 frame 之前就报 `etaf-posframe-error` |
-| 锚点或尺寸非法 | 报 `etaf-posframe-error`，不留下打开的东西 |
-| Emacs 没有图形 frame | 报 `etaf-posframe-error`；面板需要子 frame |
+| 选项未知 | plist 里有[面板选项](#面板选项)之外的键。 |
+| 取值非法 | 开关不是 `t` 或 `nil`，尺寸不是正整数也不在 `(fraction F)` 范围内，`:auto-hide` 不是 `t`、`nil` 或正数秒，`:title` 不是字符串，`:key` 不是符号，或 `:theme` 不是模式、plist、ref、computed。 |
+| `:at` 非法 | 取值既不是锚点、锚点加偏移，也不是 `(cells ROW COL)`、`(pixels X . Y)` 或函数。 |
+| `:stack` 没有锚点 | `:stack` 非 nil 而 `:at` 是字符格、像素对或 poshandler。 |
+| `:border` 非法 | 字段不在 `:width`、`:color`、`:focus`、`:hover` 之内，宽度超出 0 到 19，或颜色不是字符串。 |
+| 应用注册不完整 | `etaf-posframe-register-app` 没有 `:create` 或没有 `:view`；注册里的面板选项在开面板时才校验，不在注册时。 |
+| 没有图形 frame | Emacs 跑在终端里，子 frame 不存在。 |
 
-**参见。** `etaf-posframe-show`、[标准错误](standard-errors.md)。
+**参见。** `etaf-posframe-show`、`etaf-posframe-register-app`、[标准错误](standard-errors.md)。

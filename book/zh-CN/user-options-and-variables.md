@@ -134,6 +134,9 @@
 | [`etaf-posframe-hide-inactive`](posframe-panels.md#variable-etaf-posframe-hide-inactive) | Emacs 不是当前活动应用时隐藏面板。 |
 | [`etaf-posframe-focus-follows-mouse`](posframe-panels.md#variable-etaf-posframe-focus-follows-mouse) | 指针停在面板上时把输入焦点移过去。 |
 | [`etaf-posframe-border-width`](posframe-panels.md#variable-etaf-posframe-border-width) | `:border` 没给宽度时的 frame 边框像素数。 |
+| [`etaf-posframe-dark-surface`](posframe-panels.md#variable-etaf-posframe-dark-surface) | 暗色面板表面沉向的中性近黑。 |
+| [`etaf-posframe-dark-shade`](posframe-panels.md#variable-etaf-posframe-dark-shade) | 暗色面板表面往那个近黑沉多少。 |
+| [`etaf-posframe-surface-lift`](posframe-panels.md#variable-etaf-posframe-surface-lift) | 亮色面板表面往黑沉多少。 |
 | [`etaf-posframe-border-focus-strength`](posframe-panels.md#variable-etaf-posframe-border-focus-strength) | 聚焦边框里主题强调色占的比重。 |
 | [`etaf-posframe-border-hover-strength`](posframe-panels.md#variable-etaf-posframe-border-hover-strength) | 悬停边框里主题强调色占的比重。 |
 | [`etaf-posframe-default-width`](posframe-panels.md#variable-etaf-posframe-default-width) | 没有 `:width` 时新面板的内容列数。 |

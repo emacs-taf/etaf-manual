@@ -10,13 +10,37 @@
 
 把一个 ETAF 应用注册成浮动面板。
 
-**参数。** ID 是命名该应用的符号。OPTIONS 是 plist：`:title` 是人类可读的名字，也是面板标题栏文字；`:shortcut` 是 `etaf-posframe-app-prefix` 给这个应用绑的键字符串；`:create` 是返回新会话的函数；`:view` 是接收该会话、返回 View 的函数；`:require` 是建会话之前要加载的 feature；`:keep-alive` 为 t 时关闭只是隐藏面板、会话留给下次打开，音乐与游戏因此能继续，为 nil 时面板关闭即停止应用；`:on-stop` 是应用停止时以会话为参数调用的函数；`:width`、`:height`、`:at`、`:stack`、`:focusable`、`:focus-on-open`、`:auto-hide`、`:theme`、`:border` 与 `:draggable` 的含义与 `etaf-posframe-show` 相同，注册默认是右上锚点、叠放、默认尺寸、打开即聚焦。
+**参数。** ID 是命名该应用的符号。OPTIONS 由注册选项与面板选项两部分组成：
+
+| 注册选项 | 取值 | 默认 | 含义 |
+| --- | --- | --- | --- |
+| `:create` | 零参函数 | 必填 | 返回这个应用的新会话。 |
+| `:view` | 一参函数 | 必填 | 接收会话，返回它的 View。 |
+| `:title` | 字符串 | ID 的名字 | 人类可读的名字，也是面板标题栏文字。 |
+| `:shortcut` | 非空键字符串 | 无 | `etaf-posframe-app-prefix` 给这个应用绑的键。 |
+| `:require` | feature 符号 | 无 | 建会话之前要加载的 feature。 |
+| `:keep-alive` | `t`、`nil` | `nil` | 关闭时只隐藏面板、会话留给下次打开，音乐与游戏因此能继续；nil 时面板关闭即停止应用。 |
+| `:on-stop` | 一参函数、`nil` | `nil` | 应用停止时以会话为参数调用。 |
+
+其余面板选项原样交给 `etaf-posframe-show`，注册时没给的取注册默认：
+
+| 面板选项 | 注册默认 |
+| --- | --- |
+| `:at` | `frame-top-right` |
+| `:stack` | `t` |
+| `:width` | `etaf-posframe-default-width` |
+| `:height` | `etaf-posframe-default-max-height` |
+| `:title` | 注册里的 `:title` |
+| `:focusable` | `t` |
+| `:focus-on-open`、`:auto-hide`、`:fill-height`、`:theme`、`:border`、`:draggable` | 与 `etaf-posframe-show` 的默认相同 |
+
+`:key` 不能由注册指定：注册表把它设成 ID，`etaf-posframe-app` 才能找到自己开的面板。面板选项的完整取值表见[面板选项](posframe-panels.md#面板选项)。
 
 **语义。** 注册是全局的，与任何已打开的面板无关：它只记录怎么建这个应用，所以同一个 ID 再注册是替换记录与快捷键，而不是开出两个面板。会话由 `:create` 建、由面板持有；关掉一个没有 `:keep-alive` 的应用会停止它，面板关了就不留东西在跑，而 `:keep-alive` 的应用会一直留着会话，直到 `etaf-posframe-app-quit` 停它。`:on-stop` 是应用释放会话所持东西的唯一地方——一个连接、一个计时器、一个文件。
 
 **返回。** 注册用的 ID。
 
-**错误。** ID 不是符号、缺 `:create` 或 `:view`、或需要函数的选项给了非函数时报 `etaf-posframe-error`。
+**错误。** ID 不是符号、或注册里没有 `:create` 或 `:view` 时报 `etaf-posframe-error`。其他选项的值等到开面板时才用，所以非法的面板选项从 `etaf-posframe-app` 报出来，而 `kbd` 读不了的 `:shortcut` 在重建快捷键 keymap 时报错。
 
 **示例。**
 

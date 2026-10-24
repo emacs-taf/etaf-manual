@@ -10,13 +10,37 @@ A panel application is an ETAF application whose window is a floating panel: the
 
 Register an ETAF application as a floating panel.
 
-**Arguments.** ID is a symbol naming the application. OPTIONS is a plist: `:title` is the human name and the panel's title-bar text; `:shortcut` is the key string `etaf-posframe-app-prefix` binds to this application; `:create` is a function returning a fresh session; `:view` is a function taking that session and returning its View; `:require` is a feature to load before creating a session; `:keep-alive` is t to hide the panel on close and keep the session for the next open, so music or a game continues, or nil to stop the application when its panel closes; `:on-stop` is a function called with the session when the application stops; and `:width`, `:height`, `:at`, `:stack`, `:focusable`, `:focus-on-open`, `:auto-hide`, `:theme`, `:border` and `:draggable` mean what they mean in `etaf-posframe-show`, with a top-right anchor, stacking, the default size and focus on open as the registration defaults.
+**Arguments.** ID is a symbol naming the application. OPTIONS is a plist of registry options and panel options:
+
+| Registry option | Accepted values | Default | Meaning |
+| --- | --- | --- | --- |
+| `:create` | function of no arguments | required | Returns a fresh session for the application. |
+| `:view` | function of one argument | required | Takes the session and returns its View. |
+| `:title` | string | the ID's name | Human name and the panel's title-bar text. |
+| `:shortcut` | non-empty key string | none | Key that `etaf-posframe-app-prefix` binds to this application. |
+| `:require` | feature symbol | none | Feature to load before creating a session. |
+| `:keep-alive` | `t`, `nil` | `nil` | Hide the panel on close and keep the session for the next open, so music or a game continues; nil stops the application when its panel closes. |
+| `:on-stop` | function of one argument, `nil` | `nil` | Called with the session when the application stops. |
+
+Every remaining panel option is passed to `etaf-posframe-show` unchanged, with registration defaults for the ones a registration usually leaves out:
+
+| Panel option | Registration default |
+| --- | --- |
+| `:at` | `frame-top-right` |
+| `:stack` | `t` |
+| `:width` | `etaf-posframe-default-width` |
+| `:height` | `etaf-posframe-default-max-height` |
+| `:title` | the registration's `:title` |
+| `:focusable` | `t` |
+| `:focus-on-open`, `:auto-hide`, `:fill-height`, `:theme`, `:border`, `:draggable` | the `etaf-posframe-show` defaults |
+
+`:key` cannot be chosen by a registration: the registry sets it to ID, which is what makes `etaf-posframe-app` find the panel it opened. The full value table for the panel options is in [Panel options](posframe-panels.md#panel-options).
 
 **Semantics.** Registration is global and independent of any open panel: it records how to build the application and nothing else, so registering twice with the same ID replaces the record and its shortcut instead of opening two panels. The session is created by `:create` and owned by the panel; hiding a panel whose application is not `:keep-alive` stops it, so a closed panel leaves nothing running, and a `:keep-alive` application keeps its session until `etaf-posframe-app-quit` stops it. `:on-stop` is the one place an application releases what its session holds — a socket, a timer, a file.
 
 **Returns.** The registered ID.
 
-**Errors.** `etaf-posframe-error` for an ID that is not a symbol, a missing `:create` or `:view`, or an option that is not a function where one is required.
+**Errors.** `etaf-posframe-error` for an ID that is not a symbol or for a registration without `:create` or `:view`. The values of the other options are used when the panel opens rather than at registration, so an invalid panel option signals from `etaf-posframe-app`, and a `:shortcut` that `kbd` cannot read fails while the shortcut keymap is rebuilt.
 
 **Example.**
 

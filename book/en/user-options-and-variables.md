@@ -134,6 +134,9 @@ Every documented variable, grouped by the chapter that defines it. Each row link
 | [`etaf-posframe-hide-inactive`](posframe-panels.md#variable-etaf-posframe-hide-inactive) | Hide the panels while Emacs is not the active application. |
 | [`etaf-posframe-focus-follows-mouse`](posframe-panels.md#variable-etaf-posframe-focus-follows-mouse) | Move the input focus to a panel the pointer rests on. |
 | [`etaf-posframe-border-width`](posframe-panels.md#variable-etaf-posframe-border-width) | Frame border width in pixels when `:border` gives none. |
+| [`etaf-posframe-dark-surface`](posframe-panels.md#variable-etaf-posframe-dark-surface) | Neutral near-black a dark panel surface sinks toward. |
+| [`etaf-posframe-dark-shade`](posframe-panels.md#variable-etaf-posframe-dark-shade) | How far a dark panel surface sinks toward that near-black. |
+| [`etaf-posframe-surface-lift`](posframe-panels.md#variable-etaf-posframe-surface-lift) | How far a light panel surface sinks toward black. |
 | [`etaf-posframe-border-focus-strength`](posframe-panels.md#variable-etaf-posframe-border-focus-strength) | How much of the Theme accent a focused border shows. |
 | [`etaf-posframe-border-hover-strength`](posframe-panels.md#variable-etaf-posframe-border-hover-strength) | How much of the Theme accent a hovered border shows. |
 | [`etaf-posframe-default-width`](posframe-panels.md#variable-etaf-posframe-default-width) | Content columns of a new panel without `:width`. |

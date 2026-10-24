@@ -33,13 +33,18 @@ STAMP = re.compile(r"([0-9]{4}-[0-9]{2}-[0-9]{2})T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:[
 
 REPOSITORIES = {"etaf-install": "emacs-taf/emacs-taf"}
 
+# Where the page files each package this project publishes.  A new archive
+# package must be placed here: the writer refuses to publish pages while a
+# package is left over, because a silent "Other" section hides the omission
+# from readers.  A package another author publishes states its own group.
 GROUPS = (
-    ("Framework", {"etaf-install", "etaf-ui", "etaf", "ebox", "ecss", "ekp", "etaf-db"}),
+    ("Framework", {"etaf-install", "etaf-ui", "etaf", "ebox", "ecss", "ekp", "etaf-db",
+                   "etaf-posframe"}),
     ("Applications", {"etaf-md-preview", "etaf-rss", "etaf-reader", "etaf-algo-lab",
                       "etaf-screensaver", "etaf-desktop", "etaf-miniflux", "etaf-ncm",
                       "etaf-weread", "etaf-bili", "etaf-youtube", "etaf-pi", "etaf-telega",
                       "etaf-ascii-video", "etaf-video-player", "etaf-video-studio",
-                      "etaf-manual"}),
+                      "etaf-manual", "etaf-pomodoro"}),
     ("Games", {"etaf-gamekit", "etaf-solitaire", "etaf-xiangqi", "etaf-tanks", "etaf-salvage"}),
 )
 
@@ -514,8 +519,8 @@ def groups(packages, community={}):
     placed, result = set(), []
     def declared_group(item):
         # Only a package the archive redistributes for another author has a
-        # declared group; ours are grouped by GROUPS alone, or every package
-        # would match the default.
+        # declared group; ours are grouped by the sections alone, or every
+        # package would match the default.
         record = community.get(item["name"])
         return None if record is None else record.get("group", "application")
 
@@ -530,6 +535,18 @@ def groups(packages, community={}):
     if other:
         result.append(("Other", other))
     return result
+
+
+def unplaced(packages, community={}):
+    """Name the packages no section claims.
+
+    The page files them under Other so a reader sees the omission; the
+    publisher refuses to deploy them, because a nameless section is a mistake,
+    not a category.
+    """
+    claimed = set().union(*(members for _, members in GROUPS))
+    return sorted(item["name"] for item in packages
+                  if item["name"] not in claimed and item["name"] not in community)
 
 
 def inspect_archive(path):
@@ -602,11 +619,11 @@ def archive_pages(package_dir):
     updated = manifest.get("updated", {})
     packages = sorted(manifest["packages"], key=lambda item: item["name"])
     names = {item["name"] for item in packages}
+    community = manifest.get("community", {})
     dates = [day for day in (stamp_date(value) for value in updated.values()) if day]
     newest = max(dates) if dates else None
     rows_by_name = {item["name"]: item for item in packages}
     sections = []
-    community = manifest.get("community", {})
     for label, selected in groups(packages, community):
         rows = []
         for item in selected:
@@ -693,7 +710,8 @@ versioned file never changes bytes.</p>
     for item in packages:
         package_page(item, sources, updated, rows_by_name, used_by,
                      package_dir / item["name"], community.get(item["name"]))
-    return {"packages": len(packages), "updated": str(newest) if newest else None}
+    return {"packages": len(packages), "updated": str(newest) if newest else None,
+            "unplaced": unplaced(packages, community)}
 
 
 def package_page(item, sources, updated, rows_by_name, used_by, directory, origin=None):

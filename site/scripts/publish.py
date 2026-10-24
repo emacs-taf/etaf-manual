@@ -100,6 +100,9 @@ def publish(args):
             raise ValueError("dist/packages is reserved; supply a validated --packages release instead")
         if archive_input:
             report = archive_pages.archive_pages(work / "packages")
+            if report["unplaced"]:
+                raise ValueError("no section places " + ", ".join(report["unplaced"])
+                                 + ": add each one to GROUPS in site/scripts/archive_pages.py")
             print(f"Archive pages for {report['packages']} packages; newest change "
                   f"{report['updated'] or 'not recorded'}")
         payload = work / "payload.tgz"

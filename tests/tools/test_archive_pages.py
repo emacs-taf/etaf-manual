@@ -207,6 +207,17 @@ class ArchivePageTests(unittest.TestCase):
         self.assertNotIn('ebox', applications)
         games = index[index.index('id="games"'):]
         self.assertIn('<strong>etaf-tanks</strong>', games)
+        self.assertEqual(json.loads(self.pages().stdout)["unplaced"], [])
+
+    def test_report_names_the_packages_no_section_places(self):
+        """A name with neither a section nor a community record must be visible.
+
+        The page shows it under Other, the report names it, and the publisher
+        refuses to deploy it: a nameless section is a mistake, not a category.
+        """
+        self.pages()
+        report = json.loads(self.pages().stdout)
+        self.assertEqual(report["unplaced"], ["alpha", "beta", "gamma"])
 
     def test_packages_without_a_declared_group_keep_their_role(self):
         self.pages()

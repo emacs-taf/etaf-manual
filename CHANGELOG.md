@@ -4,6 +4,14 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
 
 ## Unreleased
 
+### Changed
+
+- The archive pages file a package by where it belongs: adding `etaf-posframe`
+  to the archive shipped it under "Other" until a section named it.  The writer
+  now reports every package no section places, and the publisher refuses to
+  deploy such a page, so a new package cannot reach readers as a nameless
+  entry.
+
 ### Added
 
 - A reader mounted by a host records the buffer it renders into, so its keys,

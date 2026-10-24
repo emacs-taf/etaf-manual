@@ -422,11 +422,10 @@ reads a name with completion.  A symbol without an entry signals a
 (defun etaf-manual-reader-toggle-theme-command ()
   "Switch the reader between the light and dark palettes."
   (interactive)
-  (let ((session (etaf-manual-reader--current)))
-    (etaf-manual-reader-toggle-theme session)
-    (message "主题：%s" (if (eq (etaf-manual-reader--read session :theme) 'dark)
-                          "深色"
-                        "浅色"))))
+  (let* ((session (etaf-manual-reader--current))
+         (theme (etaf-manual-reader-toggle-theme session)))
+    (message "外观：%s" (or (cdr (assq theme etaf-manual-reader--theme-modes))
+                          (symbol-name theme)))))
 
 ;;;; Keys
 
@@ -445,7 +444,7 @@ reads a name with completion.  A symbol without an entry signals a
     ("w" etaf-manual-reader-copy-code-command "复制代码")
     ("g" etaf-manual-reader-switch-language-command "中英文切换")
     ("i" etaf-manual-reader-index "跳转")
-    ("t" etaf-manual-reader-toggle-theme-command "深浅主题")
+    ("t" etaf-manual-reader-toggle-theme-command "外观：亮/随/暗")
     ("q" etaf-manual-close "退出阅读器"))
   "Reader keys as (KEY COMMAND LABEL).
 The buffer's mode map and the page Host's `:keys' both come from this table,

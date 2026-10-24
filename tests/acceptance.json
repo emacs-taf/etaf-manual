@@ -205,6 +205,11 @@
    "name": "etaf-manual-reader-session-is-recorded-by-its-host",
    "file": "tests/etaf-manual-reader-tests.el",
    "purpose": "A host that mounts the reader records its session in the host buffer, so the reader's commands and Host keys find it there."
+  },
+  {
+   "name": "etaf-manual-reader-auto-follows-the-host-appearance",
+   "file": "tests/etaf-manual-reader-tests.el",
+   "purpose": "An `auto' reader paints with the appearance its host provides and repaints when the host switches it, so 随 follows the Emacs theme while 亮 and 暗 pin the palette."
   }
  ]
 }

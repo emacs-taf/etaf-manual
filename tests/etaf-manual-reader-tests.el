@@ -43,6 +43,16 @@
       (setq position (1+ position)))
     found))
 
+(defvar etaf-manual-reader-test--surface-session nil
+  "Reader session mounted by the surface host during a case.")
+
+(etaf-define-component etaf-manual-reader-test-surface-host (&key surface appearance)
+  "Provide SURFACE and APPEARANCE to the reader mounted below."
+  :setup (progn
+           (etaf-surface-provide surface)
+           (when appearance (etaf-appearance-provide appearance)))
+  :view (expr (etaf-manual-reader-view etaf-manual-reader-test--surface-session)))
+
 (ert-deftest etaf-manual-reader-create-reports-state ()
   "A new session reads the first chapter and exposes its outline."
   (let* ((session (etaf-manual-reader-create :language "zh-CN"))
@@ -154,11 +164,15 @@ a renderer bug."
     (should (equal "Component" (plist-get (etaf-manual-reader-state session) :chapter-title)))))
 
 (ert-deftest etaf-manual-reader-toggle-theme-switches-palette ()
-  "Toggling the theme flips between the dark and light palettes."
+  "Toggling the theme pins the palette opposite the one on screen."
   (let ((session (etaf-manual-reader-create :language "zh-CN" :theme 'dark)))
     (should (eq (etaf-manual-reader-toggle-theme session) 'light))
     (should (eq 'light (plist-get (etaf-manual-reader-state session) :theme)))
-    (should (eq (etaf-manual-reader-toggle-theme session) 'dark))))
+    (should (eq (etaf-manual-reader-toggle-theme session) 'dark)))
+  ;; An `auto' reader pins the opposite of the appearance it resolves to.
+  (let ((session (etaf-manual-reader-create :language "zh-CN" :theme 'auto)))
+    (should (memq (etaf-manual-reader-toggle-theme session) '(light dark)))
+    (should-not (eq 'auto (plist-get (etaf-manual-reader-state session) :theme)))))
 
 (ert-deftest etaf-manual-reader-toc-marks-the-current-chapter ()
   "The outline names the parts, chapters and current sections."
@@ -549,6 +563,33 @@ a renderer bug."
         (should (string-match-p "左子节点" text))
         (should-not (string-match-p "▶ 运行" text))))))
 
+(ert-deftest etaf-manual-reader-auto-follows-the-host-appearance ()
+  "An `auto' reader paints with the appearance its host provides.
+A panel keeps that appearance in step with the Emacs theme, so `随' follows
+the theme while `亮' and `暗' pin the palette."
+  (let ((surface (etaf-surface-create))
+        (appearance (etaf-ref 'dark))
+        (buffer (generate-new-buffer " *etaf-manual-reader-auto*")))
+    (let ((etaf-manual-reader-test--surface-session
+           (etaf-manual-reader-create :language "zh-CN" :theme 'auto)))
+      (unwind-protect
+          (progn
+            (etaf-mount buffer
+                        (etaf-view (etaf-manual-reader-test-surface-host
+                                    :surface surface :appearance appearance))
+                        (list :viewport-width 1200 :viewport-height 40))
+            (should (eq 'auto (etaf-value (etaf-surface-mode surface))))
+            (should (equal "#191a1c"
+                           (plist-get (etaf-value (etaf-surface-theme surface))
+                                      :ui-bg)))
+            ;; The host switches appearance; the auto reader follows it.
+            (etaf-set-value appearance 'light)
+            (etaf-runtime-flush (etaf-runtime-for-buffer buffer))
+            (should (equal "#ffffff"
+                           (plist-get (etaf-value (etaf-surface-theme surface))
+                                      :ui-bg))))
+        (when (buffer-live-p buffer) (kill-buffer buffer))))))
+
 (ert-deftest etaf-manual-reader-session-is-recorded-by-its-host ()
   "A host that mounts the reader records its session in the host buffer.
 `etaf-manual-open' is one such host; a panel or a desktop host is another,
@@ -572,14 +613,6 @@ there instead of reporting that the buffer is not a reader."
         (ignore-errors (etaf-unmount runtime)))
       (when (buffer-live-p buffer) (kill-buffer buffer)))))
 
-(defvar etaf-manual-reader-test--surface-session nil
-  "Reader session mounted by the surface host during a case.")
-
-(etaf-define-component etaf-manual-reader-test-surface-host (&key surface)
-  "Provide SURFACE to the reader mounted below."
-  :setup (etaf-surface-provide surface)
-  :view (expr (etaf-manual-reader-view etaf-manual-reader-test--surface-session)))
-
 (ert-deftest etaf-manual-reader-declares-its-palette-to-a-host ()
   "A panel frames the reader with the reader's palette and switch.
 The session's palette mode is the one cell the reader's own header switch and
@@ -594,7 +627,7 @@ the panel's title bar both write."
                         (etaf-view (etaf-manual-reader-test-surface-host
                                     :surface surface))
                         (list :viewport-width 1200 :viewport-height 40))
-            (should (equal '((light . "浅色") (dark . "深色"))
+            (should (equal '((light . "亮") (auto . "随") (dark . "暗"))
                            (etaf-surface-modes surface)))
             (should (eq 'dark (etaf-value (etaf-surface-mode surface))))
             (should (equal "#191a1c"

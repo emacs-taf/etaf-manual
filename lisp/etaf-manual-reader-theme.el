@@ -81,19 +81,24 @@ reader's own language switch changes it for the running session."
   "Color palettes of the manual reader.")
 
 (defconst etaf-manual-reader--theme-modes
-  '((light . "浅色") (dark . "深色"))
-  "Palette modes the reader offers, in display order.
-The header switch and the title bar of a panel framing the reader both use
-this list, so the two controls never show different choices.")
+  '((light . "亮") (auto . "随") (dark . "暗"))
+  "Appearance modes the reader offers, in display order.
+`t' cycles them and the title bar of a panel framing the reader offers the
+same three, so the switch reads like every other panel's.")
 
-(defun etaf-manual-reader-auto-theme ()
-  "Return the palette matching the host appearance."
-  (etaf-appearance))
+(defun etaf-manual-reader--resolved (theme)
+  "Return the light or dark palette name THEME paints with.
+`auto' follows the appearance the host provides: a reader inside a panel
+matches the panel's palette, and a standalone reader follows the Emacs
+theme.  Reading a ref here is what makes `auto' repaint on a theme switch."
+  (let ((theme (or theme 'auto)))
+    (if (eq theme 'auto) (etaf-appearance) theme)))
 
 (defun etaf-manual-reader-palette (theme)
   "Return THEME's palette alist.
-THEME is `dark', `light' or nil for the frame's own background mode."
-  (or (cdr (assq (or theme (etaf-manual-reader-auto-theme))
+THEME is `light', `dark', `auto' (follow the host appearance) or nil for the
+same."
+  (or (cdr (assq (etaf-manual-reader--resolved theme)
                  etaf-manual-reader-palettes))
       (signal 'etaf-manual-error
               (list (format "Unknown manual reader theme: %S" theme)))))
@@ -109,7 +114,7 @@ THEME is `dark', `light' or nil for the frame's own background mode."
 The application provides this through `etaf-theme-provide', so shared ETAF
 UI Components follow the reader's colors."
   (let* ((palette (etaf-manual-reader-palette theme))
-         (dark (eq (or theme (etaf-manual-reader-auto-theme)) 'dark))
+         (dark (eq (etaf-manual-reader--resolved theme) 'dark))
          (lookup (lambda (key) (cdr (assq key palette))))
          (bg (funcall lookup :bg))
          (panel (funcall lookup :panel))

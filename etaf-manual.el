@@ -85,8 +85,8 @@
 ;; position and `C-c C-c' reruns it, `w' copies the code at the reading
 ;; position, `g' switches between Chinese and
 ;; English, `i' opens a jump completion listing chapters, sections,
-;; definition entries and index terms, `t' switches the palette and `q'
-;; closes the reader.  The mounted page declares these keys as Host `:keys', so they
+;; definition entries and index terms, `t' cycles the palette mode (`亮',
+;; `暗', `随') and `q' closes the reader.  The mounted page declares these keys as Host `:keys', so they
 ;; also work when the reader View is embedded and `?' opens the read-only
 ;; ETAF key help listing them.  The navigation column and, on wide frames,
 ;; the on-this-page column are draggable dividers: dragging one resizes
@@ -114,8 +114,10 @@
 ;;
 ;; Function: etaf-manual-reader-create (&key language theme chapter)
 ;; Create a headless manual reader session and return it.
-;; LANGUAGE defaults to `etaf-manual-language', THEME to the frame's own
-;; background mode, and CHAPTER to the manual's first chapter.  CHAPTER is
+;; LANGUAGE defaults to `etaf-manual-language', THEME to `auto' (follow the
+;; appearance the host provides, and the Emacs theme in a standalone reader;
+;; `light' and `dark' pin the palette), and CHAPTER to the manual's first
+;; chapter.  CHAPTER is
 ;; the chapter identifier (a symbol) or its name as a string; an unknown
 ;; chapter signals `etaf-manual-error' here, before any buffer exists.  The
 ;; session owns no buffer, so scripts and tests drive the same model the
@@ -236,6 +238,8 @@
 ;;
 ;; Function: etaf-manual-reader-toggle-theme (session)
 ;; Switch SESSION between the light and dark palettes; return the new one.
+;; An `auto' reader pins the opposite of the appearance it resolves to, and
+;; the title bar of a panel framing the reader offers `auto' again after that.
 ;;
 ;; Function: etaf-manual-reader-view (session)
 ;; Return the application View of SESSION.

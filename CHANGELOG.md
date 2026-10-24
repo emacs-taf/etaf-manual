@@ -19,12 +19,16 @@ All notable changes to the ETAF Reference Manual and the `etaf-manual` package a
 
 ### Changed
 
+- The reader's palette mode gained `auto`: it is the default and follows the
+  appearance the host provides, which a panel keeps in step with the Emacs
+  theme, so a reader follows the theme until `t` pins light or dark.
 - A reader mounted under a host declares its palette, its palette mode and the
-  `浅色`/`深色` modes there, so a panel framing it paints the reader's palette
-  and its title bar switches the reader: the two switches write one cell.
+  `亮`/`随`/`暗` modes there, so a panel framing it paints the reader's palette
+  and its title bar offers the same three-mode switch as every other panel:
+  both switches write one cell.
 - The reader's header no longer carries its own palette switch; `t` switches
-  the palette in the reader buffer and the title bar of a panel offers the same
-  two modes.
+  the palette in the reader buffer and a panel's title bar offers all three
+  modes.
 
 - The archive's download count now counts installations instead of file fetches:
   a tarball counts only when the same client also requested its signature (what

@@ -81,7 +81,7 @@ headless reader for scripts and tests."
                                 (etaf-manual-reader--book-chapters book) chapter))))
     (list
      :language (etaf-ref language :name 'etaf-manual-reader-language)
-     :theme (etaf-ref (or theme (etaf-manual-reader-auto-theme))
+     :theme (etaf-ref (or theme 'auto)
                       :name 'etaf-manual-reader-theme)
      :chapter (etaf-ref (or chapter
                             (etaf-manual-reader--book-default-chapter book))
@@ -571,7 +571,7 @@ non-nil when a chapter was applied."
         (etaf-manual-book language)
         (etaf-manual-reader--write session :language language)))
     (let ((theme (plist-get saved :theme)))
-      (when (memq theme '(light dark))
+      (when (memq theme '(light auto dark))
         (etaf-manual-reader--write session :theme theme)))
     (when (numberp (plist-get saved :sidebar-width))
       (etaf-manual-reader-set-sidebar-width session (plist-get saved :sidebar-width)))
@@ -904,13 +904,19 @@ the reader; anything else goes to the browser."
   session)
 
 (defun etaf-manual-reader-set-theme (session theme)
-  "Show SESSION with palette THEME."
+  "Show SESSION with palette THEME.
+THEME is `light', `dark' or `auto', where `auto' follows the appearance the
+host provides and the Emacs theme in a standalone reader."
   (etaf-manual-reader--write session :theme theme)
   session)
 
 (defun etaf-manual-reader-toggle-theme (session)
-  "Switch SESSION between the light and dark palettes and return the new one."
-  (let ((theme (if (eq (etaf-manual-reader--read session :theme) 'dark)
+  "Switch SESSION between the light and dark palettes and return the new one.
+An `auto' reader pins the opposite of the appearance it resolves to; the
+title bar of a panel framing the reader offers `auto' again after that."
+  (let ((theme (if (eq (etaf-manual-reader--resolved
+                        (etaf-manual-reader--read session :theme))
+                       'dark)
                    'light
                  'dark)))
     (etaf-manual-reader-set-theme session theme)
@@ -956,7 +962,8 @@ Each part has `:number', `:title' and `:chapters'; each chapter has `:id',
 
 (defun etaf-manual-reader-state (session)
   "Return a detached snapshot of SESSION's reading state.
-Keys are `:language', `:theme', `:chapter', `:chapter-title', `:part',
+Keys are `:language', `:theme' (`light', `auto' or `dark'), `:chapter',
+`:chapter-title', `:part',
 `:node', `:node-title', `:nodes' (titles in order), `:position' (zero-based
 chapter index), `:chapters' (count), `:can-back' and `:can-forward'."
   (let ((chapter (etaf-manual-reader--chapter session))

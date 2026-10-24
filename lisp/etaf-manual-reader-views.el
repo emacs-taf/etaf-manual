@@ -39,7 +39,8 @@
   "Return the rendering environment of SESSION.
 VIEWPORT, when known, is the frame width in character cells and ROWS the
 frame height in lines."
-  (let* ((theme (etaf-manual-reader--read session :theme))
+  (let* ((theme (etaf-manual-reader--resolved
+                 (etaf-manual-reader--read session :theme)))
          (key (list theme viewport rows))
          (last (gethash session etaf-manual-reader--envs)))
     ;; Components compare list props by identity, so an unchanged

@@ -55,9 +55,9 @@
 | 下中 | `frame-bottom-center` | `window-bottom-center` |
 | 右下 | `frame-bottom-right` | `window-bottom-right` |
 
-按锚点落位时面板与所贴的边留出余量，不会压在滚动条或窗口边框上：父 frame 内留 8 像素，窗口文本区内留 4 像素。贴右或贴下的锚点还会把面板自己的宽或高留在父 frame 之内，宽面板不会跑出屏幕。`point` 把面板放在 point 处向上长，point 之前的文字仍然看得见；`point-top` 放在 point 处向下长。
+按锚点落位时面板与所贴的边留出余量，不会压在滚动条或窗口边框上：父 frame 内留一个字符格，窗口文本区内留半个字符格。贴右或贴下的锚点还会把面板自己的宽或高留在父 frame 之内，宽面板不会跑出屏幕。`point` 把面板放在 point 处向上长，point 之前的文字仍然看得见；`point-top` 放在 point 处向下长。
 
-`:stack t` 读已有面板，把新面板贴着它们放，所以面板高度各不相同，叠起来也不会留空。顶部或居中的锚点下，新面板紧接在它碰到的最低一块下面；底部锚点下则紧接在最高一块上面；两个 frame 之间留 6 像素。只有第一列排不下时，才向左挪一列，始终不出父 frame。`:stack` 需要带锚点的 `:at`（锚点符号或锚点加偏移），因为字符格、像素对和 poshandler 都没有叠放方向；`:stack` 配上其他 `:at` 会报错。
+`:stack t` 读已有面板，把新面板贴着它们放，所以面板高度各不相同，叠起来也不会留空。顶部或居中的锚点下，新面板紧接在它碰到的最低一块下面；底部锚点下则紧接在最高一块上面；图形帧上两块之间留 6 像素，终端上留一格。只有第一列排不下时，才向左挪一列，始终不出父 frame。`:stack` 需要带锚点的 `:at`（锚点符号或锚点加偏移），因为字符格、像素对和 poshandler 都没有叠放方向；`:stack` 配上其他 `:at` 会报错。
 
 ### 面板尺寸
 
@@ -144,7 +144,7 @@ frame 会收到渲染内容的高度，最多到 `:height` 预算，所以短的
 | `:focus` | 颜色字符串、`nil` | 强调色按聚焦强度混入表面 |
 | `:hover` | 颜色字符串、`nil` | 强调色按悬停强度混入表面 |
 
-写 `nil` 的那几种从主题推导：宽度取 `etaf-posframe-border-width`（默认 1），`:focus` 与 `:hover` 取 `etaf-posframe-border-focus-strength`（0.6）与 `etaf-posframe-border-hover-strength`（0.3），所以调用方可以只覆盖聚焦边框，另外两种继续跟随主题。未知字段、超出 0 到 19 的宽度、非字符串的颜色都报 `etaf-posframe-error`。
+写 `nil` 的那几种从主题推导：宽度取 `etaf-posframe-border-width`（默认 1），`:focus` 与 `:hover` 取 `etaf-posframe-border-focus-strength`（0.6）与 `etaf-posframe-border-hover-strength`（0.3），所以调用方可以只覆盖聚焦边框，另外两种继续跟随主题。未知字段、超出 0 到 19 的宽度、非字符串的颜色都报 `etaf-posframe-error`。终端把边框画在 frame 尺寸之外的一格里；宽度不管写多少都只占一格，颜色用终端自己的配色。宽度与三种状态颜色只对图形帧生效。
 
 ### 面板标识
 
@@ -166,7 +166,7 @@ frame 会收到渲染内容的高度，最多到 `:height` 预算，所以短的
 
 **返回。** 一个面板值，对调用方不透明；交给下面几个函数或 `etaf-posframe-hide` 使用。
 
-**错误。** 选项未知、取值不在上表范围内、`:stack` 没有带锚点的 `:at`、或 frame 不是图形 frame 时报 `etaf-posframe-error`。显示失败会先卸载 View、删掉 frame，再把错误抛出去，所以调用方换成合法选项重试时是从干净状态开始。
+**错误。** 选项未知、取值不在上表范围内、`:stack` 没有带锚点的 `:at`、或显示环境不支持子 frame 时报 `etaf-posframe-error`。显示失败会先卸载 View、删掉 frame，再把错误抛出去，所以调用方换成合法选项重试时是从干净状态开始。
 
 **示例。**
 
@@ -274,7 +274,7 @@ frame 会收到渲染内容的高度，最多到 `:height` 预算，所以短的
 
 Emacs 不是前台应用时隐藏面板，默认 `t`。
 
-**语义。** 子 frame 本身是一个窗口，所以会列出窗口的窗口管理器（例如 macOS 的调度中心）会把面板当成切换目标，点它会激活 Emacs 而不是身后的应用。前台是别的应用时隐藏面板就能让这份列表保持干净；Emacs 回到前台时面板再出现。写 nil 则保持可见，适合要贴着别的应用一直留在屏幕上的面板。这个变量与 `:auto-hide` 无关，后者管的是用户在 Emacs 里去了别处。
+**语义。** 子 frame 本身是一个窗口，所以会列出窗口的窗口管理器（例如 macOS 的调度中心）会把面板当成切换目标，点它会激活 Emacs 而不是身后的应用。前台是别的应用时隐藏面板就能让这份列表保持干净；Emacs 回到前台时面板再出现。写 nil 则保持可见，适合要贴着别的应用一直留在屏幕上的面板。这个变量与 `:auto-hide` 无关，后者管的是用户在 Emacs 里去了别处。文本终端上这个变量不起作用：终端 frame 不出现在窗口列表里，面板一直可见。
 
 #### Variable: etaf-posframe-focus-follows-mouse
 
@@ -407,6 +407,6 @@ frame 边框宽度，0 到 19 像素，`:border` 没给 `:width` 时用它。
 | `:stack` 没有锚点 | `:stack` 非 nil 而 `:at` 是字符格、像素对或 poshandler。 |
 | `:border` 非法 | 字段不在 `:width`、`:color`、`:focus`、`:hover` 之内，宽度超出 0 到 19，或颜色不是字符串。 |
 | 应用注册不完整 | `etaf-posframe-register-app` 没有 `:create` 或没有 `:view`；注册里的面板选项在开面板时才校验，不在注册时。 |
-| 没有图形 frame | Emacs 跑在终端里，子 frame 不存在。 |
+| 显示环境不支持子 frame | Emacs 跑在不提供 `tty-child-frames` 的终端里。 |
 
 **参见。** `etaf-posframe-show`、`etaf-posframe-register-app`、[标准错误](standard-errors.md)。

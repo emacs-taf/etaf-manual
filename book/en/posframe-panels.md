@@ -55,9 +55,9 @@ The anchors are twenty symbols: `point`, `point-top`, and every combination of `
 | bottom centre | `frame-bottom-center` | `window-bottom-center` |
 | bottom right | `frame-bottom-right` | `window-bottom-right` |
 
-An anchored panel keeps a margin to the edge it is anchored to, so it never sits on a scroll bar or a window border: 8 pixels inside the parent frame, 4 pixels inside the window's text area. A right or bottom anchor also keeps the panel's own width or height inside the parent, so a wide panel cannot run off the screen. `point` places the panel at point growing upward, which keeps the text before point visible; `point-top` places it at point growing downward.
+An anchored panel keeps a margin to the edge it is anchored to, so it never sits on a scroll bar or a window border: one character cell inside the parent frame, half a cell inside the window's text area. A right or bottom anchor also keeps the panel's own width or height inside the parent, so a wide panel cannot run off the screen. `point` places the panel at point growing upward, which keeps the text before point visible; `point-top` places it at point growing downward.
 
-`:stack t` reads the live panels and places the new panel against them, so a stack stays closed however tall each panel turned out. From a top or centre anchor the panel sits directly below the lowest panel it meets, from a bottom anchor directly above the highest, and two stacked frames stay 6 pixels apart. A column to the left takes the panel only when the frame has no room in the one it starts in, and a panel never leaves the parent frame. `:stack` needs an anchored `:at` — an anchor symbol or an anchor with an offset — because a character cell, a pixel pair or a poshandler carries no stacking direction. `:stack` with any other `:at` signals.
+`:stack t` reads the live panels and places the new panel against them, so a stack stays closed however tall each panel turned out. From a top or centre anchor the panel sits directly below the lowest panel it meets, from a bottom anchor directly above the highest, and two stacked frames stay 6 pixels apart on a graphical frame and one cell apart on a terminal. A column to the left takes the panel only when the frame has no room in the one it starts in, and a panel never leaves the parent frame. `:stack` needs an anchored `:at` — an anchor symbol or an anchor with an offset — because a character cell, a pixel pair or a poshandler carries no stacking direction. `:stack` with any other `:at` signals.
 
 ### Panel size
 
@@ -144,7 +144,7 @@ A panel whose `:theme` is `auto`, `light` or `dark` carries the title-bar theme 
 | `:focus` | colour string, `nil` | the accent tinted into the surface by the focus strength |
 | `:hover` | colour string, `nil` | the same by the hover strength |
 
-A `nil` colour means "derive this one from the Theme": the width comes from `etaf-posframe-border-width` (1), `:focus` and `:hover` from `etaf-posframe-border-focus-strength` (0.6) and `etaf-posframe-border-hover-strength` (0.3), so a caller can override only the focused border and keep the other two derived. An unknown field, a width outside 0 to 19 or a non-string colour signals `etaf-posframe-error`.
+A `nil` colour means "derive this one from the Theme": the width comes from `etaf-posframe-border-width` (1), `:focus` and `:hover` from `etaf-posframe-border-focus-strength` (0.6) and `etaf-posframe-border-hover-strength` (0.3), so a caller can override only the focused border and keep the other two derived. An unknown field, a width outside 0 to 19 or a non-string colour signals `etaf-posframe-error`. A text terminal draws the border in one cell that sits outside the frame size, takes one cell regardless of `:width`, and uses the terminal's own colours; the width and the three colours apply to graphical frames.
 
 ### Panel identity
 
@@ -166,7 +166,7 @@ Show VIEW in a floating panel and return the panel.
 
 **Returns.** A panel value, opaque to callers; pass it to the functions below or to `etaf-posframe-hide`.
 
-**Errors.** `etaf-posframe-error` for an unknown option, a value the table above does not accept, `:stack` without an anchored `:at`, or a non-graphical frame. A failed show unmounts the View and deletes the frame before the error is re-signaled, so a caller that retries with valid options starts from a clean state.
+**Errors.** `etaf-posframe-error` for an unknown option, a value the table above does not accept, `:stack` without an anchored `:at`, or a display without child frames. A failed show unmounts the View and deletes the frame before the error is re-signaled, so a caller that retries with valid options starts from a clean state.
 
 **Example.**
 
@@ -274,7 +274,7 @@ Keymap that is always active while a focusable panel has focus.
 
 Hide the panels while Emacs is not the active application, `t` by default.
 
-**Semantics.** A child frame is a window of its own, so a window manager that lists windows — macOS Mission Control, for instance — would offer the panel as a target, and clicking it would activate Emacs instead of the application behind it. Hiding the panels while another application is active keeps that list clean; the panels come back when Emacs is active again. Nil keeps them visible, which suits a panel that should stay on screen beside another application. The variable is independent of `:auto-hide`, which is about the user working elsewhere inside Emacs.
+**Semantics.** A child frame is a window of its own, so a window manager that lists windows — macOS Mission Control, for instance — would offer the panel as a target, and clicking it would activate Emacs instead of the application behind it. Hiding the panels while another application is active keeps that list clean; the panels come back when Emacs is active again. Nil keeps them visible, which suits a panel that should stay on screen beside another application. The variable is independent of `:auto-hide`, which is about the user working elsewhere inside Emacs. It has no effect on a text terminal, whose frame is not listed as a window: terminal panels stay visible.
 
 #### Variable: etaf-posframe-focus-follows-mouse
 
@@ -407,6 +407,6 @@ Signals invalid panel input and unavailable capabilities.
 | `:stack` without an anchor | `:stack` is non-nil and `:at` is a cell, a pixel pair or a poshandler. |
 | Bad `:border` | A field outside `:width`, `:color`, `:focus` and `:hover`, a width outside 0 to 19, or a non-string colour. |
 | Incomplete application registration | `etaf-posframe-register-app` has no `:create` or no `:view`; a panel option of a registration is checked when its panel opens, not at registration. |
-| No graphical frame | Emacs runs in a terminal, where child frames do not exist. |
+| No child frame display | Emacs runs in a terminal that does not provide the `tty-child-frames` feature. |
 
 **See also.** `etaf-posframe-show`, `etaf-posframe-register-app`, [Standard Errors](standard-errors.md).

@@ -123,7 +123,7 @@
 
 **参见。** `etaf-list`。
 
-#### Component: etaf-list (&key items on-select)
+#### Component: etaf-list (&key items on-select checkbox selected)
 
 渲染可选择列表。ITEMS 含 `:key`、`:title` 与可选 `:description`；选择报告给 ON-SELECT。
 

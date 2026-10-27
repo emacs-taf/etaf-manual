@@ -123,7 +123,7 @@ Render nested items with caller-owned expanded keys and selection callbacks.
 
 **See also.** `etaf-list`.
 
-#### Component: etaf-list (&key items on-select)
+#### Component: etaf-list (&key items on-select checkbox selected)
 
 Render a selectable list. ITEMS contain `:key`, `:title` and optional `:description`; selection is reported to ON-SELECT.
 

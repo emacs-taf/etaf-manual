@@ -288,13 +288,13 @@ Emacs 不是前台应用时隐藏面板，默认 `t`。
 
 文本终端能把子 frame 画出来，却不给它键盘和鼠标：每个按键、每次点击都留在面板身后的 frame 上。所以终端里靠应用前缀映射操作面板，作用对象是当前选中的 frame 上的面板，没有就取最近打开的那个，而键盘留在普通 buffer 里。
 
-前缀之后，方向键把面板移动一格，`C-<left>` 与 `C-<right>` 收窄或加宽一列，`C-<up>` 与 `C-<down>` 收缩或加高一行，`k` 再读一个键交给面板执行。方向键在第一次按下之后继续有效，所以一串移动只需按一次前缀，按住不动也会连续移动；按其他键结束这一串。面板停在父 frame 边缘，不会移到屏幕外。移动过的面板在后续刷新里保持新位置，改过尺寸的保持新宽度和行预算：新位置变成绝对锚点，新高度变成 `:fill-height` 的预算。
+前缀之后，方向键把面板移动 `etaf-posframe-move-step` 格，`=` 或 `+` 加宽，`-` 收窄，`>` 加高，`<` 收缩，`k` 再读一个键交给面板执行。移动按字符格算：图形 frame 按自己的字符宽高走，终端按自己的一格走。这里特意不用 Control 加方向键，因为 macOS 的窗口管理器在 Emacs 看到按键之前就切换桌面了。按键在第一次按下之后继续有效，所以一串移动只需按一次前缀，按住不动也会连续移动；按其他键结束这一串。面板停在父 frame 边缘，不会移到屏幕外。移动过的面板在后续刷新里保持新位置，改过尺寸的保持新宽度和行预算：新位置变成绝对锚点，新高度变成 `:fill-height` 的预算。
 
 #### Function: etaf-posframe-move (direction &optional steps panel)
 
 把 PANEL 沿 `direction` 移动 `steps` 格。
 
-**语义。** `direction` 是 `left`、`right`、`up` 或 `down`，`steps` 默认 1，`panel` 的默认值与前缀映射相同。位置不会越过父 frame 的左上角，面板的锚点变成它此刻的绝对位置，所以刷新不会把它放回去。交互调用时提示方向，不读方向键。
+**语义。** `direction` 是 `left`、`right`、`up` 或 `down`，`steps` 默认取 `etaf-posframe-move-step`（3），`panel` 的默认值与前缀映射相同。一格就是一个字符格。位置不会越过父 frame 的左上角，面板的锚点变成它此刻的绝对位置，所以刷新不会把它放回去。交互调用时提示方向，不读方向键。
 
 **错误。** 没有可用面板时报 `etaf-posframe-error`。
 
@@ -302,7 +302,7 @@ Emacs 不是前台应用时隐藏面板，默认 `t`。
 
 把 PANEL 沿 `axis` 改变 `steps` 格尺寸。
 
-**语义。** `axis` 是 `wider`、`narrower`、`taller` 或 `shorter`，`steps` 默认 1。面板不会窄于四列、矮于两行。新宽度和行预算在 frame 改变之前先记下，所以 frame 尺寸变化触发的刷新会保持它们，内容按新宽度重排。交互调用时提示方向。
+**语义。** `axis` 是 `wider`、`narrower`、`taller` 或 `shorter`，`steps` 默认取 `etaf-posframe-resize-step`（1）。面板不会窄于四列、矮于两行。新宽度和行预算在 frame 改变之前先记下，所以 frame 尺寸变化触发的刷新会保持它们，内容按新宽度重排。交互调用时提示方向。
 
 **错误。** 没有可用面板时报 `etaf-posframe-error`。
 
@@ -313,6 +313,18 @@ Emacs 不是前台应用时隐藏面板，默认 `t`。
 **语义。** 按键执行时面板 buffer 是当前 buffer，所以 View 在宿主上声明的按键能在那里生效。需要键盘焦点落在某一行上的控件（例如用 Tab 走到的按钮）仍然需要图形 frame；因此终端面板适合键由宿主声明的 View。返回执行过的键序列。
 
 **错误。** 没有可用面板时报 `etaf-posframe-error`。
+
+#### Variable: etaf-posframe-move-step
+
+`etaf-posframe-move` 没有给步数时移动的字符格数，默认 `3`。
+
+**语义。** 一格就是一个字符格，所以图形 frame 按自己的字符宽高走，终端按自己的一格走。默认值让一次按键看得见效果，按住时又停得下来；前缀映射的方向键也用它。
+
+#### Variable: etaf-posframe-resize-step
+
+`etaf-posframe-resize` 没有给步数时改变的行列数，默认 `1`。
+
+**语义。** 默认每次一格，窄面板才不会一下子冲出自己的 frame。想少按几次就调大；前缀映射的缩放键也用它。
 
 **参见。** `etaf-posframe-app-prefix`、`etaf-posframe-panel-keys`。
 

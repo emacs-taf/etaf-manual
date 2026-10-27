@@ -141,6 +141,8 @@
 | [`etaf-posframe-border-hover-strength`](posframe-panels.md#variable-etaf-posframe-border-hover-strength) | 悬停边框里主题强调色占的比重。 |
 | [`etaf-posframe-default-width`](posframe-panels.md#variable-etaf-posframe-default-width) | 没有 `:width` 时新面板的内容列数。 |
 | [`etaf-posframe-default-max-height`](posframe-panels.md#variable-etaf-posframe-default-max-height) | 没有 `:height` 时新面板的最大内容行数。 |
+| [`etaf-posframe-move-step`](posframe-panels.md#variable-etaf-posframe-move-step) | `etaf-posframe-move` 没给步数时移动的字符格数。 |
+| [`etaf-posframe-resize-step`](posframe-panels.md#variable-etaf-posframe-resize-step) | `etaf-posframe-resize` 没给步数时改变的行列数。 |
 | [`etaf-posframe-apps`](posframe-applications.md#variable-etaf-posframe-apps) | 已注册应用，按注册顺序排列的 `(ID . PLIST)` 记录。 |
 | [`etaf-posframe-app-map`](posframe-applications.md#variable-etaf-posframe-app-map) | 每个注册快捷键一个绑定的 keymap。 |
 | [`etaf-posframe-app-repeat-delay`](posframe-applications.md#variable-etaf-posframe-app-repeat-delay) | 忽略重复应用开关的秒数。 |

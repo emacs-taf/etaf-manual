@@ -141,6 +141,8 @@ Every documented variable, grouped by the chapter that defines it. Each row link
 | [`etaf-posframe-border-hover-strength`](posframe-panels.md#variable-etaf-posframe-border-hover-strength) | How much of the Theme accent a hovered border shows. |
 | [`etaf-posframe-default-width`](posframe-panels.md#variable-etaf-posframe-default-width) | Content columns of a new panel without `:width`. |
 | [`etaf-posframe-default-max-height`](posframe-panels.md#variable-etaf-posframe-default-max-height) | Maximum content lines of a new panel without `:height`. |
+| [`etaf-posframe-move-step`](posframe-panels.md#variable-etaf-posframe-move-step) | Character cells `etaf-posframe-move` moves without a step count. |
+| [`etaf-posframe-resize-step`](posframe-panels.md#variable-etaf-posframe-resize-step) | Columns or rows `etaf-posframe-resize` changes without a step count. |
 | [`etaf-posframe-apps`](posframe-applications.md#variable-etaf-posframe-apps) | Registered applications as `(ID . PLIST)` records, in registration order. |
 | [`etaf-posframe-app-map`](posframe-applications.md#variable-etaf-posframe-app-map) | Keymap with one binding per registered shortcut. |
 | [`etaf-posframe-app-repeat-delay`](posframe-applications.md#variable-etaf-posframe-app-repeat-delay) | Seconds during which a repeated app toggle is ignored. |

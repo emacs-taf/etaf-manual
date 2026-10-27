@@ -284,6 +284,38 @@ Move the input focus to a panel the mouse pointer rests on, `nil` by default.
 
 **See also.** `etaf-posframe-show`, `etaf-posframe-panel-keys`.
 
+### Reaching a panel from a text terminal
+
+A text terminal draws a child frame but gives it neither the keyboard nor the mouse: every key and click stays with the frame behind the panel. A terminal therefore reaches a panel through the app prefix map, which acts on the panel of the selected frame and otherwise on the most recent panel, while the keyboard sits in an ordinary buffer.
+
+After the prefix, the arrow keys move the panel one cell, `C-<left>` and `C-<right>` narrow or widen it one column, `C-<up>` and `C-<down>` shorten or heighten it one row, and `k` reads one more key and runs it in the panel. A moved panel keeps its place and a resized one keeps its width and row budget through later refreshes, because the new place becomes an absolute anchor and the new height becomes the `:fill-height` budget.
+
+#### Function: etaf-posframe-move (direction &optional steps panel)
+
+Move PANEL `steps` cells in `direction`.
+
+**Semantics.** `direction` is `left`, `right`, `up` or `down`, `steps` defaults to 1, and `panel` defaults as in the prefix map. The place is clamped to the parent frame's top left corner, and the panel's anchor becomes the absolute position it now occupies, so a refresh does not put it back. Interactively the command prompts for the direction instead of reading an arrow key.
+
+**Errors.** Signals `etaf-posframe-error` when no live panel is available.
+
+#### Function: etaf-posframe-resize (axis &optional steps panel)
+
+Change PANEL's size by `steps` cells along `axis`.
+
+**Semantics.** `axis` is `wider`, `narrower`, `taller` or `shorter`; `steps` defaults to 1. The panel never becomes narrower than four columns or shorter than two rows. The new width and row budget are recorded before the frame changes, so the refresh that a frame resize triggers keeps them and the content re-lays out to the new width. Interactively the command prompts for the axis.
+
+**Errors.** Signals `etaf-posframe-error` when no live panel is available.
+
+#### Function: etaf-posframe-send-key (&optional panel)
+
+Read one key sequence and run it in PANEL's View.
+
+**Semantics.** The key runs with the panel's buffer current, so a key the View declares on its Host runs there. A control that needs the keyboard focus on one row, such as a button reached through Tab, still needs a graphical frame; a terminal panel therefore suits a View that declares its keys. Return the key sequence that ran.
+
+**Errors.** Signals `etaf-posframe-error` when no live panel is available.
+
+**See also.** `etaf-posframe-app-prefix`, `etaf-posframe-panel-keys`.
+
 ## Appearance and borders
 
 <!-- index: panel theme; panel token; panel border; border strength -->

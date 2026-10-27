@@ -288,7 +288,7 @@ Move the input focus to a panel the mouse pointer rests on, `nil` by default.
 
 A text terminal draws a child frame but gives it neither the keyboard nor the mouse: every key and click stays with the frame behind the panel. A terminal therefore reaches a panel through the app prefix map, which acts on the panel of the selected frame and otherwise on the most recent panel, while the keyboard sits in an ordinary buffer.
 
-After the prefix, the arrow keys move the panel one cell, `C-<left>` and `C-<right>` narrow or widen it one column, `C-<up>` and `C-<down>` shorten or heighten it one row, and `k` reads one more key and runs it in the panel. A moved panel keeps its place and a resized one keeps its width and row budget through later refreshes, because the new place becomes an absolute anchor and the new height becomes the `:fill-height` budget.
+After the prefix, the arrow keys move the panel one cell, `C-<left>` and `C-<right>` narrow or widen it one column, `C-<up>` and `C-<down>` shorten or heighten it one row, and `k` reads one more key and runs it in the panel. The arrow keys stay live after the first press, so the prefix is needed once per run and a held key repeats the move; any other key ends the run. A panel stops at its parent frame's edge rather than leaving the screen. A moved panel keeps its place and a resized one keeps its width and row budget through later refreshes, because the new place becomes an absolute anchor and the new height becomes the `:fill-height` budget.
 
 #### Function: etaf-posframe-move (direction &optional steps panel)
 

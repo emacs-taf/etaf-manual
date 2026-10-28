@@ -71,6 +71,29 @@ Return the catalog Theme tokens for application PALETTE.
                                  :border "#2B3A4E" :accent "#356BB2"))))
 ```
 
+### Deriving state colors
+
+An application that derives a hover fill, a selection tint or a surface step from its own palette needs one arithmetic on `#RRGGBB` values, not a second palette.
+
+#### Function: etaf-ui-color-mix (from to amount)
+
+Return FROM mixed AMOUNT of the way toward TO.
+
+**Arguments.** FROM and TO are `#RRGGBB` colors, and AMOUNT is a fraction between 0 and 1: 0 returns FROM, 1 returns TO.
+
+**Semantics.** The three channels are interpolated independently and rounded, so the result keeps the perceptual weight of a straight blend. A color written in any other spelling — a named color, a `#RGB` shortcut, `unspecified-bg` — is returned unchanged, which keeps a Theme that names a color usable instead of signaling.
+
+**Returns.** A `#RRGGBB` string, or FROM unchanged when either color is not in that form.
+
+**Errors.** None. A non-number AMOUNT signals `wrong-type-argument` from the arithmetic.
+
+```elisp
+;; A hover fill: the surface with 10% of the text color mixed in.
+(etaf-ui-color-mix "#FAFAFA" "#383A42" 0.10)  ; => "#E9E9E9"
+```
+
+A catalog component derives its own state steps this way rather than asking the caller for a hover color, so a dark Theme and a light Theme both get a fill that keeps the label readable. The catalog's own fallbacks are the reference: 8% for a hover fill, 12% for a resting selected chip, and 4% for a disabled one.
+
 ## Choosing between :view and :render
 
 Both authoring frontends of `etaf-define-component` are ordinary choices for a catalog component, and the component's entry describes behavior, not which one it uses. As [Component](components.md) defines, `:view` is the structural language compiled with the definition: each prop name it uses is a tracked read, so a component that only assembles Hosts and semantic content should use it, and a local update can repaint one binding without re-running the whole render. `:render` is ordinary Elisp evaluated in a retained effect; use it when the output depends on a computed value read in Lisp, when nodes must be built programmatically, or when the component must branch on ordinary data before choosing structure. Both receive the same props, slots and scope, and both can mix static rules with Host properties.

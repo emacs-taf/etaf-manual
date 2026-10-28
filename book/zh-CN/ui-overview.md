@@ -71,6 +71,29 @@ prop 就是普通 Component prop，[Component](components.md) 的调用规则原
                                  :border "#2B3A4E" :accent "#356BB2"))))
 ```
 
+### 派生状态色
+
+应用要从自己的调色板派生出悬停底色、选中底色或表面层级时，需要的是一套 `#RRGGBB` 上的算术，而不是第二份调色板。
+
+#### Function: etaf-ui-color-mix (from to amount)
+
+返回从 FROM 向 TO 混合 AMOUNT 之后的颜色。
+
+**参数。** FROM 与 TO 是 `#RRGGBB` 颜色，AMOUNT 是 0 到 1 之间的比例：0 得 FROM，1 得 TO。
+
+**语义。** 三个通道各自插值再取整，结果与直接混合的观感一致。其他写法的颜色（命名颜色、`#RGB` 简写、`unspecified-bg`）原样返回，这样用命名颜色的主题仍然可用，而不是报错。
+
+**返回。** 一个 `#RRGGBB` 字符串；两个颜色中有一个不是这种写法时返回 FROM 本身。
+
+**错误。** 无。AMOUNT 不是数字时由算术报 `wrong-type-argument`。
+
+```elisp
+;; 悬停底色：表面颜色里混入 10% 的正文颜色。
+(etaf-ui-color-mix "#FAFAFA" "#383A42" 0.10)  ; => "#E9E9E9"
+```
+
+目录组件用这个函数自己派生状态层级，而不向调用方索取一个悬停色，因此深色主题和浅色主题都得到一层标签仍然清楚可读的底色。目录自己的兜底值就是参照：悬停底色混 8%，未被选中的胶囊混 12%，禁用态混 4%。
+
 ## `:view` 与 `:render` 怎么选
 
 `etaf-define-component` 的两个作者前端对目录组件都是普通选择，条目的内容描述行为，不描述用了哪一个。正如 [Component](components.md) 所定义，`:view` 是与定义一同编译的结构语言：它用到的每个 prop 名都是一次被追踪的读取，因此只组装 Host 与语义内容的组件应当用它，局部更新可以只重绘一个绑定，不必重跑整个渲染。`:render` 是在保留 effect 里求值的普通 Elisp；当输出依赖在 Lisp 里读取的 computed 值、必须程序化构建节点、或必须先对普通数据分支再决定结构时使用它。两者收到同样的 props、slot 与 Scope，也都能把静态规则与 Host 属性混用。

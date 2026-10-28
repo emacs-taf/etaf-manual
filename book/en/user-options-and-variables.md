@@ -66,6 +66,7 @@ Every documented variable, grouped by the chapter that defines it. Each row link
 | [`etaf-video-audio-volume`](native-video.md#variable-etaf-video-audio-volume) | Default audio volume for new videos, from 0 to 100. |
 | [`etaf-video-density-ramp`](native-video.md#variable-etaf-video-density-ramp) | Characters used for one video pixel in the `ascii` render mode. |
 | [`etaf-video-display-fps`](native-video.md#variable-etaf-video-display-fps) | Display timer rate in frames per second for new video playback. |
+| [`etaf-video-render-backend`](native-video.md#variable-etaf-video-render-backend) | Rendering backend for video frames: `image`, `canvas` or `auto`. |
 | [`etaf-video-ffmpeg-program`](native-video.md#variable-etaf-video-ffmpeg-program) | Name or absolute path of the ffmpeg executable used to decode video. |
 | [`etaf-video-ffplay-program`](native-video.md#variable-etaf-video-ffplay-program) | Name or absolute path of the ffplay executable used for audio. |
 | [`etaf-video-ffprobe-program`](native-video.md#variable-etaf-video-ffprobe-program) | Name or absolute path of the ffprobe executable used for metadata. |

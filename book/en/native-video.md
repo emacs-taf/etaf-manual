@@ -268,6 +268,16 @@ Display timer rate in frames per second for new video playback.
 
 **See also.** `etaf-video`, `:on-frame`, `etaf-video-set-speed`.
 
+#### Variable: etaf-video-render-backend
+
+Rendering backend that puts a graphical video frame on screen.
+
+**Semantics.** The value defaults to `image`: every frame publishes one scaled JPEG through the retained Host content, and any Emacs that can display images works.  `canvas` reads BGRA frames into one Emacs canvas image and refreshes only its pixel buffer, so a frame costs no JPEG encode, no decode and no content publication; it needs the `canvas` image type (Emacs 32, or a patched 31) and a built `native/etaf-video-canvas` module.  `auto` takes `canvas` when both are present and `image` otherwise.  Missing capabilities never fail playback: a build without the image type, a module that cannot load, or a canvas outside a graphical frame silently keep the `image` path.  `ascii` and `color` modes ignore the setting.
+
+**Performance.** The canvas buffer stays at logical resolution: the macOS NS backend re-uploads every pixel on refresh, so a device-resolution buffer would quadruple the per-frame cost for no visible gain in a text host.
+
+**See also.** `etaf-video`, `etaf-video-display-fps`.
+
 ## External programs
 
 <!-- index: etaf-video-ffmpeg-program; etaf-video-ffplay-program; etaf-video-ffprobe-program; optional dependency -->

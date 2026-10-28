@@ -66,6 +66,7 @@
 | [`etaf-video-audio-volume`](native-video.md#variable-etaf-video-audio-volume) | 新视频的默认音量，0 到 100。 |
 | [`etaf-video-density-ramp`](native-video.md#variable-etaf-video-density-ramp) | `ascii` 渲染模式下每个视频像素所用的字符。 |
 | [`etaf-video-display-fps`](native-video.md#variable-etaf-video-display-fps) | 新视频播放的显示定时器频率，单位是每秒帧数。 |
+| [`etaf-video-render-backend`](native-video.md#variable-etaf-video-render-backend) | 视频帧的渲染后端：`image`、`canvas` 或 `auto`。 |
 | [`etaf-video-ffmpeg-program`](native-video.md#variable-etaf-video-ffmpeg-program) | 用于解码视频的 ffmpeg 可执行文件的名字或绝对路径。 |
 | [`etaf-video-ffplay-program`](native-video.md#variable-etaf-video-ffplay-program) | 用于音频的 ffplay 可执行文件的名字或绝对路径。 |
 | [`etaf-video-ffprobe-program`](native-video.md#variable-etaf-video-ffprobe-program) | 用于元数据的 ffprobe 可执行文件的名字或绝对路径。 |

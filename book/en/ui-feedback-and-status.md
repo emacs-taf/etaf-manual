@@ -78,6 +78,34 @@ Render a keyboard shortcut as accessible keycaps from a nonempty string list.
 
 **Example.** `(etaf-kbd :keys '("C-c" "C-k"))`
 
+#### Component: etaf-keycap (&key text level label active disabled on-press aria-label help-echo)
+
+Render one key as a keycap; action keys and region keys are two sizes.
+
+**Arguments.** TEXT is the nonempty string drawn in the cap. LEVEL is `action` (default) or `region`. LABEL is optional caption text drawn one column to the right of the cap. ACTIVE matters for region keys only: non-nil fills the square with `:ui-accent` and draws the letter in `:ui-bg`. DISABLED keeps the slot and the outline and drops only the ink to `:ui-disabled-fg`. ON-PRESS is an optional zero-argument callback; supplying it makes the cap a focusable button. ARIA-LABEL and HELP-ECHO pass through to the Host.
+
+**Semantics.** An action key is one row high with a one-pixel hairline border and no fill, its letter at 10px. A region key is a 20px right-angled square with a bold centred letter. The two sizes, not the colour, separate "do something" from "go somewhere". A cap is an inline control and never grows the line: it is shorter than the standard row and centres inside it, and it takes no part in flex shrinking, so a cap at the right end of a row is never squeezed by the spacer before it. Enabled and disabled change only ink; position and width stay put.
+
+**Returns.** A View.
+
+**Errors.** `error→ etaf-component-call-error` when TEXT is not a nonempty string, LEVEL is neither keyword, LABEL is not a string, or ON-PRESS is not a function.
+
+**Example.** `(etaf-keycap :text "x" :label "Complete" :on-press #'agenda-toggle)`, `(etaf-keycap :text "B" :level 'region :active t)`
+
+#### Component: etaf-check-mark (&key state color glyph aria-label)
+
+Draw one task's check state as a box.
+
+**Arguments.** STATE is `empty`, `done`, `dropped` or `skipped`, default `empty`. COLOR overrides the ink of the box and its stroke; otherwise it inherits the surrounding foreground. GLYPH optionally overrides the two-cell terminal spelling of that state. ARIA-LABEL defaults to the state's own word.
+
+**Semantics.** On graphical frames the four states are one right-angled box with a path: empty, check, cross, dash. Box and stroke keep identical metrics across the states, so a column of marks never shifts when a state changes. The box is a path rather than a character, so it stays crisp at any scale and does not depend on the font carrying the glyph. Without SVG the mark falls back to two cells of text (待 / 完 / 弃 / 跳), which keeps the meaning readable.
+
+**Returns.** A View.
+
+**Errors.** `error→ etaf-component-call-error` when STATE is outside the four keywords or GLYPH is not a nonempty string.
+
+**Example.** `(etaf-check-mark :state 'done)`, `(etaf-check-mark :state 'empty :glyph "todo" :color "#e06c75")`
+
 ## Progress
 
 <!-- index: etaf-progress; determinate progress; track token; reactive value -->

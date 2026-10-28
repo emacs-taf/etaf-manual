@@ -78,6 +78,34 @@ variant 命名的是语义角色而不是颜色。状态 variant `success`、`wa
 
 **示例。** `(etaf-kbd :keys '("C-c" "C-k"))`
 
+#### Component: etaf-keycap (&key text level label active disabled on-press aria-label help-echo)
+
+把一枚键渲染成键帽；动作键与区域键是两种尺寸。
+
+**参数。** TEXT 是非空字符串，键帽上写的那一个字或几个字。LEVEL 是 `action`（默认）或 `region`。LABEL 是可选的说明文字，画在键帽右边一列处。ACTIVE 只对区域键有意义，非 nil 时整格填 `:ui-accent`、字母用 `:ui-bg`。DISABLED 保留位置与轮廓，只把墨色降到 `:ui-disabled-fg`。ON-PRESS 是可选的零参数回调，给出后键帽成为可聚焦按钮。ARIA-LABEL 与 HELP-ECHO 透传给 Host。
+
+**语义。** 动作键一行高、单像素细框、不填充，字母 10px；区域键是 20px 见方的方块、直角、字母加粗居中。两级尺寸本身就是「做事」与「去哪儿」的区别，不看颜色也能分开。键帽是行内控件，不抢行高：它比标准行矮，在行里垂直居中；整枚键帽 `flex-shrink 0`，所以同一行右侧的键帽不会被弹性空间挤扁。可用与禁用只改墨色，位置与宽度不变。
+
+**返回。** 一个 View。
+
+**错误。** TEXT 非非空字符串、LEVEL 不是两个关键字之一、LABEL 不是字符串、ON-PRESS 不是函数时报 `error→ etaf-component-call-error`。
+
+**示例。** `(etaf-keycap :text "x" :label "完成" :on-press #'agenda-toggle)`、`(etaf-keycap :text "B" :level 'region :active t)`
+
+#### Component: etaf-check-mark (&key state color glyph aria-label)
+
+把一条任务的勾选状态画成方框。
+
+**参数。** STATE 是 `empty`、`done`、`dropped`、`skipped` 之一，默认 `empty`。COLOR 覆盖方框与笔画的墨色，其余时候随上下文前景。GLYPH 是可选的两个字符的终端写法，覆盖该状态默认的汉字。ARIA-LABEL 缺省用该状态的汉字。
+
+**语义。** 图形 frame 上四种状态画成同一尺寸的直角方框加路径：空框、勾、叉、一横；四种状态的方框与笔画尺寸完全一致，所以一列勾选框不会因为状态不同而错位。方框是路径而不是字符，任何缩放下都清晰，也不依赖字体是否含该字形。没有 SVG 的终端退成两个字符宽的汉字（待 / 完 / 弃 / 跳），语义照样可读。
+
+**返回。** 一个 View。
+
+**错误。** STATE 不在四个关键字里、GLYPH 不是非空字符串时报 `error→ etaf-component-call-error`。
+
+**示例。** `(etaf-check-mark :state 'done)`、`(etaf-check-mark :state 'empty :glyph "未办" :color "#e06c75")`
+
 ## 进度
 
 <!-- index: etaf-progress; determinate progress; track token; reactive value -->

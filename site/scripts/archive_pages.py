@@ -44,7 +44,7 @@ GROUPS = (
                       "etaf-screensaver", "etaf-desktop", "etaf-miniflux", "etaf-ncm",
                       "etaf-weread", "etaf-bili", "etaf-youtube", "etaf-pi", "etaf-telega",
                       "etaf-ascii-video", "etaf-video-player", "etaf-video-studio",
-                      "etaf-manual", "etaf-pomodoro"}),
+                      "etaf-manual", "etaf-pomodoro", "maillist"}),
     ("Games", {"etaf-gamekit", "etaf-solitaire", "etaf-xiangqi", "etaf-tanks", "etaf-salvage"}),
 )
 

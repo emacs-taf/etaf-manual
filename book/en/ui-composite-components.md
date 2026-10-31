@@ -117,7 +117,7 @@ Parse Markdown TEXT into a document plist.
 
 **Semantics.** Parsing covers CommonMark block and inline structure plus the GitHub extensions: pipe tables, task list items, strikethrough, bare autolinks, footnotes and alert blocks; YAML front matter is stripped into document metadata.  A block is a plist whose `:type` is `heading`, `paragraph`, `code-block`, `blockquote`, `list`, `table`, `thematic-break`, `html-block` or `footnote-def`; an inline's `:type` is `text`, `code`, `emph`, `strong`, `strike`, `link`, `image`, `autolink`, `footnote-ref`, `html` or `break`.  The tree carries no presentation facts: the render functions own every style and ETAF node choice.  Headings get stable unique anchors, and link reference definitions and footnote definitions are collected while blocks are read and resolved into inline nodes.  Parsing is pure Elisp and reads no buffer, file or network.
 
-**Returns.** A document plist: `:meta` (front matter alist), `:title`, `:children` (top-level blocks with heading anchors), `:outline` (document-order `(LEVEL TEXT ID)`), `:footnotes` (with `:label`, `:number` and `:children`) and `:features` (the resolved extension plist).
+**Returns.** A document plist: `:meta` (front matter alist), `:title`, `:children` (top-level blocks with heading anchors; each top-level block also carries `:begin` and `:end`, its half-open character range in TEXT, so a caller maps an edit back to the block that holds it), `:outline` (document-order `(LEVEL TEXT ID)`), `:footnotes` (with `:label`, `:number` and `:children`) and `:features` (the resolved extension plist).
 
 **Errors.** An unknown dialect name signals `error→ etaf-ui-markdown-error`.
 

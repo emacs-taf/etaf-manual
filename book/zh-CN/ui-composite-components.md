@@ -117,7 +117,7 @@ Markdown 正文渲染把 Markdown 文本转换成普通 ETAF View，供 Markdown
 
 **语义。** 解析覆盖 CommonMark 的块与内联结构以及 GitHub 扩展：管道表格、任务列表项、删除线、裸自动链接、脚注与告警块；YAML front matter 被剥离为文档元数据。块是 plist，`:type` 为 `heading`、`paragraph`、`code-block`、`blockquote`、`list`、`table`、`thematic-break`、`html-block` 或 `footnote-def`；内联的 `:type` 为 `text`、`code`、`emph`、`strong`、`strike`、`link`、`image`、`autolink`、`footnote-ref`、`html` 或 `break`。块树不携带呈现事实：样式与 ETAF 节点的选择属于渲染函数。标题获得稳定且唯一的锚点；链接引用定义与脚注定义在块读取时收集，再解析进内联节点。解析是纯 Elisp，不读缓冲区、文件或网络。
 
-**返回。** 文档 plist：`:meta`（front matter alist）、`:title`、`:children`（带标题锚点的顶层块）、`:outline`（按文档顺序的 `(LEVEL TEXT ID)`）、`:footnotes`（含 `:label`、`:number` 与 `:children`）与 `:features`（解析出的扩展 plist）。
+**返回。** 文档 plist：`:meta`（front matter alist）、`:title`、`:children`（带标题锚点的顶层块；每个顶层块另带 `:begin` 与 `:end`，即它在 TEXT 中的半开字符区间，供调用方把一次编辑映射回它所在的块）、`:outline`（按文档顺序的 `(LEVEL TEXT ID)`）、`:footnotes`（含 `:label`、`:number` 与 `:children`）与 `:features`（解析出的扩展 plist）。
 
 **错误。** 未知方言名报 `error→ etaf-ui-markdown-error`。
 

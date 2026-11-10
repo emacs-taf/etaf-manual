@@ -40,7 +40,7 @@ REPOSITORIES = {"etaf-install": "emacs-taf/emacs-taf"}
 GROUPS = (
     ("Framework", {"etaf-install", "etaf-ui", "etaf", "ebox", "ecss", "ekp", "etaf-db",
                    "etaf-posframe"}),
-    ("Applications", {"etaf-md-preview", "etaf-rss", "etaf-reader", "etaf-algo-lab",
+    ("Applications", {"etaf-md-preview", "etaf-org-preview", "etaf-rss", "etaf-reader", "etaf-algo-lab",
                       "etaf-screensaver", "etaf-desktop", "etaf-miniflux", "etaf-ncm",
                       "etaf-weread", "etaf-bili", "etaf-youtube", "etaf-pi", "etaf-telega",
                       "etaf-ascii-video", "etaf-video-player", "etaf-video-studio",

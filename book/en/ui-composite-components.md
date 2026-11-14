@@ -149,7 +149,7 @@ Default markdown dialect of `etaf-ui-markdown-parse`.
 
 Named dialects and the extension flags they enable.
 
-**Semantics.** `commonmark` is the CommonMark core; `gfm` adds the GitHub extensions the renderer also treats as its default: tables, task lists, strikethrough, bare autolinks, footnotes and alert blocks, plus front matter, which is a document convention rather than a markdown extension.
+**Semantics.** `commonmark` is the CommonMark core; `gfm` adds the GitHub extensions the renderer also treats as its default: tables, task lists, strikethrough, bare autolinks, footnotes and alert blocks, plus front matter, which is a document convention rather than a markdown extension.  `etaf` reads definition lists, sub- and superscript, abbreviations, `$` math, emoji shortcodes, `==highlighted==` runs, `::icon::`, `:kbd[keys]` and `:badge[text]` on top of `gfm`.
 
 **See also.** `etaf-ui-markdown-parse`.
 

@@ -149,7 +149,7 @@ Markdown 正文渲染把 Markdown 文本转换成普通 ETAF View，供 Markdown
 
 具名方言与它们启用的扩展标志。
 
-**语义。** `commonmark` 是 CommonMark 核心；`gfm` 加上渲染器也视为默认的 GitHub 扩展：表格、任务列表、删除线、裸自动链接、脚注与告警块，外加 front matter（它是文档约定而非 Markdown 扩展）。
+**语义。** `commonmark` 是 CommonMark 核心；`gfm` 加上渲染器也视为默认的 GitHub 扩展：表格、任务列表、删除线、裸自动链接、脚注与告警块，外加 front matter（它是文档约定而非 Markdown 扩展）。`etaf` 在 `gfm` 之上再读定义列表、上下标、缩写、`$` 公式、表情短代码、`==高亮==`、`::图标::`、`:kbd[按键]` 与 `:badge[文字]`。
 
 **参见。** `etaf-ui-markdown-parse`。
 

@@ -55,11 +55,11 @@ Names the font family used to measure and paint the node's text.
 
 | Value | Initial | Applies to | Inherited | Impact |
 | --- | --- | --- | --- | --- |
-| A positive number | `nil` | Every node | Yes | Paint and geometry |
+| A multiple of the body size | `nil` | Every node | Yes | Paint and geometry |
 
-Sets the font size in CSS reference pixels.
+Sets the font size as a multiple of the body size.
 
-**Semantics.** The value is a bare positive number, not a `(UNIT NUMBER)` length; zero and lengths are rejected. The size drives glyph metrics, line measurement and the face height, so it affects geometry and paint. The value is inherited.
+**Semantics.** The value is a bare positive number from 0.3 through 4, not a `(UNIT NUMBER)` length; zero, lengths and anything outside that range are rejected, as a pixel size left over from the older absolute API would multiply the whole interface. 1 is the body size, 1.42 a heading and 0.85 a caption, so every size follows the reader's own default font instead of assuming a body size in pixels. The size drives glyph metrics, line measurement and the face height, so it affects geometry and paint. The value is inherited.
 
 #### Style: :font-weight
 

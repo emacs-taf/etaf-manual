@@ -62,7 +62,7 @@
 
 渲染受控标题栏，带最小化、Zoom 与关闭动作按钮。
 
-**参数。** TITLE 是居中标题。MODE、SHOW-*、各动作回调、ACTIVE、DRAG-LOCK-MODIFIER（默认 `shift`）与 GROUP 与 `etaf-window-controls` 相同。ON-MOVE 接收标题栏的手势。TITLE-FONT-SIZE 与 FONT-FAMILY 默认 nil 表示继承；显式尺寸是正的 CSS 参考像素数。`actions` 与 default slot 在内建灯右侧追加自定义控件。
+**参数。** TITLE 是居中标题。MODE、SHOW-*、各动作回调、ACTIVE、DRAG-LOCK-MODIFIER（默认 `shift`）与 GROUP 与 `etaf-window-controls` 相同。ON-MOVE 接收标题栏的手势。TITLE-FONT-SIZE 与 FONT-FAMILY 默认 nil 表示继承；显式尺寸是正文大小的倍数，取 0.3 到 4。`actions` 与 default slot 在内建灯右侧追加自定义控件。
 
 **语义。** 标题栏是一行保留行：前导间隔、交通灯、等宽固定列的标题表面（无需定位子节点即保持居中）、固定宽的 actions 列。响应式 MODE 改变标题栏的模式类与 Zoom 目标而不重渲染标题栏，标题的色调随 ACTIVE 作为保留绘制更新。整条标题栏把拖拽手势交给 ON-MOVE，因此按压并拖动它会经调用方的处理器移动窗口。
 

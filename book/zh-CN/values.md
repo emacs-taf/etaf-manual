@@ -38,7 +38,7 @@
 
 <!-- index: 字体族; 字号; 字重; 字体样式 -->
 
-四个属性承载字体，它们的值语法比 CSS 窄。`:font-family` 是非空字符串或符号，例如 `"DejaVu Sans Mono"` 或 `mono`。`:font-size` 是正数，解释为 CSS 参考像素，不是长度列表；Ebox 绘制时把它换算成 face 高度。`:font-weight` 是 `normal`、`bold`、`bolder`、`lighter` 或一百到九百的 `100`…`900`。`:font-style` 是 `normal`、`italic` 或 `oblique`。前三者默认可继承，因此没有自己声明的子 Host 跟随父级的字体。
+四个属性承载字体，它们的值语法比 CSS 窄。`:font-family` 是非空字符串或符号，例如 `"DejaVu Sans Mono"` 或 `mono`。`:font-size` 是正数，读作正文大小的倍数，范围 0.3 到 4，不是长度列表；Ebox 绘制时把它乘成 face 高度。`:font-weight` 是 `normal`、`bold`、`bolder`、`lighter` 或一百到九百的 `100`…`900`。`:font-style` 是 `normal`、`italic` 或 `oblique`。前三者默认可继承，因此没有自己声明的子 Host 跟随父级的字体。
 
 ## 简写与别名
 

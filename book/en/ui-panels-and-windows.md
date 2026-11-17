@@ -62,7 +62,7 @@ Render reusable macOS-style traffic-light controls.
 
 Render a controlled title bar with minimize, zoom and close action buttons.
 
-**Arguments.** TITLE is the centered title. MODE, SHOW-*, the action callbacks, ACTIVE, DRAG-LOCK-MODIFIER (default `shift`) and GROUP match `etaf-window-controls`. ON-MOVE receives the title bar's gestures. TITLE-FONT-SIZE and FONT-FAMILY default to nil to inherit; an explicit size is a positive CSS reference pixel number. The `actions` and default slots append custom controls after the built-in lights on the right.
+**Arguments.** TITLE is the centered title. MODE, SHOW-*, the action callbacks, ACTIVE, DRAG-LOCK-MODIFIER (default `shift`) and GROUP match `etaf-window-controls`. ON-MOVE receives the title bar's gestures. TITLE-FONT-SIZE and FONT-FAMILY default to nil to inherit; an explicit size is a multiple of the body size, from 0.3 through 4. The `actions` and default slots append custom controls after the built-in lights on the right.
 
 **Semantics.** The bar is one retained row: a leading spacer, the traffic lights, an equal-fixed-column title surface that stays centered without a positioned child, and a fixed-width actions column. A reactive MODE changes the chrome's mode class and the Zoom target without re-rendering the bar, and the title's tone follows ACTIVE as a retained paint update. The whole bar hands its drag gestures to ON-MOVE, so pressing and dragging it moves the window through the caller's handler.
 

@@ -38,7 +38,7 @@ A color value is a string or the symbol `currentColor`. Ebox does not parse colo
 
 <!-- index: font family; font size; font weight; font style -->
 
-Four properties carry the font, and their value grammars are narrower than CSS. `:font-family` is a non-empty string or a symbol, such as `"DejaVu Sans Mono"` or `mono`. `:font-size` is a positive number interpreted as CSS reference pixels, not a length tuple; Ebox converts it to the face height when it paints. `:font-weight` is one of `normal`, `bold`, `bolder`, `lighter` or the hundreds `100` through `900`. `:font-style` is `normal`, `italic` or `oblique`. The first three of these are inherited by default, so a child Host without its own declaration follows its parent's font.
+Four properties carry the font, and their value grammars are narrower than CSS. `:font-family` is a non-empty string or a symbol, such as `"DejaVu Sans Mono"` or `mono`. `:font-size` is a positive number read as a multiple of the body size, from 0.3 through 4, not a length tuple; Ebox multiplies it into the face height when it paints. `:font-weight` is one of `normal`, `bold`, `bolder`, `lighter` or the hundreds `100` through `900`. `:font-style` is `normal`, `italic` or `oblique`. The first three of these are inherited by default, so a child Host without its own declaration follows its parent's font.
 
 ## Shorthands and aliases
 

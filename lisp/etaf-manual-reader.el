@@ -88,11 +88,10 @@ repaints the reader without a remount."
   ;; only positive measurements are trusted; the renderer then keeps its
   ;; wide layout and a default page height.
   (let* ((viewport (etaf-viewport))
+         ;; The framework reports the canvas's own columns, so the reader fits
+         ;; its panels with the cell the page is drawn in.
          (columns (and viewport (numberp (car viewport)) (> (car viewport) 0)
-                       (max 20 (/ (car viewport)
-                                  (max 1 (or (plist-get (ignore-errors (etaf-display-metrics))
-                                                        :char-width)
-                                             (frame-char-width)))))))
+                       (max 20 (or (ignore-errors (etaf-canvas-columns)) 20))))
          (rows (and viewport (numberp (cdr viewport)) (> (cdr viewport) 0)
                     (cdr viewport))))
     (etaf-manual-reader--shell reader (etaf-manual-reader--env reader columns rows)

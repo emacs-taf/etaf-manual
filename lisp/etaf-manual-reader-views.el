@@ -501,11 +501,14 @@ DIRECTION is `previous' or `next'; the card opens the neighbour chapter."
 
 ;;;; Article column
 
-(defun etaf-manual-reader--article-column (session env)
-  "Return the scrolling article column View of SESSION in ENV."
+(defun etaf-manual-reader--article-column (session env &optional columns)
+  "Return the scrolling article column View of SESSION in ENV.
+COLUMNS states the column's width in canvas cells when the caller knows how
+much the side panels leave; the article then centres inside that box, so the
+remainder is split between both sides instead of collecting on the right."
   (etaf-node 'column
              (list :ref etaf-manual-reader--article-ref
-                   :width 'stretch
+                   :width (if columns (list 'ch columns) 'stretch)
                    :height 'stretch
                    :flex-grow 1
                    :flex-basis '(px 0)
@@ -563,7 +566,19 @@ latest message on the left, the most useful keys on the right."
 KEYS is the page Host's `:keys' table, so `?' lists the reader's keys."
   (let* ((wide (etaf-manual-reader--wide-p env))
          (toc (and (not wide) (etaf-manual-reader--read session :toc)))
-         (article (etaf-manual-reader--article-column session env))
+         ;; The side panels and the two draggable dividers are whole cells, so
+         ;; the wide layout spends the rest on the article and centres the
+         ;; measure inside it; leaving the remainder to one side would grow
+         ;; with the window.
+         (columns (etaf-manual-reader--viewport-columns env))
+         (outline (and (etaf-manual-reader--outline-p env)
+                       (etaf-manual-reader--outline-width env)))
+         (sidebar (and wide (etaf-manual-reader--sidebar-width env)))
+         (free (and columns
+                    (max etaf-manual-reader--measure-min
+                         (- columns (or sidebar 0) (or outline 0)
+                            (if sidebar 1 0) (if outline 1 0)))))
+         (article (etaf-manual-reader--article-column session env free))
          (body (if toc
                    (etaf-node 'column
                               (list :width 'stretch :height 'stretch

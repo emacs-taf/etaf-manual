@@ -336,16 +336,24 @@ sections too, so page navigation stays reachable on a narrow frame."
 
 ;;;; On-this-page column
 
+(defun etaf-manual-reader--char-width ()
+  "Return the character width the reader's canvas draws.
+`ch' resolves against the canvas's own face, so a divider's pixels and the
+column count it reports come from one cell."
+  (max 1 (or (plist-get (ignore-errors (etaf-display-metrics)) :char-width)
+             (frame-char-width))))
+
 (defun etaf-manual-reader--column-pixels (columns)
-  "Return COLUMNS character cells as pixels on the reader's frame."
-  (* (max 1 (frame-char-width)) columns))
+  "Return COLUMNS character cells as pixels on the reader's canvas."
+  (* (etaf-manual-reader--char-width) columns))
 
 (defun etaf-manual-reader--resizer (session env kind)
   "Return the draggable divider resizing KIND in ENV.
 KIND is `sidebar' for the navigation column or `outline' for the
 on-this-page column; the divider reports candidate widths in pixels and
 SESSION clamps the column it accepts."
-  (let ((sidebar (eq kind 'sidebar)))
+  (let ((sidebar (eq kind 'sidebar))
+        (cell (etaf-manual-reader--char-width)))
     (etaf-node 'etaf-pane-resizer
                (list :ref (if sidebar 'etaf-manual-sidebar-resizer
                             'etaf-manual-outline-resizer)
@@ -358,9 +366,9 @@ SESSION clamps the column it accepts."
                      :on-change (lambda (pixels)
                                   (if sidebar
                                       (etaf-manual-reader-set-sidebar-width
-                                       session (/ pixels (max 1 (frame-char-width))))
+                                       session (/ pixels cell))
                                     (etaf-manual-reader-set-outline-width
-                                     session (/ pixels (max 1 (frame-char-width)))))))
+                                     session (/ pixels cell)))))
                nil)))
 
 (defun etaf-manual-reader--outline-row (session env node)

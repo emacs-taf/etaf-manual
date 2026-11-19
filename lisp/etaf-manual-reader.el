@@ -89,7 +89,10 @@ repaints the reader without a remount."
   ;; wide layout and a default page height.
   (let* ((viewport (etaf-viewport))
          (columns (and viewport (numberp (car viewport)) (> (car viewport) 0)
-                       (max 20 (/ (car viewport) (max 1 (frame-char-width))))))
+                       (max 20 (/ (car viewport)
+                                  (max 1 (or (plist-get (ignore-errors (etaf-display-metrics))
+                                                        :char-width)
+                                             (frame-char-width)))))))
          (rows (and viewport (numberp (cdr viewport)) (> (cdr viewport) 0)
                     (cdr viewport))))
     (etaf-manual-reader--shell reader (etaf-manual-reader--env reader columns rows)
